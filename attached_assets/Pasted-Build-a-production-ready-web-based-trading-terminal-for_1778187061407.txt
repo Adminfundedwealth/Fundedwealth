@@ -1,0 +1,385 @@
+Build a production-ready web-based trading terminal for FundedWealth India inside my existing Next.js + Tailwind + shadcn/ui prop firm dashboard.
+
+GOAL:
+Create a modern simulated prop trading terminal similar to:
+https://www.futurefunding.in/trading-terminal
+
+IMPORTANT:
+This is NOT a real broker/exchange.
+This is a simulated prop trading environment using real-time market prices.
+
+The terminal must feel:
+- premium
+- institutional
+- futuristic
+- smooth
+- AI-ready
+- fast
+- mobile responsive
+
+====================================================
+BRAND
+====================================================
+
+Platform Name:
+FundedWealth India
+
+Theme:
+Dark premium fintech UI
+
+Style inspiration:
+- TradingView
+- Linear
+- Stripe
+- modern hedge fund dashboard
+
+Colors:
+- Matte black backgrounds
+- Soft purple/blue glow
+- Glassmorphism cards
+- Neon blue highlights
+- Clean typography
+- Minimal but advanced
+
+Avoid:
+- gaming UI
+- excessive glow
+- cluttered design
+- cheap gradients
+
+====================================================
+ROUTES
+====================================================
+
+Create these routes:
+
+/trade
+/trade/[accountId]
+
+Example:
+trade/FW-IND-102938
+
+====================================================
+TERMINAL LAYOUT
+====================================================
+
+Desktop Layout:
+
+------------------------------------------------
+Top Navbar
+------------------------------------------------
+Left Sidebar | Main Chart Area | Right Order Panel
+------------------------------------------------
+Bottom Positions / Orders / History Tabs
+------------------------------------------------
+
+====================================================
+TOP NAVBAR
+====================================================
+
+Topbar should contain:
+
+- FundedWealth logo
+- Current account balance
+- Equity
+- Daily drawdown
+- Max drawdown
+- Profit target progress
+- Live market status indicator
+- User profile dropdown
+- Notifications icon
+- Theme toggle
+
+Add subtle live glowing indicators.
+
+====================================================
+LEFT SIDEBAR
+====================================================
+
+Sidebar menu:
+
+- Dashboard
+- Trade Terminal
+- Accounts
+- Analytics
+- Payouts
+- Leaderboard
+- AI Journal
+- Settings
+
+Include compact watchlist section:
+
+WATCHLIST:
+- NIFTY
+- BANKNIFTY
+- FINNIFTY
+- CRUDEOIL
+- SENSEX
+
+Each shows:
+- live price
+- percentage change
+- green/red movement
+
+====================================================
+MAIN CHART AREA
+====================================================
+
+Integrate TradingView Advanced Charting Library.
+
+NOT basic iframe widget.
+
+Requirements:
+- candlestick charts
+- timeframe selector
+- indicators
+- drawing tools
+- fullscreen
+- responsive resizing
+- dark theme
+- symbol switching
+
+Default symbol:
+NIFTY
+
+Add top chart controls:
+- 1m
+- 5m
+- 15m
+- 1h
+- 1D
+
+Create premium professional layout.
+
+====================================================
+RIGHT ORDER PANEL
+====================================================
+
+Modern glassmorphism order panel.
+
+Fields:
+- Symbol
+- Quantity
+- Order type
+- Buy button
+- Sell button
+- Stop loss
+- Take profit
+- Margin required
+- Risk amount
+
+Buttons:
+BUY = green
+SELL = red
+
+Add:
+- smooth hover animations
+- loading states
+- order confirmation toast
+
+====================================================
+SIMULATED TRADING ENGINE
+====================================================
+
+Build a simulated paper trading backend.
+
+When BUY/SELL clicked:
+
+1. Validate account rules
+2. Create trade
+3. Store in database
+4. Update balance
+5. Update equity
+6. Update pnl
+7. Update analytics
+
+NO real exchange execution.
+
+====================================================
+DATABASE STRUCTURE
+====================================================
+
+Create tables/models:
+
+ACCOUNTS:
+- id
+- userId
+- accountSize
+- balance
+- equity
+- drawdown
+- dailyLoss
+- profitTarget
+- status
+- phase
+
+TRADES:
+- id
+- accountId
+- symbol
+- side
+- quantity
+- entryPrice
+- exitPrice
+- pnl
+- status
+- createdAt
+
+ORDERS:
+- id
+- tradeId
+- type
+- price
+- status
+
+====================================================
+RULE ENGINE
+====================================================
+
+Implement prop firm rule engine:
+
+- max daily drawdown
+- max total drawdown
+- profit target
+- max lot size
+- trading hours validation
+
+If violated:
+- show red warning
+- disable trading
+- mark account breached
+
+====================================================
+BOTTOM TERMINAL TABS
+====================================================
+
+Tabs:
+- Open Positions
+- Pending Orders
+- Trade History
+- Analytics
+
+====================================================
+OPEN POSITIONS TABLE
+====================================================
+
+Columns:
+- Symbol
+- Side
+- Qty
+- Entry
+- Current Price
+- PnL
+- Status
+- Close button
+
+PnL updates live.
+
+====================================================
+ANALYTICS PANEL
+====================================================
+
+Show:
+- Win rate
+- Risk-reward ratio
+- Daily pnl graph
+- Long vs short ratio
+- Best trade
+- Worst trade
+- Consistency score
+
+Add animated charts.
+
+====================================================
+REALTIME SYSTEM
+====================================================
+
+Use WebSockets for:
+- live prices
+- live pnl
+- live updates
+
+====================================================
+AI SECTION (IMPORTANT)
+====================================================
+
+Create placeholder AI assistant card:
+
+“AI Trade Assistant”
+
+Features:
+- Detect revenge trading
+- Risk warnings
+- Discipline scoring
+- Trading psychology insights
+
+Add futuristic AI panel UI.
+
+====================================================
+DESIGN REQUIREMENTS
+====================================================
+
+- fully responsive
+- smooth animations
+- framer-motion transitions
+- loading skeletons
+- premium spacing
+- modern typography
+- soft shadows
+- blur/glass effects
+- professional fintech appearance
+
+====================================================
+TECH STACK
+====================================================
+
+Use:
+- Next.js App Router
+- TypeScript
+- TailwindCSS
+- shadcn/ui
+- Framer Motion
+- TradingView Charting Library
+- Zustand or Context API
+- Socket.io
+- Supabase or PostgreSQL
+
+====================================================
+EXTRA FEATURES
+====================================================
+
+Add:
+- keyboard shortcuts
+- compact mode
+- fullscreen chart mode
+- reconnect handling
+- loading states
+- empty states
+- responsive mobile layout
+
+====================================================
+MOBILE VERSION
+====================================================
+
+Mobile terminal should:
+- stack sections vertically
+- collapsible order panel
+- swipeable tabs
+- optimized chart area
+
+====================================================
+FINAL GOAL
+====================================================
+
+The final product should feel like:
+- modern prop trading terminal
+- institutional dashboard
+- AI-powered trading workspace
+
+NOT like:
+- cheap broker clone
+- simple TradingView embed
+- template UI
+
+The experience should feel:
+premium, advanced, scalable, and startup-grade.

@@ -1,0 +1,23 @@
+import fs from 'fs';
+import path from 'path';
+
+export function generateRobotsTxt(hostname: string) {
+  return `User-agent: *\nDisallow:\nSitemap: ${hostname.replace(/\/$/, '')}/sitemap.xml\n`;
+}
+
+export function generateSitemapXml(entries: { loc: string; lastmod?: string; changefreq?: string; priority?: number }[]) {
+  const urls = entries.map(e => `  <url>\n    <loc>${e.loc}</loc>\n    ${e.lastmod ? `<lastmod>${e.lastmod}</lastmod>` : ''}\n    ${e.changefreq ? `<changefreq>${e.changefreq}</changefreq>` : ''}\n    ${e.priority ? `<priority>${e.priority}</priority>` : ''}\n  </url>`).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`;
+}
+
+export function jsonLdForPage(params: { title: string; description: string; url: string; image?: string; type?: string }) {
+  const graph: any = {
+    '@context': 'https://schema.org',
+    '@type': params.type || 'WebPage',
+    'headline': params.title,
+    'description': params.description,
+    'url': params.url,
+  };
+  if (params.image) graph.image = params.image;
+  return JSON.stringify(graph, null, 2);
+}

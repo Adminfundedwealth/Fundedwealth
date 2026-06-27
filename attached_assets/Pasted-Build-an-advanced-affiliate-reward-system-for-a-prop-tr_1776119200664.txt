@@ -1,0 +1,182 @@
+Build an advanced affiliate reward system for a prop trading platform (FundedWealth) with FREE ACCOUNT rewards and GIVEAWAY system.
+
+GOAL:
+Maximize affiliate-driven growth using low-cost rewards (evaluation accounts) while preventing abuse and maintaining profitability.
+
+---
+
+🎯 CORE RULES
+
+1. ONLY paid purchases count as referrals
+2. No rewards for signup/login
+3. Rewards unlock only after verification period
+4. Free accounts are evaluation accounts (NOT funded accounts)
+5. Prevent abuse, fraud, and reselling
+
+---
+
+💰 AFFILIATE COMMISSION SYSTEM
+
+* Tier-based commission:
+
+Starter:
+
+* 1–20 sales → 30%
+
+Pro:
+
+* 21–100 sales → 35%
+
+Elite:
+
+* 101–300 sales → 40%
+
+Apex:
+
+* 300+ sales → 50%
+
+---
+
+🎁 FREE ACCOUNT REWARD SYSTEM
+
+Implement milestone-based rewards:
+
+* 10 valid sales → Free ₹1L 1-Step Evaluation Account
+* 25 valid sales → Free ₹2L 1-Step Evaluation Account
+* 50 valid sales → Free ₹5L 1-Step Evaluation Account
+* 100 valid sales → Free ₹5L 2-Step Evaluation Account
+
+Rules:
+
+* Only successful paid users count
+* No refunds/chargebacks allowed
+* Reward unlock after 5–7 days
+* Each reward can be claimed once per milestone
+* Accounts are non-transferable
+
+---
+
+🔥 GIVEAWAY SYSTEM (VIRAL GROWTH ENGINE)
+
+Enable affiliates to run giveaways:
+
+Feature:
+
+* Affiliates can request "Giveaway Credits"
+
+Unlock condition:
+
+* Minimum 50 sales completed
+
+System provides:
+
+* 3–10 free evaluation accounts (₹1L or ₹2L)
+
+Affiliate must:
+
+* Use accounts for public giveaway
+* Promote on Instagram / Telegram / YouTube
+* Tag platform (FundedWealth)
+
+Tracking:
+
+* Each giveaway account linked to affiliate ID
+* Track new users from giveaway campaigns
+
+---
+
+🛡 RESTRICTIONS (ANTI-ABUSE)
+
+Implement strict controls:
+
+1. Free accounts:
+
+* Cannot be sold
+* Cannot be transferred
+* One per user only
+
+2. Fraud detection:
+
+* Block same IP multiple accounts
+* Block self-referral
+* Detect suspicious patterns
+
+3. Reward cancellation:
+
+* If fraud or refund detected → reward revoked
+
+---
+
+📦 ACCOUNT TYPE RULES
+
+Free accounts must be:
+
+* Evaluation accounts ONLY
+* Same trading rules as paid accounts
+* Profit withdrawal allowed ONLY after passing evaluation
+
+No direct funded accounts given for free
+
+---
+
+💸 PAYOUT PROTECTION
+
+* Commission held for 5–7 days
+* Rewards locked during holding period
+* Cancel if:
+
+  * refund occurs
+  * suspicious activity detected
+
+---
+
+📊 AFFILIATE DASHBOARD FEATURES
+
+Display:
+
+* Total sales
+* Valid sales (eligible for rewards)
+* Current milestone progress
+* Rewards unlocked
+* Giveaway credits available
+
+Add:
+
+* Progress bar (e.g. 32/50 sales)
+* Claim reward button
+* Giveaway request button
+
+---
+
+🎯 MARKETING FEATURES
+
+* Show:
+  “Earn FREE funded accounts by referring traders”
+
+* Add:
+  Leaderboard of top affiliates
+  Monthly contests
+
+---
+
+📜 TERMS & CONDITIONS (STRICT)
+
+* Only completed purchases count
+* Signup/login not counted
+* Rewards subject to verification
+* Company reserves right to reject fraudulent activity
+* Giveaway misuse leads to ban
+
+---
+
+⚡ FINAL SYSTEM GOAL
+
+* Increase affiliate motivation
+* Reduce reward cost using evaluation accounts
+* Drive viral growth via giveaways
+* Maintain business profitability
+
+---
+
+Build full backend logic + frontend dashboard + database tracking system.
+Use clean fintech-style UI.

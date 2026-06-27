@@ -1,0 +1,182 @@
+Build a complete "Trade & Give Back" donation system for a prop trading platform (FundedWealth).
+
+GOAL:
+Create a trust-building, viral donation system where both the company and users contribute to real causes, with optional user participation and public recognition.
+
+---
+
+🎯 CORE SYSTEM
+
+There are TWO types of contributions:
+
+1. Company Contribution (background system)
+2. User Contribution (optional during withdrawal)
+
+---
+
+🏢 COMPANY DONATION SYSTEM
+
+* Allocate 1–3% of company profit to donation pool
+* Do NOT display exact % publicly
+* Track internally:
+
+  * Total donation pool
+  * Category-wise allocation
+
+Display publicly:
+
+* “We support real causes across India”
+
+---
+
+💰 USER DONATION SYSTEM
+
+Trigger donation popup when:
+
+* User clicks "Withdraw"
+* OR after showing profit
+
+---
+
+🖥 DONATION POPUP UI
+
+Title:
+"Make Your Profit More Meaningful ❤️"
+
+Subtext:
+"Support real causes across India with a small contribution."
+
+Step 1: Select Cause
+
+* Animal Feeding 🐶
+* Girls Education 🎓
+
+Step 2: Select Amount
+
+* ₹10
+* ₹50
+* ₹100
+* ₹500
+* Custom input
+
+Buttons:
+
+* "Donate & Withdraw"
+* "Skip for now"
+
+Rules:
+
+* Donation is OPTIONAL
+* Default = no donation selected
+
+---
+
+📊 USER IMPACT TRACKING
+
+For each user, store:
+
+* total_donated_amount
+* total_meals_supported
+* total_students_supported
+
+Update after each donation
+
+---
+
+🧾 DASHBOARD IMPACT SECTION
+
+Create section: "Your Impact ❤️"
+
+Display cards:
+
+1. Meals Provided 🐶
+2. Education Supported 🎓
+3. Total Contribution ₹
+
+Add badge system:
+
+* Supporter (₹1–₹100)
+* Contributor (₹100–₹1000)
+* Impact Leader (₹1000+)
+
+Display badge near username
+
+---
+
+🏆 LEADERBOARD SYSTEM
+
+Create "Top Impact Traders"
+
+* Weekly leaderboard
+* Monthly leaderboard
+
+Fields:
+
+* Name
+* Contribution amount
+* Rank
+
+Show:
+"You are #X this week"
+
+---
+
+📢 SOCIAL SHARING FEATURE
+
+Add "Share Your Impact" button
+
+Auto-generate message:
+"My trading profits helped support real causes ❤️ Join FundedWealth"
+
+Enable sharing to:
+
+* WhatsApp
+* Instagram
+* Telegram
+
+---
+
+📸 IMPACT PROOF PAGE
+
+Create page:
+
+"Where Your Contributions Go"
+
+Include:
+
+* Real images/videos upload section (admin controlled)
+* Monthly updates:
+  "This month we supported X meals / X students"
+
+---
+
+🛡 RULES & PROTECTION
+
+* Donations are voluntary only
+* No automatic deductions
+* Prevent spam/fake contributions
+* Store transaction logs securely
+
+---
+
+⚡ PERFORMANCE
+
+* Real-time updates for leaderboard
+* Fast loading UI
+* Mobile optimized
+
+---
+
+🎯 FINAL RESULT
+
+System should:
+
+* Build strong user trust
+* Increase engagement
+* Enable viral sharing
+* Differentiate brand in India market
+
+---
+
+Build full frontend + backend + database schema.
+Use clean fintech-style UI with modern cards and smooth UX.

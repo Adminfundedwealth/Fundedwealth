@@ -1,0 +1,23 @@
+MIGRATIONS TO SKIP OR ALREADY HANDLED
+======================================
+
+20260518_terminal_tables.sql
+  - Reason: Creates trading_orders with SERIAL (integer) IDs
+  - Status: BYPASSED - 20260519_create_trading_orders_uuid.sql creates correct UUID version
+  - Action: Will be attempted but IF NOT EXISTS will prevent conflicts
+
+20260518_phase4_advanced_orders.sql
+  - Status: PATCHED - converted INTEGER FK refs to UUID
+  - Action: Safe to apply now
+
+Remaining Integer-Keyed Migrations (NOT YET PATCHED - will fail on apply):
+  - 001_fraud_detection_system.sql (references users as INTEGER)
+  - 002_observability_monitoring_system.sql (references users as INTEGER)
+  - 003_security_auth_rbac_phase1.sql (references users as INTEGER)
+  - 20260518_phase9_infrastructure_reliability.sql (references users as INTEGER)
+  - 20260519_create_support_tickets.sql (references users as INTEGER)
+
+Action: Apply UUID-compatible migrations first, then patch/skip integer migrations or apply only after converting them.
+
+Applied Migrations (SUCCESS):
+  - 20260519_create_trading_orders_uuid.sql ✓ (trading_orders created with UUID id)

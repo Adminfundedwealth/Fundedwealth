@@ -1,0 +1,50 @@
+/* FundedWealth Urgency System — urgency-system.css */
+
+/* Sticky Bar */
+.fw-urgency-bar{position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#1A0030 0%,#2d0050 50%,#1A0030 100%);border-bottom:1px solid rgba(255,138,61,.3);padding:10px 16px;text-align:center;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;height:42px}
+.fw-urgency-bar .fw-bar-msg{color:#fff;font-size:13px;font-weight:600;letter-spacing:.3px;opacity:1;transition:opacity .4s ease,transform .4s ease;position:absolute;left:0;right:0;top:50%;transform:translateY(-50%)}
+.fw-urgency-bar .fw-bar-msg.fw-fade-out{opacity:0;transform:translateY(-20px)}
+.fw-urgency-bar .fw-bar-msg .fw-highlight{color:#FF8A3D;font-weight:700}
+.fw-urgency-bar .fw-bar-msg .fw-code{background:rgba(255,138,61,.2);border:1px solid rgba(255,138,61,.4);border-radius:4px;padding:1px 6px;font-family:monospace;color:#FF8A3D;font-size:12px;margin:0 3px}
+.fw-urgency-bar .fw-bar-close{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;line-height:1;padding:4px}
+.fw-urgency-bar .fw-bar-close:hover{color:#fff}
+
+/* Social Proof Popup */
+.fw-social-popup{position:fixed;bottom:24px;left:24px;z-index:9998;background:linear-gradient(135deg,#1A0030,#2a0045);border:1px solid rgba(168,85,247,.4);border-radius:14px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 20px rgba(168,85,247,.2);max-width:320px;opacity:0;transform:translateY(20px) scale(.95);transition:opacity .4s ease,transform .4s ease;pointer-events:none;font-family:system-ui,-apple-system,sans-serif}
+.fw-social-popup.fw-show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.fw-social-popup .fw-sp-row{display:flex;align-items:center;gap:10px}
+.fw-social-popup .fw-sp-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4A00E0,#D63384);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.fw-social-popup .fw-sp-text{color:rgba(255,255,255,.9);font-size:13px;line-height:1.4}
+.fw-social-popup .fw-sp-text strong{color:#fff;font-weight:700}
+.fw-social-popup .fw-sp-text .fw-sp-action{color:#FF8A3D;font-weight:600}
+.fw-social-popup .fw-sp-time{color:rgba(255,255,255,.35);font-size:10px;margin-top:3px}
+.fw-social-popup .fw-sp-close{position:absolute;top:8px;right:10px;color:rgba(255,255,255,.3);cursor:pointer;font-size:14px}
+
+/* Exit Intent Modal */
+.fw-exit-overlay{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease;pointer-events:none;font-family:system-ui,-apple-system,sans-serif}
+.fw-exit-overlay.fw-show{opacity:1;pointer-events:auto}
+.fw-exit-modal{background:linear-gradient(160deg,#1A0030,#0f0020);border:1px solid rgba(168,85,247,.5);border-radius:20px;padding:32px 28px;max-width:400px;width:90%;text-align:center;transform:scale(.9);transition:transform .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.fw-exit-overlay.fw-show .fw-exit-modal{transform:scale(1)}
+.fw-exit-modal h3{color:#fff;font-size:22px;font-weight:800;margin:0 0 8px}
+.fw-exit-modal p{color:rgba(255,255,255,.7);font-size:14px;margin:0 0 16px;line-height:1.5}
+.fw-exit-modal .fw-exit-code{display:inline-block;background:rgba(255,138,61,.15);border:2px solid #FF8A3D;border-radius:8px;padding:8px 20px;color:#FF8A3D;font-family:monospace;font-size:20px;font-weight:800;letter-spacing:2px;margin:8px 0 16px}
+.fw-exit-modal .fw-exit-timer{color:rgba(255,255,255,.5);font-size:12px;margin-bottom:16px}
+.fw-exit-modal .fw-exit-btn{display:inline-block;background:linear-gradient(90deg,#FF8A3D,#D63384);color:#fff;font-weight:700;font-size:15px;padding:12px 32px;border-radius:12px;border:none;cursor:pointer;text-decoration:none;transition:opacity .2s}
+.fw-exit-modal .fw-exit-btn:hover{opacity:.9}
+.fw-exit-modal .fw-exit-dismiss{display:block;margin-top:12px;color:rgba(255,255,255,.35);font-size:12px;cursor:pointer;border:none;background:none}
+.fw-exit-modal .fw-exit-close{position:absolute;top:14px;right:16px;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;background:none;border:none}
+
+/* Return Visitor Banner */
+.fw-return-banner{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:9997;background:linear-gradient(90deg,#4A00E0,#D63384);border-radius:12px;padding:12px 24px;color:#fff;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(74,0,224,.4);opacity:0;transition:opacity .5s ease,transform .5s ease;transform:translateX(-50%) translateY(-10px);font-family:system-ui,-apple-system,sans-serif;max-width:90%;text-align:center}
+.fw-return-banner.fw-show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fw-return-banner .fw-rb-close{margin-left:12px;cursor:pointer;opacity:.6}
+.fw-return-banner .fw-rb-close:hover{opacity:1}
+
+/* Mobile adjustments */
+@media(max-width:640px){
+  .fw-urgency-bar{font-size:11px;padding:8px 10px;height:38px}
+  .fw-social-popup{left:12px;right:12px;bottom:16px;max-width:none}
+  .fw-exit-modal{padding:24px 20px}
+  .fw-exit-modal h3{font-size:18px}
+  .fw-return-banner{font-size:12px;padding:10px 16px;top:46px}
+}

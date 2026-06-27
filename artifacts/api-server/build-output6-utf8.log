@@ -1,0 +1,58 @@
+﻿node : X [ERROR] No matching export in "src/lib/rate-limit.ts" for import 
+"rateLimit"
+At line:1 char:86
++ ... ifacts\api-server"; node ./build.mjs > build-output6.log 2>&1; if (Te ...
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (X [ERROR] No ma...ort "rateLimit" 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+    src/routes/kyc-new.ts:8:9:
+      8 Γöé import { rateLimit } from "../lib/rate-limit";
+        Γò╡          ~~~~~~~~~
+
+X [ERROR] No matching export in "src/lib/email.ts" for import 
+"sendKycStatusEmail"
+
+    src/routes/kyc-new.ts:9:9:
+      9 Γöé import { sendKycStatusEmail, sendKycApprovedEmail, 
+sendKycRejectedE...
+        Γò╡          ~~~~~~~~~~~~~~~~~~
+
+X [ERROR] No matching export in "../../lib/db/src/index.ts" for import 
+"affiliateCommissions"
+
+    src/routes/admin.ts:11:2:
+      11 Γöé   affiliateCommissions,
+         Γò╡   ~~~~~~~~~~~~~~~~~~~~
+
+3 errors
+
+  dist\pino-worker.mjs           153.5kb
+  dist\pino-file.mjs             142.1kb
+  dist\pino-pretty.mjs           114.6kb
+  dist\thread-stream-worker.mjs    7.3kb
+  dist\pino-worker.mjs.map       256.9kb
+  ...and 3 more output files...
+
+Done in 6278ms
+Error: Build failed with 3 errors:
+src/routes/admin.ts:11:2: ERROR: No matching export in 
+"../../lib/db/src/index.ts" for import "affiliateCommissions"
+src/routes/kyc-new.ts:8:9: ERROR: No matching export in 
+"src/lib/rate-limit.ts" for import "rateLimit"
+src/routes/kyc-new.ts:9:9: ERROR: No matching export in "src/lib/email.ts" for 
+import "sendKycStatusEmail"
+    at failureErrorWithLog (C:\Users\rmsam\Desktop\fundedwealth (1) data\funded
+wealth\node_modules\.pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:1467:
+15)
+    at C:\Users\rmsam\Desktop\fundedwealth (1) data\fundedwealth\node_modules\.
+pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:926:25
+    at C:\Users\rmsam\Desktop\fundedwealth (1) data\fundedwealth\node_modules\.
+pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:1345:9
+    at process.processTicksAndRejections 
+(node:internal/process/task_queues:104:5) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}

@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: fundedwealth-api
+    runtime: node
+    region: singapore
+    plan: free
+    rootDir: ./
+    buildCommand: corepack enable && corepack prepare pnpm@11.1.1 --activate && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build
+    startCommand: node --enable-source-maps ./artifacts/api-server/dist/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "9000"
+      # ── Supabase (Database + Auth) ──
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      # ── Razorpay ──
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      # ── OxaPay (Crypto) ──
+      - key: OXAPAY_API_KEY
+        sync: false
+      - key: OXAPAY_WEBHOOK_SECRET
+        sync: false
+      # ── Resend (Email) ──
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        value: noreply@fundedwealth.in
+      # ── Gemini AI ──
+      - key: GEMINI_API_KEY
+        sync: false
+      # ── CORS ──
+      - key: CORS_ORIGIN
+        sync: false
+      # ── Dhan Market Data ──
+      - key: DHAN_API_KEY
+        sync: false
+      # ── Sentry ──
+      - key: SENTRY_DSN
+        sync: false
+    healthCheckPath: /api/health
+    autoDeploy: true

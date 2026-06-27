@@ -1,0 +1,32 @@
+﻿powershell : X [ERROR] Could not resolve "zod"
+At line:1 char:86
++ ... pi-server"; powershell -NoProfile -Command "& { node ./build.mjs; if  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (X [ERROR] Could not resolve "zod" 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+    src/lib/validation-service.ts:1:18:
+      1 Γöé import { z } from "zod";
+        Γò╡                   ~~~~~
+
+  You can mark the path "zod" as external to exclude it from the bundle, which 
+will remove this error and leave the unresolved path in the bundle.
+
+1 error
+Error: Build failed with 1 error:
+src/lib/validation-service.ts:1:18: ERROR: Could not resolve "zod"
+    at failureErrorWithLog (C:\Users\rmsam\Desktop\fundedwealth (1) data\funded
+wealth\node_modules\.pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:1467:
+15)
+    at C:\Users\rmsam\Desktop\fundedwealth (1) data\fundedwealth\node_modules\.
+pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:926:25
+    at C:\Users\rmsam\Desktop\fundedwealth (1) data\fundedwealth\node_modules\.
+pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:1345:9
+    at process.processTicksAndRejections 
+(node:internal/process/task_queues:104:5) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+MISSING_INDEX

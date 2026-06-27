@@ -1,0 +1,96 @@
+Build a high-converting "Featured Prop Firm Card" component for my website PropFirmMarket.
+
+Company Name: FundedWealth
+
+GOAL:
+This card must look premium, trustworthy, and slightly highlighted compared to other firms, but NOT biased or spammy.
+
+--------------------------------------------------
+
+CARD DESIGN:
+
+- Dark theme (match site style)
+- Gradient border glow (purple → pink → orange)
+- Slight scale effect on hover (1.03x)
+- Soft shadow for premium feel
+
+Top Badge (very important):
+- Add small badge: "⭐ Featured Partner"
+- Add second badge: "🇮🇳 Best for Indian Traders"
+
+--------------------------------------------------
+
+CONTENT STRUCTURE:
+
+1. LOGO + NAME
+   - FundedWealth logo (left)
+   - Name: "FundedWealth"
+   - Subtext: "₹ Based Prop Firm"
+
+2. RATING
+   - ⭐ 4.8 (or placeholder dynamic rating)
+   - "Fast Growing in India"
+
+3. KEY BENEFITS (highlight these with icons):
+   - ₹ INR Account Sizes (No USD confusion)
+   - Instant Funding Available
+   - Fast Payouts (24–48 hrs)
+   - Beginner Friendly Challenges
+
+4. ACCOUNT INFO:
+   - Profit Split: "Up to 90%"
+   - Max Account: "₹10,00,000"
+   - Platforms: "MT5 / Web Terminal"
+
+5. CTA SECTION (VERY IMPORTANT):
+
+Primary Button:
+- Text: "Start Trading →"
+- Color: Gradient (pink → orange)
+- Action: redirect to fundedwealth site
+
+Secondary Button:
+- Text: "View Details"
+- Outline style
+
+6. TRUST ELEMENT:
+
+- Small text below:
+  "Built for Indian traders • INR payouts • No hidden fees"
+
+--------------------------------------------------
+
+EXTRA FEATURES (IMPORTANT FOR CONVERSION):
+
+- Add small "🔥 Trending" tag (top right corner)
+- Add "This week: +320 traders joined" (dynamic or static)
+- Add hover tooltip: "Why choose FundedWealth?"
+
+--------------------------------------------------
+
+POSITIONING RULE:
+
+- This card should appear in TOP section but NOT always #1
+- Slightly visually highlighted compared to others
+
+--------------------------------------------------
+
+RESPONSIVE:
+
+- Mobile optimized
+- Stack layout clean
+- Buttons full width on mobile
+
+--------------------------------------------------
+
+ANIMATION:
+
+- Smooth hover glow
+- Button hover shine effect
+
+--------------------------------------------------
+
+OUTPUT:
+
+- Clean React / Tailwind component
+- Reusable for other firms (props-based system)

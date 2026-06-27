@@ -1,0 +1,15 @@
+﻿node : 
+At line:1 char:86
++ ... ifacts\api-server"; node ./build.mjs > build-output7.log 2>&1; if (Te ...
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  dist\index.mjs                   4.8mb
+  dist\pino-worker.mjs           153.5kb
+  dist\pino-file.mjs             142.1kb
+  dist\pino-pretty.mjs           114.6kb
+  dist\thread-stream-worker.mjs    7.3kb
+  ...and 5 more output files...
+
+Done in 5650ms

@@ -1,0 +1,208 @@
+Build a high-conversion, scalable affiliate system for a prop trading platform (FundedWealth).
+
+GOAL:
+Create an aggressive but profitable affiliate system that drives rapid user acquisition in India while maintaining business margins.
+
+---
+
+🎯 CORE PRINCIPLES
+
+1. Only paid users count as referrals
+2. No commission for signups or logins
+3. Fraud-proof tracking system
+4. High commission for growth (30%–50%)
+5. Milestone-based rewards (hard to unlock)
+6. Delayed payouts (anti-refund protection)
+
+---
+
+💰 COMMISSION STRUCTURE
+
+Implement dynamic tier-based commissions:
+
+Tier 1 (Starter):
+
+* 1–20 sales
+* 30% commission
+
+Tier 2 (Pro):
+
+* 21–100 sales
+* 35% commission
+
+Tier 3 (Elite):
+
+* 101–300 sales
+* 40% commission
+
+Tier 4 (Apex):
+
+* 300+ sales
+* 50% commission
+
+Rules:
+
+* Commission applies ONLY on successful payment
+* Commission auto-calculated per transaction
+* Store commission history per user
+
+---
+
+🎁 REWARD SYSTEM (GROWTH ENGINE)
+
+Milestone rewards:
+
+* 30 sales → ₹5,000 bonus
+* 75 sales → ₹15,000 bonus
+* 150 sales → iPhone reward
+* 400 sales → MacBook reward
+* 800+ sales → Bike reward
+
+Rules:
+
+* Only VALID purchases count
+* Refunds cancel reward eligibility
+* Rewards locked until verification
+
+---
+
+🧠 REFERRAL TRACKING SYSTEM
+
+Build system with:
+
+* Unique referral link per affiliate
+* Cookie + backend tracking
+* Track:
+
+  * clicks
+  * signups
+  * purchases
+  * revenue generated
+
+Store per user:
+
+* total clicks
+* total conversions
+* total earnings
+* current tier
+
+---
+
+🛡 FRAUD PROTECTION
+
+Implement:
+
+* Block self-referrals (same IP/device/email)
+* Detect multiple accounts from same IP
+* Prevent coupon stacking abuse
+* Flag suspicious activity
+
+Add:
+
+* "Under Review" status for risky accounts
+
+---
+
+💸 PAYOUT SYSTEM
+
+Rules:
+
+* Minimum payout: ₹1,000
+* Payout delay: 5–7 days (holding period)
+* Cancel commission if:
+
+  * refund happens
+  * fraud detected
+
+Payment methods:
+
+* UPI
+* Bank transfer
+
+Affiliate dashboard should include:
+
+* available balance
+* pending balance
+* withdrawn history
+
+---
+
+📊 AFFILIATE DASHBOARD UI
+
+Design modern dashboard with:
+
+1. Overview cards:
+
+   * Total Earnings
+   * Pending Earnings
+   * Total Sales
+   * Conversion Rate
+
+2. Charts:
+
+   * Daily earnings graph
+   * Sales trend
+
+3. Referral tools:
+
+   * Copy referral link button
+   * Share to WhatsApp button
+
+4. Rewards progress:
+
+   * Progress bar to next milestone
+   * Locked/unlocked rewards
+
+5. Transaction table:
+
+   * Date
+   * User
+   * Plan purchased
+   * Commission earned
+
+---
+
+🔥 MARKETING OPTIMIZATION FEATURES
+
+Add:
+
+* Leaderboard (top affiliates)
+* Monthly contests
+* Real-time notifications:
+  "You earned ₹X from a new referral"
+
+---
+
+📜 TERMS & CONDITIONS (STRICT)
+
+Enforce:
+
+* Only completed purchases count
+* No commission for signup/login
+* Self-referral prohibited
+* Refund = commission reversal
+* Company can suspend fraudulent accounts
+* Rewards subject to verification
+
+---
+
+⚡ PERFORMANCE REQUIREMENTS
+
+* Fast load dashboard
+* Real-time tracking updates
+* Secure backend (prevent manipulation)
+
+---
+
+🎯 FINAL OUTPUT
+
+System must:
+
+* Maximize affiliate motivation
+* Maintain business profitability
+* Be scalable to 20,000+ users
+
+---
+
+Build frontend + backend logic + database schema.
+Use clean UI similar to modern fintech dashboards.

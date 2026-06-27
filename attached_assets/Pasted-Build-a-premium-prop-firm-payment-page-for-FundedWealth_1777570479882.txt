@@ -1,0 +1,101 @@
+Build a premium prop-firm payment page for “FundedWealth” inspired by modern fintech SaaS platforms like SharkFunded, FundingPips, and prop trading companies.
+
+TECH STACK:
+- React + Vite
+- TailwindCSS
+- Framer Motion
+- Responsive design
+- Dark fintech UI
+- Production-ready clean code
+
+PAGE LAYOUT:
+Create a 2-column payment page.
+
+LEFT SIDEBAR:
+- FundedWealth logo at top
+- “Trusted Merchant” badge
+- Payment amount section
+- Security features
+- 256-bit SSL text
+- Instant verification text
+- Clean divider lines
+- Minimal professional fintech design
+
+RIGHT PAYMENT PANEL:
+- “Scan QR to Pay” heading
+- Countdown timer badge
+- Merchant name: FundedWealth
+- Dynamic QR code box
+- UPI ID section with copy button
+- Amount box with copy button
+- Warning alert:
+  “Pay exact amount including decimals or payment will fail”
+- Supported payment apps:
+  - Paytm
+  - PhonePe
+  - Google Pay
+- “Cancel Payment” button
+- UTR input field
+- Verify button
+- SSL encrypted footer
+
+DESIGN STYLE:
+- Modern SaaS fintech
+- Dark navy background
+- Neon blue glow
+- Glassmorphism cards
+- Subtle gradients
+- Smooth hover animations
+- Rounded corners
+- Professional prop-firm style
+- Premium dashboard aesthetic
+- Looks like real funded trading platform
+
+FEATURES:
+- Fully responsive mobile/tablet/desktop
+- Animated timer countdown
+- QR code placeholder
+- Copy-to-clipboard buttons
+- Payment status states:
+  - Waiting
+  - Processing
+  - Success
+  - Failed
+- Loading animations
+- Smooth transitions
+- Professional typography
+
+COLOR PALETTE:
+- Background: #07111f
+- Primary Blue: #00c2ff
+- Secondary Blue: #2f6bff
+- White text
+- Soft glowing borders
+- Cyan highlights
+
+CREATE COMPONENTS:
+- PaymentSidebar.jsx
+- PaymentPanel.jsx
+- CountdownTimer.jsx
+- QRCodeBox.jsx
+- PaymentStatus.jsx
+- UTRVerification.jsx
+
+BACKEND READY:
+Prepare frontend structure for:
+- Razorpay integration
+- Cashfree integration
+- Dynamic QR generation
+- Webhook verification
+- Order API connection
+
+EXTRA:
+Add realistic fintech UI details:
+- tiny glowing borders
+- blur effects
+- terminal-style spacing
+- professional shadows
+- subtle candlestick chart background
+
+FINAL RESULT:
+The page should look like a real prop-firm payment gateway used by modern trading platforms and should feel trustworthy, premium, and enterprise-level.

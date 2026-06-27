@@ -1,0 +1,58 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# FundedWealth API Server — Docker image for AWS App Runner
+# ─────────────────────────────────────────────────────────────────────────────
+# Build:  docker build -f Dockerfile.apprunner -t fundedwealth-api .
+# Run:    docker run -p 9000:9000 --env-file .env fundedwealth-api
+# ─────────────────────────────────────────────────────────────────────────────
+
+FROM node:20-slim AS builder
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@11.1.1 --activate
+
+WORKDIR /app
+
+# Copy workspace config first for cache efficiency
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.json tsconfig.base.json ./
+
+# Copy workspace package manifests
+COPY lib/db/package.json lib/db/tsconfig.json ./lib/db/
+COPY lib/api-zod/package.json lib/api-zod/tsconfig.json ./lib/api-zod/
+COPY lib/api-client-react/package.json lib/api-client-react/tsconfig.json ./lib/api-client-react/
+COPY lib/integrations-gemini-ai/package.json lib/integrations-gemini-ai/tsconfig.json ./lib/integrations-gemini-ai/
+COPY artifacts/api-server/package.json artifacts/api-server/tsconfig.json ./artifacts/api-server/
+COPY artifacts/fundedwealth/package.json ./artifacts/fundedwealth/
+COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
+COPY scripts/package.json ./scripts/
+
+# Install dependencies
+RUN pnpm install --no-frozen-lockfile --prod=false
+
+# Copy source code
+COPY lib/ ./lib/
+COPY artifacts/api-server/ ./artifacts/api-server/
+
+# Build the API server (esbuild bundles everything into dist/index.mjs)
+RUN pnpm --filter @workspace/api-server run build
+
+# ─── Production image ─────────────────────────────────────────────────────────
+FROM node:20-slim AS runner
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy only the built output
+COPY --from=builder /app/artifacts/api-server/dist ./dist
+COPY --from=builder /app/package.json ./
+
+ENV NODE_ENV=production
+ENV PORT=9000
+
+EXPOSE 9000
+
+# Health check for App Runner
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "const http = require('http'); http.get('http://localhost:9000/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); }).on('error', () => process.exit(1));"
+
+CMD ["node", "--enable-source-maps", "./dist/index.mjs"]

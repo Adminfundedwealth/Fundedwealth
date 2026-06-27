@@ -1,0 +1,31 @@
+﻿node : node:internal/modules/package_json_reader:301
+At line:1 char:104
++ ... ORT='3000'; node --enable-source-maps .\dist\index.mjs > start-output ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (node:internal/m...json_reader:301 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@opentelemetry/sdk-node' 
+imported from C:\Users\rmsam\Desktop\fundedwealth (1) 
+data\fundedwealth\artifacts\api-server\dist\index.mjs
+    at Object.getPackageJSONURL 
+(node:internal/modules/package_json_reader:301:9)
+    at packageResolve (node:internal/modules/esm/resolve:764:81)
+    at moduleResolve (node:internal/modules/esm/resolve:855:18)
+    at defaultResolve (node:internal/modules/esm/resolve:988:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:697:20)
+    at #resolveAndMaybeBlockOnLoaderThread 
+(node:internal/modules/esm/loader:714:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:746:52)
+    at #resolve (node:internal/modules/esm/loader:679:17)
+    at ModuleLoader.getOrCreateModuleJob 
+(node:internal/modules/esm/loader:599:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:162:33) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v24.15.0

@@ -1,0 +1,12 @@
+{
+  "name": "fw-audit",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "audit": "npx playwright test --reporter=list",
+    "install-browsers": "npx playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.52.0"
+  }
+}

@@ -1,0 +1,815 @@
+﻿node.exe : [WARN] The "pnpm" field in package.json is no longer read by pnpm. The following 
+keys were ignored: "pnpm.overrides", "pnpm.auditConfig". See https://pnpm.io/settings for 
+the new home of each setting.
+At C:\Users\jitro\AppData\Roaming\npm\pnpm.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/pnpm/bin/pnpm.mjs" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([WARN] The "pnp...f each setting.:String) [],  
+   RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+src/__tests__/phase11.e2e.test.ts(4,59): error TS2307: Cannot find module 'vitest' or its corresponding type declarations.
+src/__tests__/phase11.e2e.test.ts(47,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(48,20): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(49,26): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(55,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(63,28): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(64,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(65,25): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(71,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(72,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(73,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(83,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(84,23): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(98,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(99,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(100,23): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(120,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(121,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(129,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(150,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(151,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(170,28): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(176,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(177,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(185,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(186,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(193,11): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(194,16): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(201,57): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(212,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(217,16): error TS2448: Block-scoped variable 'data' used before its declaration.
+src/__tests__/phase11.e2e.test.ts(217,16): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(226,61): error TS2448: Block-scoped variable 'data' used before its declaration.
+src/__tests__/phase11.e2e.test.ts(226,61): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(228,61): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(236,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(247,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(248,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(254,73): error TS2448: Block-scoped variable 'data' used before its declaration.
+src/__tests__/phase11.e2e.test.ts(254,73): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(260,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(267,19): error TS2448: Block-scoped variable 'data' used before its declaration.
+src/__tests__/phase11.e2e.test.ts(267,19): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(274,65): error TS2448: Block-scoped variable 'data' used before its declaration.
+src/__tests__/phase11.e2e.test.ts(274,65): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(276,74): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(284,22): error TS2304: Cannot find name 'data'.
+src/__tests__/phase11.e2e.test.ts(289,90): error TS2304: Cannot find name 'data'.
+src/__tests__/phase11.e2e.test.ts(291,14): error TS18046: 'payoutData' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(299,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.e2e.test.ts(305,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(4,38): error TS2307: Cannot find module 'vitest' or its corresponding type declarations.
+src/__tests__/phase11.failures.test.ts(87,61): error TS18046: 'order' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(96,14): error TS18046: 'positions' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(116,14): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(117,11): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(118,16): error TS18046: 'data' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(137,14): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(137,35): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(245,14): error TS18046: 'health' is of type 'unknown'.
+src/__tests__/phase11.failures.test.ts(245,32): error TS18046: 'health' is of type 'unknown'.
+src/__tests__/security.test.ts(1,59): error TS2307: Cannot find module 'vitest' or its corresponding type declarations.
+src/__tests__/security.test.ts(3,40): error TS2305: Module '"@workspace/db"' has no exported member 'permissions'.
+src/__tests__/security.test.ts(4,33): error TS2307: Cannot find module '../src/lib/security-service' or its corresponding type declarations.
+src/__tests__/security.test.ts(5,29): error TS2307: Cannot find module '../src/lib/rbac-service' or its corresponding type declarations.
+src/__tests__/security.test.ts(6,35): error TS2307: Cannot find module '../src/lib/validation-service' or its corresponding type declarations.
+src/__tests__/security.test.ts(8,20): error TS2307: Cannot find module 'bcrypt' or its corresponding type declarations.
+src/__tests__/security.test.ts(28,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/__tests__/security.test.ts(33,7): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; method: string | SQL<unknown> | Placeholder<string, any>; identifier: string | SQL<unknown> | Placeholder<...>; ... 9 more ...; lastUsedAt?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; method: string | SQL<unknown> | Placeholder<string, any>; identifier: string | SQL<unknown> | Placeholder<...>; ... 9 more ...; lastUsedAt?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; method: string | SQL<unknown> | Placeholder<string, any>; identifier: string | SQL<unknown> | Placeholder<...>; ... 9 more ...; lastUsedAt?: SQL<...> | ... 3 more ... | undefined; }[]'.
+src/__tests__/security.test.ts(44,34): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: false; enumValues: undefined; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: false; enumValues: undefined; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: false; enumValues: undefined; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/device-fingerprint-service.ts(69,17): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/device-fingerprint-service.ts(103,21): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; deviceFingerprint: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<...> | undefined; ... 8 more ...; seenCount?: number | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; deviceFingerprint: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<...> | undefined; ... 8 more ...; seenCount?: number | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; deviceFingerprint: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<...> | undefined; ... 8 more ...; seenCount?: number | ... 2 more ... | undefined; }[]'.
+src/lib/device-fingerprint-service.ts(123,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/device-fingerprint-service.ts(163,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/device-fingerprint-service.ts(171,17): error TS2322: Type 'string[]' is not assignable to type 'number[]'.
+  Type 'string' is not assignable to type 'number'.
+src/lib/device-fingerprint-service.ts(463,21): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/device-fingerprint-service.ts(475,25): error TS2322: Type 'number' is not assignable to type 'string | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | undefined'.
+src/lib/economic-calendar.ts(79,33): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | number | null | undefined'.
+src/lib/economic-calendar.ts(245,55): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type '{ id: number; createdAt: Date; link: string | null; userId: string; type: string; message: string; metadata: string; title: string; priority: string; expiresAt: Date | null; actionUrl: string | null; icon: string | null; category: string; deliveryChannels: string; isRead: boolean; }'.
+  Property '0' does not exist on type '{ id: number; createdAt: Date; link: string | null; userId: string; type: string; message: string; metadata: string; title: string; priority: string; expiresAt: Date | null; actionUrl: string | null; icon: string | null; category: string; deliveryChannels: string; isRead: boolean; }'.
+src/lib/fraud-detection-service.ts(85,9): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { ip: string | SQL<unknown> | Placeholder<string, any>; lookupSource: string | SQL<unknown> | Placeholder<string, any>; trigger: string | SQL<unknown> | Placeholder<...>; ... 22 more ...; vpnProxyRiskScore?: number | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { ip: string | SQL<unknown> | Placeholder<string, any>; lookupSource: string | SQL<unknown> | Placeholder<string, any>; trigger: string | SQL<unknown> | Placeholder<...>; ... 22 more ...; vpnProxyRiskScore?: number | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ ip: string | SQL<unknown> | Placeholder<string, any>; lookupSource: string | SQL<unknown> | Placeholder<string, any>; trigger: string | SQL<unknown> | Placeholder<...>; ... 22 more ...; vpnProxyRiskScore?: number | ... 2 more ... | undefined; }[]'.
+src/lib/fraud-detection-service.ts(128,16): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(171,18): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(198,16): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "device_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(228,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(285,57): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/lib/fraud-detection-service.ts(286,65): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/lib/fraud-detection-service.ts(326,11): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(values: { riskScore: string | SQL<unknown> | Placeholder<string, any>; referredUserId: string | SQL<unknown> | Placeholder<string, any>; referrerId: string | SQL<...> | Placeholder<...>; ... 5 more ...; deviceFingerprint?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'referrerId' does not exist in type '{ riskScore: string | SQL<unknown> | Placeholder<string, any>; referredUserId: string | SQL<unknown> | Placeholder<string, any>; referrerId: string | SQL<...> | Placeholder<...>; ... 5 more ...; deviceFingerprint?: string | ... 3 more ... | undefined; }[]'.
+src/lib/fraud-detection-service.ts(343,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "referrer_id"; tableName: "referral_fraud_logs"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "referrer_id"; tableName: "referral_fraud_logs"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "referrer_id"; tableName: "referral_fraud_logs"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "referrer_id"; tableName: "referral_fraud_logs"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(350,11): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(values: { riskScore: string | SQL<unknown> | Placeholder<string, any>; referredUserId: string | SQL<unknown> | Placeholder<string, any>; referrerId: string | SQL<...> | Placeholder<...>; ... 5 more ...; deviceFingerprint?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'referrerId' does not exist in type '{ riskScore: string | SQL<unknown> | Placeholder<string, any>; referredUserId: string | SQL<unknown> | Placeholder<string, any>; referrerId: string | SQL<...> | Placeholder<...>; ... 5 more ...; deviceFingerprint?: string | ... 3 more ... | undefined; }[]'.
+src/lib/fraud-detection-service.ts(383,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(398,14): error TS2345: Argument of type '{ userId: number; riskScore: number; riskLevel: "HIGH" | "MEDIUM" | "LOW" | "CRITICAL"; isBlocked: boolean; payoutRestricted: boolean; requiresManualReview: boolean; }' is not assignable to parameter of type '{ userId?: string | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | undefined; id?: number | SQL<unknown> | PgColumn<...> | undefined; ... 13 more ...; lastUpdated?: SQL<...> | ... 2 more ... | undefined; }'.
+  Types of property 'userId' are incompatible.
+    Type 'number' is not assignable to type 'string | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | undefined'.
+src/lib/fraud-detection-service.ts(399,16): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(403,60): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; riskScore?: string | SQL<...> | Placeholder<...> | undefined; ... 12 more ...; lastUpdated?: SQL<...> | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Argument of type '{ userId: number; riskScore: number; riskLevel: "HIGH" | "MEDIUM" | "LOW" | "CRITICAL"; isBlocked: boolean; payoutRestricted: boolean; requiresManualReview: boolean; }' is not assignable to parameter of type '{ userId: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; riskScore?: string | SQL<unknown> | Placeholder<...> | undefined; ... 12 more ...; lastUpdated?: SQL<...> | ... 2 more ... | undefined; }'.
+      Types of property 'userId' are incompatible.
+        Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; riskScore?: string | SQL<...> | Placeholder<...> | undefined; ... 12 more ...; lastUpdated?: SQL<...> | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Argument of type '{ userId: number; riskScore: number; riskLevel: "HIGH" | "MEDIUM" | "LOW" | "CRITICAL"; isBlocked: boolean; payoutRestricted: boolean; requiresManualReview: boolean; }' is not assignable to parameter of type '{ userId: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; riskScore?: string | SQL<unknown> | Placeholder<...> | undefined; ... 12 more ...; lastUpdated?: SQL<...> | ... 2 more ... | undefined; }[]'.
+      Type '{ userId: number; riskScore: number; riskLevel: "HIGH" | "MEDIUM" | "LOW" | "CRITICAL"; isBlocked: boolean; payoutRestricted: boolean; requiresManualReview: boolean; }' is missing the following properties from type '{ userId: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; riskScore?: string | SQL<unknown> | Placeholder<...> | undefined; ... 12 more ...; lastUpdated?: SQL<...> | ... 2 more ... | undefined; }[]': length, pop, push, concat, and 29 more.
+src/lib/fraud-detection-service.ts(444,11): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "fraud_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection-service.ts(482,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-detection.ts(39,16): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-enforcement-service.ts(25,18): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/fraud-enforcement-service.ts(33,18): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/ip-intelligence-service.ts(212,17): error TS18046: 'data' is of type 'unknown'.
+src/lib/ip-intelligence-service.ts(212,44): error TS18046: 'data' is of type 'unknown'.
+src/lib/ip-intelligence-service.ts(213,45): error TS18046: 'data' is of type 'unknown'.
+src/lib/ip-intelligence-service.ts(214,71): error TS18046: 'data' is of type 'unknown'.
+src/lib/ip-intelligence-service.ts(218,28): error TS18046: 'data' is of type 'unknown'.
+src/lib/ip-intelligence-service.ts(328,46): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/ip-intelligence-service.ts(347,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; ip: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; ... 8 more ...; lastSeen?: SQL<...> | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; ip: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; ... 8 more ...; lastSeen?: SQL<...> | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; ip: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; ... 8 more ...; lastSeen?: SQL<...> | ... 2 more ... | undefined; }[]'.
+src/lib/kyc-duplicate-service.ts(56,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(73,21): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/lib/kyc-duplicate-service.ts(81,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/lib/kyc-duplicate-service.ts(98,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(107,21): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/lib/kyc-duplicate-service.ts(115,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/lib/kyc-duplicate-service.ts(152,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(161,21): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/lib/kyc-duplicate-service.ts(170,21): error TS2322: Type 'string' is not assignable to type 'number'.
+src/lib/kyc-duplicate-service.ts(197,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(210,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_submissions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(218,21): error TS2322: Type 'string[]' is not assignable to type 'number[]'.
+  Type 'string' is not assignable to type 'number'.
+src/lib/kyc-duplicate-service.ts(227,24): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(239,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "kyc_documents"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/kyc-duplicate-service.ts(247,21): error TS2322: Type 'string[]' is not assignable to type 'number[]'.
+  Type 'string' is not assignable to type 'number'.
+src/lib/monitoring-service.ts(60,51): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { method: string | SQL<unknown> | Placeholder<string, any>; path: string | SQL<unknown> | Placeholder<string, any>; statusCode: number | SQL<unknown> | Placeholder<...>; ... 8 more ...; responseBody?: unknown; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { method: string | SQL<unknown> | Placeholder<string, any>; path: string | SQL<unknown> | Placeholder<string, any>; statusCode: number | SQL<unknown> | Placeholder<...>; ... 8 more ...; responseBody?: unknown; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'path' does not exist in type '{ method: string | SQL<unknown> | Placeholder<string, any>; path: string | SQL<unknown> | Placeholder<string, any>; statusCode: number | SQL<unknown> | Placeholder<...>; ... 8 more ...; responseBody?: unknown; }[]'.
+src/lib/monitoring-service.ts(101,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { method: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<string, any>; path: string | SQL<unknown> | Placeholder<...>; ... 12 more ...; seen?: boolean | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { method: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<string, any>; path: string | SQL<unknown> | Placeholder<...>; ... 12 more ...; seen?: boolean | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'errorType' does not exist in type '{ method: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<string, any>; path: string | SQL<unknown> | Placeholder<string, any>; ... 12 more ...; seen?: boolean | ... 2 more ... | undefined; }[]'.
+src/lib/monitoring-service.ts(308,10): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<string, any> | undefined; updatedAt?: SQL<...> | ... 2 more ... | undefined; ... 6 more ...; channel?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<string, any> | undefined; updatedAt?: SQL<...> | ... 2 more ... | undefined; ... 6 more ...; channel?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'notificationId' does not exist in type '{ id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<string, any> | undefined; updatedAt?: SQL<...> | ... 2 more ... | undefined; ... 6 more ...; channel?: string | ... 3 more ... | undefined; }[]'.
+src/lib/monitoring-service.ts(462,11): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(values: { id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<string, any> | undefined; updatedAt?: SQL<...> | ... 2 more ... | undefined; ... 8 more ...; currency?: string | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'paymentId' does not exist in type '{ id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<string, any> | undefined; updatedAt?: SQL<...> | ... 2 more ... | undefined; ... 8 more ...; currency?: string | ... 2 more ... | undefined; }[]'.
+src/lib/monitoring-service.ts(738,9): error TS2322: Type '{}' is not assignable to type 'number'.
+src/lib/monitoring-service.ts(746,9): error TS2322: Type '{}' is not assignable to type 'number'.
+src/lib/monitoring-service.ts(754,9): error TS2322: Type '{}' is not assignable to type 'number'.
+src/lib/monitoring-service.ts(762,9): error TS2322: Type '{}' is not assignable to type 'number'.
+src/lib/monitoring-service.ts(981,14): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/lib/monitoring-service.ts(981,36): error TS18046: 'slaStats.breachedResponse' is of type 'unknown'.
+src/lib/monitoring-service.ts(981,64): error TS18046: 'slaStats.breachedResolution' is of type 'unknown'.
+src/lib/monitoring-service.ts(981,100): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/lib/observability.ts(184,9): error TS2774: This condition will always return true since this function is always defined. Did you mean to call it instead?
+src/lib/payment-fingerprint-service.ts(51,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; fingerprintType: string | SQL<unknown> | Placeholder<string, any>; fingerprintHash: string | SQL<...> | Placeholder<...>; id?: number | ... 2 more ... | undefined; createdAt?: SQL<...> | ... 2 more ... | undefined; source?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; fingerprintType: string | SQL<unknown> | Placeholder<string, any>; fingerprintHash: string | SQL<...> | Placeholder<...>; id?: number | ... 2 more ... | undefined; createdAt?: SQL<...> | ... 2 more ... | undefined; source?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; fingerprintType: string | SQL<unknown> | Placeholder<string, any>; fingerprintHash: string | SQL<...> | Placeholder<...>; id?: number | ... 2 more ... | undefined; createdAt?: SQL<...> | ... 2 more ... | undefined; source?: string | ... 3 more ... | undefin...'.
+src/lib/payment-fingerprint-service.ts(65,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/payment-fingerprint-service.ts(74,65): error TS2345: Argument of type 'string[]' is not assignable to parameter of type 'number[]'.
+  Type 'string' is not assignable to type 'number'.
+src/lib/payment-fingerprint-service.ts(83,17): error TS2322: Type 'string[]' is not assignable to type 'number[]'.
+  Type 'string' is not assignable to type 'number'.
+src/lib/payment-fingerprint-service.ts(109,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/payment-fingerprint-service.ts(119,25): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/payment-fingerprint-service.ts(186,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "payment_fingerprints"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/rbac-service.ts(71,16): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: false; enumValues: undefined; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: false; enumValues: undefined; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "users"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: false; enumValues: undefined; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/security-service.ts(143,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/security-service.ts(174,9): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { email: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; ipAddress: string | SQL<unknown> | Placeholder<...>; ... 13 more ...; mfaRequired?: boolean | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+      Type 'undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { email: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; ipAddress: string | SQL<unknown> | Placeholder<...>; ... 13 more ...; mfaRequired?: boolean | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ email: string | SQL<unknown> | Placeholder<string, any>; userId: string | SQL<unknown> | Placeholder<string, any>; ipAddress: string | SQL<unknown> | Placeholder<...>; ... 13 more ...; mfaRequired?: boolean | ... 2 more ... | undefined; }[]'.
+src/lib/security-service.ts(285,11): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { description: string | SQL<unknown> | Placeholder<string, any>; incidentType: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<...> | undefined; ... 14 more ...; resolution?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { description: string | SQL<unknown> | Placeholder<string, any>; incidentType: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<...> | undefined; ... 14 more ...; resolution?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ description: string | SQL<unknown> | Placeholder<string, any>; incidentType: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<...> | undefined; ... 14 more ...; resolution?: string | ... 3 more ... | undefined; }[]'.
+src/lib/security-service.ts(323,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "login_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "login_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "login_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "login_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/security-service.ts(375,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/security-service.ts(421,11): error TS2365: Operator '>' cannot be applied to types '{}' and 'number'.
+src/lib/security-service.ts(451,9): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { method: string | SQL<unknown> | Placeholder<string, any>; ipAddress: string | SQL<unknown> | Placeholder<string, any>; endpoint: string | SQL<unknown> | Placeholder<...>; ... 7 more ...; actionTaken?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { method: string | SQL<unknown> | Placeholder<string, any>; ipAddress: string | SQL<unknown> | Placeholder<string, any>; endpoint: string | SQL<unknown> | Placeholder<...>; ... 7 more ...; actionTaken?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ method: string | SQL<unknown> | Placeholder<string, any>; ipAddress: string | SQL<unknown> | Placeholder<string, any>; endpoint: string | SQL<unknown> | Placeholder<...>; ... 7 more ...; actionTaken?: string | ... 3 more ... | undefined; }[]'.
+src/lib/security-service.ts(491,9): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { code: string | SQL<unknown> | Placeholder<string, any>; expiresAt: SQL<unknown> | Date | Placeholder<string, any>; purpose: string | SQL<unknown> | Placeholder<...>; ... 8 more ...; usedAt?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | undefined' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { code: string | SQL<unknown> | Placeholder<string, any>; expiresAt: SQL<unknown> | Date | Placeholder<string, any>; purpose: string | SQL<unknown> | Placeholder<...>; ... 8 more ...; usedAt?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ code: string | SQL<unknown> | Placeholder<string, any>; expiresAt: SQL<unknown> | Date | Placeholder<string, any>; purpose: string | SQL<unknown> | Placeholder<...>; ... 8 more ...; usedAt?: SQL<...> | ... 3 more ... | undefined; }[]'.
+src/lib/security-service.ts(520,49): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "otp_codes"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "otp_codes"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "otp_codes"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "otp_codes"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/session-hardening.ts(34,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | number' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'number' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | number>, right: string | number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/session-hardening.ts(104,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | number' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'number' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | number>, right: string | number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "sessions"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/support-service.ts(1,19): error TS7016: Could not find a declaration file for module 'node-fetch'. 'C:/Users/jitro/fundedwealth/node_modules/.pnpm/node-fetch@2.7.0/node_modules/node-fetch/lib/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/node-fetch` if it exists or add a new declaration (.d.ts) file containing `declare module 'node-fetch';`
+src/lib/support-service.ts(4,30): error TS7016: Could not find a declaration file for module 'uuid'. 'C:/Users/jitro/fundedwealth/node_modules/.pnpm/uuid@9.0.1/node_modules/uuid/dist/esm-browser/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`
+src/lib/support-service.ts(49,7): error TS2353: Object literal may only specify known properties, and 'expiresIn' does not exist in type '{ upsert: boolean; }'.
+src/lib/support-service.ts(68,54): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { subject: string | SQL<unknown> | Placeholder<string, any>; body: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; ... 7 more ...; assignedTo?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | null' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { subject: string | SQL<unknown> | Placeholder<string, any>; body: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; ... 7 more ...; assignedTo?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'externalId' does not exist in type '{ subject: string | SQL<unknown> | Placeholder<string, any>; body: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; ... 7 more ...; assignedTo?: string | ... 3 more ... | undefined; }[]'.
+src/lib/support-service.ts(83,8): error TS2339: Property 'run' does not exist on type 'PgInsertBase<PgTableWithColumns<{ name: "support_messages"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "support_messages"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; ... 7 more ...; generated: undefined; }, {}, {}>; ... 5 more ...; createdAt...'.
+src/lib/support-service.ts(98,12): error TS2339: Property 'run' does not exist on type 'PgInsertBase<PgTableWithColumns<{ name: "support_attachments"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "support_attachments"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; ... 8 more ...; generated: undefined; }, {}, {}>; ... 8 more ...; createdAt: PgColum...'.
+src/lib/support-service.ts(157,87): error TS2339: Property 'equals' does not exist on type 'PgColumn<{ name: "id"; tableName: "support_tickets"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>'.
+src/lib/support-service.ts(159,96): error TS2339: Property 'equals' does not exist on type 'PgColumn<{ name: "ticket_id"; tableName: "support_messages"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>'.
+src/lib/support-service.ts(159,151): error TS2339: Property 'asc' does not exist on type 'PgColumn<{ name: "created_at"; tableName: "support_messages"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>'.
+src/lib/support-service.ts(160,105): error TS2339: Property 'equals' does not exist on type 'PgColumn<{ name: "ticket_id"; tableName: "support_attachments"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>'.
+src/lib/support-service.ts(164,54): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/lib/support-service.ts(173,89): error TS2339: Property 'equals' does not exist on type 'PgColumn<{ name: "id"; tableName: "support_attachments"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>'.
+src/lib/totp-service.ts(282,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/totp-service.ts(298,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "two_factor_settings"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/lib/turnstile-service.ts(70,15): error TS2322: Type 'unknown' is not assignable to type 'TurnstileVerifyResult'.
+src/lib/velocity-service.ts(36,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { eventType: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; userId?: string | ... 3 more ... | undefined; ipAddress?: string | ... 3 more ... | undefined; metadata?: unknown; deviceFingerprint?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'number | null' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { eventType: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; userId?: string | ... 3 more ... | undefined; ipAddress?: string | ... 3 more ... | undefined; metadata?: unknown; deviceFingerprint?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ eventType: string | SQL<unknown> | Placeholder<string, any>; id?: number | SQL<unknown> | Placeholder<string, any> | undefined; createdAt?: SQL<unknown> | Date | Placeholder<...> | undefined; userId?: string | ... 3 more ... | undefined; ipAddress?: string | ... 3 more ... | undefined; metadata?: unknown; deviceFi...'.
+src/lib/velocity-service.ts(100,17): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "velocity_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "velocity_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "velocity_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "velocity_events"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/middlewares/monitoringMiddleware.ts(22,30): error TS2339: Property 'user' does not exist on type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; }'.
+src/middlewares/monitoringMiddleware.ts(56,26): error TS2339: Property 'user' does not exist on type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; }'.
+src/middlewares/securityMiddleware.ts(13,7): error TS2717: Subsequent property declarations must have the same type.  Property 'auth' must be of type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; } | undefined', but here has type '{ userId?: number | undefined; sessionId?: number | undefined; sessionToken?: string | undefined; user?: any; email?: string | undefined; role?: string | undefined; } | undefined'.
+src/middlewares/securityMiddleware.ts(86,7): error TS2322: Type 'number' is not assignable to type 'string'.
+src/middlewares/securityMiddleware.ts(104,66): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/middlewares/securityMiddleware.ts(131,9): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/middlewares/securityMiddleware.ts(173,27): error TS2339: Property 'user' does not exist on type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; }'.
+src/middlewares/securityMiddleware.ts(183,63): error TS2339: Property 'sessionToken' does not exist on type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; }'.
+src/middlewares/securityMiddleware.ts(220,43): error TS2339: Property 'sessionToken' does not exist on type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; }'.
+src/routes/affiliate.ts(77,37): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/routes/affiliate.ts(97,37): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/routes/affiliate.ts(130,19): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<"referrals", { id: PgColumn<{ name: "id"; tableName: "referrals"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>; ... 9 more ...; referredEmail: PgColumn<...>; }, .....'.
+src/routes/affiliate.ts(135,19): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<"referrals", { id: PgColumn<{ name: "id"; tableName: "referrals"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: number; notNull: true; hasDefault: true; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>; ... 9 more ...; referredEmail: PgColumn<...>; }, .....'.
+src/routes/affiliate.ts(155,30): error TS2339: Property 'count' does not exist on type '{ count: number; }[]'.
+src/routes/affiliate.ts(394,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(33,29): error TS7006: Parameter 'password' implicitly has an 'any' type.
+src/routes/auth.ts(39,31): error TS7006: Parameter 'password' implicitly has an 'any' type.
+src/routes/auth.ts(39,41): error TS7006: Parameter 'storedHash' implicitly has an 'any' type.
+src/routes/auth.ts(134,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(139,18): error TS2448: Block-scoped variable 'clientIp' used before its declaration.
+src/routes/auth.ts(139,18): error TS2454: Variable 'clientIp' is used before being assigned.
+src/routes/auth.ts(150,52): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(249,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(268,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(283,7): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(289,75): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(303,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(343,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(358,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(392,43): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(419,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(447,29): error TS2339: Property 'user' does not exist on type '{ userId: string; sessionId?: string | undefined; email?: string | undefined; }'.
+src/routes/auth.ts(499,47): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(512,34): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(515,11): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/auth.ts(526,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(531,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auth.ts(588,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/auto-blog.ts(175,26): error TS18047: 'ai' is possibly 'null'.
+src/routes/chat/index.ts(118,26): error TS18047: 'ai' is possibly 'null'.
+src/routes/community.ts(3,20): error TS7016: Could not find a declaration file for module 'multer'. 'C:/Users/jitro/fundedwealth/node_modules/.pnpm/multer@2.1.1/node_modules/multer/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/multer` if it exists or add a new declaration (.d.ts) file containing `declare module 'multer';`
+src/routes/community.ts(29,65): error TS2345: Argument of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to parameter of type 'string'.
+src/routes/community.ts(39,65): error TS2345: Argument of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to parameter of type 'string'.
+src/routes/community.ts(49,65): error TS2345: Argument of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to parameter of type 'string'.
+src/routes/community.ts(64,16): error TS7006: Parameter '_req' implicitly has an 'any' type.
+src/routes/community.ts(64,22): error TS7006: Parameter 'file' implicitly has an 'any' type.
+src/routes/community.ts(64,28): error TS7006: Parameter 'cb' implicitly has an 'any' type.
+src/routes/community.ts(117,14): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/routes/community.ts(121,44): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/routes/community.ts(121,61): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/routes/community.ts(282,29): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/community.ts(365,29): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/fingerprint.ts(72,13): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/fingerprint.ts(88,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/fingerprint.ts(95,13): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/fingerprint.ts(108,13): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/fingerprint.ts(116,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/fraud.ts(18,32): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/fraud.ts(21,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "risk_profiles"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/fraud.ts(42,32): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/fraud.ts(65,32): error TS18048: 'req.auth' is possibly 'undefined'.
+src/routes/fraud.ts(208,32): error TS18048: 'req.auth' is possibly 'undefined'.
+src/routes/fraud.ts(216,16): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/fraud.ts(239,32): error TS18048: 'req.auth' is possibly 'undefined'.
+src/routes/fraud.ts(247,16): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/fraud.ts(266,32): error TS18048: 'req.auth' is possibly 'undefined'.
+src/routes/fraud.ts(303,7): error TS2353: Object literal may only specify known properties, and 'referralRisk' does not exist in type 'RiskFactors'.
+src/routes/ip-intelligence.ts(140,13): error TS2741: Property 'where' is missing in type 'Omit<import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165cce0958ca3/node_modules/drizzle-orm/pg-core/query-builders/select").PgSelectBase<"ip_lookups", { id: import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165c...' but required in type 'Omit<import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165cce0958ca3/node_modules/drizzle-orm/pg-core/query-builders/select").PgSelectBase<"ip_lookups", { id: import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165c...'.
+src/routes/ip-intelligence.ts(152,13): error TS2741: Property 'where' is missing in type 'Omit<import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165cce0958ca3/node_modules/drizzle-orm/pg-core/query-builders/select").PgSelectBase<"ip_lookups", { id: import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165c...' but required in type 'Omit<import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165cce0958ca3/node_modules/drizzle-orm/pg-core/query-builders/select").PgSelectBase<"ip_lookups", { id: import("C:/Users/jitro/fundedwealth/node_modules/.pnpm/drizzle-orm@0.45.2_@opentel_58aa31e1560f64b505d165c...'.
+src/routes/ip-intelligence.ts(188,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "ip_lookups"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_lookups"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "ip_lookups"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_lookups"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/ip-intelligence.ts(195,20): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "user_id"; tableName: "ip_history"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/kyc-new.ts(249,78): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/kyc-new.ts(418,7): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { adminId: number | SQL<unknown> | Placeholder<string, any>; action: string | SQL<unknown> | Placeholder<string, any>; entity: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; details?: string | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string' is not assignable to type 'number | SQL<unknown> | Placeholder<string, any>'.
+  Overload 2 of 2, '(values: { adminId: number | SQL<unknown> | Placeholder<string, any>; action: string | SQL<unknown> | Placeholder<string, any>; entity: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; details?: string | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'adminId' does not exist in type '{ adminId: number | SQL<unknown> | Placeholder<string, any>; action: string | SQL<unknown> | Placeholder<string, any>; entity: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; details?: string | ... 2 more ... | undefined; }[]'.
+src/routes/notifications.ts(155,10): error TS2353: Object literal may only specify known properties, and 'returning' does not exist in type '{ count?: (string & {}) | "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; }'.
+src/routes/notifications.ts(190,12): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: SQLWrapper | Date): SQL<...>', gave the following error.
+    Argument of type 'null' is not assignable to parameter of type 'SQLWrapper | Date'.
+  Overload 2 of 3, '(left: Aliased<null>, right: SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<null>'.
+      Type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/notifications.ts(205,12): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: SQLWrapper | Date): SQL<...>', gave the following error.
+    Argument of type 'null' is not assignable to parameter of type 'SQLWrapper | Date'.
+  Overload 2 of 3, '(left: Aliased<null>, right: SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<null>'.
+      Type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/notifications.ts(226,12): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>, right: SQLWrapper | Date): SQL<...>', gave the following error.
+    Argument of type 'null' is not assignable to parameter of type 'SQLWrapper | Date'.
+  Overload 2 of 3, '(left: Aliased<null>, right: SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<null>'.
+      Type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "expires_at"; tableName: "notifications"; dataType: "date"; columnType: "PgTimestamp"; data: Date; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(2,20): error TS7016: Could not find a declaration file for module 'multer'. 'C:/Users/jitro/fundedwealth/node_modules/.pnpm/multer@2.1.1/node_modules/multer/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/multer` if it exists or add a new declaration (.d.ts) file containing `declare module 'multer';`
+src/routes/payments.ts(27,16): error TS7006: Parameter '_req' implicitly has an 'any' type.
+src/routes/payments.ts(27,22): error TS7006: Parameter 'file' implicitly has an 'any' type.
+src/routes/payments.ts(27,28): error TS7006: Parameter 'cb' implicitly has an 'any' type.
+src/routes/payments.ts(41,27): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/routes/payments.ts(266,34): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; type: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; isRead?: boolean | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Argument of type '{ userId: string; title: string; message: string; isRead: false; createdAt: Date; }' is not assignable to parameter of type '{ userId: string | SQL<unknown> | Placeholder<string, any>; type: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<string, any>; ... 11 more ...; isRead?: boolean | ... 2 more ... | undefined; }'.
+      Property 'type' is missing in type '{ userId: string; title: string; message: string; isRead: false; createdAt: Date; }' but required in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; type: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<string, any>; ... 11 more ...; isRead?: boolean | ... 2 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; type: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; isRead?: boolean | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; type: string | SQL<unknown> | Placeholder<string, any>; message: string | SQL<unknown> | Placeholder<string, any>; ... 11 more ...; isRead?: boolean | ... 2 more ... | undefined; }[]'.
+src/routes/payments.ts(418,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payments.ts(424,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/payments.ts(435,29): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payments.ts(445,43): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payments.ts(474,9): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(482,23): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(487,56): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(491,18): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(492,18): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(493,20): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(500,18): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(671,13): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/routes/payments.ts(742,16): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "utr_reference"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | string[]' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'string[]' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | string[]>, right: string | SQLWrapper | string[]): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "utr_reference"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | string[]>'.
+      Type 'PgColumn<{ name: "utr_reference"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | string[]>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "utr_reference"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: false; hasDefault: false; isPrimaryKey: false; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(775,9): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(778,18): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(779,17): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(780,17): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(781,19): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(782,18): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(783,15): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(788,18): error TS18046: 'data' is of type 'unknown'.
+src/routes/payments.ts(930,27): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/routes/payments.ts(950,57): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(988,7): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; paymentMethod: string | SQL<unknown> | Placeholder<string, any>; amount: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; reviewedAt?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'orderId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; paymentMethod: string | SQL<unknown> | Placeholder<string, any>; amount: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; reviewedAt?: SQL<...> | ... 3 more ... | undefined; }[]'.
+src/routes/payments.ts(1006,69): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'number' is not assignable to parameter of type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<number>, right: number | SQLWrapper): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number>'.
+      Type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(1044,65): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | null' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'null' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | null>, right: string | SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | null>'.
+      Type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(1077,98): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/payments.ts(1086,9): error TS2322: Type 'string' is not assignable to type 'number | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | null | undefined'.
+src/routes/payments.ts(1090,45): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/payments.ts(1096,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | null' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'null' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | null>, right: string | SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | null>'.
+      Type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(1100,61): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | null' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'null' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | null>, right: string | SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | null>'.
+      Type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payments.ts(1172,98): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/payments.ts(1182,9): error TS2322: Type 'string' is not assignable to type 'number | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | null | undefined'.
+src/routes/payments.ts(1186,45): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/routes/payments.ts(1192,14): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; ... 4 more ...; generated: undefined; }, {}, {}>, right: string | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'string | null' is not assignable to parameter of type 'string | SQLWrapper'.
+      Type 'null' is not assignable to type 'string | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<string | null>, right: string | SQLWrapper | null): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<string | null>'.
+      Type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<string | null>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "id"; tableName: "orders"; dataType: "string"; columnType: "PgText"; data: string; driverParam: string; notNull: true; hasDefault: true; isPrimaryKey: true; isAutoincrement: false; hasRuntimeDefault: true; enumValues: [...]; baseColumn: never; identity: undefined; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+src/routes/payouts.ts(164,73): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payouts.ts(168,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/routes/payouts.ts(184,69): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payouts.ts(195,23): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payouts.ts(197,44): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/routes/payouts.ts(199,9): error TS2488: Type '{ id: number; createdAt: Date; updatedAt: Date; userId: string; method: string; amount: number; currentStatus: string; transactionId: string | null; processedAt: Date | null; isVerified: boolean; }' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/routes/payouts.ts(208,31): error TS2345: Argument of type 'PgTransaction<NodePgQueryResultHKT, typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index"), ExtractTablesWithRelations<typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index")>>' is not assignable to parameter of type 'NodePgDatabase<typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index")> & { $client: Pool; }'.
+  Property '$client' is missing in type 'PgTransaction<NodePgQueryResultHKT, typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index"), ExtractTablesWithRelations<typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index")>>' but required in type '{ $client: Pool; }'.
+src/routes/payouts.ts(245,9): error TS2488: Type '{ id: number; userId: string; amount: number; method: string; currentStatus: string; transactionId: string | null; processedAt: Date | null; isVerified: boolean; createdAt: Date; updatedAt: Date; }' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/routes/payouts.ts(252,31): error TS2345: Argument of type 'PgTransaction<NodePgQueryResultHKT, typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index"), ExtractTablesWithRelations<typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index")>>' is not assignable to parameter of type 'NodePgDatabase<typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index")> & { $client: Pool; }'.
+  Property '$client' is missing in type 'PgTransaction<NodePgQueryResultHKT, typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index"), ExtractTablesWithRelations<typeof import("C:/Users/jitro/fundedwealth/lib/db/dist/schema/index")>>' but required in type '{ $client: Pool; }'.
+src/routes/payouts.ts(264,27): error TS2345: Argument of type '"REQUESTED" | "UNDER_REVIEW" | "PROCESSING" | "APPROVED" | "PAID" | "REJECTED"' is not assignable to parameter of type '"APPROVED" | "PAID" | "REJECTED"'.
+  Type '"REQUESTED"' is not assignable to type '"APPROVED" | "PAID" | "REJECTED"'.
+src/scripts/validate-fingerprint.ts(85,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/scripts/validate-fingerprint.ts(123,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/scripts/validate-fingerprint.ts(156,9): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/scripts/validate-ipqs-minimal.ts(79,68): error TS18048: 'API_KEY' is possibly 'undefined'.
+src/scripts/validate-ipqs-minimal.ts(155,33): error TS18048: 'API_KEY' is possibly 'undefined'.
+src/scripts/validate-ipqs-minimal.ts(155,59): error TS18048: 'API_KEY' is possibly 'undefined'.
+src/scripts/validate-ipqs.ts(168,9): error TS2353: Object literal may only specify known properties, and 'countryMismatch' does not exist in type '{ vpnDetected: boolean; proxyDetected: boolean; torDetected: boolean; datacenterDetected: boolean; fraudScore?: number | undefined; }'.
+src/scripts/validate-ipqs.ts(211,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { ip: string | SQL<unknown> | Placeholder<string, any>; lookupSource: string | SQL<unknown> | Placeholder<string, any>; trigger: string | SQL<unknown> | Placeholder<...>; ... 22 more ...; vpnProxyRiskScore?: number | ... 2 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Type 'string | number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+      Type 'number' is not assignable to type 'string | SQL<unknown> | Placeholder<string, any> | null | undefined'.
+  Overload 2 of 2, '(values: { ip: string | SQL<unknown> | Placeholder<string, any>; lookupSource: string | SQL<unknown> | Placeholder<string, any>; trigger: string | SQL<unknown> | Placeholder<...>; ... 22 more ...; vpnProxyRiskScore?: number | ... 2 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ ip: string | SQL<unknown> | Placeholder<string, any>; lookupSource: string | SQL<unknown> | Placeholder<string, any>; trigger: string | SQL<unknown> | Placeholder<...>; ... 22 more ...; vpnProxyRiskScore?: number | ... 2 more ... | undefined; }[]'.
+src/scripts/validate-kyc-dedup.ts(52,82): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/scripts/validate-kyc-dedup.ts(67,82): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/scripts/validate-kyc-dedup.ts(83,78): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/scripts/validate-kyc-dedup.ts(99,78): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+undefined
+C:\Users\jitro\fundedwealth\artifacts\api-server:
+[ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL] Command failed with exit code 2: tsc -p tsconfig.json --noEmit

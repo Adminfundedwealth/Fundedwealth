@@ -1,0 +1,24 @@
+﻿node : X [ERROR] Must use "outdir" when there are multiple input files
+At line:1 char:86
++ ... ata\fundedwealth\artifacts\api-server"; node ./build.mjs *>&1 | Out-F ...
++                                             ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (X [ERROR] Must ...ple input files 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+1 error
+Error: Build failed with 1 error:
+error: Must use "outdir" when there are multiple input files
+    at failureErrorWithLog (C:\Users\rmsam\Desktop\fundedwealth (1) data\funded
+wealth\node_modules\.pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:1467:
+15)
+    at C:\Users\rmsam\Desktop\fundedwealth (1) data\fundedwealth\node_modules\.
+pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:926:25
+    at C:\Users\rmsam\Desktop\fundedwealth (1) data\fundedwealth\node_modules\.
+pnpm\esbuild@0.27.3\node_modules\esbuild\lib\main.js:1345:9
+    at process.processTicksAndRejections 
+(node:internal/process/task_queues:104:5) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}

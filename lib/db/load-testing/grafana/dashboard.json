@@ -1,0 +1,43 @@
+{
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "type": "graph",
+      "title": "API Latency (p95)",
+      "targets": [ { "expr": "api_latency_ms_p95" } ]
+    },
+    {
+      "type": "graph",
+      "title": "DB Latency (p95)",
+      "targets": [ { "expr": "db_latency_ms_p95" } ]
+    },
+    {
+      "type": "graph",
+      "title": "WebSocket Latency (p95)",
+      "targets": [ { "expr": "ws_latency_ms_p95" } ]
+    },
+    {
+      "type": "graph",
+      "title": "Execution Latency (p95)",
+      "targets": [ { "expr": "execution_latency_ms_p95" } ]
+    },
+    {
+      "type": "stat",
+      "title": "Errors Rate",
+      "targets": [ { "expr": "errors" } ]
+    },
+    {
+      "type": "graph",
+      "title": "Host CPU (%)",
+      "targets": [ { "expr": "node_cpu_seconds_total" } ]
+    },
+    {
+      "type": "graph",
+      "title": "Host Memory (bytes)",
+      "targets": [ { "expr": "node_memory_MemAvailable_bytes" } ]
+    }
+  ],
+  "schemaVersion": 18,
+  "title": "Load Test Overview",
+  "version": 1
+}

@@ -1,0 +1,141 @@
+﻿[36mvite v7.3.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+node.exe : Found 3 warnings while optimizing generated CSS:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Found 3 warning... generated CSS::String) 
+    [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Issue #1:
+[2mΓöé     padding-inline: 1rem;[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @screen md {
+[2mΓöå[22m          [33m[2m^--[22m Unknown at rule: @screen[39m
+[2mΓöå[22m
+[2mΓöé     .container {[22m
+[2mΓöé       max-width: min(1720px, calc(100% - 2.5rem));[22m
+
+Issue #2:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @screen lg {
+[2mΓöå[22m          [33m[2m^--[22m Unknown at rule: @screen[39m
+[2mΓöå[22m
+[2mΓöé     .container {[22m
+[2mΓöé       max-width: min(1720px, calc(100% - 3rem));[22m
+
+Issue #3:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @screen xl {
+[2mΓöå[22m          [33m[2m^--[22m Unknown at rule: @screen[39m
+[2mΓöå[22m
+[2mΓöé     .container {[22m
+[2mΓöé       max-width: 1720px;[22m
+
+Found 3 warnings while optimizing generated CSS:
+
+Issue #1:
+[2mΓöé     padding-inline: 1rem;[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @screen md {
+[2mΓöå[22m          [33m[2m^--[22m Unknown at rule: @screen[39m
+[2mΓöå[22m
+[2mΓöé     .container {[22m
+[2mΓöé       max-width: min(1720px, calc(100% - 2.5rem));[22m
+
+Issue #2:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @screen lg {
+[2mΓöå[22m          [33m[2m^--[22m Unknown at rule: @screen[39m
+[2mΓöå[22m
+[2mΓöé     .container {[22m
+[2mΓöé       max-width: min(1720px, calc(100% - 3rem));[22m
+
+Issue #3:
+[2mΓöé     }[22m
+[2mΓöé   }[22m
+[2mΓöé[22m   @screen xl {
+[2mΓöå[22m          [33m[2m^--[22m Unknown at rule: @screen[39m
+[2mΓöå[22m
+[2mΓöé     .container {[22m
+[2mΓöé       max-width: 1720px;[22m
+
+[33msrc/components/ui/progress.tsx (2:0): Error when using sourcemap for reporting an 
+error: Can't resolve original location of error.[39m
+[33msrc/components/ui/label.tsx (2:0): Error when using sourcemap for reporting an 
+error: Can't resolve original location of error.[39m
+[33msrc/components/ui/select.tsx (2:0): Error when using sourcemap for reporting an 
+error: Can't resolve original location of error.[39m
+[32mΓ£ô[39m 3035 modules transformed.
+[33mGenerated an empty chunk: "vendor".[39m
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                        [39m[1m[2m  4.95 kB[22m[1m[22m[2m Γöé gzip:   1.58 kB[22m
+[2mdist/[22m[35massets/index-C69n48pr.css                         [39m[1m[2m318.69 kB[22m[1m[22m[2m Γöé gzip:  39.34 kB[22m
+[2mdist/[22m[36massets/vendor-l0sNRNKZ.js                         [39m[1m[2m  0.00 kB[22m[1m[22m[2m Γöé gzip:   0.02 kB[22m
+[2mdist/[22m[36massets/chevron-right-DkroSa3k.js                  [39m[1m[2m  0.13 kB[22m[1m[22m[2m Γöé gzip:   0.14 kB[22m
+[2mdist/[22m[36massets/loader-circle-CzrxIGn8.js                  [39m[1m[2m  0.15 kB[22m[1m[22m[2m Γöé gzip:   0.16 kB[22m
+[2mdist/[22m[36massets/arrow-left-BLC_H4iS.js                     [39m[1m[2m  0.17 kB[22m[1m[22m[2m Γöé gzip:   0.16 kB[22m
+[2mdist/[22m[36massets/search-By7tW6ra.js                         [39m[1m[2m  0.18 kB[22m[1m[22m[2m Γöé gzip:   0.17 kB[22m
+[2mdist/[22m[36massets/circle-check-big-Dv6z6PGi.js               [39m[1m[2m  0.20 kB[22m[1m[22m[2m Γöé gzip:   0.18 kB[22m
+[2mdist/[22m[36massets/user-yI7vWRqU.js                           [39m[1m[2m  0.20 kB[22m[1m[22m[2m Γöé gzip:   0.18 kB[22m
+[2mdist/[22m[36massets/info-BaQW57Mz.js                           [39m[1m[2m  0.21 kB[22m[1m[22m[2m Γöé gzip:   0.18 kB[22m
+[2mdist/[22m[36massets/circle-x-BtD871cB.js                       [39m[1m[2m  0.21 kB[22m[1m[22m[2m Γöé gzip:   0.18 kB[22m
+[2mdist/[22m[36massets/target-BkOoXqSc.js                         [39m[1m[2m  0.23 kB[22m[1m[22m[2m Γöé gzip:   0.16 kB[22m
+[2mdist/[22m[36massets/upload-CfNrckFB.js                         [39m[1m[2m  0.23 kB[22m[1m[22m[2m Γöé gzip:   0.19 kB[22m
+[2mdist/[22m[36massets/activity-B-TEBhFJ.js                       [39m[1m[2m  0.24 kB[22m[1m[22m[2m Γöé gzip:   0.20 kB[22m
+[2mdist/[22m[36massets/copy-Dif0ODLi.js                           [39m[1m[2m  0.24 kB[22m[1m[22m[2m Γöé gzip:   0.21 kB[22m
+[2mdist/[22m[36massets/message-circle-DCILYpe4.js                 [39m[1m[2m  0.24 kB[22m[1m[22m[2m Γöé gzip:   0.21 kB[22m
+[2mdist/[22m[36massets/external-link-ChsrE0lh.js                  [39m[1m[2m  0.25 kB[22m[1m[22m[2m Γöé gzip:   0.20 kB[22m
+[2mdist/[22m[36massets/triangle-alert-D9uAtHRV.js                 [39m[1m[2m  0.27 kB[22m[1m[22m[2m Γöé gzip:   0.22 kB[22m
+[2mdist/[22m[36massets/shield-T8oxPFIC.js                         [39m[1m[2m  0.27 kB[22m[1m[22m[2m Γöé gzip:   0.23 kB[22m
+[2mdist/[22m[36massets/award-BrAG3Tr_.js                          [39m[1m[2m  0.28 kB[22m[1m[22m[2m Γöé gzip:   0.23 kB[22m
+[2mdist/[22m[36massets/book-open-89QYXjWB.js                      [39m[1m[2m  0.28 kB[22m[1m[22m[2m Γöé gzip:   0.21 kB[22m
+[2mdist/[22m[36massets/tag-ZAAfIkQn.js                            [39m[1m[2m  0.33 kB[22m[1m[22m[2m Γöé gzip:   0.25 kB[22m
+[2mdist/[22m[36massets/trash-2-CX4yeehi.js                        [39m[1m[2m  0.33 kB[22m[1m[22m[2m Γöé gzip:   0.22 kB[22m
+[2mdist/[22m[36massets/crown-CpfWOuEo.js                          [39m[1m[2m  0.36 kB[22m[1m[22m[2m Γöé gzip:   0.26 kB[22m
+[2mdist/[22m[36massets/sparkles-uotBrHwP.js                       [39m[1m[2m  0.50 kB[22m[1m[22m[2m Γöé gzip:   0.28 kB[22m
+[2mdist/[22m[36massets/brain-CKdqhxpI.js                          [39m[1m[2m  0.58 kB[22m[1m[22m[2m Γöé gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/settings-CzUGBnTL.js                       [39m[1m[2m  0.65 kB[22m[1m[22m[2m Γöé gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/plus-Cp-8d1uj.js                           [39m[1m[2m  0.69 kB[22m[1m[22m[2m Γöé gzip:   0.40 kB[22m
+[2mdist/[22m[36massets/scale-CCX2Bpie.js                          [39m[1m[2m  0.70 kB[22m[1m[22m[2m Γöé gzip:   0.36 kB[22m
+[2mdist/[22m[36massets/sign-in-By4B1OiF.js                        [39m[1m[2m  1.22 kB[22m[1m[22m[2m Γöé gzip:   0.62 kB[22m
+[2mdist/[22m[36massets/sign-up-PmZbuRSS.js                        [39m[1m[2m  1.22 kB[22m[1m[22m[2m Γöé gzip:   0.62 kB[22m
+[2mdist/[22m[36massets/WhatsAppButton-HQcHQG3J.js                 [39m[1m[2m  1.96 kB[22m[1m[22m[2m Γöé gzip:   1.15 kB[22m
+[2mdist/[22m[36massets/referral-2Gzobsmp.js                       [39m[1m[2m  2.44 kB[22m[1m[22m[2m Γöé gzip:   1.16 kB[22m
+[2mdist/[22m[36massets/refund-D958uC6W.js                         [39m[1m[2m  6.54 kB[22m[1m[22m[2m Γöé gzip:   2.08 kB[22m
+[2mdist/[22m[36massets/scaling-BCOk1364.js                        [39m[1m[2m  7.14 kB[22m[1m[22m[2m Γöé gzip:   2.46 kB[22m
+[2mdist/[22m[36massets/terms-KNHL5Lyc.js                          [39m[1m[2m  7.69 kB[22m[1m[22m[2m Γöé gzip:   2.58 kB[22m
+[2mdist/[22m[36massets/privacy-CqRYJS8L.js                        [39m[1m[2m  8.33 kB[22m[1m[22m[2m Γöé gzip:   2.57 kB[22m
+[2mdist/[22m[36massets/success-stories-BhcGadwz.js                [39m[1m[2m  8.63 kB[22m[1m[22m[2m Γöé gzip:   3.03 kB[22m
+[2mdist/[22m[36massets/economic-calendar-D1K3mTii.js              [39m[1m[2m  9.24 kB[22m[1m[22m[2m Γöé gzip:   2.44 kB[22m
+[2mdist/[22m[36massets/leaderboard-Db2UVqmn.js                    [39m[1m[2m  9.77 kB[22m[1m[22m[2m Γöé gzip:   3.08 kB[22m
+[2mdist/[22m[36massets/blog-FWyXrbHi.js                           [39m[1m[2m  9.89 kB[22m[1m[22m[2m Γöé gzip:   3.57 kB[22m
+[2mdist/[22m[36massets/payouts-DmbMt16w.js                        [39m[1m[2m 10.34 kB[22m[1m[22m[2m Γöé gzip:   3.10 kB[22m
+[2mdist/[22m[36massets/community-D4e7i7MV.js                      [39m[1m[2m 11.96 kB[22m[1m[22m[2m Γöé gzip:   4.62 kB[22m
+[2mdist/[22m[36massets/rules-CvVdd6RC.js                          [39m[1m[2m 21.72 kB[22m[1m[22m[2m Γöé gzip:   5.59 kB[22m
+[2mdist/[22m[36massets/ChatWidget-BBOSPaHz.js                     [39m[1m[2m 26.82 kB[22m[1m[22m[2m Γöé gzip:   9.28 kB[22m
+[2mdist/[22m[36massets/faq-DqGc1cYP.js                            [39m[1m[2m 27.27 kB[22m[1m[22m[2m Γöé gzip:   9.98 kB[22m
+[2mdist/[22m[36massets/impact-B89nKoIe.js                         [39m[1m[2m 28.55 kB[22m[1m[22m[2m Γöé gzip:   5.99 kB[22m
+[2mdist/[22m[36massets/kyc-TngTNiFs.js                            [39m[1m[2m 40.92 kB[22m[1m[22m[2m Γöé gzip:  12.62 kB[22m
+[2mdist/[22m[36massets/championship-BFX4dRfP.js                   [39m[1m[2m 43.41 kB[22m[1m[22m[2m Γöé gzip:   9.86 kB[22m
+[2mdist/[22m[36massets/checkout-Cnd1EFa7.js                       [39m[1m[2m 45.88 kB[22m[1m[22m[2m Γöé gzip:  10.83 kB[22m
+[2mdist/[22m[36massets/admin-BfzKQ5mh.js                          [39m[1m[2m 51.54 kB[22m[1m[22m[2m Γöé gzip:   9.94 kB[22m
+[2mdist/[22m[36massets/trade-DVBKpNvZ.js                          [39m[1m[2m 61.66 kB[22m[1m[22m[2m Γöé gzip:  16.98 kB[22m
+[2mdist/[22m[36massets/radix-kmztn3I_.js                          [39m[1m[2m 72.69 kB[22m[1m[22m[2m Γöé gzip:  25.67 kB[22m
+[2mdist/[22m[36massets/lightweight-charts.production-Cx6afNUr.js  [39m[1m[2m162.71 kB[22m[1m[22m[2m Γöé gzip:  51.83 kB[22m
+[2mdist/[22m[36massets/dashboard-DsaYiYNp.js                      [39m[1m[2m359.58 kB[22m[1m[22m[2m Γöé gzip:  90.68 kB[22m
+[2mdist/[22m[36massets/api-B3lJ2Yk7.js                            [39m[1m[2m426.56 kB[22m[1m[22m[2m Γöé gzip: 115.47 kB[22m
+[2mdist/[22m[36massets/index-DXymOOz5.js                          [39m[1m[33m790.82 kB[39m[22m[2m Γöé gzip: 228.34 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: 
+https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32mΓ£ô built in 1m 11s[39m

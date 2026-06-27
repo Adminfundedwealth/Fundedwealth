@@ -1,0 +1,38 @@
+[
+  {
+    "name": "High Rate of 5xx on /api",
+    "description": "Triggers when a high number of 5xx responses are observed on API endpoints within a short window.",
+    "eventType": "API_LOG",
+    "condition": { "pathContains": "/api", "status": "500" },
+    "enabled": true,
+    "severity": "CRITICAL",
+    "notifyEmails": ["ops@example.com"]
+  },
+  {
+    "name": "Payment failures spike",
+    "description": "Detect a spike in payment failures from the payment provider.",
+    "eventType": "PAYMENT_FAILURE",
+    "condition": { "status": "FAILED", "amountGte": 0 },
+    "enabled": true,
+    "severity": "HIGH",
+    "notifyEmails": ["finance@example.com", "ops@example.com"]
+  },
+  {
+    "name": "Support queue depth",
+    "description": "Manual rule placeholder: alert when support ticket backlog exceeds threshold. (Use dashboard query to create alert)",
+    "eventType": "API_LOG",
+    "condition": { "pathContains": "/api/support" },
+    "enabled": true,
+    "severity": "MEDIUM",
+    "notifyEmails": ["support@example.com"]
+  },
+  {
+    "name": "Possible fraud pattern detected",
+    "description": "Placeholder: triggers when referral/fraud scoring hits configured threshold. Requires integration with fraud events.",
+    "eventType": "SYSTEM_ERROR",
+    "condition": { "messageContains": "FRAUD_FLAG" },
+    "enabled": true,
+    "severity": "HIGH",
+    "notifyEmails": ["compliance@example.com", "ops@example.com"]
+  }
+]

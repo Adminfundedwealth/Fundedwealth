@@ -1,0 +1,30 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
+  "packageManager": "pnpm@11.1.1",
+  "scripts": {
+    "preinstall": "node -e \"const fs = require('fs'); ['package-lock.json', 'yarn.lock'].forEach((f) => { try { fs.rmSync(f, { force: true }) } catch {} }); const ua = process.env.npm_config_user_agent || ''; if (ua && !ua.startsWith('pnpm/') && !ua.startsWith('npm/')) { console.error('Use pnpm instead'); process.exit(1); }\"",
+    "dev": "pnpm -r --parallel --filter @workspace/fundedwealth --filter @workspace/api-server dev",
+    "dev:frontend": "pnpm -C artifacts/fundedwealth dev",
+    "build": "pnpm run typecheck && pnpm -r --if-present --filter=!@workspace/mockup-sandbox run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter=./artifacts/** --filter=./scripts --filter=!@workspace/mockup-sandbox --if-present run typecheck"
+  },
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "catalog:",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "fast-uri": ">=3.1.2",
+      "protobufjs": ">=7.5.6"
+    },
+    "auditConfig": {
+      "ignoreCves": []
+    }
+  }
+}

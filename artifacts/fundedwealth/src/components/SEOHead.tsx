@@ -1,0 +1,62 @@
+import { Helmet } from "react-helmet-async";
+
+interface SEOHeadProps {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  canonical?: string;
+  ogImage?: string;
+  ogType?: string;
+  noindex?: boolean;
+}
+
+const SITE_NAME = "FundedWealth";
+const DEFAULT_TITLE = "FundedWealth — India's #1 Best Prop Trading Firm | Get Funded Up to ₹50 Lakhs";
+const DEFAULT_DESCRIPTION = "FundedWealth is India's best prop trading firm. Get funded trading accounts up to ₹50 Lakhs. Trade NSE, BSE, MCX, Forex & Crypto with zero risk. Keep 70-90% profits. 12-hour guaranteed payouts. Join 15,000+ funded Indian traders. Lowest fees starting ₹999.";
+const DEFAULT_KEYWORDS = "prop trading India, best prop firm India, funded trading account India, prop firm India, funded trader India, NSE prop trading, BSE prop trading, MCX prop trading, forex prop trading India, crypto prop trading India, proprietary trading India, funded account India, FundedWealth, get funded trading, best prop trading firm India, prop trading company India, instant funded account India, prop firm for Indian traders, cheapest prop firm India, top prop firm India, trading evaluation India, prop trading challenge India, funded forex account India, best proprietary trading firm India, prop trading firms in India, Indian prop firm, prop trading platform India, 90 profit split prop firm, instant funding prop firm India, lowest drawdown prop firm";
+const BASE_URL = "https://fundedwealth.com";
+const DEFAULT_OG_IMAGE = `${BASE_URL}/opengraph.jpg`;
+
+export default function SEOHead({
+  title,
+  description = DEFAULT_DESCRIPTION,
+  keywords = DEFAULT_KEYWORDS,
+  canonical,
+  ogImage = DEFAULT_OG_IMAGE,
+  ogType = "website",
+  noindex = false,
+}: SEOHeadProps) {
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
+  const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : undefined;
+
+  return (
+    <Helmet>
+      <title>{fullTitle}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      <meta name="author" content="FundedWealth" />
+      <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1"} />
+      <meta name="geo.region" content="IN" />
+
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+      <meta property="og:type" content={ogType} />
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_IN" />
+      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@fundedwealth" />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={ogImage} />
+
+      <meta name="theme-color" content="#1A0030" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    </Helmet>
+  );
+}

@@ -1,0 +1,9 @@
+{
+  "installCommand": "corepack enable && corepack prepare pnpm@11.1.1 --activate && pnpm install --no-frozen-lockfile",
+  "buildCommand": "node vercel-build.mjs",
+  "framework": null,
+  "redirects": [
+    { "source": "/trade", "destination": "https://terminal.fundedwealth.com", "permanent": true },
+    { "source": "/trade/:path*", "destination": "https://terminal.fundedwealth.com", "permanent": true }
+  ]
+}

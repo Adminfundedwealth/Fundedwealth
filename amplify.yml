@@ -1,0 +1,41 @@
+version: 1
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - corepack enable
+            - corepack prepare pnpm@11.1.1 --activate
+            - pnpm install --no-frozen-lockfile
+        build:
+          commands:
+            - pnpm --filter @workspace/fundedwealth build
+      artifacts:
+        baseDirectory: artifacts/fundedwealth/dist
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - artifacts/fundedwealth/node_modules/**/*
+      buildPath: /
+    appRoot: .
+    customHeaders:
+      - pattern: '**/*'
+        headers:
+          - key: X-Content-Type-Options
+            value: nosniff
+          - key: X-Frame-Options
+            value: SAMEORIGIN
+          - key: Strict-Transport-Security
+            value: max-age=31536000; includeSubDomains; preload
+          - key: Referrer-Policy
+            value: strict-origin-when-cross-origin
+      - pattern: '/assets/*'
+        headers:
+          - key: Cache-Control
+            value: public, max-age=31536000, immutable
+    customRules:
+      - source: '</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp|avif)$)([^.]+$)/>'
+        target: /index.html
+        status: '200'

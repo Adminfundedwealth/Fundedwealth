@@ -1,0 +1,72 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^index\.html$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+# ── Security Headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Enable XSS filter in older browsers
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Enforce HTTPS for 1 year (only enable when fully on HTTPS)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # Referrer policy — don't leak URL to third parties
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions policy — disable unneeded browser APIs
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self)"
+
+    # Content Security Policy
+    # NOTE: Adjust script-src / connect-src as you add new third-party services
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; connect-src 'self' https: wss: ws:; frame-src https://checkout.razorpay.com; object-src 'none'; base-uri 'self';"
+
+    # Remove server fingerprinting
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
+
+# ── Cache Control ─────────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # HTML — no cache (always revalidate for SPA routing)
+    <FilesMatch "\.(html)$">
+        ExpiresDefault "access plus 0 seconds"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+
+    # Versioned JS/CSS assets — cache 1 year (Vite adds content hashes)
+    <FilesMatch "\.(js|css|woff2?|ttf|eot)$">
+        ExpiresDefault "access plus 1 year"
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Images
+    <FilesMatch "\.(png|jpg|jpeg|gif|webp|avif|svg|ico)$">
+        ExpiresDefault "access plus 1 month"
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+# ── Compression ───────────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ── Deny access to sensitive files ───────────────────────────────────────────
+<FilesMatch "\.(env|env\..*|git|gitignore|htpasswd|log|sql)$">
+    Require all denied
+</FilesMatch>

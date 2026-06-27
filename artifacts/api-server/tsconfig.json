@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"],
+    "noImplicitReturns": false
+  },
+  "include": ["src"],
+  "exclude": ["src/__tests__", "src/scripts"],
+  "references": [
+    {
+      "path": "../../lib/db"
+    },
+    {
+      "path": "../../lib/api-zod"
+    },
+    {
+      "path": "../../lib/integrations-gemini-ai"
+    }
+  ]
+}

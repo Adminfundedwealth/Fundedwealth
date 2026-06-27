@@ -1,0 +1,156 @@
+Upgrade the existing "FW Impact Initiative" section to clearly show BOTH company contribution and user contribution.
+
+GOAL:
+Remove confusion and highlight that:
+
+1. FundedWealth contributes from its own profits
+2. Users can optionally contribute
+
+---
+
+🎯 HERO SECTION UPDATE
+
+Replace current paragraph with:
+
+"Every trade you take creates real impact.
+FundedWealth contributes from its profits — and you can choose to give back too."
+
+Add a highlighted badge above headline:
+
+"Powered by Real Impact ❤️"
+
+---
+
+💥 ADD DOUBLE IMPACT STRIP (NEW SECTION BELOW HERO)
+
+Create a 2-column layout:
+
+LEFT CARD:
+Title: "FundedWealth Contribution 🏢"
+Text:
+"We allocate a portion of our profits to support real causes across India."
+
+Stats:
+
+* ₹X contributed by FundedWealth
+* X meals funded
+* X students supported
+
+RIGHT CARD:
+Title: "Trader Contribution (Optional) 👤"
+Text:
+"You can optionally contribute during withdrawals and increase your impact."
+
+Stats:
+
+* ₹Y contributed by traders
+* X meals funded
+* X students supported
+
+Below both cards add:
+
+"Together, we create DOUBLE IMPACT"
+
+---
+
+📊 UPDATE STATS SECTION
+
+Modify existing stats cards to show:
+
+* Total Impact ₹ (combined)
+* Meals Provided
+* Students Supported
+* Cities Covered
+
+Add subtext:
+"Includes contributions from FundedWealth + Traders"
+
+---
+
+🧾 ADD TRANSPARENCY LINE
+
+Below stats:
+
+"All contributions include both FundedWealth profit sharing and optional trader donations."
+
+---
+
+🖥 UPDATE "HOW IT WORKS"
+
+Change steps:
+
+Step 1:
+"You Trade & Profit"
+
+Step 2:
+"We Contribute Automatically"
+(subtext: FundedWealth donates from profits)
+
+Step 3:
+"You Can Give Back (Optional)"
+(subtext: donate during withdrawal)
+
+Step 4:
+"Track & Share Your Impact"
+
+---
+
+🏆 UPDATE CTA SECTION
+
+Replace CTA text with:
+
+Headline:
+"Ready to Trade with Purpose?"
+
+Subtext:
+"Your trades create impact automatically. Go further by choosing to give back."
+
+Buttons:
+
+* "Start Trading & Creating Impact"
+* "View Plans"
+
+Add small note:
+"Donations are voluntary. No automatic deductions from traders."
+
+---
+
+📊 BACKEND REQUIREMENTS
+
+Add separate tracking fields:
+
+company_contribution_total
+user_contribution_total
+
+combined_total = sum of both
+
+---
+
+🎨 UI STYLE
+
+* Use fintech dark theme
+* Use gradient highlights for "impact"
+* Add icons:
+  🏢 for company
+  👤 for trader
+  ❤️ for impact
+
+---
+
+🎯 FINAL RESULT
+
+User clearly understands:
+
+* Company is already contributing
+* User contribution is optional
+* Platform is trustworthy and transparent
+
+This should increase:
+
+* Trust
+* Conversions
+* Brand differentiation
+
+---
+
+Build frontend + backend integration with clean responsive UI.
