@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import SEOHead from "@/components/SEOHead";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -91,9 +90,6 @@ export default function Checkout() {
   } = usePayment(getToken, isLoaded);
 
   const [payCategory, setPayCategory] = useState<"upi" | "card" | "crypto" | null>(null);
-  const handleTurnstileVerify = useCallback((token: string) => {
-    (window as any).__turnstileToken = token;
-  }, []);
   const [utrInput, setUtrInput] = useState("");
   const [utrStatus, setUtrStatus] = useState<"idle" | "verifying" | "pending" | "success" | "failed">("idle");
   const [utrError, setUtrError] = useState("");
@@ -422,7 +418,6 @@ export default function Checkout() {
                           </button>
                         ))}
                       </div>
-                      <TurnstileWidget onVerify={handleTurnstileVerify} action="purchase" theme="dark" size="normal" className="flex justify-center my-3" />
                       <Button onClick={() => handleOxaPayPayment(selectedPayment, selectedPlan, selectedSizeIdx, appliedCoupon, referralCode, billing, finalTotal)} disabled={oxapayLoading || !selectedPayment?.startsWith("oxapay-")} className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold gap-2">
                         {oxapayLoading ? "Redirecting…" : <><ExternalLink size={16} /> Continue with OxaPay</>}
                       </Button>

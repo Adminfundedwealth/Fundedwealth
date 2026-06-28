@@ -368,7 +368,7 @@ async function triggerTerminalProvisioning(
 //     duplicate deliveries before any provisioning runs.
 // ---------------------------------------------------------------------------
 
-router.post("/create-crypto-payment", paymentLimiter, requireTurnstile, requireActiveAccount, async (req: Request, res: Response) => {
+router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
     const { paymentMethod, planType, sizeIndex, couponCode, referralCode, billing } = req.body;
