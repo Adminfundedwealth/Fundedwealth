@@ -3,12 +3,8 @@ import "./i18n";
 import "./index.css";
 import { lazy, Suspense, Component, type ReactNode } from "react";
 
-// Agentation — dev-only visual feedback tool for AI coding agents.
-// import.meta.env.DEV is replaced with `false` at production build time by Vite,
-// so this import and the component are completely tree-shaken from the production bundle.
-const AgentationWidget = import.meta.env.DEV
-  ? lazy(() => import("agentation").then((m) => ({ default: m.Agentation })))
-  : null;
+// Agentation removed — dev-only tool, not for production.
+const AgentationWidget = null;
 
 // ── Error Boundary — catches any render crash and shows a recovery UI ──────
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
