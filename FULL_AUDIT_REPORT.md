@@ -22,7 +22,7 @@
 
 ### C1 — Live Razorpay Key Committed in Dev `.env`
 **File:** `artifacts/fundedwealth/.env`  
-**Line:** `VITE_RAZORPAY_KEY_ID=rzp_live_Sy1K5V35MUlZoB`
+**Line:** `VITE_RAZORPAY_KEY_ID=rzp_live_XXXXXXXXXXXXXXXXX`
 
 The production live Razorpay key is stored in the development `.env` file. If this repo is ever pushed to a public location (or the file leaked), the key could be used to initiate fraudulent payment captures.
 

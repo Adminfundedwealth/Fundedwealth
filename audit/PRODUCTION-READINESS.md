@@ -40,7 +40,7 @@
 
 ### 3. CREDENTIALS IN REPOSITORY — Severity: HIGH
 **Impact:** Live payment keys and Supabase credentials are in committed .env files  
-**Evidence:** `rzp_live_Sy1K5V35MUlZoB` (Razorpay live key), Supabase URL+anon key in `.env.production`  
+**Evidence:** `rzp_live_XXXXXXXXXXXXXXXXX` (Razorpay live key), Supabase URL+anon key in `.env.production`  
 **Risk:** Anyone with repo access can make API calls against live payment system.
 
 ---

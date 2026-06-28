@@ -19,8 +19,8 @@
 
 ### What authentication already exists?
 **Clerk** — with TEST keys already configured:
-- Secret Key: `sk_test_i0RLZPGMjyW2JvYRExkby52f0e92A8JHc5K2ElQD1s`
-- Publishable Key: `pk_test_a25vd2luZy1ncm91c2UtNTEuY2xlcmsuYWNjb3VudHMuZGV2JA`
+- Secret Key: `[REDACTED]`
+- Publishable Key: `[REDACTED]`
 
 ### What deployment configuration already exists?
 **Replit** — the project was originally deployed on Replit with autoscale deployment target, port 8080.

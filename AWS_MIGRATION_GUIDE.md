@@ -132,7 +132,7 @@ Push to `main` triggers:
 | `VITE_API_BASE_URL` | `https://api.fundedwealth.com` |
 | `VITE_SUPABASE_URL` | `https://nysrxvpjdlvzvcawysvh.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | (your anon key) |
-| `VITE_RAZORPAY_KEY_ID` | `rzp_live_Sy1K5V35MUlZoB` |
+| `VITE_RAZORPAY_KEY_ID` | `rzp_live_XXXXXXXXXXXXXXXXX` |
 
 ### Backend (EC2 .env)
 See `aws/.env.ec2.template` for full list.
