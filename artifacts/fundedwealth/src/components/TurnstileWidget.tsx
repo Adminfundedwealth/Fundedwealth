@@ -67,10 +67,12 @@ export function TurnstileWidget({
     const widgetIdRef = useRef<string | null>(null);
     const [ready, setReady] = useState(false);
 
-    const isDev = import.meta.env.DEV || !import.meta.env.VITE_TURNSTILE_SITE_KEY;
+    // Only bypass CAPTCHA in local development (Vite dev server)
+    const isDev = import.meta.env.DEV &&
+        (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
     useEffect(() => {
-        if (isDev) return; // Skip loading Turnstile script in dev mode
+        if (isDev) return; // Skip loading Turnstile script in local dev only
         loadTurnstileScript().then(() => setReady(true));
     }, [isDev]);
 
@@ -79,7 +81,8 @@ export function TurnstileWidget({
 
         const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
         if (!siteKey) {
-            console.error("[Turnstile] VITE_TURNSTILE_SITE_KEY not set");
+            console.error("[Turnstile] VITE_TURNSTILE_SITE_KEY not set — CAPTCHA will not render in production!");
+            onError?.("CAPTCHA configuration missing. Please contact support.");
             return;
         }
 
@@ -106,12 +109,12 @@ export function TurnstileWidget({
         };
     }, [isDev, ready, onVerify, onExpire, onError, action, theme, size]);
 
-    // In dev mode, show a small indicator instead of the widget
+    // Only show bypass indicator in local development
     if (isDev) {
         return (
             <div className={className}>
-                <div className="px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs text-center">
-                    ✓ CAPTCHA bypassed (dev mode)
+                <div className="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs text-center">
+                    🛠️ Local dev — CAPTCHA skipped
                 </div>
             </div>
         );

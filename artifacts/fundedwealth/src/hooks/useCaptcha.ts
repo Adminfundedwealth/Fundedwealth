@@ -17,7 +17,10 @@ import { useState, useCallback } from "react";
 const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "";
 
 export function useCaptcha() {
-    const isDev = import.meta.env.DEV || !import.meta.env.VITE_TURNSTILE_SITE_KEY;
+    // Only bypass CAPTCHA when running locally on the Vite dev server
+    const isDev = import.meta.env.DEV &&
+        (typeof window !== "undefined" &&
+            (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"));
 
     const [token, setToken] = useState<string | null>(isDev ? "dev-bypass" : null);
     const [verified, setVerified] = useState(isDev);
