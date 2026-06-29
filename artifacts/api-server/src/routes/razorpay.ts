@@ -104,25 +104,132 @@ function resolveAccountSizeRzp(planType: PlanType, sizeIndex: number): number | 
 }
 
 // ---------------------------------------------------------------------------
-// Terminal Provisioning Trigger
-// 
-// After a payment is confirmed, main site inserts a pending row into the shared
-// `provisioning_logs` table. The terminal picks this up and creates the actual
-// challenge_accounts + trading_accounts records.
+// Terminal Provisioning — Full Inline Execution
 //
-// This replaces the old provisionTradingAccount() function which incorrectly
-// inserted rows into the terminal-owned `trading_accounts` table.
+// After a payment is confirmed, this function:
+//   1. Inserts a provisioning_logs row
+//   2. Creates challenge_accounts + trading_accounts records
+//   3. Updates provisioning_logs to 'completed'
 // ---------------------------------------------------------------------------
+
+interface ProvisioningPlanConfigRzp {
+  profitTargetPct: number;
+  dailyLossLimitPct: number;
+  maxDrawdownPct: number;
+  minTradingDays: number;
+  maxDaysAllowed: number;
+  type: string;
+}
+
+const PROVISIONING_CONFIGS_RZP: Record<string, ProvisioningPlanConfigRzp> = {
+  flash: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 3, maxDaysAllowed: 30, type: "flash_challenge" },
+  instant: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 1, maxDaysAllowed: 60, type: "instant_funding" },
+  "1step": { profitTargetPct: 10, dailyLossLimitPct: 4, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 45, type: "1step_evaluation" },
+  "2step": { profitTargetPct: 8, dailyLossLimitPct: 4, maxDrawdownPct: 10, minTradingDays: 5, maxDaysAllowed: 60, type: "2step_evaluation_phase1" },
+};
+
+function generateAccountCodeRzp(): string {
+  const prefix = "FW";
+  const ts = Date.now().toString(36).toUpperCase().slice(-4);
+  const rand = Math.random().toString(36).toUpperCase().slice(2, 8);
+  return `${prefix}-${ts}${rand}`;
+}
+
 async function triggerTerminalProvisioning(
   orderId: string,
   planType: PlanType,
   paymentMethod: string,
   paymentRef: string | null,
 ) {
-  await db.execute(sql`
+  // 1. Insert provisioning_logs row
+  const provResult = await db.execute(sql`
     INSERT INTO provisioning_logs (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
-    VALUES (${orderId}, ${planType}, ${paymentMethod}, ${paymentRef}, 'website', 'pending', now(), now())
+    VALUES (${orderId}, ${planType}, ${paymentMethod}, ${paymentRef}, 'website', 'processing', now(), now())
+    RETURNING id
   `);
+  const provId = (provResult.rows[0] as any).id;
+
+  // 2. Get order
+  const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  if (!order) throw new Error(`Order ${orderId} not found during provisioning`);
+
+  // 3. Get user
+  const userResult = await db.execute(sql`
+    SELECT id, first_name, last_name, email FROM users WHERE id = ${order.userId}::uuid LIMIT 1
+  `);
+  const user = (userResult.rows as any[])[0];
+  if (!user) throw new Error(`User ${order.userId} not found during provisioning`);
+
+  // 4. Get or create terminal_traders
+  const existingTrader = await db.execute(sql`
+    SELECT id FROM terminal_traders WHERE user_id = ${user.id}::uuid LIMIT 1
+  `);
+  let traderId: string;
+  if (existingTrader.rows && existingTrader.rows.length > 0) {
+    traderId = (existingTrader.rows[0] as any).id;
+  } else {
+    const displayName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Trader";
+    const traderInsert = await db.execute(sql`
+      INSERT INTO terminal_traders (user_id, display_name, email, created_at, updated_at)
+      VALUES (${user.id}::uuid, ${displayName}, ${user.email}, now(), now())
+      RETURNING id
+    `);
+    traderId = (traderInsert.rows[0] as any).id;
+  }
+
+  // 5. Plan config and account size
+  const planConfig = PROVISIONING_CONFIGS_RZP[planType] || PROVISIONING_CONFIGS_RZP["flash"];
+  const initialBalance = order.accountSize || 50000;
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + planConfig.maxDaysAllowed);
+
+  // 6. Create challenge_accounts
+  const challengeResult = await db.execute(sql`
+    INSERT INTO challenge_accounts (
+      user_id, type, plan, initial_balance, current_balance, peak_balance,
+      profit_target_pct, daily_loss_limit_pct, max_drawdown_pct,
+      min_trading_days, status, started_at, expires_at, created_at, updated_at
+    ) VALUES (
+      ${user.id}::uuid, ${planConfig.type}, ${planType},
+      ${initialBalance}, ${initialBalance}, ${initialBalance},
+      ${planConfig.profitTargetPct}, ${planConfig.dailyLossLimitPct}, ${planConfig.maxDrawdownPct},
+      ${planConfig.minTradingDays}, 'active', now(),
+      ${expiresAt.toISOString()}::timestamptz, now(), now()
+    )
+    RETURNING id
+  `);
+  const challengeAccountId = (challengeResult.rows[0] as any).id;
+
+  // 7. Create trading_accounts
+  const accountCode = generateAccountCodeRzp();
+  const tradingResult = await db.execute(sql`
+    INSERT INTO trading_accounts (
+      account_code, broker_provider, balance, available_margin, status, created_at, updated_at
+    ) VALUES (
+      ${accountCode}, 'fundedwealth', ${initialBalance}, ${initialBalance}, 'active', now(), now()
+    )
+    RETURNING id
+  `);
+  const tradingAccountId = (tradingResult.rows[0] as any).id;
+
+  // 8. Update provisioning_logs → completed
+  await db.execute(sql`
+    UPDATE provisioning_logs
+    SET status = 'completed',
+        trader_id = ${traderId}::uuid,
+        challenge_account_id = ${challengeAccountId}::uuid,
+        trading_account_id = ${tradingAccountId}::uuid,
+        completed_at = now()
+    WHERE id = ${provId}::uuid
+  `);
+
+  // 9. Update order status to confirmed
+  await db.execute(sql`
+    UPDATE orders SET status = 'confirmed', updated_at = now()
+    WHERE id = ${orderId} AND status = 'paid'
+  `);
+
+  logger.info({ orderId, planType, accountCode, challengeAccountId, tradingAccountId }, "[Provisioning] COMPLETED");
 }
 
 /**
@@ -139,9 +246,29 @@ async function triggerTerminalProvisioning(
  *   receipt      string?  — optional receipt label
  *   metadata     object?  — extra data (championship type, donation cause, etc.)
  */
-router.post("/create-order", paymentCreateLimiter, requireActiveAccount, validateBody(createOrderSchema), async (req: Request, res: Response) => {
+router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchema), async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
+
+    // Soft auth check — block banned/suspended users but don't require auth
+    // (Razorpay order creation doesn't write to DB, just creates an order on Razorpay side)
+    if (auth?.userId) {
+      const [existingUser] = await db
+        .select({ accountStatus: users.accountStatus })
+        .from(users)
+        .where(eq(users.clerkId, auth.userId))
+        .limit(1);
+      if (existingUser) {
+        const status = existingUser.accountStatus || "active";
+        if (["banned", "suspended", "restricted"].includes(status)) {
+          return res.status(403).json({
+            success: false,
+            message: "Account restricted. Contact support.",
+            code: "ACCOUNT_RESTRICTED",
+          });
+        }
+      }
+    }
 
     const { amount, payment_type = "challenge", planType, sizeIndex, couponCode, currency = "INR", receipt, metadata } = req.body;
 
@@ -171,6 +298,12 @@ router.post("/create-order", paymentCreateLimiter, requireActiveAccount, validat
 
     if (amountInPaise > 1000000000) {
       return res.status(400).json({ success: false, message: "Maximum amount is 10,000,000 INR" });
+    }
+
+    // Validate Razorpay credentials at request time
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      logger.error("Razorpay credentials not configured — cannot create order");
+      return res.status(503).json({ success: false, message: "Payment service not configured. Contact support." });
     }
 
     const order = (await razorpay.orders.create({
