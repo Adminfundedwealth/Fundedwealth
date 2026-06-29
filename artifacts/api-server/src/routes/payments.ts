@@ -859,28 +859,28 @@ router.get("/provisioning-status/:orderId", async (req: Request, res: Response) 
     }
 
     if (prov.status === "completed") {
-      // Fetch minimal trading account info for launch capability
-      let canLaunch = false;
-      let accountId: string | null = null;
+      // Only return "completed" when trading_accounts record exists and is active.
+      // If provisioning_logs says completed but account isn't usable yet, keep pending.
+      if (!prov.trading_account_id) {
+        return res.json({ success: true, status: "pending" });
+      }
 
-      if (prov.trading_account_id) {
-        const taResult = await db.execute(sql`
-          SELECT id, status FROM trading_accounts
-          WHERE id = ${prov.trading_account_id}::uuid
-          LIMIT 1
-        `);
-        const ta = (taResult.rows as any[])[0];
-        if (ta && ta.status === "active") {
-          canLaunch = true;
-          accountId = ta.id;
-        }
+      const taResult = await db.execute(sql`
+        SELECT id, status FROM trading_accounts
+        WHERE id = ${prov.trading_account_id}::uuid
+        LIMIT 1
+      `);
+      const ta = (taResult.rows as any[])[0];
+
+      if (!ta || ta.status !== "active") {
+        return res.json({ success: true, status: "pending" });
       }
 
       return res.json({
         success: true,
         status: "completed",
-        accountId,
-        canLaunch,
+        accountId: ta.id,
+        canLaunch: true,
       });
     }
 
