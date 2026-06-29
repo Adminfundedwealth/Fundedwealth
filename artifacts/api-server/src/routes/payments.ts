@@ -133,35 +133,36 @@ const SERVER_PLANS: Record<PlanType, { label: string; sizes: PlanSize[] }> = {
   flash: {
     label: "Flash Challenge",
     sizes: [
-      { size: "₹1,00,000", accountSize: 100000, fee: 999 },
-      { size: "₹2,50,000", accountSize: 250000, fee: 1999 },
-      { size: "₹5,00,000", accountSize: 500000, fee: 3999 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 7499 },
-      { size: "₹25,00,000", accountSize: 2500000, fee: 14999 },
+      { size: "₹50,000", accountSize: 50000, fee: 1999 },
+      { size: "₹1,00,000", accountSize: 100000, fee: 3499 },
+      { size: "₹2,50,000", accountSize: 250000, fee: 7499 },
+      { size: "₹5,00,000", accountSize: 500000, fee: 11499 },
+      { size: "₹10,00,000", accountSize: 1000000, fee: 19499 },
     ],
   },
   instant: {
     label: "Instant Funding",
     sizes: [
-      { size: "₹5,00,000", accountSize: 500000, fee: 8999 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 16999 },
-      { size: "₹25,00,000", accountSize: 2500000, fee: 37999 },
+      { size: "₹1,00,000", accountSize: 100000, fee: 4999 },
+      { size: "₹5,00,000", accountSize: 500000, fee: 11999 },
+      { size: "₹10,00,000", accountSize: 1000000, fee: 21999 },
     ],
   },
   "1step": {
     label: "1-Step Evaluation",
     sizes: [
-      { size: "₹5,00,000", accountSize: 500000, fee: 4999 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 8999 },
-      { size: "₹25,00,000", accountSize: 2500000, fee: 19999 },
+      { size: "₹1,00,000", accountSize: 100000, fee: 2999 },
+      { size: "₹5,00,000", accountSize: 500000, fee: 11999 },
+      { size: "₹10,00,000", accountSize: 1000000, fee: 21999 },
+      { size: "₹25,00,000", accountSize: 2500000, fee: 48499 },
     ],
   },
   "2step": {
     label: "2-Step Evaluation",
     sizes: [
-      { size: "₹5,00,000", accountSize: 500000, fee: 3599 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 6599 },
-      { size: "₹25,00,000", accountSize: 2500000, fee: 14549 },
+      { size: "₹5,00,000", accountSize: 500000, fee: 11999 },
+      { size: "₹10,00,000", accountSize: 1000000, fee: 21999 },
+      { size: "₹25,00,000", accountSize: 2500000, fee: 48499 },
     ],
   },
 };
@@ -446,8 +447,8 @@ router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, asyn
     VelocityService.checkChallengeFarming(user.id, purchaseFingerprint).catch(() => { });
 
     const orderId = `FW-${(auth?.userId ?? user.id.toString()).slice(-6)}-S${sizeIndex}-${Date.now()}`;
-    const callbackUrl = `${process.env.API_BASE_URL || ""}/api/payments/oxapay-webhook`;
-    const returnUrl = `${process.env.FRONTEND_URL || ""}/payment-pending`;
+    const callbackUrl = process.env.OXAPAY_CALLBACK_URL || `${process.env.API_BASE_URL || ""}/api/payments/oxapay-webhook`;
+    const returnUrl = process.env.OXAPAY_RETURN_URL || `${process.env.FRONTEND_URL || ""}/payment-pending`;
 
     const payload = {
       merchant: OXAPAY_MERCHANT_API_KEY,
@@ -495,10 +496,11 @@ router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, asyn
         amount: pricing.finalTotal,
       });
     } else {
-      console.error("OxaPay error:", data);
+      console.error("OxaPay error:", JSON.stringify(data));
       res.status(400).json({
         error: "Payment creation failed",
         message: data.message || "Unknown error from OxaPay",
+        details: process.env.NODE_ENV !== "production" ? data : undefined,
       });
     }
   } catch (error) {

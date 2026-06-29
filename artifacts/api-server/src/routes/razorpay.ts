@@ -85,10 +85,10 @@ type PlanType = "flash" | "instant" | "1step" | "2step";
 
 // Server-side plan definitions for account size resolution
 const RAZORPAY_PLANS: Record<PlanType, { sizes: { accountSize: number; fee: number }[] }> = {
-  flash: { sizes: [{ accountSize: 100000, fee: 999 }, { accountSize: 250000, fee: 1999 }, { accountSize: 500000, fee: 3999 }, { accountSize: 1000000, fee: 7499 }, { accountSize: 2500000, fee: 14999 }] },
-  instant: { sizes: [{ accountSize: 500000, fee: 8999 }, { accountSize: 1000000, fee: 16999 }, { accountSize: 2500000, fee: 37999 }] },
-  "1step": { sizes: [{ accountSize: 500000, fee: 4999 }, { accountSize: 1000000, fee: 8999 }, { accountSize: 2500000, fee: 19999 }] },
-  "2step": { sizes: [{ accountSize: 500000, fee: 3599 }, { accountSize: 1000000, fee: 6599 }, { accountSize: 2500000, fee: 14549 }] },
+  flash: { sizes: [{ accountSize: 50000, fee: 1999 }, { accountSize: 100000, fee: 3499 }, { accountSize: 250000, fee: 7499 }, { accountSize: 500000, fee: 11499 }, { accountSize: 1000000, fee: 19499 }] },
+  instant: { sizes: [{ accountSize: 100000, fee: 4999 }, { accountSize: 500000, fee: 11999 }, { accountSize: 1000000, fee: 21999 }] },
+  "1step": { sizes: [{ accountSize: 100000, fee: 2999 }, { accountSize: 500000, fee: 11999 }, { accountSize: 1000000, fee: 21999 }, { accountSize: 2500000, fee: 48499 }] },
+  "2step": { sizes: [{ accountSize: 500000, fee: 11999 }, { accountSize: 1000000, fee: 21999 }, { accountSize: 2500000, fee: 48499 }] },
 };
 
 /**
@@ -203,7 +203,7 @@ router.post("/create-order", paymentCreateLimiter, requireActiveAccount, validat
     });
 
   } catch (error: any) {
-    logger.error({ error, message: error?.message, description: error?.error?.description }, "Failed to create Razorpay order");
+    logger.error({ error: error?.message, statusCode: error?.statusCode, description: error?.error?.description, stack: error?.stack }, "Failed to create Razorpay order");
     if (error.error?.description) {
       return res.status(400).json({ success: false, message: error.error.description });
     }
