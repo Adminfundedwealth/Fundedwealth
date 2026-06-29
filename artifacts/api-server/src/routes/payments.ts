@@ -805,6 +805,7 @@ router.get("/payment-status/:trackId", async (req: Request, res: Response) => {
 
 router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) => {
   try {
+    console.log("[VERIFY-UTR-DEBUG] 1. entered handler");
     const auth = getAuth(req);
     const { utr, amount, planType, sizeIndex, billing, referralCode, couponCode } = req.body || {};
 
@@ -830,6 +831,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     }
 
     const user = await getOrCreateUser(auth?.userId, billing || null);
+    console.log("[VERIFY-UTR-DEBUG] 2. after getOrCreateUser()", user ? "user found/created" : "user is null");
     if (!user) {
       return res.status(400).json({ success: false, message: "Valid billing email is required to submit UTR." });
     }
@@ -865,6 +867,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       .from(orders)
       .where(eq(orders.utrReference, utrStr))
       .limit(1);
+    console.log("[VERIFY-UTR-DEBUG] 3. after duplicate UTR lookup, existingOrder.length=", existingOrder.length);
 
     if (existingOrder.length > 0) {
       const existing = existingOrder[0];
@@ -893,6 +896,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       return res.status(400).json({ success: false, message: "Could not resolve account size for plan/size selection." });
     }
 
+    console.log("[VERIFY-UTR-DEBUG] 4. before db.transaction()", { userId: user.id, amount, planType, accountSize });
     const result = await db.transaction(async (tx) => {
       const [order] = await tx.insert(orders).values({
         userId: user.id,
@@ -906,6 +910,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
 
       return { order };
     });
+    console.log("[VERIFY-UTR-DEBUG] 5. after orders insert, orderId=", result.order.id);
 
     // Trigger terminal provisioning after order is durably committed
     await triggerTerminalProvisioning(
@@ -914,7 +919,20 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       "upi_manual",
       utrStr,
     );
+    console.log("[VERIFY-UTR-DEBUG] 6. after provisioning_logs insert");
 
+    // Notify admin panel of confirmed UPI payment
+    AdminEventService.notifyPaymentReceived({
+      orderId: result.order.id,
+      userId: user.id,
+      amount,
+      paymentMethod: "upi_manual",
+      planType,
+      accountSize: Math.round(accountSize),
+    }).catch(() => {});
+    console.log("[VERIFY-UTR-DEBUG] 7. after admin_events insert (fire-and-forget)");
+
+    console.log("[VERIFY-UTR-DEBUG] 8. before sendEmail()");
     await sendEmail({
       to: user.email,
       subject: "FundedWealth - Payment Received! Account Being Provisioned",
@@ -935,16 +953,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     }).catch((emailError) => {
       req.log.error({ emailError, userId: auth?.userId }, "utr_payment_received_email_failed");
     });
-
-    // Notify admin panel of confirmed UPI payment
-    AdminEventService.notifyPaymentReceived({
-      orderId: result.order.id,
-      userId: user.id,
-      amount,
-      paymentMethod: "upi_manual",
-      planType,
-      accountSize: Math.round(accountSize),
-    }).catch(() => {});
+    console.log("[VERIFY-UTR-DEBUG] 9. after sendEmail()");
 
     return res.status(200).json({
       success: true,
@@ -952,7 +961,8 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       provisioningStatus: "pending",
       message: "Payment received. Your account is being provisioned.",
     });
-  } catch (err) {
+  } catch (err: any) {
+    console.error("[VERIFY-UTR-DEBUG] EXCEPTION CAUGHT:", err?.message, err?.stack);
     req.log.error({ err }, "verify_utr_failed");
     return res.status(500).json({ success: false, message: "Server error" });
   }
