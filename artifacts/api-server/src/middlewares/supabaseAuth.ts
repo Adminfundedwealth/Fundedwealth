@@ -49,6 +49,10 @@ export async function supabaseAuthMiddleware(req: Request, _res: Response, next:
     const token = extractToken(req);
     if (!token || !supabaseAdmin) {
         // No token or Supabase not configured — proceed without auth
+        if (token && !supabaseAdmin) {
+            // Token provided but we can't verify it — log this as a config issue
+            console.warn("[supabaseAuth] Token present but SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY not configured — cannot verify JWT");
+        }
         return next();
     }
 

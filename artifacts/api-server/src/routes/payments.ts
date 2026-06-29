@@ -803,10 +803,31 @@ router.get("/payment-status/:trackId", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/verify-utr", paymentLimiter, requireActiveAccount, async (req: Request, res: Response) => {
+router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
     const { utr, amount, planType, sizeIndex, billing, referralCode, couponCode } = req.body || {};
+
+    // Soft auth check: if user exists and is restricted, block.
+    // Unlike other endpoints, we allow unauthenticated requests with valid billing info
+    // because the UPI QR flow may have session timing issues.
+    if (auth?.userId) {
+      const [existingUser] = await db
+        .select({ accountStatus: users.accountStatus })
+        .from(users)
+        .where(eq(users.clerkId, auth.userId))
+        .limit(1);
+      if (existingUser) {
+        const status = existingUser.accountStatus || "active";
+        if (["banned", "suspended", "restricted"].includes(status)) {
+          return res.status(403).json({
+            success: false,
+            message: "Account restricted. Payment received but provisioning blocked. Contact support.",
+            code: "ACCOUNT_RESTRICTED",
+          });
+        }
+      }
+    }
 
     const user = await getOrCreateUser(auth?.userId, billing || null);
     if (!user) {

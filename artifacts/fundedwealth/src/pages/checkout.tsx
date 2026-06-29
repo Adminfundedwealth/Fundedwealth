@@ -152,7 +152,7 @@ export default function Checkout() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) setUtrStatus("success");
       else if (res.status === 202 || data.status === "pending") setUtrStatus("pending");
-      else { setUtrStatus("failed"); setUtrError(data.message || "Verification failed"); }
+      else { setUtrStatus("failed"); setUtrError(data.message || data.error || "Verification failed. Please try again or contact support."); }
     } catch { setUtrStatus("pending"); }
   };
 
