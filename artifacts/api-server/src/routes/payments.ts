@@ -933,7 +933,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
         </div>
       `,
     }).catch((emailError) => {
-      req.log.error({ emailError, userId: auth.userId }, "utr_payment_received_email_failed");
+      req.log.error({ emailError, userId: auth?.userId }, "utr_payment_received_email_failed");
     });
 
     // Notify admin panel of confirmed UPI payment
