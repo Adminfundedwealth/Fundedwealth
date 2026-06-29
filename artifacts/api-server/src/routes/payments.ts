@@ -803,6 +803,95 @@ router.get("/payment-status/:trackId", async (req: Request, res: Response) => {
   }
 });
 
+// ── Provisioning Status (public, no auth required) ──────────────────────────
+// Used by payment-pending page to poll provisioning progress for both
+// authenticated and guest (billing-email-only) checkout flows.
+router.get("/provisioning-status/:orderId", async (req: Request, res: Response) => {
+  try {
+    const orderId = req.params.orderId as string;
+
+    if (!orderId || orderId.length < 10) {
+      return res.status(400).json({ success: false, message: "Invalid orderId" });
+    }
+
+    // 1. Verify order exists
+    const [order] = await db
+      .select({ id: orders.id, status: orders.status })
+      .from(orders)
+      .where(eq(orders.id, orderId))
+      .limit(1);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // 2. Check provisioning_logs for this order
+    const provResult = await db.execute(sql`
+      SELECT
+        status,
+        error_message,
+        trading_account_id,
+        challenge_account_id,
+        completed_at
+      FROM provisioning_logs
+      WHERE order_id = ${orderId}
+      ORDER BY created_at DESC
+      LIMIT 1
+    `);
+
+    const prov = (provResult.rows as any[])[0];
+
+    // No provisioning entry yet — order is paid but provisioning hasn't started
+    if (!prov) {
+      return res.json({ success: true, status: "pending" });
+    }
+
+    if (prov.status === "pending" || prov.status === "processing") {
+      return res.json({ success: true, status: "pending" });
+    }
+
+    if (prov.status === "failed") {
+      return res.json({
+        success: true,
+        status: "failed",
+        error: prov.error_message || "Provisioning failed. Please contact support.",
+      });
+    }
+
+    if (prov.status === "completed") {
+      // Fetch minimal trading account info for launch capability
+      let canLaunch = false;
+      let accountId: string | null = null;
+
+      if (prov.trading_account_id) {
+        const taResult = await db.execute(sql`
+          SELECT id, status FROM trading_accounts
+          WHERE id = ${prov.trading_account_id}::uuid
+          LIMIT 1
+        `);
+        const ta = (taResult.rows as any[])[0];
+        if (ta && ta.status === "active") {
+          canLaunch = true;
+          accountId = ta.id;
+        }
+      }
+
+      return res.json({
+        success: true,
+        status: "completed",
+        accountId,
+        canLaunch,
+      });
+    }
+
+    // Fallback for unknown status
+    return res.json({ success: true, status: "pending" });
+  } catch (err) {
+    req.log?.error?.({ err }, "provisioning_status_check_failed");
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);

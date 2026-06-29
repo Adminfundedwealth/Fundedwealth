@@ -228,7 +228,7 @@ export default function PaymentPending() {
     }
   }, [trackId, isLoaded, getToken, navigate]);
 
-  // ── Poll: UPI flow (provisioning status via /api/accounts/my) ──────────────
+  // ── Poll: UPI flow (provisioning status via public endpoint) ─────────────
   const checkUpiStatus = useCallback(async () => {
     if (!orderId) {
       setStatus("error");
@@ -238,47 +238,30 @@ export default function PaymentPending() {
 
     try {
       const apiBase = import.meta.env.VITE_API_URL || "";
-      const token = isLoaded ? await getToken().catch(() => null) : null;
 
-      if (!token) {
-        // Not authenticated yet — show provisioning state, keep polling
-        setStatus("provisioning");
-        setLastChecked(new Date());
-        return;
-      }
-
-      const res = await fetch(`${apiBase}/api/accounts/my`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch(`${apiBase}/api/payments/provisioning-status/${orderId}`, {
         credentials: "include",
       });
 
       setLastChecked(new Date());
 
-      if (res.status === 401 || res.status === 403) {
-        setStatus("provisioning");
+      if (res.status === 404) {
+        setStatus("error");
+        setApiError("Order not found. Please contact support.");
         return;
       }
 
       const data = await res.json().catch(() => ({}));
 
-      if (res.ok && data.success && Array.isArray(data.accounts)) {
-        // Find the account matching our orderId
-        const match = data.accounts.find((a: any) => a.orderId === orderId);
-
-        if (!match) {
-          // Order exists but no provisioning entry yet — still pending
-          setStatus("provisioning");
-          return;
-        }
-
-        if (match.provisioningStatus === "completed") {
+      if (res.ok && data.success) {
+        if (data.status === "completed") {
           setStatus("completed");
           setTimeout(() => navigate("/dashboard?payment=success&method=upi"), 2500);
-        } else if (match.provisioningStatus === "failed") {
+        } else if (data.status === "failed") {
           setStatus("Failed");
-          setApiError(match.provisioningError || "Provisioning failed. Contact support.");
+          setApiError(data.error || "Provisioning failed. Contact support.");
         } else {
-          // pending or processing
+          // pending
           setStatus("provisioning");
         }
       } else if (!res.ok) {
@@ -287,7 +270,7 @@ export default function PaymentPending() {
     } catch {
       // Network error — keep polling silently
     }
-  }, [orderId, isLoaded, getToken, navigate]);
+  }, [orderId, navigate]);
 
   // ── Unified check function ─────────────────────────────────────────────────
   const checkStatus = flow === "upi" ? checkUpiStatus : checkCryptoStatus;
