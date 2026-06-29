@@ -373,7 +373,7 @@ async function triggerTerminalProvisioning(
   paymentMethod: string,
   paymentRef: string | null,
 ) {
-  // 1. Insert provisioning_logs row (pending → will be completed inline)
+  // 1. Insert provisioning_logs row
   const provResult = await db.execute(sql`
     INSERT INTO provisioning_logs (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
     VALUES (${orderId}, ${planType}, ${paymentMethod}, ${paymentRef}, 'website', 'processing', now(), now())
@@ -392,78 +392,38 @@ async function triggerTerminalProvisioning(
   const user = (userResult.rows as any[])[0];
   if (!user) throw new Error(`User ${order.userId} not found during provisioning`);
 
-  // 4. Get or create terminal_traders
-  const existingTrader = await db.execute(sql`
-    SELECT id FROM terminal_traders WHERE user_id = ${user.id}::uuid LIMIT 1
-  `);
-
-  let traderId: string;
-  if (existingTrader.rows && existingTrader.rows.length > 0) {
-    traderId = (existingTrader.rows[0] as any).id;
-  } else {
-    const displayName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Trader";
-    const traderInsert = await db.execute(sql`
-      INSERT INTO terminal_traders (user_id, display_name, email, created_at, updated_at)
-      VALUES (${user.id}::uuid, ${displayName}, ${user.email}, now(), now())
-      RETURNING id
-    `);
-    traderId = (traderInsert.rows[0] as any).id;
-  }
-
-  // 5. Determine plan config and account size
+  // 4. Determine plan config and account size
   const planConfig = PROVISIONING_PLAN_CONFIGS[planType] || PROVISIONING_PLAN_CONFIGS["flash"];
   const initialBalance = order.accountSize || 50000;
 
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + planConfig.maxDaysAllowed);
-
-  // 6. Create challenge_accounts
-  const challengeResult = await db.execute(sql`
-    INSERT INTO challenge_accounts (
-      user_id, type, plan, initial_balance, current_balance, peak_balance,
-      profit_target_pct, daily_loss_limit_pct, max_drawdown_pct,
-      min_trading_days, status, started_at, expires_at, created_at, updated_at
-    ) VALUES (
-      ${user.id}::uuid, ${planConfig.type}, ${planType},
-      ${initialBalance}, ${initialBalance}, ${initialBalance},
-      ${planConfig.profitTargetPct}, ${planConfig.dailyLossLimitPct}, ${planConfig.maxDrawdownPct},
-      ${planConfig.minTradingDays}, 'active', now(),
-      ${expiresAt.toISOString()}::timestamptz, now(), now()
-    )
-    RETURNING id
-  `);
-  const challengeAccountId = (challengeResult.rows[0] as any).id;
-
-  // 7. Create trading_accounts
+  // 5. Create trading_accounts (Drizzle schema: id, account_code, user_id, plan, virtual_balance, status, order_id)
   const accountCode = generateAccountCode();
-  const tradingResult = await db.execute(sql`
+  const tradingAccountId = randomUUID();
+  await db.execute(sql`
     INSERT INTO trading_accounts (
-      account_code, broker_provider, balance, available_margin, status, created_at, updated_at
+      id, account_code, user_id, plan, virtual_balance, status, order_id, expires_at, created_at, updated_at
     ) VALUES (
-      ${accountCode}, 'fundedwealth', ${initialBalance}, ${initialBalance}, 'active', now(), now()
+      ${tradingAccountId}, ${accountCode}, ${user.id}, ${planType}, ${initialBalance}, 'active', ${orderId},
+      ${new Date(Date.now() + planConfig.maxDaysAllowed * 86400000).toISOString()}::timestamptz, now(), now()
     )
-    RETURNING id
   `);
-  const tradingAccountId = (tradingResult.rows[0] as any).id;
 
-  // 8. Update provisioning_logs → completed
+  // 6. Update provisioning_logs → completed
   await db.execute(sql`
     UPDATE provisioning_logs
     SET status = 'completed',
-        trader_id = ${traderId}::uuid,
-        challenge_account_id = ${challengeAccountId}::uuid,
         trading_account_id = ${tradingAccountId}::uuid,
         completed_at = now()
     WHERE id = ${provId}::uuid
   `);
 
-  // 9. Update order status to confirmed
+  // 7. Update order status to confirmed
   await db.execute(sql`
     UPDATE orders SET status = 'confirmed', updated_at = now()
     WHERE id = ${orderId} AND status = 'paid'
   `);
 
-  console.log(`[Provisioning] COMPLETED: order=${orderId} plan=${planType} accountCode=${accountCode} challengeId=${challengeAccountId} tradingId=${tradingAccountId}`);
+  console.log(`[Provisioning] COMPLETED: order=${orderId} plan=${planType} accountCode=${accountCode} tradingId=${tradingAccountId}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -980,7 +940,7 @@ router.get("/provisioning-status/:orderId", async (req: Request, res: Response) 
 
       const taResult = await db.execute(sql`
         SELECT id, status FROM trading_accounts
-        WHERE id = ${prov.trading_account_id}::uuid
+        WHERE id = ${prov.trading_account_id}
         LIMIT 1
       `);
       const ta = (taResult.rows as any[])[0];
@@ -1151,8 +1111,8 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     return res.status(200).json({
       success: true,
       orderId: result.order.id,
-      provisioningStatus: "pending",
-      message: "Payment received. Your account is being provisioned.",
+      provisioningStatus: "completed",
+      message: "Payment verified. Your trading account is ready.",
     });
   } catch (err) {
     req.log.error({ err }, "verify_utr_failed");
