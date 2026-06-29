@@ -4,7 +4,6 @@ import "./index.css";
 import { lazy, Suspense, Component, type ReactNode } from "react";
 
 // Agentation removed — dev-only tool, not for production.
-const AgentationWidget = null;
 
 // ── Error Boundary — catches any render crash and shows a recovery UI ──────
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
@@ -50,11 +49,6 @@ createRoot(document.getElementById("root")!).render(
     <Suspense fallback={<Loading />}>
       <App />
     </Suspense>
-    {/* Agentation: dev-only — tree-shaken to nothing in production */}
-    {AgentationWidget && (
-      <Suspense fallback={null}>
-        <AgentationWidget />
-      </Suspense>
-    )}
+    {/* Agentation removed — dev-only tool, not for production */}
   </ErrorBoundary>
 );
