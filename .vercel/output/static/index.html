@@ -52,26 +52,45 @@
   <link rel="alternate" hreflang="x-default" href="https://fundedwealth.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/urgency-system.css">
-  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
-  <script type="module" crossorigin src="/assets/index-DqU9bzg5.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/icons-BfFS3Mv0.js">
+  <link rel="preconnect" href="https://kzomfotqxuisolnsvnwh.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="https://checkout.razorpay.com">
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="/urgency-system.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="/urgency-system.css"></noscript>
+  <script type="module" crossorigin src="/assets/index-BD8SC_JE.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/i18n-Ck4pObTI.js">
   <link rel="modulepreload" crossorigin href="/assets/supabase-D1S55ZRl.js">
-  <link rel="modulepreload" crossorigin href="/assets/radix-CWhJt4Ja.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-C8Em86FF.css">
+  <link rel="modulepreload" crossorigin href="/assets/radix-CNuFz4zF.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-Co6eCbWu.css">
 </head>
 
 <body>
   <div id="root"></div>
-  <script src="/urgency-system.js" defer></script>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2JC3K2H68Y"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-2JC3K2H68Y');
+    // Defer urgency system until after main content is interactive
+    window.addEventListener('load', function() {
+      var s = document.createElement('script');
+      s.src = '/urgency-system.js';
+      document.body.appendChild(s);
+    });
+  </script>
+  <!-- Google Analytics — deferred to not block rendering -->
+  <script>
+    window.addEventListener('load', function() {
+      var s = document.createElement('script');
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-2JC3K2H68Y';
+      s.async = true;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', 'G-2JC3K2H68Y');
+    });
   </script>
 </body>
 
