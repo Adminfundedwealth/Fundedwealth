@@ -17,7 +17,7 @@ export const pool = new Pool({
   max: 10,                          // enough for production load
   statement_timeout: 30000,         // kill queries running > 30s
   query_timeout: 30000,             // node-postgres client-side timeout
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : undefined,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
 });
 export const db = drizzle(pool, { schema });
 
