@@ -862,11 +862,29 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     }
 
     // ── Duplicate UTR check — prevent double-claiming ───────────────────────
-    const existingOrder = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.utrReference, utrStr))
-      .limit(1);
+    console.log("[VERIFY-UTR-DEBUG] orders schema object:", JSON.stringify(Object.keys(orders), null, 2));
+    console.log("[VERIFY-UTR-DEBUG] orders.utrReference column:", orders.utrReference);
+    let existingOrder: any[];
+    try {
+      existingOrder = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.utrReference, utrStr))
+        .limit(1);
+    } catch (dbErr: any) {
+      console.error("[VERIFY-UTR-DEBUG] DUPLICATE UTR QUERY FAILED");
+      console.error("[VERIFY-UTR-DEBUG] err.message:", dbErr?.message);
+      console.error("[VERIFY-UTR-DEBUG] err.code:", dbErr?.code);
+      console.error("[VERIFY-UTR-DEBUG] err.detail:", dbErr?.detail);
+      console.error("[VERIFY-UTR-DEBUG] err.hint:", dbErr?.hint);
+      console.error("[VERIFY-UTR-DEBUG] err.position:", dbErr?.position);
+      console.error("[VERIFY-UTR-DEBUG] err.constraint:", dbErr?.constraint);
+      console.error("[VERIFY-UTR-DEBUG] err.column:", dbErr?.column);
+      console.error("[VERIFY-UTR-DEBUG] err.table:", dbErr?.table);
+      console.error("[VERIFY-UTR-DEBUG] err.schema:", dbErr?.schema);
+      console.error("[VERIFY-UTR-DEBUG] err.stack:", dbErr?.stack);
+      throw dbErr; // re-throw so outer catch still returns 500
+    }
     console.log("[VERIFY-UTR-DEBUG] 3. after duplicate UTR lookup, existingOrder.length=", existingOrder.length);
 
     if (existingOrder.length > 0) {
