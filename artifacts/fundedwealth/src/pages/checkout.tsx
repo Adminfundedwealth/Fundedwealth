@@ -150,7 +150,17 @@ export default function Checkout() {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data.success) setUtrStatus("success");
+      if (res.ok && data.success) {
+        setUtrStatus("success");
+        // Redirect to pending page for provisioning polling
+        const params = new URLSearchParams({
+          orderId: data.orderId || "",
+          plan: selectedPlan,
+          amount: String(finalTotal),
+          method: "upi",
+        });
+        window.location.href = `/payment-pending?${params.toString()}`;
+      }
       else if (res.status === 202 || data.status === "pending") setUtrStatus("pending");
       else { setUtrStatus("failed"); setUtrError(data.message || data.error || "Verification failed. Please try again or contact support."); }
     } catch { setUtrStatus("pending"); }

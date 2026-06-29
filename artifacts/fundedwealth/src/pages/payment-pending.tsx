@@ -1,11 +1,14 @@
 /**
- * OxaPay Payment Pending Page
+ * Payment Pending Page
  *
- * Shown after the user returns from OxaPay's payment page.
- * The page polls /api/payments/payment-status/:trackId every 8 seconds
- * and transitions to success or failure once the status is known.
+ * Supports two flows:
+ * 1. OxaPay (crypto): Polls /api/payments/payment-status/:trackId
+ *    URL: /payment-pending?trackId=xxx&plan=1step&amount=4999
  *
- * URL: /payment-pending?trackId=xxx&plan=1step&amount=4999
+ * 2. UPI Manual (UTR): Polls /api/accounts/my for provisioning status
+ *    URL: /payment-pending?orderId=xxx&plan=flash&amount=1999&method=upi
+ *
+ * Transitions to success or failure once the status is known.
  */
 
 import { useEffect, useState, useCallback } from "react";
@@ -20,6 +23,7 @@ import {
   ArrowRight,
   Bitcoin,
   Loader2,
+  Smartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
@@ -33,7 +37,11 @@ type PayStatus =
   | "Paid"        // confirmed → success
   | "Failed"      // payment failed
   | "Expired"     // invoice expired
+  | "provisioning" // UTR: order paid, provisioning in progress
+  | "completed"   // UTR: provisioning completed
   | "error";      // API call failed
+
+type FlowType = "crypto" | "upi";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -42,7 +50,7 @@ function getQueryParam(search: string, key: string): string | null {
   return params.get(key);
 }
 
-function getStatusConfig(status: PayStatus) {
+function getStatusConfig(status: PayStatus, flow: FlowType) {
   switch (status) {
     case "checking":
     case "Waiting":
@@ -50,11 +58,22 @@ function getStatusConfig(status: PayStatus) {
         icon: <Clock size={56} className="text-amber-400" />,
         ring: "border-amber-400/40",
         bg: "from-amber-500/10 to-amber-500/5",
-        title: "Waiting for your payment",
-        subtitle: status === "checking"
-          ? "Looking up your transaction…"
-          : "Send crypto to the address shown on OxaPay. This page updates automatically.",
+        title: flow === "upi" ? "Setting up your account" : "Waiting for your payment",
+        subtitle: flow === "upi"
+          ? "Your payment was verified. We're provisioning your trading account now…"
+          : status === "checking"
+            ? "Looking up your transaction…"
+            : "Send crypto to the address shown on OxaPay. This page updates automatically.",
         color: "text-amber-400",
+      };
+    case "provisioning":
+      return {
+        icon: <RefreshCw size={56} className="text-blue-400 animate-spin" style={{ animationDuration: "2s" }} />,
+        ring: "border-blue-400/40",
+        bg: "from-blue-500/10 to-blue-500/5",
+        title: "Provisioning your account",
+        subtitle: "Your payment is confirmed. We're creating your trading account — this usually takes 30–60 seconds.",
+        color: "text-blue-400",
       };
     case "Confirming":
       return {
@@ -66,12 +85,13 @@ function getStatusConfig(status: PayStatus) {
         color: "text-blue-400",
       };
     case "Paid":
+    case "completed":
       return {
         icon: <CheckCircle2 size={56} className="text-emerald-400" />,
         ring: "border-emerald-400/40",
         bg: "from-emerald-500/15 to-emerald-500/5",
-        title: "Payment confirmed!",
-        subtitle: "Your trading account is being activated. You'll receive a confirmation email shortly.",
+        title: "Account activated!",
+        subtitle: "Your trading account is ready. You can now start trading on your challenge account.",
         color: "text-emerald-400",
       };
     case "Failed":
@@ -79,8 +99,10 @@ function getStatusConfig(status: PayStatus) {
         icon: <XCircle size={56} className="text-red-400" />,
         ring: "border-red-400/40",
         bg: "from-red-500/10 to-red-500/5",
-        title: "Payment failed",
-        subtitle: "Something went wrong with your crypto payment. Please try again or contact support.",
+        title: "Provisioning failed",
+        subtitle: flow === "upi"
+          ? "Something went wrong while setting up your account. Please contact support — your payment is safe."
+          : "Something went wrong with your crypto payment. Please try again or contact support.",
         color: "text-red-400",
       };
     case "Expired":
@@ -99,14 +121,15 @@ function getStatusConfig(status: PayStatus) {
         ring: "border-gray-400/40",
         bg: "from-gray-500/10 to-gray-500/5",
         title: "Could not check status",
-        subtitle: "We couldn't reach our payment server. Your payment may still be processing — check your email or contact support.",
+        subtitle: "We couldn't reach our server. Your payment may still be processing — check your email or contact support.",
         color: "text-gray-400",
       };
   }
 }
 
-const POLL_INTERVAL_MS = 8000; // poll every 8 seconds
-const MAX_POLLS = 75; // stop after 10 minutes (75 × 8s)
+const CRYPTO_POLL_INTERVAL_MS = 8000;
+const UPI_POLL_INTERVAL_MS = 4000;
+const MAX_POLLS = 150; // ~10 min for UPI at 4s intervals
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -116,10 +139,16 @@ export default function PaymentPending() {
 
   const search = window.location.search;
   const initialTrackId = getQueryParam(search, "trackId");
+  const initialOrderId = getQueryParam(search, "orderId");
   const initialPlan = getQueryParam(search, "plan") ?? "";
   const initialAmount = getQueryParam(search, "amount") ?? "";
+  const initialMethod = getQueryParam(search, "method") ?? "";
+
+  // Determine flow type
+  const flow: FlowType = initialOrderId && initialMethod === "upi" ? "upi" : "crypto";
 
   const [trackId, setTrackId] = useState<string | null>(initialTrackId);
+  const [orderId] = useState<string | null>(initialOrderId);
   const [plan, setPlan] = useState<string>(initialPlan);
   const [amount, setAmount] = useState<string>(initialAmount);
   const [status, setStatus] = useState<PayStatus>("checking");
@@ -127,8 +156,9 @@ export default function PaymentPending() {
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [apiError, setApiError] = useState("");
 
+  // ── Crypto: recover from localStorage ──────────────────────────────────────
   useEffect(() => {
-    if (trackId) return;
+    if (flow !== "crypto" || trackId) return;
 
     const stored = window.localStorage.getItem("oxapay_pending") || window.sessionStorage.getItem("oxapay_pending");
     if (!stored) return;
@@ -150,18 +180,18 @@ export default function PaymentPending() {
     } catch {
       // Ignore invalid stored state.
     }
-  }, [trackId]);
+  }, [flow, trackId]);
 
+  // ── Cleanup storage on terminal state ──────────────────────────────────────
   useEffect(() => {
-    if (!trackId) return;
-    if (["Paid", "Failed", "Expired", "error"].includes(status)) {
+    if (flow === "crypto" && trackId && ["Paid", "Failed", "Expired", "error"].includes(status)) {
       window.localStorage.removeItem("oxapay_pending");
       window.sessionStorage.removeItem("oxapay_pending");
     }
-  }, [status, trackId]);
+  }, [flow, status, trackId]);
 
-  // ── Poll backend ────────────────────────────────────────────────────────────
-  const checkStatus = useCallback(async () => {
+  // ── Poll: Crypto flow (OxaPay) ─────────────────────────────────────────────
+  const checkCryptoStatus = useCallback(async () => {
     if (!trackId) {
       setStatus("error");
       setApiError("No trackId in URL — cannot check payment status.");
@@ -179,10 +209,7 @@ export default function PaymentPending() {
 
       setLastChecked(new Date());
 
-      if (res.status === 401 || res.status === 403) {
-        // Not authenticated — still show pending, don't error out
-        return;
-      }
+      if (res.status === 401 || res.status === 403) return;
 
       const data = await res.json().catch(() => ({}));
 
@@ -190,22 +217,89 @@ export default function PaymentPending() {
         const s = data.status as PayStatus;
         setStatus(s);
 
-        // Auto-redirect on terminal states
         if (s === "Paid") {
           setTimeout(() => navigate("/dashboard?payment=success&method=crypto"), 2500);
         }
       } else if (!res.ok) {
         setApiError(data.message || data.error || "Status check failed");
-        // Don't flip to error immediately — keep showing "checking" until max polls
       }
     } catch {
       // Network error — keep polling silently
     }
   }, [trackId, isLoaded, getToken, navigate]);
 
+  // ── Poll: UPI flow (provisioning status via /api/accounts/my) ──────────────
+  const checkUpiStatus = useCallback(async () => {
+    if (!orderId) {
+      setStatus("error");
+      setApiError("No orderId — cannot check provisioning status.");
+      return;
+    }
+
+    try {
+      const apiBase = import.meta.env.VITE_API_URL || "";
+      const token = isLoaded ? await getToken().catch(() => null) : null;
+
+      if (!token) {
+        // Not authenticated yet — show provisioning state, keep polling
+        setStatus("provisioning");
+        setLastChecked(new Date());
+        return;
+      }
+
+      const res = await fetch(`${apiBase}/api/accounts/my`, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+
+      setLastChecked(new Date());
+
+      if (res.status === 401 || res.status === 403) {
+        setStatus("provisioning");
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success && Array.isArray(data.accounts)) {
+        // Find the account matching our orderId
+        const match = data.accounts.find((a: any) => a.orderId === orderId);
+
+        if (!match) {
+          // Order exists but no provisioning entry yet — still pending
+          setStatus("provisioning");
+          return;
+        }
+
+        if (match.provisioningStatus === "completed") {
+          setStatus("completed");
+          setTimeout(() => navigate("/dashboard?payment=success&method=upi"), 2500);
+        } else if (match.provisioningStatus === "failed") {
+          setStatus("Failed");
+          setApiError(match.provisioningError || "Provisioning failed. Contact support.");
+        } else {
+          // pending or processing
+          setStatus("provisioning");
+        }
+      } else if (!res.ok) {
+        setApiError(data.message || data.error || "Status check failed");
+      }
+    } catch {
+      // Network error — keep polling silently
+    }
+  }, [orderId, isLoaded, getToken, navigate]);
+
+  // ── Unified check function ─────────────────────────────────────────────────
+  const checkStatus = flow === "upi" ? checkUpiStatus : checkCryptoStatus;
+  const pollInterval = flow === "upi" ? UPI_POLL_INTERVAL_MS : CRYPTO_POLL_INTERVAL_MS;
+
   // ── Effect: poll on mount + interval ───────────────────────────────────────
   useEffect(() => {
-    if (!trackId) {
+    if (flow === "crypto" && !trackId) {
+      setStatus("error");
+      return;
+    }
+    if (flow === "upi" && !orderId) {
       setStatus("error");
       return;
     }
@@ -218,29 +312,26 @@ export default function PaymentPending() {
         const next = c + 1;
         if (next >= MAX_POLLS) {
           clearInterval(interval);
-          // If still in a pending state after max polls, keep showing last status
           return next;
         }
         checkStatus();
         return next;
       });
-    }, POLL_INTERVAL_MS);
+    }, pollInterval);
 
     return () => clearInterval(interval);
-  }, [trackId, checkStatus]);
+  }, [flow, trackId, orderId, checkStatus, pollInterval]);
 
-  // When status becomes a terminal state, stop polling is handled implicitly
-  // because MAX_POLLS is very generous and we redirect on "Paid"
-
-  const cfg = getStatusConfig(status);
-  const isTerminal = ["Paid", "Failed", "Expired", "error"].includes(status);
-  const isPending = ["checking", "Waiting", "Confirming"].includes(status);
+  const cfg = getStatusConfig(status, flow);
+  const isTerminal = ["Paid", "Failed", "Expired", "error", "completed"].includes(status);
+  const isPending = ["checking", "Waiting", "Confirming", "provisioning"].includes(status);
+  const referenceId = flow === "upi" ? orderId : trackId;
 
   return (
     <div className="min-h-screen bg-[#0D0020] text-white flex flex-col">
       <SEOHead
         title="Payment Processing — FundedWealth"
-        description="Your crypto payment is being processed."
+        description="Your payment is being processed."
         noindex={true}
       />
 
@@ -253,7 +344,7 @@ export default function PaymentPending() {
           </Link>
           <div className="flex items-center gap-2 text-xs text-white/40">
             <ShieldCheck size={14} />
-            <span>Secured by OxaPay</span>
+            <span>{flow === "upi" ? "UPI Payment Verified" : "Secured by OxaPay"}</span>
           </div>
         </div>
       </div>
@@ -295,10 +386,16 @@ export default function PaymentPending() {
                     <span className="text-white font-semibold">₹{Number(amount).toLocaleString("en-IN")}</span>
                   </div>
                 )}
-                {trackId && (
+                {flow === "upi" && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/50">Track ID</span>
-                    <span className="text-white/70 font-mono text-xs truncate max-w-[180px]">{trackId}</span>
+                    <span className="text-white/50">Method</span>
+                    <span className="text-white/70 font-semibold">UPI Manual Transfer</span>
+                  </div>
+                )}
+                {referenceId && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/50">{flow === "upi" ? "Order ID" : "Track ID"}</span>
+                    <span className="text-white/70 font-mono text-xs truncate max-w-[180px]">{referenceId}</span>
                   </div>
                 )}
               </div>
@@ -333,16 +430,31 @@ export default function PaymentPending() {
           {isPending && (
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 mb-6">
               <div className="flex items-start gap-3">
-                <Bitcoin size={20} className="text-blue-400 shrink-0 mt-0.5" />
+                {flow === "upi" ? (
+                  <Smartphone size={20} className="text-blue-400 shrink-0 mt-0.5" />
+                ) : (
+                  <Bitcoin size={20} className="text-blue-400 shrink-0 mt-0.5" />
+                )}
                 <div>
                   <p className="text-blue-300 text-sm font-semibold mb-1">
-                    How crypto payments work
+                    {flow === "upi" ? "What's happening now" : "How crypto payments work"}
                   </p>
                   <ul className="text-white/50 text-xs space-y-1 list-disc list-inside">
-                    <li>You send crypto to the OxaPay address</li>
-                    <li>Blockchain confirms the transaction (1–10 min)</li>
-                    <li>We activate your account automatically</li>
-                    <li>You get a confirmation email</li>
+                    {flow === "upi" ? (
+                      <>
+                        <li>Your UPI payment has been verified</li>
+                        <li>We're creating your challenge trading account</li>
+                        <li>You'll get login credentials via email</li>
+                        <li>This usually takes under 60 seconds</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>You send crypto to the OxaPay address</li>
+                        <li>Blockchain confirms the transaction (1–10 min)</li>
+                        <li>We activate your account automatically</li>
+                        <li>You get a confirmation email</li>
+                      </>
+                    )}
                   </ul>
                 </div>
               </div>
@@ -351,9 +463,9 @@ export default function PaymentPending() {
 
           {/* Action buttons */}
           <div className="space-y-3">
-            {status === "Paid" && (
+            {(status === "Paid" || status === "completed") && (
               <Button
-                onClick={() => navigate("/dashboard?payment=success&method=crypto")}
+                onClick={() => navigate(`/dashboard?payment=success&method=${flow}`)}
                 className="w-full h-12 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold"
               >
                 Go to Dashboard <ArrowRight size={18} className="ml-2" />
@@ -361,12 +473,23 @@ export default function PaymentPending() {
             )}
 
             {(status === "Failed" || status === "Expired") && (
-              <Button
-                onClick={() => navigate("/checkout")}
-                className="w-full h-12 bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white font-bold"
-              >
-                Try Again <ArrowRight size={18} className="ml-2" />
-              </Button>
+              <>
+                <Button
+                  onClick={() => navigate("/checkout")}
+                  className="w-full h-12 bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white font-bold"
+                >
+                  Try Again <ArrowRight size={18} className="ml-2" />
+                </Button>
+                {flow === "upi" && (
+                  <p className="text-center text-white/50 text-xs">
+                    Your payment is safe. Contact{" "}
+                    <a href="mailto:support@fundedwealth.in" className="text-white/70 underline">
+                      support@fundedwealth.in
+                    </a>{" "}
+                    if you need help.
+                  </p>
+                )}
+              </>
             )}
 
             {isPending && (
@@ -398,8 +521,8 @@ export default function PaymentPending() {
             >
               support@fundedwealth.in
             </a>
-            {trackId && (
-              <span className="block mt-1">Quote Track ID: {trackId}</span>
+            {referenceId && (
+              <span className="block mt-1">Quote {flow === "upi" ? "Order" : "Track"} ID: {referenceId}</span>
             )}
           </p>
         </div>
