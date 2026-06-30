@@ -1,6 +1,5 @@
 import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
-import { requireActiveAccount } from "../middlewares/accountStatusMiddleware";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { logger } from "../lib/logger";
@@ -233,7 +232,7 @@ router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchem
  *   couponCode          string?
  *   amount              number   — INR, used for mismatch check
  */
-router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, validateBody(verifyPaymentSchema), async (req: Request, res: Response) => {
+router.post("/verify-payment", paymentVerifyLimiter, validateBody(verifyPaymentSchema), async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
 
