@@ -213,7 +213,7 @@ router.post("/emergency", allowInternalOrAdmin, async (req: Request, res: Respon
  * Returns the SINGLE-SOURCE-OF-TRUTH challenge catalog from @workspace/products.
  * Consumed by the Admin panel so it never duplicates product/size/risk values.
  */
-router.get("/catalog", (_req: Request, res: Response) => {
+router.get("/catalog", allowInternalOrAdmin, (_req: Request, res: Response) => {
   const products = PLAN_TYPES.map((key) => {
     const p = PRODUCTS[key];
     return {
