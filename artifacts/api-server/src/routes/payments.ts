@@ -14,6 +14,13 @@ import { VelocityService } from "../lib/velocity-service";
 import { requireTurnstile } from "../lib/turnstile-service";
 import { requireActiveAccount } from "../middlewares/accountStatusMiddleware";
 import { AdminEventService } from "../lib/admin-event-service";
+import {
+  resolveAccountSize,
+  computeTotal as computeServerTotal,
+  getProduct,
+  type PlanType,
+} from "@workspace/products";
+import { provisionChallenge } from "../lib/provisioning-service";
 
 const router = Router();
 
@@ -121,97 +128,9 @@ const NETWORK_MAP: Record<string, string> = {
   "oxapay-ltc": "LTC",
 };
 
-type PlanType = "flash" | "instant" | "1step" | "2step";
-
-interface PlanSize {
-  size: string;
-  accountSize: number; // Actual challenge account size in INR (e.g. 500000)
-  fee: number;
-}
-
-const SERVER_PLANS: Record<PlanType, { label: string; sizes: PlanSize[] }> = {
-  flash: {
-    label: "Flash Challenge",
-    sizes: [
-      { size: "₹50,000", accountSize: 50000, fee: 1999 },
-      { size: "₹1,00,000", accountSize: 100000, fee: 3499 },
-      { size: "₹2,50,000", accountSize: 250000, fee: 7499 },
-      { size: "₹5,00,000", accountSize: 500000, fee: 11499 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 19499 },
-    ],
-  },
-  instant: {
-    label: "Instant Funding",
-    sizes: [
-      { size: "₹1,00,000", accountSize: 100000, fee: 4999 },
-      { size: "₹5,00,000", accountSize: 500000, fee: 11999 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 21999 },
-    ],
-  },
-  "1step": {
-    label: "1-Step Evaluation",
-    sizes: [
-      { size: "₹1,00,000", accountSize: 100000, fee: 2999 },
-      { size: "₹5,00,000", accountSize: 500000, fee: 11999 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 21999 },
-      { size: "₹25,00,000", accountSize: 2500000, fee: 48499 },
-    ],
-  },
-  "2step": {
-    label: "2-Step Evaluation",
-    sizes: [
-      { size: "₹5,00,000", accountSize: 500000, fee: 11999 },
-      { size: "₹10,00,000", accountSize: 1000000, fee: 21999 },
-      { size: "₹25,00,000", accountSize: 2500000, fee: 48499 },
-    ],
-  },
-};
-
-/**
- * Resolve the actual challenge account size from plan type and size index.
- * This is the VIRTUAL BALANCE the user trades with — NOT the fee they paid.
- */
-function resolveAccountSize(planType: PlanType, sizeIndex: number): number | null {
-  const plan = SERVER_PLANS[planType];
-  if (!plan) return null;
-  const size = plan.sizes[sizeIndex];
-  if (!size) return null;
-  return size.accountSize;
-}
-
-const VALID_COUPONS: Record<string, number> = {
-  FLASH: 60,
-  INSTANT: 55,
-  FW: 65,
-  FW70: 70,
-  WELCOME: 10,
-};
-
-function computeServerTotal(
-  planType: PlanType,
-  sizeIndex: number,
-  couponCode?: string
-): { baseFee: number; total: number; finalTotal: number; discount: number } | null {
-  const plan = SERVER_PLANS[planType];
-  if (!plan) return null;
-  const size = plan.sizes[sizeIndex];
-  if (!size) return null;
-
-  const baseFee = size.fee;
-  const total = baseFee;
-
-  let discount = 0;
-  if (couponCode) {
-    const code = couponCode.trim().toUpperCase();
-    if (VALID_COUPONS[code]) {
-      discount = VALID_COUPONS[code];
-    }
-  }
-
-  const finalTotal = discount > 0 ? Math.round(total * (1 - discount / 100)) : total;
-
-  return { baseFee, total, finalTotal, discount };
-}
+// Plan catalog + pricing come from the shared single source of truth:
+// @workspace/products (imported above as resolveAccountSize / computeServerTotal / getProduct).
+// No plan, size, fee or coupon values are defined locally anymore.
 
 async function createReferralConversion(
   clerkUserId: string,
@@ -332,40 +251,10 @@ async function getOrCreateUser(authUserId: string | undefined | null, billing: B
 }
 
 // ---------------------------------------------------------------------------
-// Terminal Provisioning — Full Inline Execution
-//
-// After a payment is confirmed, this function:
-//   1. Inserts a provisioning_logs row
-//   2. Creates challenge_accounts + trading_accounts records
-//   3. Updates provisioning_logs to 'completed'
-//
-// Previously this only inserted a 'pending' row expecting an external Terminal
-// app to pick it up — that app was never deployed, causing the production bug
-// where users get stuck after UTR verification.
+// Terminal Provisioning — delegates to the shared provisioning service so the
+// website and Founder Emergency Provision create identical accounts. Risk
+// settings and account sizes come from @workspace/products.
 // ---------------------------------------------------------------------------
-
-interface ProvisioningPlanConfig {
-  profitTargetPct: number;
-  dailyLossLimitPct: number;
-  maxDrawdownPct: number;
-  minTradingDays: number;
-  maxDaysAllowed: number;
-  type: string;
-}
-
-const PROVISIONING_PLAN_CONFIGS: Record<string, ProvisioningPlanConfig> = {
-  flash: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 3, maxDaysAllowed: 30, type: "flash_challenge" },
-  instant: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 1, maxDaysAllowed: 60, type: "instant_funding" },
-  "1step": { profitTargetPct: 10, dailyLossLimitPct: 4, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 45, type: "1step_evaluation" },
-  "2step": { profitTargetPct: 8, dailyLossLimitPct: 4, maxDrawdownPct: 10, minTradingDays: 5, maxDaysAllowed: 60, type: "2step_evaluation_phase1" },
-};
-
-function generateAccountCode(): string {
-  const prefix = "FW";
-  const ts = Date.now().toString(36).toUpperCase().slice(-4);
-  const rand = Math.random().toString(36).toUpperCase().slice(2, 8);
-  return `${prefix}-${ts}${rand}`;
-}
 
 async function triggerTerminalProvisioning(
   orderId: string,
@@ -373,57 +262,7 @@ async function triggerTerminalProvisioning(
   paymentMethod: string,
   paymentRef: string | null,
 ) {
-  // 1. Insert provisioning_logs row
-  const provResult = await db.execute(sql`
-    INSERT INTO provisioning_logs (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
-    VALUES (${orderId}, ${planType}, ${paymentMethod}, ${paymentRef}, 'website', 'processing', now(), now())
-    RETURNING id
-  `);
-  const provId = (provResult.rows[0] as any).id;
-
-  // 2. Get order to find user_id and account_size
-  const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
-  if (!order) throw new Error(`Order ${orderId} not found during provisioning`);
-
-  // 3. Get user
-  const userResult = await db.execute(sql`
-    SELECT id, first_name, last_name, email FROM users WHERE id = ${order.userId}::uuid LIMIT 1
-  `);
-  const user = (userResult.rows as any[])[0];
-  if (!user) throw new Error(`User ${order.userId} not found during provisioning`);
-
-  // 4. Determine plan config and account size
-  const planConfig = PROVISIONING_PLAN_CONFIGS[planType] || PROVISIONING_PLAN_CONFIGS["flash"];
-  const initialBalance = order.accountSize || 50000;
-
-  // 5. Create trading_accounts (Drizzle schema: id, account_code, user_id, plan, virtual_balance, status, order_id)
-  const accountCode = generateAccountCode();
-  const tradingAccountId = randomUUID();
-  await db.execute(sql`
-    INSERT INTO trading_accounts (
-      id, account_code, user_id, plan, virtual_balance, status, order_id, expires_at, created_at, updated_at
-    ) VALUES (
-      ${tradingAccountId}, ${accountCode}, ${user.id}, ${planType}, ${initialBalance}, 'active', ${orderId},
-      ${new Date(Date.now() + planConfig.maxDaysAllowed * 86400000).toISOString()}::timestamptz, now(), now()
-    )
-  `);
-
-  // 6. Update provisioning_logs → completed
-  await db.execute(sql`
-    UPDATE provisioning_logs
-    SET status = 'completed',
-        trading_account_id = ${tradingAccountId}::uuid,
-        completed_at = now()
-    WHERE id = ${provId}::uuid
-  `);
-
-  // 7. Update order status to confirmed
-  await db.execute(sql`
-    UPDATE orders SET status = 'confirmed', updated_at = now()
-    WHERE id = ${orderId} AND status = 'paid'
-  `);
-
-  console.log(`[Provisioning] COMPLETED: order=${orderId} plan=${planType} accountCode=${accountCode} tradingId=${tradingAccountId}`);
+  await provisionChallenge({ orderId, planType, paymentMethod, paymentRef, source: "website" });
 }
 
 // ---------------------------------------------------------------------------
@@ -535,7 +374,7 @@ router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, asyn
       callbackUrl,
       returnUrl,
       orderId,
-      description: `FundedWealth ${SERVER_PLANS[planType as PlanType].label} - ${SERVER_PLANS[planType as PlanType].sizes[sizeIndex].size}`,
+      description: `FundedWealth ${getProduct(planType as PlanType)?.serverLabel ?? planType} - ${getProduct(planType as PlanType)?.sizes[sizeIndex]?.sizeLabel ?? ""}`,
     };
 
     const response = await fetch(OXAPAY_API_URL, {
@@ -940,7 +779,7 @@ router.get("/provisioning-status/:orderId", async (req: Request, res: Response) 
 
       const taResult = await db.execute(sql`
         SELECT id, status FROM trading_accounts
-        WHERE id = ${prov.trading_account_id}
+        WHERE id = ${prov.trading_account_id}::uuid
         LIMIT 1
       `);
       const ta = (taResult.rows as any[])[0];

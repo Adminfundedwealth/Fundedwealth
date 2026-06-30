@@ -16,6 +16,8 @@ import { db, orders } from "@workspace/db";
 import { sql, eq, desc } from "drizzle-orm";
 import { AdminEventService } from "../lib/admin-event-service";
 import { logger } from "../lib/logger";
+import { provisionChallenge } from "../lib/provisioning-service";
+import { PLAN_TYPES, resolveAccountSize, type PlanType } from "@workspace/products";
 
 const router = Router();
 
@@ -121,6 +123,77 @@ router.post("/retry/:id", async (req: Request, res: Response) => {
   } catch (err) {
     logger.error({ err }, "Failed to retry provisioning");
     res.status(500).json({ error: "Failed to retry provisioning" });
+  }
+});
+
+/**
+ * POST /api/provisioning/emergency
+ * Founder Emergency Provision — manually provision a challenge for a user
+ * WITHOUT a payment, e.g. to recover a stuck order or to grant an account.
+ *
+ * This uses the EXACT same shared product catalog (@workspace/products) and the
+ * shared provisioning service as the website checkout, so the resulting
+ * challenge_accounts, trading_accounts and risk settings are identical to a
+ * normal website purchase for the same plan + size.
+ *
+ * Body:
+ *   userId?    string  — internal users.id (uuid)
+ *   email?     string  — alternative way to identify the user
+ *   orderId?   string  — optional existing order to attach + confirm
+ *   planType   string  — flash | instant | 1step | 2step
+ *   sizeIndex  number  — index into the plan's sizes (default 0)
+ *   note?      string  — free-form reason, stored as payment_ref
+ */
+router.post("/emergency", async (req: Request, res: Response) => {
+  try {
+    const { userId, email, orderId, planType, sizeIndex = 0, note } = req.body || {};
+
+    if (!planType || !PLAN_TYPES.includes(planType as PlanType)) {
+      return res.status(400).json({ success: false, error: "Valid planType is required (flash | instant | 1step | 2step)" });
+    }
+    if (typeof sizeIndex !== "number" || resolveAccountSize(planType as PlanType, sizeIndex) == null) {
+      return res.status(400).json({ success: false, error: "Invalid sizeIndex for the selected plan" });
+    }
+
+    // Resolve the internal user id (directly, via email, or via the order)
+    let resolvedUserId: string | null = typeof userId === "string" ? userId : null;
+
+    if (!resolvedUserId && typeof email === "string" && email.trim()) {
+      const userRows = await db.execute(sql`
+        SELECT id FROM users WHERE email = ${email.trim().toLowerCase()} LIMIT 1
+      `);
+      resolvedUserId = (userRows.rows[0] as any)?.id ?? null;
+    }
+
+    if (!resolvedUserId && typeof orderId === "string") {
+      const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+      resolvedUserId = order?.userId ?? null;
+    }
+
+    if (!resolvedUserId) {
+      return res.status(404).json({ success: false, error: "Could not resolve a user from userId, email or orderId" });
+    }
+
+    const result = await provisionChallenge({
+      planType: planType as PlanType,
+      orderId: typeof orderId === "string" ? orderId : null,
+      userId: resolvedUserId,
+      sizeIndex,
+      paymentMethod: "founder_emergency",
+      paymentRef: typeof note === "string" && note.trim() ? note.trim() : "founder_emergency_provision",
+      source: "founder_emergency",
+    });
+
+    logger.info({ ...result, planType, sizeIndex, source: "founder_emergency" }, "[Provisioning] Founder emergency provision completed");
+
+    return res.json({
+      success: true,
+      message: "Emergency provision completed.",
+      provisioning: result,
+    });
+  } catch (err) {
+    logger.error({ err }, "Failed founder emergency provision");
+    return res.status(500).json({ success: false, error: (err as Error).message || "Failed to provision" });
   }
 });
 

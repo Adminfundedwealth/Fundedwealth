@@ -5,7 +5,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import { logger } from "../lib/logger";
 import { db, users, orders, webhookLogs, championshipRegistrations, impactDonations } from "@workspace/db";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { paymentConfirmationEmail } from "../lib/email";
 import { MonitoringService } from "../lib/monitoring-service";
 import { rateLimit } from "../lib/rate-limit";
@@ -13,6 +13,11 @@ import { AuditService } from "../lib/audit-service";
 import { AdminEventService } from "../lib/admin-event-service";
 import { validateBody } from "../lib/api-security";
 import { z } from "zod";
+import {
+  resolveAccountSize as resolveAccountSizeRzp,
+  type PlanType,
+} from "@workspace/products";
+import { provisionChallenge } from "../lib/provisioning-service";
 
 const router = Router();
 
@@ -80,60 +85,12 @@ if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
 
 // ---------------------------------------------------------------------------
 // Plan definitions + provisioning trigger
-// ---------------------------------------------------------------------------
-type PlanType = "flash" | "instant" | "1step" | "2step";
-
-// Server-side plan definitions for account size resolution
-const RAZORPAY_PLANS: Record<PlanType, { sizes: { accountSize: number; fee: number }[] }> = {
-  flash: { sizes: [{ accountSize: 50000, fee: 1999 }, { accountSize: 100000, fee: 3499 }, { accountSize: 250000, fee: 7499 }, { accountSize: 500000, fee: 11499 }, { accountSize: 1000000, fee: 19499 }] },
-  instant: { sizes: [{ accountSize: 100000, fee: 4999 }, { accountSize: 500000, fee: 11999 }, { accountSize: 1000000, fee: 21999 }] },
-  "1step": { sizes: [{ accountSize: 100000, fee: 2999 }, { accountSize: 500000, fee: 11999 }, { accountSize: 1000000, fee: 21999 }, { accountSize: 2500000, fee: 48499 }] },
-  "2step": { sizes: [{ accountSize: 500000, fee: 11999 }, { accountSize: 1000000, fee: 21999 }, { accountSize: 2500000, fee: 48499 }] },
-};
-
-/**
- * Resolve the actual challenge account size from plan type and size index.
- * This is the VIRTUAL BALANCE the user trades with — NOT the fee they paid.
- */
-function resolveAccountSizeRzp(planType: PlanType, sizeIndex: number): number | null {
-  const plan = RAZORPAY_PLANS[planType];
-  if (!plan) return null;
-  const size = plan.sizes[sizeIndex];
-  if (!size) return null;
-  return size.accountSize;
-}
-
-// ---------------------------------------------------------------------------
-// Terminal Provisioning — Full Inline Execution
 //
-// After a payment is confirmed, this function:
-//   1. Inserts a provisioning_logs row
-//   2. Creates challenge_accounts + trading_accounts records
-//   3. Updates provisioning_logs to 'completed'
+// Plan/size/fee values and risk rules now come from the shared single source
+// of truth (@workspace/products). Provisioning is delegated to the shared
+// provisioning service so the website and Founder Emergency Provision create
+// identical challenge_accounts, trading_accounts and risk settings.
 // ---------------------------------------------------------------------------
-
-interface ProvisioningPlanConfigRzp {
-  profitTargetPct: number;
-  dailyLossLimitPct: number;
-  maxDrawdownPct: number;
-  minTradingDays: number;
-  maxDaysAllowed: number;
-  type: string;
-}
-
-const PROVISIONING_CONFIGS_RZP: Record<string, ProvisioningPlanConfigRzp> = {
-  flash: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 3, maxDaysAllowed: 30, type: "flash_challenge" },
-  instant: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 1, maxDaysAllowed: 60, type: "instant_funding" },
-  "1step": { profitTargetPct: 10, dailyLossLimitPct: 4, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 45, type: "1step_evaluation" },
-  "2step": { profitTargetPct: 8, dailyLossLimitPct: 4, maxDrawdownPct: 10, minTradingDays: 5, maxDaysAllowed: 60, type: "2step_evaluation_phase1" },
-};
-
-function generateAccountCodeRzp(): string {
-  const prefix = "FW";
-  const ts = Date.now().toString(36).toUpperCase().slice(-4);
-  const rand = Math.random().toString(36).toUpperCase().slice(2, 8);
-  return `${prefix}-${ts}${rand}`;
-}
 
 async function triggerTerminalProvisioning(
   orderId: string,
@@ -141,95 +98,7 @@ async function triggerTerminalProvisioning(
   paymentMethod: string,
   paymentRef: string | null,
 ) {
-  // 1. Insert provisioning_logs row
-  const provResult = await db.execute(sql`
-    INSERT INTO provisioning_logs (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
-    VALUES (${orderId}, ${planType}, ${paymentMethod}, ${paymentRef}, 'website', 'processing', now(), now())
-    RETURNING id
-  `);
-  const provId = (provResult.rows[0] as any).id;
-
-  // 2. Get order
-  const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
-  if (!order) throw new Error(`Order ${orderId} not found during provisioning`);
-
-  // 3. Get user
-  const userResult = await db.execute(sql`
-    SELECT id, first_name, last_name, email FROM users WHERE id = ${order.userId}::uuid LIMIT 1
-  `);
-  const user = (userResult.rows as any[])[0];
-  if (!user) throw new Error(`User ${order.userId} not found during provisioning`);
-
-  // 4. Get or create terminal_traders
-  const existingTrader = await db.execute(sql`
-    SELECT id FROM terminal_traders WHERE user_id = ${user.id}::uuid LIMIT 1
-  `);
-  let traderId: string;
-  if (existingTrader.rows && existingTrader.rows.length > 0) {
-    traderId = (existingTrader.rows[0] as any).id;
-  } else {
-    const displayName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Trader";
-    const traderInsert = await db.execute(sql`
-      INSERT INTO terminal_traders (user_id, display_name, email, created_at, updated_at)
-      VALUES (${user.id}::uuid, ${displayName}, ${user.email}, now(), now())
-      RETURNING id
-    `);
-    traderId = (traderInsert.rows[0] as any).id;
-  }
-
-  // 5. Plan config and account size
-  const planConfig = PROVISIONING_CONFIGS_RZP[planType] || PROVISIONING_CONFIGS_RZP["flash"];
-  const initialBalance = order.accountSize || 50000;
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + planConfig.maxDaysAllowed);
-
-  // 6. Create challenge_accounts
-  const challengeResult = await db.execute(sql`
-    INSERT INTO challenge_accounts (
-      user_id, type, plan, initial_balance, current_balance, peak_balance,
-      profit_target_pct, daily_loss_limit_pct, max_drawdown_pct,
-      min_trading_days, status, started_at, expires_at, created_at, updated_at
-    ) VALUES (
-      ${user.id}::uuid, ${planConfig.type}, ${planType},
-      ${initialBalance}, ${initialBalance}, ${initialBalance},
-      ${planConfig.profitTargetPct}, ${planConfig.dailyLossLimitPct}, ${planConfig.maxDrawdownPct},
-      ${planConfig.minTradingDays}, 'active', now(),
-      ${expiresAt.toISOString()}::timestamptz, now(), now()
-    )
-    RETURNING id
-  `);
-  const challengeAccountId = (challengeResult.rows[0] as any).id;
-
-  // 7. Create trading_accounts
-  const accountCode = generateAccountCodeRzp();
-  const tradingResult = await db.execute(sql`
-    INSERT INTO trading_accounts (
-      account_code, broker_provider, balance, available_margin, status, created_at, updated_at
-    ) VALUES (
-      ${accountCode}, 'fundedwealth', ${initialBalance}, ${initialBalance}, 'active', now(), now()
-    )
-    RETURNING id
-  `);
-  const tradingAccountId = (tradingResult.rows[0] as any).id;
-
-  // 8. Update provisioning_logs → completed
-  await db.execute(sql`
-    UPDATE provisioning_logs
-    SET status = 'completed',
-        trader_id = ${traderId}::uuid,
-        challenge_account_id = ${challengeAccountId}::uuid,
-        trading_account_id = ${tradingAccountId}::uuid,
-        completed_at = now()
-    WHERE id = ${provId}::uuid
-  `);
-
-  // 9. Update order status to confirmed
-  await db.execute(sql`
-    UPDATE orders SET status = 'confirmed', updated_at = now()
-    WHERE id = ${orderId} AND status = 'paid'
-  `);
-
-  logger.info({ orderId, planType, accountCode, challengeAccountId, tradingAccountId }, "[Provisioning] COMPLETED");
+  await provisionChallenge({ orderId, planType, paymentMethod, paymentRef, source: "website" });
 }
 
 /**

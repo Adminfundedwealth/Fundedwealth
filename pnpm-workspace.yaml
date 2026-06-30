@@ -43,6 +43,7 @@ packages:
   - lib/api-client-react
   - lib/db
   - lib/integrations-gemini-ai
+  - lib/products
   - scripts
 
 catalog:

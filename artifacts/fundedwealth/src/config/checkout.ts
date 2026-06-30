@@ -1,7 +1,13 @@
-import { CreditCard, Building2 } from "lucide-react";
-import React from "react";
+// Checkout display config for the Main Website.
+//
+// The challenge catalog (types, sizes, fees, drawdown, daily loss, profit
+// target, leverage, payout rules, coupons) lives in the shared single source
+// of truth: @workspace/products. This file only adapts that canonical data
+// into the display shape the checkout UI already expects, plus website-only
+// presentation config (add-ons, payment methods).
+import { PRODUCTS, COUPONS, PLAN_TYPES, type PlanType } from "@workspace/products";
 
-export type PlanType = "flash" | "instant" | "1step" | "2step";
+export type { PlanType };
 
 export interface PlanConfig {
   label: string;
@@ -17,79 +23,29 @@ export interface PlanConfig {
   duration: string;
 }
 
-export const PLANS: Record<PlanType, PlanConfig> = {
-  flash: {
-    label: "Flash",
-    discount: "60%",
-    code: "Flash",
-    profitTarget: "—",
-    maxLoss: "4%",
-    dailyLoss: "2%",
-    minDays: "—",
-    leverage: "1:100",
-    profitSplit: "80%",
-    duration: "24 Hours",
-    sizes: [
-      { size: "₹50,000", origFee: "₹1,999", discFee: "₹799" },
-      { size: "₹1,00,000", origFee: "₹3,499", discFee: "₹1,399" },
-      { size: "₹2,50,000", origFee: "₹7,499", discFee: "₹2,999", popular: true },
-      { size: "₹5,00,000", origFee: "₹11,499", discFee: "₹4,599" },
-      { size: "₹10,00,000", origFee: "₹19,499", discFee: "₹7,799" },
-    ],
-  },
-  instant: {
-    label: "Instant",
-    discount: "55%",
-    code: "Instant",
-    profitTarget: "—",
-    maxLoss: "6%",
-    dailyLoss: "3%",
-    minDays: "1",
-    leverage: "1:100",
-    profitSplit: "80%",
-    duration: "Unlimited",
-    sizes: [
-      { size: "₹1,00,000", origFee: "₹4,999", discFee: "₹2,749" },
-      { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹6,049", popular: true },
-      { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹9,899" },
-    ],
-  },
-  "1step": {
-    label: "1-Step",
-    discount: "65%",
-    code: "FW",
-    profitTarget: "10%",
-    maxLoss: "6%",
-    dailyLoss: "3%",
-    minDays: "3",
-    leverage: "1:100",
-    profitSplit: "90%",
-    duration: "30 Days",
-    sizes: [
-      { size: "₹1,00,000", origFee: "₹2,999", discFee: "₹1,049" },
-      { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹4,199", popular: true },
-      { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹7,699" },
-      { size: "₹25,00,000", origFee: "₹48,499", discFee: "₹16,974" },
-    ],
-  },
-  "2step": {
-    label: "2-Step",
-    discount: "70%",
-    code: "FW",
-    profitTarget: "8% + 5%",
-    maxLoss: "8%",
-    dailyLoss: "4%",
-    minDays: "5",
-    leverage: "1:100",
-    profitSplit: "90%",
-    duration: "60 Days",
-    sizes: [
-      { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹3,599" },
-      { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹6,599", popular: true },
-      { size: "₹25,00,000", origFee: "₹48,499", discFee: "₹14,549" },
-    ],
-  },
-};
+// Derived from the shared catalog — same shape/values the UI consumed before.
+export const PLANS: Record<PlanType, PlanConfig> = PLAN_TYPES.reduce((acc, key) => {
+  const p = PRODUCTS[key];
+  acc[key] = {
+    label: p.displayLabel,
+    discount: p.discount,
+    code: p.code,
+    profitTarget: p.profitTarget,
+    maxLoss: p.maxLoss,
+    dailyLoss: p.dailyLoss,
+    minDays: p.minDays,
+    leverage: p.leverage,
+    profitSplit: p.profitSplit,
+    duration: p.duration,
+    sizes: p.sizes.map((s) => ({
+      size: s.sizeLabel,
+      origFee: s.origFeeLabel,
+      discFee: s.discFeeLabel,
+      ...(s.popular ? { popular: true } : {}),
+    })),
+  };
+  return acc;
+}, {} as Record<PlanType, PlanConfig>);
 
 export const ADDONS = [
   { id: "lifetime", label: "90% Lifetime Payout", price: "₹999/mo" },
@@ -109,10 +65,5 @@ export const PAYMENT_METHODS = [
   { id: "oxapay-ltc", label: "Litecoin (LTC)", icon: "LTC", desc: "Litecoin network — via OxaPay", group: "crypto" },
 ];
 
-export const COUPON_CODES: Record<string, number> = {
-  FLASH: 60,
-  INSTANT: 55,
-  FW: 65,
-  FW70: 70,
-  WELCOME: 10,
-};
+// Coupon code → discount %, sourced from the shared catalog.
+export const COUPON_CODES: Record<string, number> = COUPONS;

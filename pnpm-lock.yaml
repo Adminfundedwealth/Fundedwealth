@@ -192,6 +192,9 @@ importers:
       '@workspace/integrations-gemini-ai':
         specifier: workspace:*
         version: link:../../lib/integrations-gemini-ai
+      '@workspace/products':
+        specifier: workspace:*
+        version: link:../../lib/products
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -429,6 +432,9 @@ importers:
       '@workspace/api-client-react':
         specifier: workspace:*
         version: link:../../lib/api-client-react
+      '@workspace/products':
+        specifier: workspace:*
+        version: link:../../lib/products
       agentation:
         specifier: ^3.0.2
         version: 3.0.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -755,6 +761,8 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.19.20
+
+  lib/products: {}
 
   scripts:
     devDependencies:
