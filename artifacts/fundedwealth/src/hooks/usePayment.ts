@@ -51,7 +51,8 @@ export const usePayment = (
     appliedCoupon: string,
     referralCode: string | null,
     billing: BillingInfo,
-    finalTotal: number
+    finalTotal: number,
+    password?: string
   ) => {
     if (!selectedPayment?.startsWith("oxapay-")) return;
     setOxapayLoading(true);
@@ -76,6 +77,7 @@ export const usePayment = (
           couponCode: appliedCoupon || undefined,
           referralCode: referralCode || undefined,
           billing,
+          password: password || undefined,
           captchaToken: (window as any).__turnstileToken || undefined,
         }),
       });

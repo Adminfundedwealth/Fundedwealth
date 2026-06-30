@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, PlanType, COUPON_CODES } from "../config/checkout";
 
 export const useCheckout = () => {
-  const { isLoaded, getToken } = useAuth();
+  const { isLoaded, getToken, isSignedIn } = useAuth();
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("1step");
   const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
@@ -27,6 +27,11 @@ export const useCheckout = () => {
     email: "",
   });
 
+  // Account credentials — only relevant for guest checkout. A signed-in user
+  // already has a Supabase auth identity, so these stay empty and unused.
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   useEffect(() => {
     const storedCode = window.localStorage.getItem("fw_referral_code");
     if (storedCode) {
@@ -48,6 +53,12 @@ export const useCheckout = () => {
     billing.email.trim() &&
     billing.phone.trim();
 
+  // Guests must set a password (min 8 chars) that matches the confirmation.
+  // Signed-in users already have an account, so the password is not required.
+  const passwordValid =
+    password.length >= 8 && password === confirmPassword;
+  const credentialsValid = isSignedIn ? true : passwordValid;
+
   return {
     step,
     setStep,
@@ -65,9 +76,16 @@ export const useCheckout = () => {
     setSelectedPayment,
     billing,
     setBilling,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    passwordValid,
+    credentialsValid,
     referralCode,
     billingValid,
     isLoaded,
+    isSignedIn,
     getToken,
   };
 };

@@ -6,7 +6,7 @@ import rateLimit from "express-rate-limit";
 import { db, users, orders, referrals, notifications, manualPayments, webhookLogs } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
 import { paymentConfirmationEmail, sendEmail } from "../lib/email";
-import { broadcastNotificationToUser } from "../lib/supabase";
+import { broadcastNotificationToUser, supabaseAdmin } from "../lib/supabase";
 import { MonitoringService } from "../lib/monitoring-service";
 import { IPIntelligenceService } from "../lib/ip-intelligence-service";
 import { FraudDetectionService } from "../lib/fraud-detection-service";
@@ -250,6 +250,74 @@ async function getOrCreateUser(authUserId: string | undefined | null, billing: B
   return newUser;
 }
 
+/**
+ * Ensure a Supabase Auth identity exists for a purchaser so they can log in to the
+ * website after provisioning. A first-time guest checkout creates a public.users row
+ * with clerk_id = "guest_*" but NO Supabase auth identity and NO password — meaning
+ * the customer can never sign in. This bridges that gap.
+ *
+ * Returns a one-time temporary password ONLY when a brand-new auth identity is created.
+ * Idempotent: if an auth identity already exists for the email, it returns that id with
+ * no password (the customer signs in / resets normally).
+ */
+async function ensureSupabaseAuthIdentity(params: {
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  password?: string | null;
+}): Promise<{ authUserId: string | null; tempPassword: string | null; created: boolean }> {
+  if (!supabaseAdmin) {
+    return { authUserId: null, tempPassword: null, created: false };
+  }
+
+  const email = params.email.trim().toLowerCase();
+  const firstName = params.firstName || "";
+  const lastName = params.lastName || "";
+
+  // If the purchaser chose a password during checkout, use it so they can be
+  // logged in immediately with credentials they already know. Otherwise fall
+  // back to a strong auto-generated temporary password that we email to them.
+  const chosenPassword =
+    typeof params.password === "string" && params.password.length >= 8
+      ? params.password
+      : null;
+  // Strong temporary password: upper + lower + digit + special, length 20.
+  const tempPassword = chosenPassword ?? `Fw1!${randomUUID().replace(/-/g, "").slice(0, 16)}`;
+
+  try {
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true, // pre-confirm so the customer can log in immediately
+      user_metadata: {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName} ${lastName}`.trim(),
+        phone: params.phone || "",
+      },
+    });
+
+    if (!error && data?.user) {
+      // Only surface the password back to the caller when WE generated it (so it
+      // can be emailed). A user-chosen password is never echoed back.
+      return { authUserId: data.user.id, tempPassword: chosenPassword ? null : tempPassword, created: true };
+    }
+
+    // createUser failed (most commonly: email already registered) — find the existing
+    // identity so we can at least link public.users.clerk_id to it.
+    const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const existingUsers = (list?.users ?? []) as Array<{ id: string; email?: string | null }>;
+    const existing = existingUsers.find((u) => (u.email || "").toLowerCase() === email);
+    if (existing) {
+      return { authUserId: existing.id, tempPassword: null, created: false };
+    }
+    return { authUserId: null, tempPassword: null, created: false };
+  } catch {
+    return { authUserId: null, tempPassword: null, created: false };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Terminal Provisioning — delegates to the shared provisioning service so the
 // website and Founder Emergency Provision create identical accounts. Risk
@@ -284,7 +352,7 @@ async function triggerTerminalProvisioning(
 router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
-    const { paymentMethod, planType, sizeIndex, couponCode, referralCode, billing } = req.body;
+    const { paymentMethod, planType, sizeIndex, couponCode, referralCode, billing, password } = req.body;
 
     if (!paymentMethod || !planType || sizeIndex === undefined) {
       res.status(400).json({ error: "Missing required fields: paymentMethod, planType, sizeIndex" });
@@ -316,7 +384,25 @@ router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, asyn
       return;
     }
 
-    // IPQS VPN/Proxy detection for challenge purchase (non-blocking)
+    // Crypto checkout redirects off-site, so client-side auto-login isn't possible
+    // on return. Create the Supabase auth identity now using the guest's chosen
+    // password so they can sign in with credentials they already know once their
+    // account is provisioned. Reuses the same identity helper as the UPI path.
+    const isCryptoGuest = !auth?.userId || (user.clerkId?.startsWith("guest_") ?? false);
+    if (isCryptoGuest) {
+      const identity = await ensureSupabaseAuthIdentity({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        password: typeof password === "string" ? password : null,
+      });
+      if (identity.authUserId && identity.authUserId !== user.clerkId) {
+        await db.update(users)
+          .set({ clerkId: identity.authUserId, updatedAt: new Date() })
+          .where(eq(users.id, user.id));
+      }
+    }
     const purchaseIp =
       (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
       req.socket.remoteAddress ||
@@ -807,7 +893,7 @@ router.get("/provisioning-status/:orderId", async (req: Request, res: Response) 
 router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
-    const { utr, amount, planType, sizeIndex, billing, referralCode, couponCode } = req.body || {};
+    const { utr, amount, planType, sizeIndex, billing, referralCode, couponCode, password } = req.body || {};
 
     // Soft auth check: if user exists and is restricted, block.
     // Unlike other endpoints, we allow unauthenticated requests with valid billing info
@@ -916,6 +1002,30 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       utrStr,
     );
 
+    // ── Onboarding: ensure the purchaser can actually log in to the website ──
+    // A guest checkout has a public.users row but no Supabase Auth identity/password.
+    // Create one (with a temp password) and link clerk_id so they can sign in and
+    // reach the dashboard with their freshly provisioned account.
+    let loginCredentials: { email: string; tempPassword: string } | null = null;
+    const isGuest = !auth?.userId || (user.clerkId?.startsWith("guest_") ?? false);
+    if (isGuest) {
+      const identity = await ensureSupabaseAuthIdentity({
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        password: typeof password === "string" ? password : null,
+      });
+      if (identity.authUserId && identity.authUserId !== user.clerkId) {
+        await db.update(users)
+          .set({ clerkId: identity.authUserId, updatedAt: new Date() })
+          .where(eq(users.id, user.id));
+      }
+      if (identity.created && identity.tempPassword) {
+        loginCredentials = { email: user.email, tempPassword: identity.tempPassword };
+      }
+    }
+
     await sendEmail({
       to: user.email,
       subject: "FundedWealth - Payment Received! Account Being Provisioned",
@@ -930,6 +1040,13 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
             <li><strong>Plan type:</strong> ${planType}</li>
             <li><strong>Status:</strong> Provisioning in progress</li>
           </ul>
+          ${loginCredentials ? `
+          <div style="margin-top: 24px; padding: 20px; background: rgba(255,138,61,0.08); border: 1px solid rgba(255,138,61,0.3); border-radius: 16px;">
+            <p style="color: #FF8A3D; font-weight: bold; margin: 0 0 8px;">Your login details</p>
+            <p style="color: rgba(255,255,255,0.85); margin: 0 0 4px;"><strong>Email:</strong> ${loginCredentials.email}</p>
+            <p style="color: rgba(255,255,255,0.85); margin: 0 0 12px;"><strong>Temporary password:</strong> ${loginCredentials.tempPassword}</p>
+            <p style="color: rgba(255,255,255,0.6); font-size: 13px; margin: 0;">Sign in at https://www.fundedwealth.com/sign-in and change your password from the dashboard.</p>
+          </div>` : ""}
           <p style="color: rgba(255,255,255,0.75); margin-top: 24px;">You'll receive another email once your account is fully activated. Check your dashboard for updates.</p>
         </div>
       `,
@@ -952,6 +1069,9 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       orderId: result.order.id,
       provisioningStatus: "completed",
       message: "Payment verified. Your trading account is ready.",
+      ...(loginCredentials
+        ? { loginEmail: loginCredentials.email, tempPassword: loginCredentials.tempPassword }
+        : {}),
     });
   } catch (err) {
     req.log.error({ err }, "verify_utr_failed");

@@ -9,6 +9,9 @@ import {
   ExternalLink,
   Smartphone,
   ChevronDown,
+  Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +28,7 @@ import { PaymentUPI } from "@/components/checkout/PaymentUPI";
 // Hooks & Config
 import { useCheckout } from "@/hooks/useCheckout";
 import { usePayment } from "@/hooks/usePayment";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, ADDONS, PAYMENT_METHODS, PlanType } from "@/config/checkout";
 
 const RazorpayLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
@@ -74,6 +78,11 @@ export default function Checkout() {
     setSelectedPayment,
     billing,
     setBilling,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    credentialsValid,
     referralCode,
     billingValid,
     getToken,
@@ -89,8 +98,12 @@ export default function Checkout() {
     handleRazorpayPayment,
   } = usePayment(getToken, isLoaded);
 
+  const { signIn, isSignedIn } = useAuth();
+
   const [payCategory, setPayCategory] = useState<"upi" | "card" | "crypto" | null>(null);
   const [utrInput, setUtrInput] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [utrStatus, setUtrStatus] = useState<"idle" | "verifying" | "pending" | "success" | "failed">("idle");
   const [utrError, setUtrError] = useState("");
   const [paySecondsLeft, setPaySecondsLeft] = useState(900);
@@ -137,6 +150,9 @@ export default function Checkout() {
           sizeIndex: selectedSizeIdx,
           couponCode: appliedCoupon || undefined,
           referralCode: referralCode || undefined,
+          // Guest-chosen account password — backend creates the Supabase auth
+          // identity with this exact password so we can auto-login below.
+          password: !isSignedIn ? password : undefined,
           billing: {
             firstName: billing.firstName,
             lastName: billing.lastName,
@@ -152,6 +168,17 @@ export default function Checkout() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
         setUtrStatus("success");
+        // First-time guest purchaser: the backend created a Supabase auth identity
+        // using the password they chose in Billing Details. Sign them in now with
+        // that same password so they land directly in the dashboard. We fall back to
+        // any server-issued credentials (legacy temp-password path) if present.
+        if (!isSignedIn) {
+          const loginEmail = data.loginEmail || billing.email;
+          const loginPassword = password || data.tempPassword;
+          if (loginEmail && loginPassword) {
+            await signIn(loginEmail, loginPassword).catch(() => {});
+          }
+        }
         // Redirect to pending page for provisioning polling
         const params = new URLSearchParams({
           orderId: data.orderId || "",
@@ -320,9 +347,68 @@ export default function Checkout() {
                       <Input value={billing.email} onChange={(e) => setBilling({ ...billing, email: e.target.value })} placeholder="you@example.com" type="email" className="h-11 bg-white/5 border-white/10 text-white" />
                     </div>
                   </div>
+
+                  {!isSignedIn && (
+                    <div className="pt-2 mt-2 border-t border-white/10">
+                      <p className="text-white/70 text-sm font-semibold mb-1">Create your account password</p>
+                      <p className="text-white/40 text-xs mb-4">You'll be signed in automatically after payment and taken to your dashboard.</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-white/60 text-sm mb-1.5 block">Password</label>
+                          <div className="relative">
+                            <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                            <Input
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="At least 8 characters"
+                              type={showPassword ? "text" : "password"}
+                              autoComplete="new-password"
+                              className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((s) => !s)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-white/60 text-sm mb-1.5 block">Confirm Password</label>
+                          <div className="relative">
+                            <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                            <Input
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Re-enter password"
+                              type={showConfirmPassword ? "text" : "password"}
+                              autoComplete="new-password"
+                              className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword((s) => !s)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                            >
+                              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      {password.length > 0 && password.length < 8 && (
+                        <p className="text-amber-400/80 text-xs mt-2">Password must be at least 8 characters.</p>
+                      )}
+                      {confirmPassword.length > 0 && password !== confirmPassword && (
+                        <p className="text-red-400/80 text-xs mt-2">Passwords do not match.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <Button onClick={() => setTermsOpen(true)} disabled={!billingValid} className="w-full h-12 mt-6 text-base font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white border-0 disabled:opacity-40">Proceed To Pay</Button>
+                <Button onClick={() => setTermsOpen(true)} disabled={!billingValid || !credentialsValid} className="w-full h-12 mt-6 text-base font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white border-0 disabled:opacity-40">Proceed To Pay</Button>
               </div>
 
               <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} onAgree={() => setStep(3)} />
@@ -428,7 +514,7 @@ export default function Checkout() {
                           </button>
                         ))}
                       </div>
-                      <Button onClick={() => handleOxaPayPayment(selectedPayment, selectedPlan, selectedSizeIdx, appliedCoupon, referralCode, billing, finalTotal)} disabled={oxapayLoading || !selectedPayment?.startsWith("oxapay-")} className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold gap-2">
+                      <Button onClick={() => handleOxaPayPayment(selectedPayment, selectedPlan, selectedSizeIdx, appliedCoupon, referralCode, billing, finalTotal, !isSignedIn ? password : undefined)} disabled={oxapayLoading || !selectedPayment?.startsWith("oxapay-")} className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold gap-2">
                         {oxapayLoading ? "Redirecting…" : <><ExternalLink size={16} /> Continue with OxaPay</>}
                       </Button>
                       {oxapayError && <p className="text-red-400 text-xs">{oxapayError}</p>}
