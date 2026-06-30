@@ -52,6 +52,34 @@ const router = Router();
 // ==================== Public Endpoints ====================
 
 /**
+ * GET /api/auth/check-email?email=xxx
+ * Returns whether a Supabase Auth identity already exists for the given email.
+ * Used by the checkout billing form to decide between "Create password" and
+ * "Enter your existing password" — never reveals account details.
+ */
+router.get("/check-email", async (req, res) => {
+  const email = (req.query.email as string || "").trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({ exists: false });
+  }
+
+  try {
+    // Check public.users table for an existing entry with a real (non-guest) auth link
+    const [existing] = await db
+      .select({ clerkId: users.clerkId })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    // A user row with a non-guest clerkId means they have a Supabase Auth identity
+    const exists = !!(existing && existing.clerkId && !existing.clerkId.startsWith("guest_"));
+    return res.json({ exists });
+  } catch {
+    return res.json({ exists: false });
+  }
+});
+
+/**
  * POST /api/auth/register
  * Register new user with email/password
  */

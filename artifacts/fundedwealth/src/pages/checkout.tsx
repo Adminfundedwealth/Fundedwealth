@@ -83,6 +83,8 @@ export default function Checkout() {
     confirmPassword,
     setConfirmPassword,
     credentialsValid,
+    emailExists,
+    emailChecking,
     referralCode,
     billingValid,
     getToken,
@@ -168,25 +170,41 @@ export default function Checkout() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
         setUtrStatus("success");
-        // First-time guest purchaser: the backend created a Supabase auth identity
-        // using the password they chose in Billing Details. Sign them in now with
-        // that same password so they land directly in the dashboard. We fall back to
-        // any server-issued credentials (legacy temp-password path) if present.
+
+        // ── Auto-login: sign the guest in with their chosen password ──────────
+        // The backend created/linked the Supabase auth identity using the password
+        // they chose in Billing Details. We sign them in now so the session is
+        // persisted to localStorage BEFORE any navigation happens.
+        let signedIn = isSignedIn;
         if (!isSignedIn) {
           const loginEmail = data.loginEmail || billing.email;
           const loginPassword = password || data.tempPassword;
           if (loginEmail && loginPassword) {
-            await signIn(loginEmail, loginPassword).catch(() => {});
+            const { error: signInError } = await signIn(loginEmail, loginPassword);
+            if (!signInError) {
+              signedIn = true;
+              // Wait a tick for Supabase's onAuthStateChange to fire and persist
+              // the session to localStorage (synchronous storage but async event).
+              await new Promise((r) => setTimeout(r, 100));
+            }
           }
         }
-        // Redirect to pending page for provisioning polling
-        const params = new URLSearchParams({
-          orderId: data.orderId || "",
-          plan: selectedPlan,
-          amount: String(finalTotal),
-          method: "upi",
-        });
-        window.location.href = `/payment-pending?${params.toString()}`;
+
+        // ── Redirect: go straight to Dashboard if provisioning is already done ─
+        // verify-utr provisions synchronously, so provisioningStatus is "completed"
+        // in the response. No need to detour through /payment-pending.
+        if (signedIn && (data.provisioningStatus === "completed" || data.provisioningStatus === "pending")) {
+          window.location.href = "/dashboard?payment=success&method=upi";
+        } else {
+          // Fallback: redirect to payment-pending for polling (e.g. if sign-in failed)
+          const params = new URLSearchParams({
+            orderId: data.orderId || "",
+            plan: selectedPlan,
+            amount: String(finalTotal),
+            method: "upi",
+          });
+          window.location.href = `/payment-pending?${params.toString()}`;
+        }
       }
       else if (res.status === 202 || data.status === "pending") setUtrStatus("pending");
       else { setUtrStatus("failed"); setUtrError(data.message || data.error || "Verification failed. Please try again or contact support."); }
@@ -350,59 +368,90 @@ export default function Checkout() {
 
                   {!isSignedIn && (
                     <div className="pt-2 mt-2 border-t border-white/10">
-                      <p className="text-white/70 text-sm font-semibold mb-1">Create your account password</p>
-                      <p className="text-white/40 text-xs mb-4">You'll be signed in automatically after payment and taken to your dashboard.</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-white/60 text-sm mb-1.5 block">Password</label>
-                          <div className="relative">
-                            <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
-                            <Input
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="At least 8 characters"
-                              type={showPassword ? "text" : "password"}
-                              autoComplete="new-password"
-                              className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword((s) => !s)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
-                              aria-label={showPassword ? "Hide password" : "Show password"}
-                            >
-                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
+                      {emailExists ? (
+                        <>
+                          <p className="text-white/70 text-sm font-semibold mb-1">Welcome back!</p>
+                          <p className="text-white/40 text-xs mb-4">This email already has an account. Enter your password to sign in after payment.</p>
+                          <div>
+                            <label className="text-white/60 text-sm mb-1.5 block">Your Password</label>
+                            <div className="relative">
+                              <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                              <Input
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your existing password"
+                                type={showPassword ? "text" : "password"}
+                                autoComplete="current-password"
+                                className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword((s) => !s)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                              >
+                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <label className="text-white/60 text-sm mb-1.5 block">Confirm Password</label>
-                          <div className="relative">
-                            <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
-                            <Input
-                              value={confirmPassword}
-                              onChange={(e) => setConfirmPassword(e.target.value)}
-                              placeholder="Re-enter password"
-                              type={showConfirmPassword ? "text" : "password"}
-                              autoComplete="new-password"
-                              className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirmPassword((s) => !s)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
-                              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                            >
-                              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-white/70 text-sm font-semibold mb-1">Create your account password</p>
+                          <p className="text-white/40 text-xs mb-4">You'll be signed in automatically after payment and taken to your dashboard.</p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-white/60 text-sm mb-1.5 block">Password</label>
+                              <div className="relative">
+                                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                                <Input
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
+                                  placeholder="At least 8 characters"
+                                  type={showPassword ? "text" : "password"}
+                                  autoComplete="new-password"
+                                  className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword((s) => !s)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                                  aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="text-white/60 text-sm mb-1.5 block">Confirm Password</label>
+                              <div className="relative">
+                                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                                <Input
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  placeholder="Re-enter password"
+                                  type={showConfirmPassword ? "text" : "password"}
+                                  autoComplete="new-password"
+                                  className="h-11 bg-white/5 border-white/10 text-white pl-9 pr-10"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowConfirmPassword((s) => !s)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                                >
+                                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      {password.length > 0 && password.length < 8 && (
-                        <p className="text-amber-400/80 text-xs mt-2">Password must be at least 8 characters.</p>
-                      )}
-                      {confirmPassword.length > 0 && password !== confirmPassword && (
-                        <p className="text-red-400/80 text-xs mt-2">Passwords do not match.</p>
+                          {password.length > 0 && password.length < 8 && (
+                            <p className="text-amber-400/80 text-xs mt-2">Password must be at least 8 characters.</p>
+                          )}
+                          {confirmPassword.length > 0 && password !== confirmPassword && (
+                            <p className="text-red-400/80 text-xs mt-2">Passwords do not match.</p>
+                          )}
+                        </>
                       )}
                     </div>
                   )}

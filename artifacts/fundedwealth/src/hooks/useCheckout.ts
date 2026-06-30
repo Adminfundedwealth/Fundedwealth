@@ -32,6 +32,38 @@ export const useCheckout = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Detect whether the billing email already has an account.
+  // If true → user enters their existing password (no confirm field).
+  // If false → user creates a new password (with confirm field).
+  const [emailExists, setEmailExists] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+
+  // Debounced email-exists check
+  useEffect(() => {
+    if (isSignedIn) return; // No need — already authenticated
+    const email = billing.email.trim().toLowerCase();
+    if (!email || !email.includes("@") || email.length < 5) {
+      setEmailExists(false);
+      return;
+    }
+
+    setEmailChecking(true);
+    const timer = setTimeout(async () => {
+      try {
+        const apiBase = import.meta.env.VITE_API_URL || "";
+        const res = await fetch(`${apiBase}/api/auth/check-email?email=${encodeURIComponent(email)}`);
+        const data = await res.json().catch(() => ({ exists: false }));
+        setEmailExists(!!data.exists);
+      } catch {
+        setEmailExists(false);
+      } finally {
+        setEmailChecking(false);
+      }
+    }, 600);
+
+    return () => { clearTimeout(timer); setEmailChecking(false); };
+  }, [billing.email, isSignedIn]);
+
   useEffect(() => {
     const storedCode = window.localStorage.getItem("fw_referral_code");
     if (storedCode) {
@@ -54,9 +86,11 @@ export const useCheckout = () => {
     billing.phone.trim();
 
   // Guests must set a password (min 8 chars) that matches the confirmation.
+  // For existing accounts, only the password field is required (no confirm).
   // Signed-in users already have an account, so the password is not required.
-  const passwordValid =
-    password.length >= 8 && password === confirmPassword;
+  const passwordValid = emailExists
+    ? password.length >= 8
+    : password.length >= 8 && password === confirmPassword;
   const credentialsValid = isSignedIn ? true : passwordValid;
 
   return {
@@ -82,6 +116,8 @@ export const useCheckout = () => {
     setConfirmPassword,
     passwordValid,
     credentialsValid,
+    emailExists,
+    emailChecking,
     referralCode,
     billingValid,
     isLoaded,

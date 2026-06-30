@@ -184,7 +184,11 @@ export const usePayment = (
               // lands authenticated on the dashboard — never the login page.
               const loginEmail = verifyData.loginEmail || billing.email;
               if (signIn && password && loginEmail) {
-                await signIn(loginEmail, password).catch(() => {});
+                const { error: signInError } = await signIn(loginEmail, password);
+                if (!signInError) {
+                  // Wait for session persistence before full-page nav
+                  await new Promise((r) => setTimeout(r, 100));
+                }
               }
               window.location.href = "/dashboard?payment=success";
             } else {
