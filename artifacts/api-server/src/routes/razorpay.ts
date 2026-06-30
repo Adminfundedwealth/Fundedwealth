@@ -18,6 +18,7 @@ import {
   type PlanType,
 } from "@workspace/products";
 import { provisionChallenge } from "../lib/provisioning-service";
+import { getOrCreateUser, ensureSupabaseAuthIdentity } from "../lib/guest-account-service";
 
 const router = Router();
 
@@ -66,6 +67,10 @@ const verifyPaymentSchema = z.object({
   amount: z.number().positive().optional(),
   payment_type: z.enum(["challenge", "championship", "donation"]).optional(),
   metadata: z.any().optional(),
+  // Guest checkout (same flow as UPI/crypto): billing identifies/creates the
+  // purchaser and password seeds their Supabase auth identity for auto-login.
+  billing: z.any().optional(),
+  password: z.string().optional(),
 });
 
 // Rate limiters for payment endpoints
@@ -231,9 +236,6 @@ router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchem
 router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, validateBody(verifyPaymentSchema), async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
-    if (!auth?.userId) {
-      return res.status(401).json({ success: false, message: "Authentication required for payment verification" });
-    }
 
     const {
       razorpay_order_id,
@@ -245,6 +247,8 @@ router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, valid
       amount,
       payment_type,
       metadata,
+      billing,
+      password,
     } = req.body;
 
     const paymentType = (payment_type && ["challenge", "championship", "donation"].includes(payment_type))
@@ -277,7 +281,7 @@ router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, valid
 
     if (expectedSignature !== razorpay_signature) {
       logger.warn(
-        { orderId: razorpay_order_id, paymentId: razorpay_payment_id, userId: auth.userId },
+        { orderId: razorpay_order_id, paymentId: razorpay_payment_id, userId: auth?.userId ?? "guest" },
         "Razorpay signature verification failed",
       );
       return res.status(400).json({ success: false, message: "Invalid payment signature" });
@@ -336,11 +340,17 @@ router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, valid
       });
     }
 
-    // ── 5. Look up user — auth is required, no guest fallback ───────────────
-    let [dbUser] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+    // ── 5. Resolve purchaser — SAME guest checkout flow as UPI/crypto ───────
+    // Reuses the shared getOrCreateUser() so an authenticated user, a returning
+    // customer (matched by billing email), or a brand-new guest all resolve to a
+    // single public.users row. No "please register first" — no login required.
+    let dbUser = await getOrCreateUser(auth?.userId, billing || null);
 
     if (!dbUser) {
-      return res.status(404).json({ success: false, message: "User account not found. Please register first." });
+      return res.status(400).json({
+        success: false,
+        message: "Billing details with a valid email are required to complete checkout.",
+      });
     }
 
     // Block provisioning for restricted/suspended/banned accounts
@@ -351,6 +361,26 @@ router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, valid
         message: "Account restricted. Payment received but provisioning blocked. Contact support.",
         code: "ACCOUNT_RESTRICTED",
       });
+    }
+
+    // Guest purchaser: ensure a Supabase Auth identity exists (seeded with the
+    // password they chose at checkout) so the client can auto-login afterwards.
+    // Reuses the shared ensureSupabaseAuthIdentity() — no second auth flow.
+    const isGuest = !auth?.userId || (dbUser.clerkId?.startsWith("guest_") ?? false);
+    if (isGuest) {
+      const identity = await ensureSupabaseAuthIdentity({
+        email: dbUser.email,
+        firstName: dbUser.firstName,
+        lastName: dbUser.lastName,
+        phone: dbUser.phone,
+        password: typeof password === "string" ? password : null,
+      });
+      if (identity.authUserId && identity.authUserId !== dbUser.clerkId) {
+        await db.update(users)
+          .set({ clerkId: identity.authUserId, updatedAt: new Date() })
+          .where(eq(users.id, dbUser.id));
+        dbUser = { ...dbUser, clerkId: identity.authUserId };
+      }
     }
 
     // ── 6. Determine INR amount for account sizing ──────────────────────────
@@ -412,6 +442,7 @@ router.post("/verify-payment", paymentVerifyLimiter, requireActiveAccount, valid
         message: "Payment verified. Your account is being provisioned.",
         orderId: dbOrder.id,
         provisioningStatus: "pending",
+        loginEmail: dbUser.email,
         payment: { id: razorpay_payment_id, order_id: razorpay_order_id, amount: amountINR, currency: rzpPayment?.currency || "INR", status: rzpPayment?.status || "verified", method: rzpPayment?.method || "razorpay" },
       });
 

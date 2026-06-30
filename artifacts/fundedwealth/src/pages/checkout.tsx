@@ -89,6 +89,8 @@ export default function Checkout() {
     isLoaded,
   } = useCheckout();
 
+  const { signIn, isSignedIn } = useAuth();
+
   const {
     oxapayLoading,
     oxapayError,
@@ -96,9 +98,7 @@ export default function Checkout() {
     razorpayError,
     handleOxaPayPayment,
     handleRazorpayPayment,
-  } = usePayment(getToken, isLoaded);
-
-  const { signIn, isSignedIn } = useAuth();
+  } = usePayment(getToken, isLoaded, signIn);
 
   const [payCategory, setPayCategory] = useState<"upi" | "card" | "crypto" | null>(null);
   const [utrInput, setUtrInput] = useState("");
@@ -499,7 +499,7 @@ export default function Checkout() {
                           </button>
                         ))}
                       </div>
-                      <Button onClick={() => handleRazorpayPayment(selectedPayment, selectedPlan, selectedSizeIdx, appliedCoupon, billing, finalTotal, productName)} disabled={razorpayLoading || !selectedPayment?.startsWith("razorpay-")} className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold gap-2">
+                      <Button onClick={() => handleRazorpayPayment(selectedPayment, selectedPlan, selectedSizeIdx, appliedCoupon, billing, finalTotal, productName, !isSignedIn ? password : undefined)} disabled={razorpayLoading || !selectedPayment?.startsWith("razorpay-")} className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold gap-2">
                         {razorpayLoading ? "Opening Razorpay…" : <><ExternalLink size={16} /> Pay ₹{finalTotal.toLocaleString("en-IN")} via <RazorpayLogo size="md" /></>}
                       </Button>
                       {razorpayError && <p className="text-red-400 text-xs">{razorpayError}</p>}

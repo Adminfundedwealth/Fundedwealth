@@ -37,7 +37,8 @@ function getApiBase(): string {
 
 export const usePayment = (
   getToken: () => Promise<string | null>,
-  isLoaded: boolean
+  isLoaded: boolean,
+  signIn?: (email: string, password: string) => Promise<{ error: string | null }>
 ) => {
   const [oxapayLoading, setOxapayLoading] = useState(false);
   const [oxapayError, setOxapayError] = useState("");
@@ -113,7 +114,8 @@ export const usePayment = (
     appliedCoupon: string,
     billing: { firstName: string; lastName: string; email: string; phone: string },
     finalTotal: number,
-    productName: string
+    productName: string,
+    password?: string
   ) => {
     if (!selectedPayment?.startsWith("razorpay-")) return;
     setRazorpayLoading(true);
@@ -172,10 +174,18 @@ export const usePayment = (
                 sizeIndex: selectedSizeIdx,
                 couponCode: appliedCoupon || undefined,
                 billing,
+                password: password || undefined,
               }),
             });
             const verifyData = await verifyRes.json().catch(() => ({}));
             if (verifyRes.ok && verifyData.success) {
+              // Same guest flow as UPI: the backend created/linked the Supabase
+              // auth identity using the chosen password. Sign in now so the user
+              // lands authenticated on the dashboard — never the login page.
+              const loginEmail = verifyData.loginEmail || billing.email;
+              if (signIn && password && loginEmail) {
+                await signIn(loginEmail, password).catch(() => {});
+              }
               window.location.href = "/dashboard?payment=success";
             } else {
               setRazorpayError("Payment verification failed. Contact support with your payment ID: " + response.razorpay_payment_id);
