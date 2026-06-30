@@ -257,7 +257,7 @@ router.get("/my", async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("[Accounts] Failed to fetch user accounts:", error);
-    return res.status(500).json({ success: false, message: "Failed to load accounts" });
+    return res.status(500).json({ success: false, message: "Failed to load accounts", debug: String(error?.message || error) });
   }
 });
 
