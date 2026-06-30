@@ -409,7 +409,7 @@ export default function SignInPage() {
                 />
               )}
 
-              <button type="submit" disabled={loading || !isLoaded || (!(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && !captcha.isVerified)}
+              <button type="submit" disabled={loading || !isLoaded}
                 className="w-full h-12 rounded-xl font-bold text-[15px] text-white transition disabled:opacity-50 disabled:cursor-not-allowed mt-1 relative overflow-hidden"
                 style={{ background: "linear-gradient(135deg,#4A00E0 0%,#7C3AED 60%,#9333EA 100%)", boxShadow: "0 4px 20px rgba(74,0,224,0.5), 0 0 0 1px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}>
                 <span className="relative z-10">{loading ? <Spinner /> : "Login"}</span>

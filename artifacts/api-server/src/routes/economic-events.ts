@@ -44,6 +44,11 @@ router.get("/", async (req, res) => {
     res.json({ events });
   } catch (error) {
     console.error("[EconomicEvents] GET / failed", error);
+    const errMsg = String((error as Error)?.message || "");
+    if (errMsg.includes("does not exist") || errMsg.includes("relation")) {
+      // Table not created yet — return empty instead of spamming logs
+      return res.json({ events: [], _note: "economic_events table not provisioned" });
+    }
     res.status(500).json({ error: "Failed to load economic events" });
   }
 });
