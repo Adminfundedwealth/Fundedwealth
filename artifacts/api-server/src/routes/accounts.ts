@@ -267,7 +267,7 @@ router.get("/my", async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("[Accounts] Failed to fetch user accounts:", error);
-    return res.status(500).json({ success: false, message: "Failed to load accounts", debug: String(error?.message || error) });
+    return res.status(500).json({ success: false, message: "Failed to load accounts" });
   }
 });
 
@@ -298,21 +298,27 @@ router.get("/:accountId", async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // 2. Find provisioning_logs entry for this trading_account_id and verify ownership
-    const provResult = await db.execute(sql`
-      SELECT pl.*, o.user_id as order_user_id, o.plan_type, o.amount, o.account_size
-      FROM provisioning_logs pl
-      JOIN orders o ON o.id = pl.order_id
-      WHERE (pl.trading_account_id = ${accountId}::uuid OR pl.challenge_account_id = ${accountId}::uuid)
-        AND o.user_id = ${String(user.id)}
+    // 2. Resolve the account via the TRADER CHAIN and verify ownership.
+    //    trading_accounts.trader_id → terminal_traders.external_id = users.id.
+    //    Works for website AND manual/emergency provisions (no order dependency).
+    const ownRes = await db.execute(sql`
+      SELECT
+        ta.id  AS trading_account_id,
+        ca.id  AS challenge_account_id,
+        tt.id  AS trader_id
+      FROM trading_accounts ta
+      JOIN terminal_traders tt ON tt.id = ta.trader_id
+      LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+      WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
+        AND tt.external_id = ${String(user.id)}
       LIMIT 1
     `);
 
-    if (!provResult.rows || provResult.rows.length === 0) {
+    if (!ownRes.rows || ownRes.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Account not found" });
     }
 
-    const prov = provResult.rows[0] as any;
+    const prov = ownRes.rows[0] as any;
 
     // 3. Get challenge_accounts details
     let challenge: any = null;

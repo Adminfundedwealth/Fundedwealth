@@ -65,40 +65,32 @@ router.post("/launch", async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // ── 4. VERIFY OWNERSHIP VIA PROVISIONING CHAIN ──────────────────────────
-    // Walk: trading_account_id or challenge_account_id → provisioning_logs → orders → user_id
+    // ── 4. VERIFY OWNERSHIP VIA TRADER CHAIN ────────────────────────────────
+    // Authoritative ownership: trading_accounts.trader_id → terminal_traders.external_id = users.id.
+    // This is identical for website checkout AND manual/emergency provisioning, and does
+    // NOT depend on an order existing (manual provisions have no real order row).
     const ownershipResult = await db.execute(sql`
-      SELECT 
-        pl.id as provisioning_id,
-        pl.order_id,
-        pl.status as provisioning_status,
-        pl.trader_id,
-        pl.challenge_account_id,
-        pl.trading_account_id,
-        o.user_id as order_user_id
-      FROM provisioning_logs pl
-      JOIN orders o ON o.id = pl.order_id
-      WHERE (pl.trading_account_id = ${accountId}::uuid OR pl.challenge_account_id = ${accountId}::uuid)
-        AND pl.status = 'completed'
+      SELECT
+        tt.id  AS trader_id,
+        ca.id  AS challenge_account_id,
+        ta.id  AS trading_account_id,
+        ca.status AS challenge_status
+      FROM trading_accounts ta
+      JOIN terminal_traders tt ON tt.id = ta.trader_id
+      LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+      WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
+        AND tt.external_id = ${String(user.id)}
       LIMIT 1
     `);
 
     if (!ownershipResult.rows || ownershipResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Account not found or provisioning not completed.",
+        message: "Account not found or does not belong to this user.",
       });
     }
 
     const prov = ownershipResult.rows[0] as any;
-
-    // Verify ownership: the order must belong to the current user
-    if (prov.order_user_id !== String(user.id)) {
-      return res.status(403).json({
-        success: false,
-        message: "Account does not belong to this user.",
-      });
-    }
 
     // ── 5. CHECK TERMINAL ACCOUNT STATE ─────────────────────────────────────
     // Fetch the challenge_accounts status to confirm it's launchable
