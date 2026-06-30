@@ -10,26 +10,37 @@
  *   POST /api/provisioning/retry/:id — retry a failed provisioning (admin)
  */
 
-import { Router, type Request, type Response } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { requireAdminAuth } from "../middlewares/supabaseAuth";
 import { db, orders } from "@workspace/db";
 import { sql, eq, desc } from "drizzle-orm";
 import { AdminEventService } from "../lib/admin-event-service";
 import { logger } from "../lib/logger";
 import { provisionChallenge } from "../lib/provisioning-service";
-import { PLAN_TYPES, resolveAccountSize, type PlanType } from "@workspace/products";
+import { PLAN_TYPES, PRODUCTS, resolveAccountSize, type PlanType } from "@workspace/products";
 
 const router = Router();
 
-// All provisioning management routes require admin
-router.use(requireAdminAuth);
+/**
+ * Allow EITHER an authenticated admin (Supabase JWT) OR a trusted internal
+ * service call (the Admin panel) identified by a shared secret header.
+ * This lets the Admin panel reuse THIS production provisioning pipeline
+ * without minting a Supabase user JWT, so Founder Emergency Provision and a
+ * website purchase create identical accounts via the same code path.
+ */
+function allowInternalOrAdmin(req: Request, res: Response, next: NextFunction) {
+  const secret = process.env.INTERNAL_PROVISION_SECRET;
+  const provided = req.header("x-internal-provision-secret");
+  if (secret && provided && provided === secret) return next();
+  return requireAdminAuth(req, res, next);
+}
 
 /**
  * GET /api/provisioning/status
  * Returns provisioning logs with order details.
  * Query: status (pending|completed|failed|all), limit, offset
  */
-router.get("/status", async (req: Request, res: Response) => {
+router.get("/status", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const status = (req.query.status as string) || "all";
     const limit = Math.min(100, parseInt(req.query.limit as string) || 50);
@@ -85,7 +96,7 @@ router.get("/status", async (req: Request, res: Response) => {
  * Retry a failed provisioning by resetting its status to 'pending'.
  * Terminal will pick it up on next poll cycle.
  */
-router.post("/retry/:id", async (req: Request, res: Response) => {
+router.post("/retry/:id", requireAdminAuth, async (req: Request, res: Response) => {
   try {
     const provId = req.params.id as string;
 
@@ -144,7 +155,7 @@ router.post("/retry/:id", async (req: Request, res: Response) => {
  *   sizeIndex  number  — index into the plan's sizes (default 0)
  *   note?      string  — free-form reason, stored as payment_ref
  */
-router.post("/emergency", async (req: Request, res: Response) => {
+router.post("/emergency", allowInternalOrAdmin, async (req: Request, res: Response) => {
   try {
     const { userId, email, orderId, planType, sizeIndex = 0, note } = req.body || {};
 
@@ -195,6 +206,38 @@ router.post("/emergency", async (req: Request, res: Response) => {
     logger.error({ err }, "Failed founder emergency provision");
     return res.status(500).json({ success: false, error: (err as Error).message || "Failed to provision" });
   }
+});
+
+/**
+ * GET /api/provisioning/catalog
+ * Returns the SINGLE-SOURCE-OF-TRUTH challenge catalog from @workspace/products.
+ * Consumed by the Admin panel so it never duplicates product/size/risk values.
+ */
+router.get("/catalog", (_req: Request, res: Response) => {
+  const products = PLAN_TYPES.map((key) => {
+    const p = PRODUCTS[key];
+    return {
+      slug: p.key,
+      displayLabel: p.displayLabel,
+      serverLabel: p.serverLabel,
+      leverage: p.leverage,
+      profitSplit: p.profitSplit,
+      duration: p.duration,
+      maxLoss: p.maxLoss,
+      dailyLoss: p.dailyLoss,
+      profitTarget: p.profitTarget,
+      minDays: p.minDays,
+      rules: p.rules,
+      sizes: p.sizes.map((s, index) => ({
+        index,
+        accountSize: s.accountSize,
+        sizeLabel: s.sizeLabel,
+        fee: s.fee,
+        popular: s.popular ?? false,
+      })),
+    };
+  });
+  res.json({ products });
 });
 
 export default router;
