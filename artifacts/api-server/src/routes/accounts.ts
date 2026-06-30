@@ -92,30 +92,40 @@ router.get("/my", async (req: Request, res: Response) => {
     // 4. Load the user's orders + provisioning logs to (a) attach purchase/fee context
     //    to each live account and (b) surface pending/failed provisioning attempts that
     //    don't yet have a live account.
-    const userOrders = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.userId, String(user.id)))
-      .orderBy(desc(orders.createdAt));
-
-    const orderById = new Map(userOrders.map(o => [String(o.id), o]));
-    const orderIds = userOrders.map(o => o.id);
-
+    let userOrders: any[] = [];
     let provLogRows: any[] = [];
-    if (orderIds.length > 0) {
-      const provLogs = await db.execute(sql`
-        SELECT id, order_id, status, error_message, trading_account_id, challenge_account_id, started_at, completed_at, created_at
-        FROM provisioning_logs
-        WHERE order_id::text = ANY(${orderIds}::text[])
-        ORDER BY created_at DESC
-      `);
-      provLogRows = provLogs.rows as any[];
-    }
-
-    // Map trading_account_id → order_id so a live account can show its purchase fee.
+    const orderById = new Map<string, any>();
     const tradingToOrder = new Map<string, string>();
-    for (const pl of provLogRows) {
-      if (pl.trading_account_id) tradingToOrder.set(String(pl.trading_account_id), String(pl.order_id));
+
+    // Order/provisioning context is SUPPLEMENTARY (fee, orderId, pending/failed states).
+    // It must never blank out the live accounts, so any failure here is non-fatal.
+    try {
+      userOrders = await db
+        .select()
+        .from(orders)
+        .where(eq(orders.userId, String(user.id)))
+        .orderBy(desc(orders.createdAt));
+
+      for (const o of userOrders) orderById.set(String(o.id), o);
+      const orderIds = userOrders.map(o => String(o.id));
+
+      if (orderIds.length > 0) {
+        const idList = sql.join(orderIds.map((id) => sql`${id}`), sql`, `);
+        const provLogs = await db.execute(sql`
+          SELECT id, order_id, status, error_message, trading_account_id, challenge_account_id, started_at, completed_at, created_at
+          FROM provisioning_logs
+          WHERE order_id::text IN (${idList})
+          ORDER BY created_at DESC
+        `);
+        provLogRows = provLogs.rows as any[];
+      }
+
+      // Map trading_account_id → order_id so a live account can show its purchase fee.
+      for (const pl of provLogRows) {
+        if (pl.trading_account_id) tradingToOrder.set(String(pl.trading_account_id), String(pl.order_id));
+      }
+    } catch (ctxErr) {
+      console.error("[Accounts] Order/provisioning context lookup failed (non-fatal):", ctxErr);
     }
 
     const accounts: any[] = [];
