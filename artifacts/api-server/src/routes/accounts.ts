@@ -42,177 +42,156 @@ router.get("/my", async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // 2. Get user's confirmed/paid orders
+    // 2. Resolve the user's terminal trader identity.
+    //    terminal_traders.external_id = users.id is the AUTHORITATIVE ownership link
+    //    for every provisioned account. It is populated identically by website
+    //    checkout AND Founder/manual emergency provisioning, so anchoring discovery
+    //    here makes both paths produce the EXACT SAME dashboard result.
+    const traderRes = await db.execute(sql`
+      SELECT id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
+    `);
+    const traderId = (traderRes.rows as any[])[0]?.id ?? null;
+
+    // 3. Pull every LIVE account for this trader straight from the terminal-owned
+    //    tables, joined challenge ⇄ trading. Discovery is anchored on trader_id
+    //    (NOT order_id), so manually/emergency provisioned accounts surface exactly
+    //    like website-purchased ones.
+    let liveRows: any[] = [];
+    if (traderId) {
+      const liveRes = await db.execute(sql`
+        SELECT
+          ta.id               AS trading_account_id,
+          ta.account_code     AS account_code,
+          ta.broker_provider  AS broker_provider,
+          ta.broker_client_id AS broker_client_id,
+          ta.balance          AS ta_balance,
+          ta.available_margin AS available_margin,
+          ta.status           AS trading_status,
+          ca.id               AS challenge_account_id,
+          ca.type             AS challenge_type,
+          ca.plan             AS plan,
+          ca.initial_balance  AS initial_balance,
+          ca.current_balance  AS current_balance,
+          ca.profit_target_pct    AS profit_target_pct,
+          ca.daily_loss_limit_pct AS daily_loss_limit_pct,
+          ca.max_drawdown_pct     AS max_drawdown_pct,
+          ca.min_trading_days     AS min_trading_days,
+          ca.status           AS challenge_status,
+          ca.started_at       AS started_at,
+          ca.expires_at       AS expires_at,
+          ca.created_at       AS created_at,
+          ca.updated_at       AS updated_at
+        FROM trading_accounts ta
+        LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+        WHERE ta.trader_id = ${traderId}::uuid
+        ORDER BY ca.created_at DESC NULLS LAST
+      `);
+      liveRows = liveRes.rows as any[];
+    }
+
+    // 4. Load the user's orders + provisioning logs to (a) attach purchase/fee context
+    //    to each live account and (b) surface pending/failed provisioning attempts that
+    //    don't yet have a live account.
     const userOrders = await db
       .select()
       .from(orders)
       .where(eq(orders.userId, String(user.id)))
       .orderBy(desc(orders.createdAt));
 
-    if (userOrders.length === 0) {
-      return res.json({ success: true, accounts: [] });
-    }
-
-    // 3. Get provisioning_logs for these orders (raw SQL — terminal-owned table)
+    const orderById = new Map(userOrders.map(o => [String(o.id), o]));
     const orderIds = userOrders.map(o => o.id);
-    const provLogs = await db.execute(sql`
-      SELECT 
-        pl.id as provisioning_id,
-        pl.order_id,
-        pl.plan,
-        pl.payment_method,
-        pl.payment_ref,
-        pl.status as provisioning_status,
-        pl.error_message,
-        pl.trader_id,
-        pl.challenge_account_id,
-        pl.trading_account_id,
-        pl.started_at,
-        pl.completed_at,
-        pl.created_at
-      FROM provisioning_logs pl
-      WHERE pl.order_id = ANY(${orderIds})
-      ORDER BY pl.created_at DESC
-    `);
 
-    // 4. For completed provisioning, fetch challenge_accounts details
-    const challengeIds = (provLogs.rows as any[])
-      .filter((pl: any) => pl.challenge_account_id)
-      .map((pl: any) => pl.challenge_account_id);
-
-    let challengeAccounts: any[] = [];
-    if (challengeIds.length > 0) {
-      const caResult = await db.execute(sql`
-        SELECT 
-          id,
-          type,
-          plan,
-          initial_balance,
-          current_balance,
-          peak_balance,
-          profit_target_pct,
-          daily_loss_limit_pct,
-          max_drawdown_pct,
-          min_trading_days,
-          status,
-          started_at,
-          expires_at,
-          passed_at,
-          failed_at,
-          fail_reason,
-          created_at,
-          updated_at
-        FROM challenge_accounts
-        WHERE id = ANY(${challengeIds})
+    let provLogRows: any[] = [];
+    if (orderIds.length > 0) {
+      const provLogs = await db.execute(sql`
+        SELECT id, order_id, status, error_message, trading_account_id, challenge_account_id, started_at, completed_at, created_at
+        FROM provisioning_logs
+        WHERE order_id = ANY(${orderIds})
+        ORDER BY created_at DESC
       `);
-      challengeAccounts = caResult.rows as any[];
+      provLogRows = provLogs.rows as any[];
     }
 
-    // 5. For completed provisioning, fetch trading_accounts details
-    const tradingIds = (provLogs.rows as any[])
-      .filter((pl: any) => pl.trading_account_id)
-      .map((pl: any) => pl.trading_account_id);
-
-    let tradingAccountRows: any[] = [];
-    if (tradingIds.length > 0) {
-      const taResult = await db.execute(sql`
-        SELECT 
-          id,
-          account_code,
-          broker_provider,
-          balance,
-          available_margin,
-          status,
-          created_at,
-          updated_at
-        FROM trading_accounts
-        WHERE id = ANY(${tradingIds})
-      `);
-      tradingAccountRows = taResult.rows as any[];
-    }
-
-    // 6. Build account list — one entry per provisioning attempt (or per order if no provisioning yet)
-    const challengeMap = new Map(challengeAccounts.map((ca: any) => [ca.id, ca]));
-    const tradingMap = new Map(tradingAccountRows.map((ta: any) => [ta.id, ta]));
-    const provByOrder = new Map<string, any[]>();
-    for (const pl of provLogs.rows as any[]) {
-      const existing = provByOrder.get(pl.order_id) || [];
-      existing.push(pl);
-      provByOrder.set(pl.order_id, existing);
+    // Map trading_account_id → order_id so a live account can show its purchase fee.
+    const tradingToOrder = new Map<string, string>();
+    for (const pl of provLogRows) {
+      if (pl.trading_account_id) tradingToOrder.set(String(pl.trading_account_id), String(pl.order_id));
     }
 
     const accounts: any[] = [];
+    const accountedOrderIds = new Set<string>();
+
+    // 5. Map every LIVE account to the dashboard shape (provisioningStatus: "completed").
+    for (const row of liveRows) {
+      const linkedOrderId = tradingToOrder.get(String(row.trading_account_id)) || null;
+      const order = linkedOrderId ? orderById.get(linkedOrderId) : null;
+      if (order) accountedOrderIds.add(String(order.id));
+
+      const initialBalance = row.initial_balance != null
+        ? Number(row.initial_balance)
+        : (row.ta_balance != null ? Number(row.ta_balance) : (order?.accountSize || 0));
+      const currentBalance = row.current_balance != null ? Number(row.current_balance) : initialBalance;
+      const challengeStatus = row.challenge_status || "active";
+
+      let dashStatus = challengeStatus;
+      if (challengeStatus === "active") dashStatus = "active";
+      else if (challengeStatus === "passed") dashStatus = "passed";
+      else if (challengeStatus === "failed" || challengeStatus === "breached") dashStatus = "breached";
+
+      let phase = "phase_1";
+      if (String(row.challenge_type || "").includes("phase2")) phase = "phase_2";
+      else if (String(row.challenge_type || "").includes("funded")) phase = "funded";
+
+      const canLaunch = challengeStatus === "active" && row.trading_status === "active";
+
+      accounts.push({
+        // trading_account ID is the canonical identifier used by the launch flow.
+        id: row.trading_account_id || row.challenge_account_id,
+        accountCode: row.account_code || null,
+        brokerProvider: row.broker_provider || null,
+        brokerLogin: row.broker_client_id || row.account_code || null,
+        planType: row.plan || order?.planType || null,
+        phase,
+        status: dashStatus,
+        currentBalance,
+        startBalance: initialBalance,
+        profitLoss: currentBalance - initialBalance,
+        profitTarget: row.profit_target_pct != null ? Math.round(initialBalance * Number(row.profit_target_pct) / 100) : Math.round(initialBalance * 0.10),
+        maxDrawdown: row.max_drawdown_pct != null ? Math.round(initialBalance * Number(row.max_drawdown_pct) / 100) : Math.round(initialBalance * 0.06),
+        dailyLossLimit: row.daily_loss_limit_pct != null ? Math.round(initialBalance * Number(row.daily_loss_limit_pct) / 100) : Math.round(initialBalance * 0.03),
+        dailyDrawdown: 0,
+        profitSplit: 80,
+        tradingDays: row.min_trading_days || 0,
+        scalingLevel: 1,
+        isFunded: phase === "funded",
+        fundedAt: null,
+        feePaid: order?.amount || 0,
+        couponUsed: null,
+        createdAt: row.created_at || order?.createdAt || null,
+        updatedAt: row.updated_at || order?.updatedAt || null,
+        expiresAt: row.expires_at || null,
+        orderId: linkedOrderId,
+        provisioningStatus: "completed",
+        canLaunch,
+      });
+    }
+
+    // 6. Surface paid/confirmed orders that DON'T yet have a live account
+    //    (provisioning pending or failed) so the user still sees progress.
+    const provByOrder = new Map<string, any>();
+    for (const pl of provLogRows) {
+      const key = String(pl.order_id);
+      if (!provByOrder.has(key)) provByOrder.set(key, pl); // first row = most recent
+    }
 
     for (const order of userOrders) {
-      // Skip orders that are not yet confirmed/paid
       if (!["confirmed", "paid"].includes(order.status)) continue;
+      if (accountedOrderIds.has(String(order.id))) continue; // already represented by a live account
 
-      const provEntries = provByOrder.get(order.id) || [];
+      const prov = provByOrder.get(String(order.id));
+      if (prov?.status === "completed") continue; // safety: completed but account row missing
 
-      if (provEntries.length === 0) {
-        // Order confirmed but no provisioning_logs entry yet — show as pending
-        accounts.push({
-          id: `pending-${order.id}`,
-          accountCode: null,
-          planType: order.planType,
-          phase: "pending",
-          status: "provisioning_pending",
-          currentBalance: order.accountSize || 0,
-          startBalance: order.accountSize || 0,
-          profitLoss: 0,
-          profitTarget: Math.round((order.accountSize || 0) * 0.10),
-          maxDrawdown: Math.round((order.accountSize || 0) * 0.06),
-          dailyLossLimit: Math.round((order.accountSize || 0) * 0.03),
-          dailyDrawdown: 0,
-          profitSplit: 80,
-          tradingDays: 0,
-          scalingLevel: 1,
-          isFunded: false,
-          fundedAt: null,
-          feePaid: order.amount || 0,
-          couponUsed: null,
-          createdAt: order.createdAt,
-          updatedAt: order.updatedAt,
-          expiresAt: null,
-          orderId: order.id,
-          provisioningStatus: "pending",
-          canLaunch: false,
-        });
-        continue;
-      }
-
-      // Use the most recent provisioning entry for this order
-      const prov = provEntries[0];
-
-      if (prov.provisioning_status === "pending") {
-        accounts.push({
-          id: `pending-${order.id}`,
-          accountCode: null,
-          planType: order.planType,
-          phase: "pending",
-          status: "provisioning_pending",
-          currentBalance: order.accountSize || 0,
-          startBalance: order.accountSize || 0,
-          profitLoss: 0,
-          profitTarget: Math.round((order.accountSize || 0) * 0.10),
-          maxDrawdown: Math.round((order.accountSize || 0) * 0.06),
-          dailyLossLimit: Math.round((order.accountSize || 0) * 0.03),
-          dailyDrawdown: 0,
-          profitSplit: 80,
-          tradingDays: 0,
-          scalingLevel: 1,
-          isFunded: false,
-          fundedAt: null,
-          feePaid: order.amount || 0,
-          couponUsed: null,
-          createdAt: order.createdAt,
-          updatedAt: prov.started_at || order.updatedAt,
-          expiresAt: null,
-          orderId: order.id,
-          provisioningStatus: "pending",
-          canLaunch: false,
-        });
-      } else if (prov.provisioning_status === "failed") {
+      if (prov?.status === "failed") {
         accounts.push({
           id: `failed-${order.id}`,
           accountCode: null,
@@ -241,56 +220,33 @@ router.get("/my", async (req: Request, res: Response) => {
           provisioningError: prov.error_message || "Provisioning failed. Contact support.",
           canLaunch: false,
         });
-      } else if (prov.provisioning_status === "completed") {
-        // Provisioning completed — use terminal-owned account data
-        const challenge = challengeMap.get(prov.challenge_account_id);
-        const trading = tradingMap.get(prov.trading_account_id);
-
-        const accountCode = trading?.account_code || null;
-        const initialBalance = challenge ? Number(challenge.initial_balance) : (order.accountSize || 0);
-        const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
-        const challengeStatus = challenge?.status || "active";
-
-        // Map terminal status to dashboard status
-        let dashStatus = challengeStatus;
-        if (challengeStatus === "active") dashStatus = "active";
-        else if (challengeStatus === "passed") dashStatus = "passed";
-        else if (challengeStatus === "failed" || challengeStatus === "breached") dashStatus = "breached";
-
-        // Determine phase from challenge type
-        let phase = "phase_1";
-        if (challenge?.type?.includes("phase2")) phase = "phase_2";
-        else if (challenge?.type?.includes("funded")) phase = "funded";
-
-        const canLaunch = challengeStatus === "active" && trading?.status === "active";
-
+      } else {
         accounts.push({
-          // Use the trading_account ID as the canonical account identifier for launch
-          id: prov.trading_account_id || prov.challenge_account_id || `completed-${order.id}`,
-          accountCode,
-          planType: challenge?.plan || order.planType,
-          phase,
-          status: dashStatus,
-          currentBalance,
-          startBalance: initialBalance,
-          profitLoss: currentBalance - initialBalance,
-          profitTarget: challenge ? Math.round(initialBalance * Number(challenge.profit_target_pct) / 100) : Math.round(initialBalance * 0.10),
-          maxDrawdown: challenge ? Math.round(initialBalance * Number(challenge.max_drawdown_pct) / 100) : Math.round(initialBalance * 0.06),
-          dailyLossLimit: challenge ? Math.round(initialBalance * Number(challenge.daily_loss_limit_pct) / 100) : Math.round(initialBalance * 0.03),
+          id: `pending-${order.id}`,
+          accountCode: null,
+          planType: order.planType,
+          phase: "pending",
+          status: "provisioning_pending",
+          currentBalance: order.accountSize || 0,
+          startBalance: order.accountSize || 0,
+          profitLoss: 0,
+          profitTarget: Math.round((order.accountSize || 0) * 0.10),
+          maxDrawdown: Math.round((order.accountSize || 0) * 0.06),
+          dailyLossLimit: Math.round((order.accountSize || 0) * 0.03),
           dailyDrawdown: 0,
           profitSplit: 80,
-          tradingDays: challenge?.min_trading_days || 0,
+          tradingDays: 0,
           scalingLevel: 1,
-          isFunded: phase === "funded",
+          isFunded: false,
           fundedAt: null,
           feePaid: order.amount || 0,
           couponUsed: null,
-          createdAt: challenge?.created_at || order.createdAt,
-          updatedAt: challenge?.updated_at || order.updatedAt,
-          expiresAt: challenge?.expires_at || null,
+          createdAt: order.createdAt,
+          updatedAt: prov?.started_at || order.updatedAt,
+          expiresAt: null,
           orderId: order.id,
-          provisioningStatus: "completed",
-          canLaunch,
+          provisioningStatus: "pending",
+          canLaunch: false,
         });
       }
     }
