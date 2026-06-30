@@ -106,7 +106,7 @@ router.get("/my", async (req: Request, res: Response) => {
       const provLogs = await db.execute(sql`
         SELECT id, order_id, status, error_message, trading_account_id, challenge_account_id, started_at, completed_at, created_at
         FROM provisioning_logs
-        WHERE order_id = ANY(${orderIds})
+        WHERE order_id::text = ANY(${orderIds}::text[])
         ORDER BY created_at DESC
       `);
       provLogRows = provLogs.rows as any[];
@@ -257,7 +257,7 @@ router.get("/my", async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("[Accounts] Failed to fetch user accounts:", error);
-    return res.status(500).json({ success: false, message: "Failed to load accounts", debug: String(error?.message || error) });
+    return res.status(500).json({ success: false, message: "Failed to load accounts" });
   }
 });
 
