@@ -335,19 +335,21 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
       console.error("[FraudDetection] Challenge purchase scoring failed:", err);
     });
 
-    // Track challenge purchase velocity + check farming
-    const velocityCheck = await VelocityService.recordAndCheck(
-      "challenge_purchase", user.id, purchaseIp, purchaseFingerprint
-    );
-    if (velocityCheck.velocityRisk >= 40) {
-      return res.status(429).json({
-        error: "Too many purchases in a short time. Please try again later.",
-        code: "VELOCITY_LIMIT",
-      });
+    // Track challenge purchase velocity + check farming (non-fatal: table may not exist in all envs)
+    try {
+      const velocityCheck = await VelocityService.recordAndCheck(
+        "challenge_purchase", user.id, purchaseIp, purchaseFingerprint
+      );
+      if (velocityCheck.velocityRisk >= 40) {
+        return res.status(429).json({
+          error: "Too many purchases in a short time. Please try again later.",
+          code: "VELOCITY_LIMIT",
+        });
+      }
+      VelocityService.checkChallengeFarming(user.id, purchaseFingerprint).catch(() => { });
+    } catch {
+      // Velocity table not present — allow payment through
     }
-
-    // Check challenge farming (repeated failures + new purchase)
-    VelocityService.checkChallengeFarming(user.id, purchaseFingerprint).catch(() => { });
 
     const orderId = `FW-${(auth?.userId ?? user.id.toString()).slice(-6)}-S${sizeIndex}-${Date.now()}`;
     const callbackUrl = process.env.OXAPAY_CALLBACK_URL || `${process.env.API_BASE_URL || ""}/api/payments/oxapay-webhook`;
