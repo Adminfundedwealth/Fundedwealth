@@ -206,8 +206,12 @@ export const usePayment = (
           },
         },
       };
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on("payment.failed", (response: any) => {
+      if (typeof (window as any).Razorpay === "undefined") {
+        setRazorpayError("Razorpay SDK is loading. Please wait a moment and try again.");
+        setRazorpayLoading(false);
+        return;
+      }
+      const rzp = new (window as any).Razorpay(options);      rzp.on("payment.failed", (response: any) => {
         setRazorpayError("Payment failed: " + (response.error?.description || "Unknown error"));
         setRazorpayLoading(false);
       });

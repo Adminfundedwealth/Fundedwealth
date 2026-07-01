@@ -239,10 +239,25 @@ async function triggerTerminalProvisioning(
 //     duplicate deliveries before any provisioning runs.
 // ---------------------------------------------------------------------------
 
-router.post("/create-crypto-payment", paymentLimiter, requireActiveAccount, async (req: Request, res: Response) => {
+router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
     const { paymentMethod, planType, sizeIndex, couponCode, referralCode, billing, password } = req.body;
+
+    // Soft auth check — block banned/suspended users but allow unauthenticated guests
+    if (auth?.userId) {
+      const [existingUser] = await db
+        .select({ accountStatus: users.accountStatus })
+        .from(users)
+        .where(eq(users.clerkId, auth.userId))
+        .limit(1);
+      if (existingUser) {
+        const status = existingUser.accountStatus || "active";
+        if (["banned", "suspended", "restricted"].includes(status)) {
+          return res.status(403).json({ success: false, error: "Account restricted. Contact support.", code: "ACCOUNT_RESTRICTED" });
+        }
+      }
+    }
 
     if (!paymentMethod || !planType || sizeIndex === undefined) {
       res.status(400).json({ error: "Missing required fields: paymentMethod, planType, sizeIndex" });
