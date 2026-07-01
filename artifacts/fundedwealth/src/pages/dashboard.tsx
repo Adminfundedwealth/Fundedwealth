@@ -12,7 +12,8 @@ import {
   ArrowUpRight, ArrowDownRight, Wallet, AlertTriangle, Zap,
   Heart, Share2, Award, FileText, Upload, Camera, Globe,
   NotebookPen, MessageSquare, LifeBuoy, Activity, Send,
-  TrendingDown, ArrowUp, ArrowDown, CreditCard, Building2, Smartphone, CheckCircle2
+  TrendingDown, ArrowUp, ArrowDown, CreditCard, Building2, Smartphone, CheckCircle2,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend, ReferenceLine } from "recharts";
@@ -249,13 +250,92 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
   const phaseColor = { challenge: "text-amber-400", verification: "text-blue-400", funded: "text-green-400" }[acc.phase];
   const phaseLabel = { challenge: "Challenge", verification: "Verification", funded: "Funded" }[acc.phase];
 
+  const [copied, setCopied] = useState<string | null>(null);
+  const [showCreds, setShowCreds] = useState(false);
+  const { getToken } = useAuth();
+  const [launching, setLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState("");
+
+  const copyField = (key: string, value: string) => {
+    navigator.clipboard.writeText(value).catch(() => {});
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const downloadCreds = () => {
+    const lines = [
+      `FundedWealth — Trading Account Credentials`,
+      `==========================================`,
+      `Account Code : ${acc.accountCode}`,
+      `Login Email  : ${(acc as any).loginEmail || "Check your registered email"}`,
+      `Temp Password: Use "Forgot Password" on the login page to set / reset`,
+      `Challenge    : ${acc.phase === "funded" ? "Funded" : acc.phase === "verification" ? "Verification" : "Phase 1"}`,
+      `Account Size : ₹${acc.size.toLocaleString("en-IN")}`,
+      `Generated on : ${new Date().toLocaleString("en-IN")}`,
+    ].join("\n");
+    const blob = new Blob([lines], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `FW_Credentials_${acc.accountCode}.txt`;
+    a.click();
+  };
+
+  const handleLaunch = async () => {
+    setLaunching(true);
+    setLaunchError("");
+    try {
+      const token = await getToken();
+      const apiBase = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(`${apiBase}/api/terminal/launch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        credentials: "include",
+        body: JSON.stringify({ accountId: acc.id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success && data.launchUrl) {
+        window.open(data.launchUrl, "_blank");
+      } else {
+        setLaunchError(data.message || "Failed to launch terminal. Please try again.");
+      }
+    } catch {
+      setLaunchError("Could not reach the server. Please try again.");
+    } finally {
+      setLaunching(false);
+    }
+  };
+
+  // Provisioning pending/failed states
+  if (acc.status === "provisioning_pending") {
+    return (
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3">
+        <div className="w-10 h-10 border-2 border-amber-400/40 border-t-amber-400 rounded-full animate-spin" />
+        <div className="text-white font-bold">Setting up your account…</div>
+        <div className="text-white/50 text-sm">Your challenge account is being provisioned. This usually takes under a minute.</div>
+        <div className="text-amber-400 text-xs font-mono">{acc.accountCode !== "Provisioning..." ? acc.accountCode : "Assigning code…"}</div>
+      </div>
+    );
+  }
+
+  if (acc.status === "provisioning_failed") {
+    return (
+      <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3">
+        <XCircle size={32} className="text-red-400" />
+        <div className="text-white font-bold">Provisioning Failed</div>
+        <div className="text-white/50 text-sm">{(acc as any).provisioningError || "Something went wrong. Please contact support."}</div>
+        <a href="mailto:support@fundedwealth.in" className="text-red-400 text-xs underline hover:text-red-300">Contact Support</a>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all">
+      {/* Header */}
       <div className="flex items-start justify-between mb-5">
         <div>
           <div className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-1">Account Size</div>
           <div className="text-white text-2xl font-extrabold">{fmt(acc.size)}</div>
-          <div className="text-white/40 text-xs mt-2">Code: {acc.accountCode}</div>
+          <div className="text-white/40 text-xs mt-2 font-mono">Code: {acc.accountCode}</div>
         </div>
         <div className="flex flex-col items-end gap-1">
           <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${acc.phase === "funded" ? "bg-green-500/15 border-green-500/30 text-green-400"
@@ -267,6 +347,8 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
           </span>
         </div>
       </div>
+
+      {/* Stats grid */}
       <div className="grid grid-cols-2 gap-4 mb-5 text-sm">
         <div><div className="text-white/45 text-xs mb-0.5">Current Balance</div><div className="text-white font-bold">{fmt(acc.balance)}</div></div>
         <div><div className="text-white/45 text-xs mb-0.5">P&L</div><div className={`font-bold ${pnlColor(pnl)}`}>{pnl >= 0 ? "+" : ""}{fmt(Math.abs(pnl))}</div></div>
@@ -276,6 +358,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         <div><div className="text-white/45 text-xs mb-0.5">Win Rate</div><div className="text-green-400 font-bold">{acc.winRate}%</div></div>
       </div>
 
+      {/* Progress bars */}
       <div className="space-y-3 mb-4">
         <div>
           <div className="flex justify-between text-xs mb-1">
@@ -307,6 +390,106 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
               style={{ width: `${pnl < 0 ? Math.min((Math.abs(pnl) / acc.startBalance / (acc.maxLoss / 100)) * 100, 100) : 0}%`, background: pnl < 0 ? "linear-gradient(90deg, #ef4444, #dc2626)" : "#22c55e" }} />
           </div>
         </div>
+      </div>
+
+      {/* ── Credentials panel ── */}
+      <div className="border-t border-white/10 pt-4 mt-4 space-y-3">
+        <button
+          onClick={() => setShowCreds(v => !v)}
+          className="w-full flex items-center justify-between text-xs font-semibold text-white/60 hover:text-white transition-colors"
+        >
+          <span className="flex items-center gap-1.5">
+            <Shield size={13} className="text-[#8B5CF6]" />
+            Account Credentials
+          </span>
+          <ChevronRight size={14} className={`transition-transform ${showCreds ? "rotate-90" : ""}`} />
+        </button>
+
+        {showCreds && (
+          <div className="bg-black/30 border border-white/10 rounded-xl p-4 space-y-3">
+            {/* Login Email */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-white/40 text-[10px] uppercase tracking-wider">Login Email</div>
+                <div className="text-white text-xs font-mono truncate">{(acc as any).loginEmail || "—"}</div>
+              </div>
+              {(acc as any).loginEmail && (
+                <button onClick={() => copyField("email", (acc as any).loginEmail)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "email" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
+                  <Copy size={11} className="inline mr-1" />{copied === "email" ? "Copied" : "Copy"}
+                </button>
+              )}
+            </div>
+
+            {/* Temp Password note */}
+            <div>
+              <div className="text-white/40 text-[10px] uppercase tracking-wider">Password</div>
+              <div className="text-white/50 text-xs">Set during checkout — or use Forgot Password to reset.</div>
+            </div>
+
+            {/* Account Code */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-white/40 text-[10px] uppercase tracking-wider">Account Code</div>
+                <div className="text-white text-xs font-mono">{acc.accountCode}</div>
+              </div>
+              <button onClick={() => copyField("code", acc.accountCode)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "code" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
+                <Copy size={11} className="inline mr-1" />{copied === "code" ? "Copied" : "Copy"}
+              </button>
+            </div>
+
+            {/* Challenge */}
+            <div>
+              <div className="text-white/40 text-[10px] uppercase tracking-wider">Challenge</div>
+              <div className="text-white text-xs">{phaseLabel} — {acc.size > 0 ? `₹${acc.size.toLocaleString("en-IN")}` : "—"}</div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-2 pt-1">
+              {/* Launch Terminal */}
+              <button
+                onClick={handleLaunch}
+                disabled={launching || !(acc as any).canLaunch}
+                className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold py-2 px-3 rounded-xl text-xs hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                title={(acc as any).canLaunch ? "Open trading terminal" : "Account must be active to launch"}
+              >
+                {launching ? (
+                  <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Monitor size={13} />
+                )}
+                {launching ? "Launching…" : "Launch Terminal"}
+              </button>
+
+              {/* Copy all credentials */}
+              <button
+                onClick={() => {
+                  const text = [
+                    `Account Code: ${acc.accountCode}`,
+                    `Login Email: ${(acc as any).loginEmail || "—"}`,
+                    `Challenge: ${phaseLabel}`,
+                    `Size: ₹${acc.size.toLocaleString("en-IN")}`,
+                  ].join("\n");
+                  navigator.clipboard.writeText(text).catch(() => {});
+                  setCopied("all");
+                  setTimeout(() => setCopied(null), 2000);
+                }}
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold border transition-all ${copied === "all" ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-400" : "bg-white/5 border-white/15 text-white/60 hover:text-white hover:border-white/30"}`}
+              >
+                <Copy size={12} />{copied === "all" ? "Copied!" : "Copy All"}
+              </button>
+
+              {/* Download */}
+              <button
+                onClick={downloadCreds}
+                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-white/5 border border-white/15 text-white/60 hover:text-white hover:border-white/30 transition-all"
+              >
+                <Download size={12} />
+              </button>
+            </div>
+
+            {launchError && <p className="text-red-400 text-xs text-center">{launchError}</p>}
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between text-xs text-white/40 mt-3">
@@ -709,12 +892,12 @@ function CouponSection({ profile, validCoupons }: { profile: any; validCoupons: 
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({ initialSection }: { initialSection?: string }) {
   const { user } = useUser();
   const { signOut } = useAuth();
   const { profile, loadDemoData, donate, isDemo } = useTradingData();
   const [, navigate] = useLocation();
-  const [section, setSection] = useState<Section>("home");
+  const [section, setSection] = useState<Section>((initialSection as Section) || "home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [analyticsRange, setAnalyticsRange] = useState<"1D" | "1W" | "1M" | "ALL">("ALL");

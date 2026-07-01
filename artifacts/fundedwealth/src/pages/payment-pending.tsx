@@ -218,7 +218,7 @@ export default function PaymentPending() {
         setStatus(s);
 
         if (s === "Paid") {
-          setTimeout(() => navigate("/dashboard?payment=success&method=crypto"), 2500);
+          setTimeout(() => navigate("/dashboard/accounts"), 2500);
         }
       } else if (!res.ok) {
         setApiError(data.message || data.error || "Status check failed");
@@ -256,7 +256,7 @@ export default function PaymentPending() {
       if (res.ok && data.success) {
         if (data.status === "completed") {
           setStatus("completed");
-          setTimeout(() => navigate("/dashboard?payment=success&method=upi"), 2500);
+          setTimeout(() => navigate("/dashboard/accounts"), 2500);
         } else if (data.status === "failed") {
           setStatus("Failed");
           setApiError(data.error || "Provisioning failed. Contact support.");
@@ -448,7 +448,7 @@ export default function PaymentPending() {
           <div className="space-y-3">
             {(status === "Paid" || status === "completed") && (
               <Button
-                onClick={() => navigate(`/dashboard?payment=success&method=${flow}`)}
+                onClick={() => navigate("/dashboard/accounts")}
                 className="w-full h-12 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold"
               >
                 Go to Dashboard <ArrowRight size={18} className="ml-2" />

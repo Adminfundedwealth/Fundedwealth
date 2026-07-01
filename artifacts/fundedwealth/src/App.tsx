@@ -49,6 +49,11 @@ function DashboardRoute() {
     const [, navigate] = useLocation();
     const [onboardingReady, setOnboardingReady] = useState<boolean | null>(null);
 
+    // Read optional section from URL path e.g. /dashboard/accounts
+    const currentPath = window.location.pathname;
+    const pathSegments = currentPath.replace(basePath, "").split("/").filter(Boolean);
+    const initialSection = pathSegments[1] || "home"; // /dashboard/accounts → "accounts"
+
     useEffect(() => {
         if (!isLoaded) return;
         if (!isSignedIn) { navigate("/sign-in"); return; }
@@ -81,7 +86,7 @@ function DashboardRoute() {
     }
     if (!isSignedIn || !onboardingReady) return null;
 
-    return <Dashboard />;
+    return <Dashboard initialSection={initialSection} />;
 }
 
 function AppRouter() {
@@ -117,6 +122,7 @@ function AppRouter() {
             <Route path="/login">{() => { window.location.replace(basePath + "/sign-in"); return null; }}</Route>
             <Route path="/register">{() => { window.location.replace(basePath + "/sign-up"); return null; }}</Route>
             <Route path="/dashboard" component={DashboardRoute} />
+            <Route path="/dashboard/:section" component={DashboardRoute} />
             <Route component={NotFound} />
         </Switch>
     );

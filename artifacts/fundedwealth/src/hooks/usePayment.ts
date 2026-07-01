@@ -187,10 +187,11 @@ export const usePayment = (
                 const { error: signInError } = await signIn(loginEmail, password);
                 if (!signInError) {
                   // Wait for session persistence before full-page nav
-                  await new Promise((r) => setTimeout(r, 100));
+                  await new Promise((r) => setTimeout(r, 300));
                 }
               }
-              window.location.href = "/dashboard?payment=success";
+              // Always redirect to accounts page, never login
+              window.location.href = "/dashboard/accounts";
             } else {
               setRazorpayError("Payment verification failed. Contact support with your payment ID: " + response.razorpay_payment_id);
             }

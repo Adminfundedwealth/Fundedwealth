@@ -173,11 +173,33 @@ export async function provisionChallenge(
     WHERE id = ${provId}::uuid
   `);
 
-  // 8. Confirm the originating order (website paths only)
+  // 8. Confirm the originating order (website paths only) and store initial
+  //    login credentials in order.metadata so the accounts page can surface them.
   if (orderId) {
+    // Load user email for credential storage
+    const loginEmail = user?.email ?? null;
+
+    // Merge new credential info into any existing metadata on the order
+    let existingMeta: Record<string, unknown> = {};
+    try {
+      const [ord] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+      if (ord?.metadata) {
+        existingMeta = JSON.parse(ord.metadata as string);
+      }
+    } catch { /* ignore parse errors */ }
+
+    const updatedMeta = JSON.stringify({
+      ...existingMeta,
+      loginEmail,
+      accountCode,
+      // initialPassword is NOT stored here — it was already emailed to the user
+      // and is available in the provisioning result only transiently.
+    });
+
     await db.execute(sql`
-      UPDATE orders SET status = 'confirmed', updated_at = now()
-      WHERE id = ${orderId} AND status = 'paid'
+      UPDATE orders
+      SET status = 'confirmed', metadata = ${updatedMeta}, updated_at = now()
+      WHERE id = ${orderId} AND status IN ('paid', 'pending', 'confirmed')
     `);
   }
 

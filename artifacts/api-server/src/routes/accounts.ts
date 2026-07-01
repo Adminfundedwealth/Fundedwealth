@@ -137,6 +137,13 @@ router.get("/my", async (req: Request, res: Response) => {
       const order = linkedOrderId ? orderById.get(linkedOrderId) : null;
       if (order) accountedOrderIds.add(String(order.id));
 
+      // Extract login credentials stored in order metadata at provisioning time
+      let orderMeta: Record<string, any> = {};
+      try {
+        if (order?.metadata) orderMeta = JSON.parse(order.metadata);
+      } catch { /* ignore */ }
+      const loginEmail = orderMeta.loginEmail || null;
+
       const initialBalance = row.initial_balance != null
         ? Number(row.initial_balance)
         : (row.ta_balance != null ? Number(row.ta_balance) : (order?.accountSize || 0));
@@ -183,6 +190,8 @@ router.get("/my", async (req: Request, res: Response) => {
         orderId: linkedOrderId,
         provisioningStatus: "completed",
         canLaunch,
+        // Credentials stored in order metadata at provisioning time
+        loginEmail,
       });
     }
 

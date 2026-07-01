@@ -171,16 +171,32 @@ export default function Checkout() {
       if (res.ok && data.success) {
         setUtrStatus("success");
 
-        if (!isSignedIn && data.onboardingToken) {
-          // First-time guest purchaser → redirect to password-setup page.
-          // The token is signed + time-limited; the page sets the real password
-          // and auto-signs-in before forwarding to the dashboard.
-          window.location.href = `/auth/create-password?token=${encodeURIComponent(data.onboardingToken)}`;
-        } else if (isSignedIn) {
-          // Already authenticated → go straight to dashboard.
-          window.location.href = "/dashboard?payment=success&method=upi";
+        if (isSignedIn) {
+          // Already authenticated → go straight to accounts page — never login
+          window.location.href = "/dashboard/accounts";
+        } else if (!isSignedIn && data.onboardingToken) {
+          // Guest purchaser: backend has created a Supabase auth identity.
+          // Auto-sign-in using the password they chose at checkout.
+          if (password && billing.email) {
+            try {
+              const { error: signInErr } = await signIn(billing.email, password);
+              if (!signInErr) {
+                // Wait for session to persist then redirect to accounts
+                await new Promise((r) => setTimeout(r, 300));
+                window.location.href = "/dashboard/accounts";
+              } else {
+                // Sign-in failed — redirect to onboarding token page
+                window.location.href = `/auth/create-password?token=${encodeURIComponent(data.onboardingToken)}`;
+              }
+            } catch {
+              window.location.href = `/auth/create-password?token=${encodeURIComponent(data.onboardingToken)}`;
+            }
+          } else {
+            // No password provided — use onboarding link to set password
+            window.location.href = `/auth/create-password?token=${encodeURIComponent(data.onboardingToken)}`;
+          }
         } else {
-          // Provisioning done but no onboarding token (shouldn't normally happen).
+          // Provisioning done. Show provisioning status page.
           const pending = new URLSearchParams({
             orderId: data.orderId || "",
             plan: selectedPlan,

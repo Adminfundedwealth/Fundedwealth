@@ -18,6 +18,7 @@ import { useAuth } from "./SupabaseAuthContext";
 export interface TradingAccount {
   id: string;
   accountCode: string | null;
+  brokerLogin: string | null;
   planType: string;
   phase: string;
   status: string;
@@ -49,6 +50,8 @@ export interface TradingAccount {
   provisioningStatus?: "pending" | "completed" | "failed";
   provisioningError?: string;
   canLaunch?: boolean;
+  // Login credentials (available right after provisioning)
+  loginEmail?: string | null;
 }
 
 export interface TradingProfile {
@@ -77,7 +80,13 @@ export interface DashboardAccount {
   tradeCount: number;
   startDate: string;
   accountCode: string;
+  brokerLogin: string | null;
   pnlPercent: number;
+  canLaunch?: boolean;
+  provisioningStatus?: string;
+  provisioningError?: string;
+  // Credentials surfaced from provisioning
+  loginEmail?: string | null;
 }
 
 interface TradingDataContextType {
@@ -143,7 +152,12 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
     tradeCount: acc.tradingDays || 0,
     startDate: acc.createdAt,
     accountCode: acc.accountCode || "Provisioning...",
+    brokerLogin: acc.brokerLogin || acc.accountCode || null,
     pnlPercent,
+    canLaunch: acc.canLaunch,
+    provisioningStatus: acc.provisioningStatus,
+    provisioningError: acc.provisioningError,
+    loginEmail: acc.loginEmail || null,
   };
 }
 
@@ -257,7 +271,9 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
           tradeCount: 12,
           startDate: new Date(Date.now() - 7 * 86400000).toISOString(),
           accountCode: "FW-DEMO01",
+          brokerLogin: "FW-DEMO01",
           pnlPercent: 2.0,
+          canLaunch: true,
         },
       ],
       totalPayout: 0,
