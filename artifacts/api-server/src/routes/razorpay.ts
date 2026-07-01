@@ -365,6 +365,7 @@ router.post("/verify-payment", paymentVerifyLimiter, validateBody(verifyPaymentS
     // Guest purchaser: ensure a Supabase Auth identity exists (seeded with the
     // password they chose at checkout) so the client can auto-login afterwards.
     // Reuses the shared ensureSupabaseAuthIdentity() — no second auth flow.
+    let tempPasswordForStorage: string | null = null;
     const isGuest = !auth?.userId || (dbUser.clerkId?.startsWith("guest_") ?? false);
     if (isGuest) {
       const identity = await ensureSupabaseAuthIdentity({
@@ -380,6 +381,8 @@ router.post("/verify-payment", paymentVerifyLimiter, validateBody(verifyPaymentS
           .where(eq(users.id, dbUser.id));
         dbUser = { ...dbUser, clerkId: identity.authUserId };
       }
+      // Capture temp password for storage
+      tempPasswordForStorage = identity.tempPassword;
     }
 
     // ── 6. Determine INR amount for account sizing ──────────────────────────
@@ -400,6 +403,12 @@ router.post("/verify-payment", paymentVerifyLimiter, validateBody(verifyPaymentS
         return res.status(400).json({ success: false, message: "Invalid plan/size combination" });
       }
 
+      // Prepare metadata with temp password if generated
+      const orderMetadata: Record<string, any> = {};
+      if (tempPasswordForStorage) {
+        orderMetadata.tempPassword = tempPasswordForStorage;
+      }
+
       const [dbOrder] = await db.insert(orders).values({
         userId: dbUser.id,
         amount: amountINR,
@@ -409,6 +418,7 @@ router.post("/verify-payment", paymentVerifyLimiter, validateBody(verifyPaymentS
         status: "confirmed",
         paymentMethod: "razorpay",
         utrReference: razorpay_payment_id,
+        metadata: Object.keys(orderMetadata).length > 0 ? JSON.stringify(orderMetadata) : null,
       }).returning();
 
       await triggerTerminalProvisioning(dbOrder.id, planType as PlanType, "razorpay", razorpay_payment_id);

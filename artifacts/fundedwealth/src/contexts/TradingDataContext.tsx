@@ -52,6 +52,7 @@ export interface TradingAccount {
   canLaunch?: boolean;
   // Login credentials (available right after provisioning)
   loginEmail?: string | null;
+  tempPassword?: string | null;
 }
 
 export interface TradingProfile {
@@ -87,6 +88,7 @@ export interface DashboardAccount {
   provisioningError?: string;
   // Credentials surfaced from provisioning
   loginEmail?: string | null;
+  tempPassword?: string | null;
 }
 
 interface TradingDataContextType {

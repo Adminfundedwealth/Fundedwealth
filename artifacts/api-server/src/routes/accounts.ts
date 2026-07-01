@@ -143,6 +143,7 @@ router.get("/my", async (req: Request, res: Response) => {
         if (order?.metadata) orderMeta = JSON.parse(order.metadata);
       } catch { /* ignore */ }
       const loginEmail = orderMeta.loginEmail || null;
+      const tempPassword = orderMeta.tempPassword || null;
 
       const initialBalance = row.initial_balance != null
         ? Number(row.initial_balance)
@@ -192,6 +193,7 @@ router.get("/my", async (req: Request, res: Response) => {
         canLaunch,
         // Credentials stored in order metadata at provisioning time
         loginEmail,
+        tempPassword,
       });
     }
 

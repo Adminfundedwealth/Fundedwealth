@@ -263,12 +263,15 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
   };
 
   const downloadCreds = () => {
+    const tempPass = (acc as any).tempPassword 
+      ? (acc as any).tempPassword 
+      : "Use 'Forgot Password' on the login page to set / reset";
     const lines = [
       `FundedWealth — Trading Account Credentials`,
       `==========================================`,
       `Account Code : ${acc.accountCode}`,
       `Login Email  : ${(acc as any).loginEmail || "Check your registered email"}`,
-      `Temp Password: Use "Forgot Password" on the login page to set / reset`,
+      `Password     : ${tempPass}`,
       `Challenge    : ${acc.phase === "funded" ? "Funded" : acc.phase === "verification" ? "Verification" : "Phase 1"}`,
       `Account Size : ₹${acc.size.toLocaleString("en-IN")}`,
       `Generated on : ${new Date().toLocaleString("en-IN")}`,
@@ -420,10 +423,21 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
               )}
             </div>
 
-            {/* Temp Password note */}
-            <div>
-              <div className="text-white/40 text-[10px] uppercase tracking-wider">Password</div>
-              <div className="text-white/50 text-xs">Set during checkout — or use Forgot Password to reset.</div>
+            {/* Temp Password */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-white/40 text-[10px] uppercase tracking-wider">Temporary Password</div>
+                {(acc as any).tempPassword ? (
+                  <div className="text-white text-xs font-mono break-all">{(acc as any).tempPassword}</div>
+                ) : (
+                  <div className="text-white/50 text-xs">Use "Forgot Password" to reset</div>
+                )}
+              </div>
+              {(acc as any).tempPassword && (
+                <button onClick={() => copyField("password", (acc as any).tempPassword)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
+                  <Copy size={11} className="inline mr-1" />{copied === "password" ? "Copied" : "Copy"}
+                </button>
+              )}
             </div>
 
             {/* Account Code */}
@@ -463,12 +477,14 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
               {/* Copy all credentials */}
               <button
                 onClick={() => {
-                  const text = [
+                  const lines = [
                     `Account Code: ${acc.accountCode}`,
                     `Login Email: ${(acc as any).loginEmail || "—"}`,
+                    (acc as any).tempPassword ? `Temp Password: ${(acc as any).tempPassword}` : "Password: Use Forgot Password to reset",
                     `Challenge: ${phaseLabel}`,
                     `Size: ₹${acc.size.toLocaleString("en-IN")}`,
-                  ].join("\n");
+                  ];
+                  const text = lines.join("\n");
                   navigator.clipboard.writeText(text).catch(() => {});
                   setCopied("all");
                   setTimeout(() => setCopied(null), 2000);

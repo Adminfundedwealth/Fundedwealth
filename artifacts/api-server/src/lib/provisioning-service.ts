@@ -41,6 +41,8 @@ export interface ProvisionChallengeInput {
   paymentMethod: string;
   paymentRef?: string | null;
   source?: ProvisioningSource;
+  /** Temporary password generated during auth identity creation (stored for display on Accounts page). */
+  tempPassword?: string | null;
 }
 
 export interface ProvisionChallengeResult {
@@ -83,12 +85,21 @@ export async function provisionChallenge(
   // 2. Resolve user id + account size
   let userId = input.userId ?? null;
   let accountSize = input.accountSize ?? null;
+  let tempPassword = input.tempPassword ?? null;
 
   if (orderId) {
     const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
     if (!order) throw new Error(`Order ${orderId} not found during provisioning`);
     userId = userId ?? order.userId;
     accountSize = accountSize ?? order.accountSize ?? null;
+    
+    // Read tempPassword from existing order metadata if not provided in input
+    if (!tempPassword && order.metadata) {
+      try {
+        const meta = JSON.parse(order.metadata as string);
+        tempPassword = meta.tempPassword ?? null;
+      } catch { /* ignore parse errors */ }
+    }
   }
 
   if (accountSize == null && sizeIndex != null) {
@@ -192,8 +203,8 @@ export async function provisionChallenge(
       ...existingMeta,
       loginEmail,
       accountCode,
-      // initialPassword is NOT stored here — it was already emailed to the user
-      // and is available in the provisioning result only transiently.
+      // Store temp password — either from input param (QR/UPI flow) or from existing metadata (crypto/Razorpay)
+      tempPassword: tempPassword ?? existingMeta.tempPassword ?? null,
     });
 
     await db.execute(sql`

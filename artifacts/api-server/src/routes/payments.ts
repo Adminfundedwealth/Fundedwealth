@@ -219,8 +219,9 @@ async function triggerTerminalProvisioning(
   planType: PlanType,
   paymentMethod: string,
   paymentRef: string | null,
+  tempPassword?: string | null,
 ) {
-  await provisionChallenge({ orderId, planType, paymentMethod, paymentRef, source: "website" });
+  await provisionChallenge({ orderId, planType, paymentMethod, paymentRef, source: "website", tempPassword });
 }
 
 // ---------------------------------------------------------------------------
@@ -293,6 +294,7 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
     // on return. Create the Supabase auth identity now using the guest's chosen
     // password so they can sign in with credentials they already know once their
     // account is provisioned. Reuses the same identity helper as the UPI path.
+    let tempPasswordForStorage: string | null = null;
     const isCryptoGuest = !auth?.userId || (user.clerkId?.startsWith("guest_") ?? false);
     if (isCryptoGuest) {
       const identity = await ensureSupabaseAuthIdentity({
@@ -307,6 +309,8 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
           .set({ clerkId: identity.authUserId, updatedAt: new Date() })
           .where(eq(users.id, user.id));
       }
+      // Capture temp password for storage in order metadata
+      tempPasswordForStorage = identity.tempPassword;
     }
     const purchaseIp =
       (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
@@ -379,6 +383,12 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
     const data = (await response.json()) as { result: number; trackId?: string; payLink?: string; expiredAt?: string; message?: string };
 
     if (data.result === 100) {
+      // Prepare metadata with temp password if one was generated
+      const orderMetadata: Record<string, any> = {};
+      if (tempPasswordForStorage) {
+        orderMetadata.tempPassword = tempPasswordForStorage;
+      }
+
       const [order] = await db.insert(orders).values({
         userId: user.id,
         amount: pricing.finalTotal,
@@ -387,6 +397,7 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
         status: "pending",
         paymentMethod: paymentMethod,
         utrReference: data.trackId,
+        metadata: Object.keys(orderMetadata).length > 0 ? JSON.stringify(orderMetadata) : null,
       }).returning();
 
       // P0-5 FIX: State is now fully in the DB (order row above).
@@ -914,6 +925,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     // The one-time onboarding token sent to the client is the only way to set
     // the real password — enforced by the /auth/create-password endpoint.
     let onboardingToken: string | null = null;
+    let tempPassword: string | null = null;
     const isGuest = !auth?.userId || (user.clerkId?.startsWith("guest_") ?? false);
     if (isGuest) {
       const identity = await ensureSupabaseAuthIdentity({
@@ -923,6 +935,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
         phone: user.phone,
       });
       if (identity.authUserId) {
+        tempPassword = identity.tempPassword;
         // Link public.users.clerk_id to the real Supabase auth id (was guest_*)
         if (identity.authUserId !== user.clerkId) {
           await db.update(users)
@@ -934,6 +947,17 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
         const { signOnboardingToken } = await import("../lib/onboarding-token");
         onboardingToken = signOnboardingToken(identity.authUserId, user.email);
       }
+    }
+
+    // Store tempPassword in order metadata for display on Accounts page
+    if (tempPassword) {
+      const [existingOrder] = await db.select().from(orders).where(eq(orders.id, result.order.id)).limit(1);
+      let meta: Record<string, any> = {};
+      try {
+        if (existingOrder?.metadata) meta = JSON.parse(existingOrder.metadata as string);
+      } catch { /* ignore */ }
+      meta.tempPassword = tempPassword;
+      await db.update(orders).set({ metadata: JSON.stringify(meta) }).where(eq(orders.id, result.order.id));
     }
 
     const setupUrl = onboardingToken
