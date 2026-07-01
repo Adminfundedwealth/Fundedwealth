@@ -697,4 +697,112 @@ router.get("/account-status", async (req, res) => {
   }
 });
 
+/**
+ * GET /api/auth/onboarding-status
+ * Returns whether the authenticated user needs to complete the password-setup
+ * step. Called by the /auth/create-password page and DashboardRoute guard.
+ */
+router.get("/onboarding-status", async (req, res) => {
+  try {
+    const auth = (req as any).auth;
+    if (!auth?.userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const [user] = await db
+      .select({ onboardingCompleted: users.onboardingCompleted })
+      .from(users)
+      .where(eq(users.clerkId, auth.userId))
+      .limit(1);
+
+    return res.json({ onboardingCompleted: user?.onboardingCompleted ?? true });
+  } catch {
+    return res.json({ onboardingCompleted: true });
+  }
+});
+
+/**
+ * POST /api/auth/create-password
+ * Consumes a one-time onboarding token, sets the user's password via Supabase
+ * admin API, marks onboarding_completed = true, and returns the Supabase
+ * session so the client can auto-login.
+ *
+ * Body: { token: string, password: string }
+ */
+import { verifyOnboardingToken } from "../lib/onboarding-token";
+import { createClient } from "@supabase/supabase-js";
+
+router.post("/create-password", async (req, res) => {
+  try {
+    const { token, password: newPassword } = req.body || {};
+
+    if (!token || !newPassword || typeof newPassword !== "string") {
+      return res.status(400).json({ error: "token and password are required" });
+    }
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters" });
+    }
+
+    // Verify the signed token
+    const payload = verifyOnboardingToken(token);
+    if (!payload) {
+      return res.status(400).json({ error: "Invalid or expired setup link. Please contact support." });
+    }
+
+    // Check onboarding not already completed (one-time use enforcement)
+    const [user] = await db
+      .select({ id: users.id, onboardingCompleted: users.onboardingCompleted, clerkId: users.clerkId })
+      .from(users)
+      .where(eq(users.clerkId, payload.userId))
+      .limit(1);
+
+    if (user?.onboardingCompleted) {
+      return res.status(409).json({
+        error: "Password already set. Please sign in normally.",
+        alreadyCompleted: true,
+      });
+    }
+
+    // Build admin client
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) {
+      return res.status(503).json({ error: "Auth service not configured" });
+    }
+    const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+
+    // Set the password on the Supabase auth user
+    const { error: updateErr } = await admin.auth.admin.updateUserById(payload.userId, {
+      password: newPassword,
+      email_confirm: true,
+    });
+    if (updateErr) {
+      logger.error({ updateErr, userId: payload.userId }, "create-password: supabase update failed");
+      return res.status(500).json({ error: "Failed to set password. Please try again." });
+    }
+
+    // Mark onboarding completed in public.users
+    await db
+      .update(users)
+      .set({ onboardingCompleted: true, updatedAt: new Date() })
+      .where(eq(users.clerkId, payload.userId));
+
+    // Sign the user in so the frontend gets a live session immediately
+    const anonKey = process.env.SUPABASE_ANON_KEY || "";
+    const anonClient = createClient(supabaseUrl, anonKey);
+    const { data: session, error: signInErr } = await anonClient.auth.signInWithPassword({
+      email: payload.email,
+      password: newPassword,
+    });
+
+    if (signInErr || !session?.session) {
+      // Password set OK — client can sign in themselves
+      return res.json({ success: true, session: null });
+    }
+
+    return res.json({ success: true, session: session.session });
+  } catch (err) {
+    logger.error({ err }, "create-password error");
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;

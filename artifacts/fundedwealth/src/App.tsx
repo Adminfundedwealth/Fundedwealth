@@ -2,7 +2,7 @@ import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect, lazy, Suspense, Component, type ReactNode } from "react";
+import { useEffect, useState, lazy, Suspense, Component, type ReactNode } from "react";
 import { SupabaseAuthProvider, useAuth } from "@/contexts/SupabaseAuthContext";
 import { FingerprintProvider } from "@/contexts/FingerprintContext";
 import { TradingDataProvider } from "@/contexts/TradingDataContext";
@@ -35,6 +35,7 @@ const PaymentPending = lazy(() => import("@/pages/payment-pending"));
 const KYC = lazy(() => import("@/pages/kyc"));
 const SSOCallback = lazy(() => import("@/pages/sso-callback"));
 const AuthCallback = lazy(() => import("@/pages/auth-callback"));
+const CreatePassword = lazy(() => import("@/pages/create-password"));
 const ChatWidget = lazy(() => import("@/components/ChatWidget"));
 const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
@@ -44,21 +45,41 @@ const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function DashboardRoute() {
-    const { isSignedIn, isLoaded } = useAuth();
+    const { isSignedIn, isLoaded, getToken } = useAuth();
     const [, navigate] = useLocation();
+    const [onboardingReady, setOnboardingReady] = useState<boolean | null>(null);
 
     useEffect(() => {
-        if (isLoaded && !isSignedIn) navigate("/sign-in");
-    }, [isLoaded, isSignedIn, navigate]);
+        if (!isLoaded) return;
+        if (!isSignedIn) { navigate("/sign-in"); return; }
 
-    if (!isLoaded) {
+        // Check if the user still needs to set their password
+        getToken().then((tok) => {
+            if (!tok) { setOnboardingReady(true); return; }
+            const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "";
+            fetch(`${apiUrl}/api/auth/onboarding-status`, {
+                headers: { Authorization: `Bearer ${tok}` },
+            })
+                .then((r) => r.json())
+                .then((d) => {
+                    if (!d.onboardingCompleted) {
+                        navigate("/auth/create-password", { replace: true });
+                    } else {
+                        setOnboardingReady(true);
+                    }
+                })
+                .catch(() => setOnboardingReady(true));
+        });
+    }, [isLoaded, isSignedIn, navigate, getToken]);
+
+    if (!isLoaded || onboardingReady === null) {
         return (
             <div className="min-h-screen bg-[#0D0020] flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#4A00E0] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
-    if (!isSignedIn) return null;
+    if (!isSignedIn || !onboardingReady) return null;
 
     return <Dashboard />;
 }
@@ -91,6 +112,7 @@ function AppRouter() {
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/sso-callback" component={SSOCallback} />
             <Route path="/auth/callback" component={AuthCallback} />
+            <Route path="/auth/create-password" component={CreatePassword} />
             <Route path="/economic-calendar" component={EconomicCalendar} />
             <Route path="/login">{() => { window.location.replace(basePath + "/sign-in"); return null; }}</Route>
             <Route path="/register">{() => { window.location.replace(basePath + "/sign-up"); return null; }}</Route>

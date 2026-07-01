@@ -18,6 +18,9 @@ export const users = pgTable("users", {
   notificationSettings: text("notification_settings").default(JSON.stringify({ emailAlerts: true, whatsappAlerts: false, inAppAlerts: true, payoutAlerts: true, tradeAlerts: true, marketingAlerts: false })).notNull(),
   kycStatus: text("kyc_status").default("pending").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
+  // Onboarding: true once the customer has set their password via /auth/create-password.
+  // Gates the one-time password-setup page so it is never shown again.
+  onboardingCompleted: boolean("onboarding_completed").default(false).notNull(),
   // Fraud enforcement
   riskScore: integer("risk_score").default(0),
   riskLevel: text("risk_level").default("LOW"),

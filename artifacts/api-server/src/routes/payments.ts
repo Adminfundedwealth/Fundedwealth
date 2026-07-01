@@ -892,11 +892,11 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       utrStr,
     );
 
-    // ── Onboarding: ensure the purchaser can actually log in to the website ──
-    // A guest checkout has a public.users row but no Supabase Auth identity/password.
-    // Create one (with a temp password) and link clerk_id so they can sign in and
-    // reach the dashboard with their freshly provisioned account.
-    let loginCredentials: { email: string; tempPassword: string } | null = null;
+    // ── Onboarding: ensure a Supabase Auth identity exists for guest purchasers ──
+    // Creates an UNCONFIRMED placeholder (no usable password yet).
+    // The one-time onboarding token sent to the client is the only way to set
+    // the real password — enforced by the /auth/create-password endpoint.
+    let onboardingToken: string | null = null;
     const isGuest = !auth?.userId || (user.clerkId?.startsWith("guest_") ?? false);
     if (isGuest) {
       const identity = await ensureSupabaseAuthIdentity({
@@ -904,40 +904,43 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
-        password: typeof password === "string" ? password : null,
       });
-      if (identity.authUserId && identity.authUserId !== user.clerkId) {
-        await db.update(users)
-          .set({ clerkId: identity.authUserId, updatedAt: new Date() })
-          .where(eq(users.id, user.id));
-      }
-      if (identity.created && identity.tempPassword) {
-        loginCredentials = { email: user.email, tempPassword: identity.tempPassword };
+      if (identity.authUserId) {
+        // Link public.users.clerk_id to the real Supabase auth id (was guest_*)
+        if (identity.authUserId !== user.clerkId) {
+          await db.update(users)
+            .set({ clerkId: identity.authUserId, updatedAt: new Date() })
+            .where(eq(users.id, user.id));
+        }
+        // Issue a signed one-time onboarding token so the client can reach
+        // /auth/create-password to set their real password.
+        const { signOnboardingToken } = await import("../lib/onboarding-token");
+        onboardingToken = signOnboardingToken(identity.authUserId, user.email);
       }
     }
 
+    const setupUrl = onboardingToken
+      ? `https://www.fundedwealth.com/auth/create-password?token=${encodeURIComponent(onboardingToken)}`
+      : null;
+
     await sendEmail({
       to: user.email,
-      subject: "FundedWealth - Payment Received! Account Being Provisioned",
+      subject: "FundedWealth – Your trading account is ready! Set your password",
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; background: #0b0722; color: white; padding: 32px; border-radius: 24px;">
-          <h1 style="color: #FF8A3D; margin-bottom: 16px;">FundedWealth - Payment Received!</h1>
-          <p style="color: rgba(255,255,255,0.8);">Hi ${[user.firstName, user.lastName].filter(Boolean).join(" ") || "Trader"},</p>
-          <p style="color: rgba(255,255,255,0.8);">Your UPI payment has been received and your trading account is being provisioned.</p>
-          <ul style="color: rgba(255,255,255,0.9); line-height: 1.8; margin-top: 24px;">
+        <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;background:#0b0722;color:white;padding:32px;border-radius:24px;">
+          <h1 style="color:#FF8A3D;margin-bottom:16px;">Your account is ready 🎉</h1>
+          <p style="color:rgba(255,255,255,0.8);">Hi ${[user.firstName, user.lastName].filter(Boolean).join(" ") || "Trader"},</p>
+          <p style="color:rgba(255,255,255,0.8);">Your payment was confirmed and your trading account has been provisioned.</p>
+          <ul style="color:rgba(255,255,255,0.9);line-height:1.8;margin-top:24px;">
             <li><strong>Order ID:</strong> ${result.order.id}</li>
             <li><strong>Amount paid:</strong> ₹${amount.toLocaleString("en-IN")}</li>
-            <li><strong>Plan type:</strong> ${planType}</li>
-            <li><strong>Status:</strong> Provisioning in progress</li>
+            <li><strong>Plan:</strong> ${planType}</li>
           </ul>
-          ${loginCredentials ? `
-          <div style="margin-top: 24px; padding: 20px; background: rgba(255,138,61,0.08); border: 1px solid rgba(255,138,61,0.3); border-radius: 16px;">
-            <p style="color: #FF8A3D; font-weight: bold; margin: 0 0 8px;">Your login details</p>
-            <p style="color: rgba(255,255,255,0.85); margin: 0 0 4px;"><strong>Email:</strong> ${loginCredentials.email}</p>
-            <p style="color: rgba(255,255,255,0.85); margin: 0 0 12px;"><strong>Temporary password:</strong> ${loginCredentials.tempPassword}</p>
-            <p style="color: rgba(255,255,255,0.6); font-size: 13px; margin: 0;">Sign in at https://www.fundedwealth.com/sign-in and change your password from the dashboard.</p>
+          ${setupUrl ? `
+          <div style="margin-top:28px;text-align:center;">
+            <a href="${setupUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(90deg,#4A00E0,#8E2DE2);color:white;font-weight:bold;border-radius:12px;text-decoration:none;font-size:16px;">Set your password &amp; open dashboard →</a>
+            <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:12px;">This link expires in 7 days and can only be used once.</p>
           </div>` : ""}
-          <p style="color: rgba(255,255,255,0.75); margin-top: 24px;">You'll receive another email once your account is fully activated. Check your dashboard for updates.</p>
         </div>
       `,
     }).catch((emailError) => {
@@ -959,9 +962,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       orderId: result.order.id,
       provisioningStatus: "completed",
       message: "Payment verified. Your trading account is ready.",
-      ...(loginCredentials
-        ? { loginEmail: loginCredentials.email, tempPassword: loginCredentials.tempPassword }
-        : {}),
+      ...(onboardingToken ? { onboardingToken } : {}),
     });
   } catch (err) {
     req.log.error({ err }, "verify_utr_failed");
