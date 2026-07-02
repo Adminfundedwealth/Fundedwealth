@@ -147,6 +147,9 @@ export function TurnstileWidget({
         const cleanSiteKey = siteKey.trim().replace(/\s+/g, '');
 
         console.log('[Turnstile] Attempting render with sitekey:', cleanSiteKey.substring(0, 10) + '...');
+        console.log('[Turnstile] Current domain:', window.location.hostname);
+        console.log('[Turnstile] Current protocol:', window.location.protocol);
+        console.log('[Turnstile] Full origin:', window.location.origin);
 
         // Remove previous widget if re-rendering
         if (widgetIdRef.current) {
