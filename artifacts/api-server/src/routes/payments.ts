@@ -719,6 +719,50 @@ router.get("/payment-status/:trackId", async (req: Request, res: Response) => {
   }
 });
 
+// Get order by trackId (for crypto payments to get orderId for success page)
+router.get("/order-by-track-id/:trackId", async (req: Request, res: Response) => {
+  try {
+    const auth = getAuth(req);
+    const trackId = req.params.trackId as string;
+
+    if (!trackId) {
+      return res.status(400).json({ success: false, message: "trackId is required" });
+    }
+
+    const [order] = await db
+      .select({ id: orders.id, userId: orders.userId, status: orders.status })
+      .from(orders)
+      .where(eq(orders.utrReference, trackId))
+      .limit(1);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Optional auth check - if user is authenticated, verify ownership
+    if (auth?.userId) {
+      const [dbUser] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.clerkId, auth.userId))
+        .limit(1);
+
+      if (!dbUser || order.userId !== dbUser.id) {
+        return res.status(403).json({ success: false, message: "Access denied" });
+      }
+    }
+
+    return res.json({
+      success: true,
+      orderId: order.id,
+      status: order.status,
+    });
+  } catch (error) {
+    console.error("[Payments] Failed to fetch order by trackId:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch order" });
+  }
+});
+
 // ── Provisioning Status (public, no auth required) ──────────────────────────
 // Used by payment-pending page to poll provisioning progress for both
 // authenticated and guest (billing-email-only) checkout flows.
@@ -918,6 +962,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       planType as PlanType,
       "upi_manual",
       utrStr,
+      tempPassword,
     );
 
     // ── Onboarding: ensure a Supabase Auth identity exists for guest purchasers ──

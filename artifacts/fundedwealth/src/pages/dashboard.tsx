@@ -231,8 +231,6 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
   );
 }
 
-// LEADERBOARD and PNLDATA removed — replaced with live API fetch in Dashboard component
-
 const RULES_LIST = [
   { title: "Minimum Trading Days", desc: "Complete at least 5 trading days in the challenge phase.", ok: true },
   { title: "Daily Loss Limit", desc: "Maximum 5% loss on any single trading day.", ok: true },

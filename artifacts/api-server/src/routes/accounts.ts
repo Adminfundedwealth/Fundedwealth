@@ -349,6 +349,26 @@ router.get("/:accountId", async (req: Request, res: Response) => {
       trading = (taResult.rows as any[])[0] || null;
     }
 
+    // 5. Find the order that created this account to get credentials
+    let orderCreds: any = {};
+    try {
+      const orderSearch = await db.execute(sql`
+        SELECT o.id, o.metadata
+        FROM orders o
+        JOIN provisioning_logs pl ON pl.order_id = o.id
+        WHERE pl.trading_account_id = ${prov.trading_account_id}::uuid
+        LIMIT 1
+      `);
+      if (orderSearch.rows && orderSearch.rows.length > 0) {
+        const ord = orderSearch.rows[0] as any;
+        if (ord.metadata) {
+          try {
+            orderCreds = JSON.parse(ord.metadata);
+          } catch { /* ignore */ }
+        }
+      }
+    } catch { /* non-fatal */ }
+
     const initialBalance = challenge ? Number(challenge.initial_balance) : (prov.account_size || 0);
     const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
     const challengeStatus = challenge?.status || prov.status;
@@ -379,10 +399,143 @@ router.get("/:accountId", async (req: Request, res: Response) => {
         updatedAt: challenge?.updated_at || prov.created_at,
         expiresAt: challenge?.expires_at || null,
         canLaunch: challengeStatus === "active" && trading?.status === "active",
+        // Credentials from order.metadata
+        loginEmail: orderCreds.loginEmail || user.email,
+        tempPassword: orderCreds.tempPassword || null,
+        email: user.email,
       },
     });
   } catch (error: any) {
     console.error("[Accounts] Failed to fetch account:", error);
+    return res.status(500).json({ success: false, message: "Failed to load account" });
+  }
+});
+
+/**
+ * GET /api/accounts/order/:orderId
+ * Returns account details by orderId - used by success page.
+ * 
+ * SECURITY: Requires authentication OR must be called within 10 minutes of order creation.
+ * This prevents unauthorized access while allowing guest checkout success flow.
+ */
+router.get("/order/:orderId", async (req: Request, res: Response) => {
+  try {
+    const auth = getAuth(req);
+    const { orderId } = req.params;
+
+    // 1. Find order
+    const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+    
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // 2. SECURITY CHECK: Verify ownership OR recent order
+    let authorized = false;
+
+    // Option A: User is authenticated and owns the order
+    if (auth?.userId) {
+      const [user] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.clerkId, auth.userId))
+        .limit(1);
+
+      if (user && order.userId === user.id) {
+        authorized = true;
+      }
+    }
+
+    // Option B: Order is very recent (within 10 minutes) - allows guest checkout success flow
+    if (!authorized) {
+      const orderAge = Date.now() - new Date(order.createdAt).getTime();
+      const TEN_MINUTES = 10 * 60 * 1000;
+      
+      if (orderAge < TEN_MINUTES) {
+        authorized = true;
+      }
+    }
+
+    if (!authorized) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Access denied. Please login to view account details." 
+      });
+    }
+
+    // 2. Find provisioning log for this order
+    const provResult = await db.execute(sql`
+      SELECT * FROM provisioning_logs WHERE order_id = ${orderId} AND status = 'completed' LIMIT 1
+    `);
+
+    if (!provResult.rows || provResult.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Account not provisioned yet. Please wait." 
+      });
+    }
+
+    const prov = provResult.rows[0] as any;
+
+    // 3. Get challenge and trading account details
+    let challenge: any = null;
+    let trading: any = null;
+
+    if (prov.challenge_account_id) {
+      const caResult = await db.execute(sql`
+        SELECT * FROM challenge_accounts WHERE id = ${prov.challenge_account_id}::uuid LIMIT 1
+      `);
+      challenge = (caResult.rows as any[])[0] || null;
+    }
+
+    if (prov.trading_account_id) {
+      const taResult = await db.execute(sql`
+        SELECT * FROM trading_accounts WHERE id = ${prov.trading_account_id}::uuid LIMIT 1
+      `);
+      trading = (taResult.rows as any[])[0] || null;
+    }
+
+    // 4. Extract credentials from order metadata
+    let orderMeta: any = {};
+    try {
+      if (order.metadata) {
+        orderMeta = JSON.parse(order.metadata as string);
+      }
+    } catch { /* ignore */ }
+
+    // 5. Get user details
+    const userResult = await db.execute(sql`
+      SELECT email, first_name, last_name FROM users WHERE id = ${order.userId}::uuid LIMIT 1
+    `);
+    const user = (userResult.rows as any[])[0] || null;
+
+    const initialBalance = challenge ? Number(challenge.initial_balance) : (order.accountSize || 0);
+    const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
+
+    return res.json({
+      success: true,
+      account: {
+        id: prov.trading_account_id || prov.challenge_account_id,
+        accountCode: trading?.account_code || orderMeta.accountCode || "N/A",
+        planType: challenge?.plan || order.planType,
+        phase: challenge?.type?.includes("phase2") ? "phase_2" : challenge?.type?.includes("funded") ? "funded" : "phase_1",
+        status: challenge?.status || "active",
+        currentBalance,
+        startBalance: initialBalance,
+        profitLoss: currentBalance - initialBalance,
+        profitTarget: challenge ? Math.round(initialBalance * Number(challenge.profit_target_pct) / 100) : 0,
+        maxDrawdown: challenge ? Math.round(initialBalance * Number(challenge.max_drawdown_pct) / 100) : 0,
+        dailyLossLimit: challenge ? Math.round(initialBalance * Number(challenge.daily_loss_limit_pct) / 100) : 0,
+        isFunded: challenge?.type?.includes("funded") || false,
+        createdAt: challenge?.created_at || order.createdAt,
+        // Credentials from order.metadata
+        loginEmail: orderMeta.loginEmail || user?.email || "Check your email",
+        tempPassword: orderMeta.tempPassword || "Use 'Forgot Password' to reset",
+        email: user?.email,
+      },
+    });
+  } catch (error: any) {
+    console.error("[Accounts] Failed to fetch account by orderId:", error);
     return res.status(500).json({ success: false, message: "Failed to load account" });
   }
 });

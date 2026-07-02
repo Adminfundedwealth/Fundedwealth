@@ -190,8 +190,14 @@ export const usePayment = (
                   await new Promise((r) => setTimeout(r, 300));
                 }
               }
-              // Always redirect to accounts page, never login
-              window.location.href = "/dashboard/accounts";
+              // Redirect to success page with orderId to display credentials
+              const orderId = verifyData.orderId;
+              if (orderId) {
+                window.location.href = `/purchase-success?orderId=${encodeURIComponent(orderId)}`;
+              } else {
+                // Fallback to accounts page if no orderId
+                window.location.href = "/dashboard/accounts";
+              }
             } else {
               setRazorpayError("Payment verification failed. Contact support with your payment ID: " + response.razorpay_payment_id);
             }

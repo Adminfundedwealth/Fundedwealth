@@ -218,6 +218,21 @@ export default function PaymentPending() {
         setStatus(s);
 
         if (s === "Paid") {
+          // Fetch the order to get orderId for credentials display
+          const orderRes = await fetch(`${apiBase}/api/payments/order-by-track-id/${trackId}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            credentials: "include",
+          }).catch(() => null);
+          
+          if (orderRes?.ok) {
+            const orderData = await orderRes.json().catch(() => ({}));
+            if (orderData.success && orderData.orderId) {
+              setTimeout(() => navigate(`/purchase-success?orderId=${encodeURIComponent(orderData.orderId)}`), 2500);
+              return;
+            }
+          }
+          
+          // Fallback to accounts page if can't get orderId
           setTimeout(() => navigate("/dashboard/accounts"), 2500);
         }
       } else if (!res.ok) {
@@ -256,7 +271,7 @@ export default function PaymentPending() {
       if (res.ok && data.success) {
         if (data.status === "completed") {
           setStatus("completed");
-          setTimeout(() => navigate("/dashboard/accounts"), 2500);
+          setTimeout(() => navigate(`/purchase-success?orderId=${encodeURIComponent(orderId)}`), 2500);
         } else if (data.status === "failed") {
           setStatus("Failed");
           setApiError(data.error || "Provisioning failed. Contact support.");

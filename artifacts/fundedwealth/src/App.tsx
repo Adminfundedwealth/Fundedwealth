@@ -32,6 +32,7 @@ const Refund = lazy(() => import("@/pages/refund"));
 const Checkout = lazy(() => import("@/pages/checkout"));
 const ReferralLandingPage = lazy(() => import("@/pages/referral"));
 const PaymentPending = lazy(() => import("@/pages/payment-pending"));
+const PurchaseSuccess = lazy(() => import("@/pages/purchase-success"));
 const KYC = lazy(() => import("@/pages/kyc"));
 const SSOCallback = lazy(() => import("@/pages/sso-callback"));
 const AuthCallback = lazy(() => import("@/pages/auth-callback"));
@@ -113,6 +114,7 @@ function AppRouter() {
             <Route path="/ref/:code" component={ReferralLandingPage} />
             <Route path="/checkout" component={Checkout} />
             <Route path="/payment-pending" component={PaymentPending} />
+            <Route path="/purchase-success" component={PurchaseSuccess} />
             <Route path="/sign-in/*?" component={SignInPage} />
             <Route path="/sign-up/*?" component={SignUpPage} />
             <Route path="/sso-callback" component={SSOCallback} />
