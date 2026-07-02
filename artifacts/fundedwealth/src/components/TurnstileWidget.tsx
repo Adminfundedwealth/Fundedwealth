@@ -41,6 +41,14 @@ function loadTurnstileScript(): Promise<void> {
     if (scriptLoadPromise) return scriptLoadPromise;
 
     scriptLoadPromise = new Promise((resolve, reject) => {
+        // Check if script already exists
+        const existingScript = document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]');
+        if (existingScript && window.turnstile) {
+            scriptLoaded = true;
+            resolve();
+            return;
+        }
+
         window.onTurnstileLoad = () => {
             scriptLoaded = true;
             resolve();
@@ -55,6 +63,25 @@ function loadTurnstileScript(): Promise<void> {
             scriptLoadPromise = null; // allow retry
             reject(new Error("Failed to load Turnstile script"));
         };
+        
+        // Add timeout to handle script load issues
+        const timeout = setTimeout(() => {
+            if (!scriptLoaded) {
+                scriptLoadFailed = true;
+                scriptLoadPromise = null;
+                reject(new Error("Turnstile script load timeout"));
+            }
+        }, 10000);
+
+        script.onload = () => {
+            clearTimeout(timeout);
+            // Sometimes onload fires but window.onTurnstileLoad doesn't
+            if (window.turnstile && !scriptLoaded) {
+                scriptLoaded = true;
+                resolve();
+            }
+        };
+
         document.head.appendChild(script);
     });
 
@@ -119,17 +146,35 @@ export function TurnstileWidget({
         // CRITICAL FIX: Trim whitespace from sitekey (Cloudflare error 400020 if space exists)
         const cleanSiteKey = siteKey.trim().replace(/\s+/g, '');
 
+        console.log('[Turnstile] Attempting render with sitekey:', cleanSiteKey.substring(0, 10) + '...');
+
         // Remove previous widget if re-rendering
         if (widgetIdRef.current) {
-            try { window.turnstile!.remove(widgetIdRef.current); } catch { /* ignore */ }
+            try { 
+                console.log('[Turnstile] Removing previous widget:', widgetIdRef.current);
+                window.turnstile!.remove(widgetIdRef.current); 
+            } catch (e) { 
+                console.warn('[Turnstile] Failed to remove previous widget:', e);
+            }
+            widgetIdRef.current = null;
         }
 
         try {
+            console.log('[Turnstile] Calling render with options:', {
+                sitekey: cleanSiteKey.substring(0, 10) + '...',
+                action,
+                theme,
+                size,
+                hasCallback: !!onVerify,
+                hasExpireCallback: !!onExpire,
+            });
+
             widgetIdRef.current = window.turnstile!.render(containerRef.current, {
                 sitekey: cleanSiteKey,
                 callback: onVerify,
                 "expired-callback": onExpire,
                 "error-callback": (errCode: string) => {
+                    console.error('[Turnstile] Error callback triggered:', errCode);
                     const msg = `CAPTCHA encountered an error (${errCode}). Please retry.`;
                     setLoadError(msg);
                     onError?.(msg);
@@ -138,7 +183,10 @@ export function TurnstileWidget({
                 theme,
                 size,
             });
+
+            console.log('[Turnstile] Render successful, widgetId:', widgetIdRef.current);
         } catch (err) {
+            console.error('[Turnstile] Render exception:', err);
             const msg = "CAPTCHA failed to initialize. Please refresh the page.";
             setLoadError(msg);
             onError?.(msg);
@@ -146,7 +194,10 @@ export function TurnstileWidget({
 
         return () => {
             if (widgetIdRef.current && window.turnstile) {
-                try { window.turnstile.remove(widgetIdRef.current); } catch { /* ignore */ }
+                try { 
+                    console.log('[Turnstile] Cleanup: removing widget:', widgetIdRef.current);
+                    window.turnstile.remove(widgetIdRef.current); 
+                } catch { /* ignore */ }
                 widgetIdRef.current = null;
             }
         };
