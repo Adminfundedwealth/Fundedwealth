@@ -146,6 +146,8 @@ overrides:
   protobufjs@7: 7.5.5
   yaml: 2.8.3
 
+pnpmfileChecksum: sha256-zzOekepeV0NP5vdiSleFa3Jl3q8ofszBY2Dvdx2gW+A=
+
 importers:
 
   .:
