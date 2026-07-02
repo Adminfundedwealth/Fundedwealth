@@ -116,6 +116,9 @@ export function TurnstileWidget({
             return;
         }
 
+        // CRITICAL FIX: Trim whitespace from sitekey (Cloudflare error 400020 if space exists)
+        const cleanSiteKey = siteKey.trim().replace(/\s+/g, '');
+
         // Remove previous widget if re-rendering
         if (widgetIdRef.current) {
             try { window.turnstile!.remove(widgetIdRef.current); } catch { /* ignore */ }
@@ -123,7 +126,7 @@ export function TurnstileWidget({
 
         try {
             widgetIdRef.current = window.turnstile!.render(containerRef.current, {
-                sitekey: siteKey,
+                sitekey: cleanSiteKey,
                 callback: onVerify,
                 "expired-callback": onExpire,
                 "error-callback": (errCode: string) => {
