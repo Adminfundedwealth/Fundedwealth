@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Smartphone, Download } from "lucide-react";
 
-// Cache-bust: Force Vercel CDN refresh
+// Force fresh deployment
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 /* ─── Inject keyframes once ─────────────────────────────────────────────── */
