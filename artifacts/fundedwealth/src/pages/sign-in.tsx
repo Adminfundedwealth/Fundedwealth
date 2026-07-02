@@ -1,8 +1,9 @@
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Smartphone, Download } from "lucide-react";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
-import { useCaptcha } from "@/hooks/useCaptcha";
+// CAPTCHA temporarily disabled
+// import { TurnstileWidget } from "@/components/TurnstileWidget";
+// import { useCaptcha } from "@/hooks/useCaptcha";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -257,7 +258,8 @@ export default function SignInPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const captcha = useCaptcha();
+  // CAPTCHA temporarily disabled
+  // const captcha = useCaptcha();
 
   useEffect(() => {
     if (isSignedIn) window.location.replace(`${basePath}/dashboard`);
