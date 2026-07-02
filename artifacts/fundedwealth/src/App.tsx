@@ -59,24 +59,9 @@ function DashboardRoute() {
         if (!isLoaded) return;
         if (!isSignedIn) { navigate("/sign-in"); return; }
 
-        // Check if the user still needs to set their password
-        getToken().then((tok) => {
-            if (!tok) { setOnboardingReady(true); return; }
-            const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "";
-            fetch(`${apiUrl}/api/auth/onboarding-status`, {
-                headers: { Authorization: `Bearer ${tok}` },
-            })
-                .then((r) => r.json())
-                .then((d) => {
-                    if (!d.onboardingCompleted) {
-                        navigate("/auth/create-password", { replace: true });
-                    } else {
-                        setOnboardingReady(true);
-                    }
-                })
-                .catch(() => setOnboardingReady(true));
-        });
-    }, [isLoaded, isSignedIn, navigate, getToken]);
+        // If user can sign in, they don't need onboarding - just allow dashboard access
+        setOnboardingReady(true);
+    }, [isLoaded, isSignedIn, navigate]);
 
     if (!isLoaded || onboardingReady === null) {
         return (
