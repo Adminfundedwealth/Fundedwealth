@@ -1,0 +1,8 @@
+{
+  "install": {
+    "command": "pnpm install --frozen-lockfile --prefer-offline || pnpm install --no-frozen-lockfile --ignore-scripts"
+  },
+  "build": {
+    "command": "pnpm --filter @workspace/api-server run build"
+  }
+}

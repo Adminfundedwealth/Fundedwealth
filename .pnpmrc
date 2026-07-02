@@ -1,2 +1,2 @@
 resolution-mode=highest
-ignore-scripts=true
+strict-peer-dependencies=false
