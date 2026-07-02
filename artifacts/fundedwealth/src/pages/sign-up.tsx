@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Eye, EyeOff, User, Mail, Phone, Lock, ShieldCheck } from "lucide-react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useCaptcha } from "@/hooks/useCaptcha";
+import { FEATURES } from "@/config/features";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -175,11 +176,13 @@ export default function SignUpPage() {
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     if (!agree) { setError("Please accept the terms to continue."); return; }
 
-    // Verify CAPTCHA before proceeding (fail-closed)
-    const captchaOk = await captcha.verifyCaptcha("signup");
-    if (!captchaOk) {
-      setError(captcha.error || "CAPTCHA verification failed. Please try again.");
-      return;
+    // CAPTCHA verification (only if enabled)
+    if (FEATURES.ENABLE_TURNSTILE) {
+      const captchaOk = await captcha.verifyCaptcha("signup");
+      if (!captchaOk) {
+        setError(captcha.error || "CAPTCHA verification failed. Please try again.");
+        return;
+      }
     }
 
     setError(""); setLoading(true);
@@ -375,21 +378,25 @@ export default function SignUpPage() {
                 </span>
               </label>
 
-              {/* Cloudflare Turnstile CAPTCHA */}
-              <TurnstileWidget
-                onVerify={captcha.onVerify}
-                onExpire={captcha.onExpire}
-                onError={captcha.onError}
-                action="signup"
-                theme="dark"
-                size="normal"
-                className="flex justify-center my-2"
-              />
-              {captcha.error && (
-                <p className="text-red-400 text-xs text-center">{captcha.error}</p>
+              {/* Cloudflare Turnstile CAPTCHA - Feature Flag Controlled */}
+              {FEATURES.ENABLE_TURNSTILE && (
+                <>
+                  <TurnstileWidget
+                    onVerify={captcha.onVerify}
+                    onExpire={captcha.onExpire}
+                    onError={captcha.onError}
+                    action="signup"
+                    theme="dark"
+                    size="normal"
+                    className="flex justify-center my-2"
+                  />
+                  {captcha.error && (
+                    <p className="text-red-400 text-xs text-center">{captcha.error}</p>
+                  )}
+                </>
               )}
 
-              <button type="submit" disabled={loading || !isLoaded || !captcha.isVerified}
+              <button type="submit" disabled={loading || !isLoaded || (FEATURES.ENABLE_TURNSTILE && !captcha.isVerified)}
                 className="w-full h-12 rounded-xl font-bold text-[15px] text-white transition disabled:opacity-50 disabled:cursor-not-allowed mt-1 relative overflow-hidden"
                 style={{
                   background: "linear-gradient(135deg,#4A00E0 0%,#7C3AED 60%,#9333EA 100%)",

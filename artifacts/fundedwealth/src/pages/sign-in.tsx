@@ -1,9 +1,9 @@
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Smartphone, Download } from "lucide-react";
-// CAPTCHA temporarily disabled
-// import { TurnstileWidget } from "@/components/TurnstileWidget";
-// import { useCaptcha } from "@/hooks/useCaptcha";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { useCaptcha } from "@/hooks/useCaptcha";
+import { FEATURES } from "@/config/features";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -258,8 +258,7 @@ export default function SignInPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  // CAPTCHA temporarily disabled
-  // const captcha = useCaptcha();
+  const captcha = useCaptcha();
 
   useEffect(() => {
     if (isSignedIn) window.location.replace(`${basePath}/dashboard`);
@@ -275,8 +274,16 @@ export default function SignInPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault(); if (!isLoaded) return;
-    // CAPTCHA temporarily disabled for production launch
-    // Will be re-enabled after initial deployment is stable
+    
+    // CAPTCHA verification (only if enabled)
+    if (FEATURES.ENABLE_TURNSTILE) {
+      const captchaOk = await captcha.verifyCaptcha("login");
+      if (!captchaOk) {
+        setError(captcha.error || "CAPTCHA verification failed. Please try again.");
+        return;
+      }
+    }
+    
     setError(""); setLoading(true);
     try {
       const { error: err } = await signIn(identifier, password);
@@ -391,12 +398,27 @@ export default function SignInPage() {
                 </button>
               </div>
 
-              {/* CAPTCHA temporarily disabled for production launch */}
-              {/* Will be re-enabled after Turnstile configuration is verified */}
+              {/* Cloudflare Turnstile CAPTCHA - Feature Flag Controlled */}
+              {FEATURES.ENABLE_TURNSTILE && (
+                <>
+                  <TurnstileWidget
+                    onVerify={captcha.onVerify}
+                    onExpire={captcha.onExpire}
+                    onError={captcha.onError}
+                    action="login"
+                    theme="dark"
+                    size="normal"
+                    className="flex justify-center my-2"
+                  />
+                  {captcha.error && (
+                    <p className="text-red-400 text-xs text-center -mt-1 mb-2">{captcha.error}</p>
+                  )}
+                </>
+              )}
 
               {/* Login button */}
               <button type="submit"
-                disabled={loading || !isLoaded}
+                disabled={loading || !isLoaded || (FEATURES.ENABLE_TURNSTILE && !captcha.isVerified)}
                 className="w-full h-12 rounded-xl font-bold text-[15px] text-white transition disabled:opacity-50 disabled:cursor-not-allowed mt-1 relative overflow-hidden"
                 style={{ background: "linear-gradient(135deg,#4A00E0 0%,#7C3AED 60%,#9333EA 100%)", boxShadow: "0 4px 20px rgba(74,0,224,0.5), 0 0 0 1px rgba(139,92,246,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}>
                 <span className="relative z-10">{loading ? <Spinner /> : "Login"}</span>
