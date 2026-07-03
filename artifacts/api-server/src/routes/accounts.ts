@@ -175,6 +175,38 @@ router.get("/my", async (req: Request, res: Response) => {
 
       const canLaunch = challengeStatus === "active" && row.trading_status === "active";
 
+      // NEW: Fetch real trading statistics from session_analytics
+      let totalTrades = 0;
+      let winRate = 0;
+      let tradingDaysCount = 0;
+
+      try {
+        const statsRes = await db.execute(sql`
+          SELECT 
+            COALESCE(SUM(trades), 0) AS total_trades,
+            COALESCE(AVG(win_rate), 0) AS avg_win_rate,
+            COUNT(DISTINCT DATE(start_at)) AS trading_days
+          FROM session_analytics
+          WHERE user_id = (
+            SELECT tt.external_id 
+            FROM trading_accounts ta
+            JOIN terminal_traders tt ON tt.id = ta.trader_id
+            WHERE ta.id = ${row.trading_account_id}::uuid
+            LIMIT 1
+          )
+        `);
+        
+        if (statsRes.rows && statsRes.rows.length > 0) {
+          const stats = statsRes.rows[0] as any;
+          totalTrades = Number(stats.total_trades) || 0;
+          winRate = Number(stats.avg_win_rate) || 0;
+          tradingDaysCount = Number(stats.trading_days) || 0;
+        }
+      } catch (statsErr) {
+        console.error("[Accounts] Failed to fetch trading stats (non-fatal):", statsErr);
+        // Continue with 0 values if stats fetch fails
+      }
+
       accounts.push({
         // trading_account ID is the canonical identifier used by the launch flow.
         id: row.trading_account_id || row.challenge_account_id,
@@ -192,7 +224,9 @@ router.get("/my", async (req: Request, res: Response) => {
         dailyLossLimit: row.daily_loss_limit_pct != null ? Math.round(initialBalance * Number(row.daily_loss_limit_pct) / 100) : Math.round(initialBalance * 0.03),
         dailyDrawdown: 0,
         profitSplit: 80,
-        tradingDays: row.min_trading_days || 0,
+        tradingDays: tradingDaysCount,  // NEW: Real trading days from analytics
+        winRate: Math.round(winRate * 10) / 10,  // NEW: Real win rate from analytics
+        totalTrades,  // NEW: Real trade count from analytics
         scalingLevel: 1,
         isFunded: phase === "funded",
         fundedAt: null,
@@ -434,7 +468,11 @@ router.get("/:accountId", async (req: Request, res: Response) => {
 router.get("/order/:orderId", async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
-    const { orderId } = req.params;
+    const orderId = Array.isArray(req.params.orderId) ? req.params.orderId[0] : req.params.orderId;
+
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: "Order ID is required" });
+    }
 
     // 1. Find order
     const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
