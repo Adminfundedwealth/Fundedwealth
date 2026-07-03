@@ -160,6 +160,7 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
     provisioningStatus: acc.provisioningStatus,
     provisioningError: acc.provisioningError,
     loginEmail: acc.loginEmail || null,
+    tempPassword: acc.tempPassword || null,
   };
 }
 
