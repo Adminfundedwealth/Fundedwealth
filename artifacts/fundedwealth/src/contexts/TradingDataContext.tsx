@@ -255,37 +255,9 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
     fetchAccounts();
   }, [fetchAccounts]);
 
+  // Demo data loader disabled - all accounts must come from real provisioning
   const loadDemoData = useCallback(() => {
-    setIsDemo(true);
-    setProfile({
-      accounts: [
-        {
-          id: "demo-1",
-          phase: "challenge",
-          status: "active",
-          balance: 510000,
-          startBalance: 500000,
-          size: 500000,
-          profitTarget: 10,
-          dailyLoss: 3,
-          maxLoss: 6,
-          profitSplit: 80,
-          winRate: 62,
-          tradeCount: 12,
-          startDate: new Date(Date.now() - 7 * 86400000).toISOString(),
-          accountCode: "FW-DEMO01",
-          brokerLogin: "FW-DEMO01",
-          pnlPercent: 2.0,
-          canLaunch: true,
-        },
-      ],
-      totalPayout: 0,
-      referralCode: "FWDEMO",
-      referralCount: 0,
-      couponCode: "",
-      payouts: [],
-      impact: { mealsSupported: 0, studentsSupported: 0, totalDonated: 0, badge: "none", donations: [] },
-    });
+    console.warn("[TradingData] Demo data is disabled. All accounts must be provisioned via payments.");
   }, []);
 
   const donate = useCallback((_cause: string, _amount: number) => {
