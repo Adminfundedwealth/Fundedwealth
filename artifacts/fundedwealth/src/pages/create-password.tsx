@@ -30,20 +30,35 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
   const [errorMsg, setErrorMsg] = useState("");
   const isSubmitting = state === "submitting";
 
-  // If the user is already authenticated + onboarding completed → go to dashboard
+  // If no token: check if user is already signed in → redirect to dashboard
+  // If token present but user already onboarded → redirect to dashboard  
   useEffect(() => {
-    if (!token) return;
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) return;
+      if (!session) {
+        // Not signed in - if no token, show invalid link
+        if (!token) setState("invalid_token");
+        return;
+      }
+      
+      // Signed in - check onboarding status
       const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "";
       fetch(`${apiUrl}/api/auth/onboarding-status`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
         .then((r) => r.json())
         .then((d) => {
-          if (d.onboardingCompleted) navigate("/dashboard", { replace: true });
+          if (d.onboardingCompleted) {
+            // Already onboarded - redirect to dashboard
+            navigate("/dashboard", { replace: true });
+          } else if (!token) {
+            // Not onboarded but no token - invalid state
+            setState("invalid_token");
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          // Error checking status - if no token, show invalid
+          if (!token) setState("invalid_token");
+        });
     });
   }, [token, navigate]);
 
