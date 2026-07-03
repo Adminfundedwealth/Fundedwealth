@@ -263,7 +263,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
   const downloadCreds = () => {
     const tempPass = (acc as any).tempPassword 
       ? (acc as any).tempPassword 
-      : "Use 'Forgot Password' on the login page to set / reset";
+      : "Reset via 'Forgot Password' on fundedwealth.com/sign-in";
     const lines = [
       `FundedWealth — Trading Account Credentials`,
       `==========================================`,
@@ -424,11 +424,13 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             {/* Temp Password */}
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <div className="text-white/40 text-[10px] uppercase tracking-wider">Temporary Password</div>
+                <div className="text-white/40 text-[10px] uppercase tracking-wider">Terminal Password</div>
                 {(acc as any).tempPassword ? (
                   <div className="text-white text-xs font-mono break-all">{(acc as any).tempPassword}</div>
                 ) : (
-                  <div className="text-white/50 text-xs">Use "Forgot Password" to reset</div>
+                  <div className="text-white/50 text-xs">
+                    <a href="/sign-in" className="text-fw-pink hover:underline">Reset on login page</a>
+                  </div>
                 )}
               </div>
               {(acc as any).tempPassword && (
@@ -478,7 +480,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
                   const lines = [
                     `Account Code: ${acc.accountCode}`,
                     `Login Email: ${(acc as any).loginEmail || "—"}`,
-                    (acc as any).tempPassword ? `Temp Password: ${(acc as any).tempPassword}` : "Password: Use Forgot Password to reset",
+                    (acc as any).tempPassword ? `Password: ${(acc as any).tempPassword}` : "Password: Reset at fundedwealth.com/sign-in",
                     `Challenge: ${phaseLabel}`,
                     `Size: ₹${acc.size.toLocaleString("en-IN")}`,
                   ];

@@ -94,7 +94,14 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
   /* ── Render ────────────────────────────────────────────────────────── */
 
   if (state === "invalid_token") {
-    return <StatusCard icon="error" title="Invalid link" body="This setup link is missing or malformed. Check your email for the original link from FundedWealth." />;
+    return <StatusCard icon="error" title="Invalid link" body="This password setup link requires a valid setup token from your purchase confirmation email.">
+      <div className="mt-4 space-y-2">
+        <p className="text-white/50 text-xs text-left">If you need to reset your password:</p>
+        <Button onClick={() => navigate("/sign-in", { replace: true })} className="w-full bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white font-bold">
+          Go to Sign In → Use "Forgot Password"
+        </Button>
+      </div>
+    </StatusCard>;
   }
   if (state === "already_done") {
     return (
