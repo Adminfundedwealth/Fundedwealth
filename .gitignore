@@ -72,4 +72,7 @@ lib/db/.env
 /playwright/.cache/
 /playwright/.auth/
 
+# Vercel build output (should NOT be committed)
+.vercel/output/
+
 

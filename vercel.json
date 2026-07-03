@@ -1,9 +1,41 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@11.1.1 --activate && pnpm install --no-frozen-lockfile",
-  "buildCommand": "node vercel-build.mjs",
+  "installCommand": "corepack enable && corepack prepare pnpm@11.9.0 --activate && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm --filter @workspace/fundedwealth build",
+  "outputDirectory": "artifacts/fundedwealth/dist",
   "framework": null,
   "redirects": [
     { "source": "/trade", "destination": "https://terminal.fundedwealth.com", "permanent": true },
     { "source": "/trade/:path*", "destination": "https://terminal.fundedwealth.com", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        }
+      ]
+    }
   ]
 }
