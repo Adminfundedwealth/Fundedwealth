@@ -6,6 +6,7 @@ import { useEffect, useState, lazy, Suspense, Component, type ReactNode } from "
 import { SupabaseAuthProvider, useAuth } from "@/contexts/SupabaseAuthContext";
 import { FingerprintProvider } from "@/contexts/FingerprintContext";
 import { TradingDataProvider } from "@/contexts/TradingDataContext";
+import { Analytics } from "@vercel/analytics/react";
 
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Home = lazy(() => import("@/pages/home"));
@@ -133,6 +134,7 @@ function App() {
                                     </MobileShell>
                                 </Suspense>
                                 <Toaster />
+                                <Analytics />
                             </TooltipProvider>
                         </QueryClientProvider>
                     </TradingDataProvider>
