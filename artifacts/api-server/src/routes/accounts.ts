@@ -156,9 +156,22 @@ router.get("/my", async (req: Request, res: Response) => {
       else if (challengeStatus === "passed") dashStatus = "passed";
       else if (challengeStatus === "failed" || challengeStatus === "breached") dashStatus = "breached";
 
-      let phase = "phase_1";
-      if (String(row.challenge_type || "").includes("phase2")) phase = "phase_2";
-      else if (String(row.challenge_type || "").includes("funded")) phase = "funded";
+      // Map challenge_accounts.type to human-readable phase based on the actual product rules
+      let phase = "challenge"; // default
+      const typeStr = String(row.challenge_type || "").toLowerCase();
+      
+      // Flash and 1-Step are single-phase challenges
+      if (typeStr.includes("flash")) {
+        phase = "flash_funding";
+      } else if (typeStr.includes("instant") || typeStr.includes("funded")) {
+        phase = "funded";
+      } else if (typeStr.includes("1step")) {
+        phase = "challenge"; // 1-step evaluation
+      } else if (typeStr.includes("phase2") || typeStr.includes("2step_evaluation_phase2")) {
+        phase = "phase_2";
+      } else if (typeStr.includes("phase1") || typeStr.includes("evaluation")) {
+        phase = "phase_1";
+      }
 
       const canLaunch = challengeStatus === "active" && row.trading_status === "active";
 

@@ -137,9 +137,9 @@ export async function provisionChallenge(
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + rules.maxDaysAllowed);
 
-  // Map the product catalog discriminator to the challenge_accounts.type check
-  // constraint (allowed: evaluation_phase1 | evaluation_phase2 | funded).
-  const challengeType = planType === "instant" ? "funded" : "evaluation_phase1";
+  // Map plan type to challenge_accounts.type using the product catalog rules.
+  // Use the rules.type from @workspace/products as the canonical source.
+  const challengeType = rules.type;
 
   // 5. Create challenge_accounts (terminal schema: trader_id, not user_id)
   const challengeResult = await db.execute(sql`
