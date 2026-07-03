@@ -956,15 +956,6 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       return { order };
     });
 
-    // Trigger terminal provisioning after order is durably committed
-    await triggerTerminalProvisioning(
-      result.order.id,
-      planType as PlanType,
-      "upi_manual",
-      utrStr,
-      tempPassword,
-    );
-
     // ── Onboarding: ensure a Supabase Auth identity exists for guest purchasers ──
     // Creates an UNCONFIRMED placeholder (no usable password yet).
     // The one-time onboarding token sent to the client is the only way to set
@@ -993,6 +984,16 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
         onboardingToken = signOnboardingToken(identity.authUserId, user.email);
       }
     }
+
+    // Trigger terminal provisioning after order is durably committed
+    // tempPassword is now assigned BEFORE this call
+    await triggerTerminalProvisioning(
+      result.order.id,
+      planType as PlanType,
+      "upi_manual",
+      utrStr,
+      tempPassword,
+    );
 
     // Store tempPassword in order metadata for display on Accounts page
     if (tempPassword) {
