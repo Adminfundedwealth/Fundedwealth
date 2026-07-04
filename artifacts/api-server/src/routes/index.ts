@@ -26,6 +26,7 @@ import monitorRouter from "./monitor";
 import communityRouter from "./community";
 import accountsRouter from "./accounts";
 import terminalLaunchRouter from "./terminal-launch";
+import terminalSyncRouter from "./terminal-sync";
 import adminPaymentsRouter from "./admin-payments";
 import adminEventsRouter from "./admin-events";
 import provisioningRouter from "./provisioning";
@@ -57,6 +58,7 @@ router.use("/fingerprint", fingerprintRouter);
 router.use("/community", communityRouter);
 router.use("/accounts", accountsRouter);
 router.use("/terminal", terminalLaunchRouter);
+router.use("/terminal", terminalSyncRouter);
 
 // ── Admin routes (requireAdminAuth + MFA enforcement) ───────────────────────
 router.use("/auto-blog", requireAdminAuth, adminSecurityMiddleware, autoBlogRouter);

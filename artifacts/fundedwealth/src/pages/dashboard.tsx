@@ -371,16 +371,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
               style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #FF8A3D, #D63384)" }} />
           </div>
         </div>
-        <div>
-          <div className="flex justify-between text-xs mb-1">
-            <span className="text-white/50">Trading Days</span>
-            <span className="text-blue-400">{Math.min(acc.tradeCount, 5)} / 5 min</span>
-          </div>
-          <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-700 bg-blue-500"
-              style={{ width: `${Math.min((acc.tradeCount / 5) * 100, 100)}%` }} />
-          </div>
-        </div>
+        {/* Trading days tracking will be added in future update - requires backend integration */}
         <div>
           <div className="flex justify-between text-xs mb-1">
             <span className="text-white/50">Drawdown Used</span>
@@ -510,7 +501,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 
       <div className="flex justify-between text-xs text-white/40 mt-3">
         <span>Started {new Date(acc.startDate).toLocaleDateString("en-IN")}</span>
-        <span>{acc.tradeCount} trades</span>
+        <span>{acc.tradeCount > 0 ? `${acc.tradeCount} trades` : 'No trades yet'}</span>
       </div>
     </div>
   );

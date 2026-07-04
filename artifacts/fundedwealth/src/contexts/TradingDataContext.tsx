@@ -35,6 +35,9 @@ export interface TradingAccount {
   profitSplit: number;
   tradingDays: number;
   scalingLevel: number;
+  // Real trading statistics (from session_analytics)
+  winRate?: number;
+  totalTrades?: number;
   // Funded
   isFunded: boolean;
   fundedAt: string | null;
@@ -150,8 +153,8 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
       ? (acc.maxDrawdown / startBalance) * 100
       : 6,
     profitSplit: acc.profitSplit || 80,
-    winRate: 0, // Terminal will populate this later
-    tradeCount: acc.tradingDays || 0,
+    winRate: acc.winRate || 0, // Real win rate from session_analytics (synced by terminal)
+    tradeCount: acc.totalTrades || 0, // Real trade count from session_analytics (synced by terminal)
     startDate: acc.createdAt,
     accountCode: acc.accountCode || "Provisioning...",
     brokerLogin: acc.brokerLogin || acc.accountCode || null,
