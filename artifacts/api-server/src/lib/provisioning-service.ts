@@ -138,21 +138,37 @@ export async function provisionChallenge(
     traderId = (traderInsert.rows[0] as any).id;
   }
 
-  // ── 6. Create trading_accounts using raw SQL (real columns: trader_id, account_code, plan, …)
-  const tradingResult = await db.execute(sql`
-    INSERT INTO trading_accounts (
-      account_code, trader_id, order_id, plan, phase, status,
-      virtual_balance, profit_target, max_drawdown, daily_loss_limit,
-      profit_split, trading_days, fee_paid, is_funded, expires_at,
+  // ── 6. Create challenge_accounts (confirmed real columns from DB)
+  const challengeResult = await db.execute(sql`
+    INSERT INTO challenge_accounts (
+      trader_id, type, plan,
+      initial_balance, current_balance, peak_balance,
+      profit_target_pct, daily_loss_limit_pct, max_drawdown_pct,
+      min_trading_days, status, started_at, expires_at,
       created_at, updated_at
     ) VALUES (
-      ${accountCode}, ${traderId}::uuid, ${orderId},
-      ${planType}, 'phase_1', 'active',
-      ${initialBalance}, ${Math.round(initialBalance * rules.profitTargetPct  / 100)},
-      ${Math.round(initialBalance * rules.maxDrawdownPct    / 100)},
-      ${Math.round(initialBalance * rules.dailyLossLimitPct / 100)},
-      80, 0, 0, false,
+      ${traderId}::uuid, ${rules.type}, ${planType},
+      ${initialBalance}, ${initialBalance}, ${initialBalance},
+      ${rules.profitTargetPct}, ${rules.dailyLossLimitPct}, ${rules.maxDrawdownPct},
+      ${rules.minTradingDays}, 'active', now(),
       ${expiresAt.toISOString()}::timestamptz,
+      now(), now()
+    )
+    RETURNING id
+  `);
+  const challengeAccountId = (challengeResult.rows[0] as any).id as string;
+
+  // ── 7. Create trading_accounts (confirmed real columns: trader_id, challenge_id, broker_provider, …)
+  const tradingResult = await db.execute(sql`
+    INSERT INTO trading_accounts (
+      trader_id, challenge_id, account_code,
+      broker_provider, broker_client_id,
+      balance, available_margin, status,
+      created_at, updated_at
+    ) VALUES (
+      ${traderId}::uuid, ${challengeAccountId}::uuid, ${accountCode},
+      'paper', ${accountCode},
+      ${initialBalance}, ${initialBalance}, 'active',
       now(), now()
     )
     RETURNING id
@@ -160,17 +176,18 @@ export async function provisionChallenge(
 
   const tradingAccountId = (tradingResult.rows[0] as any).id as string;
 
-  // ── 7. Update provisioning_logs → completed ────────────────────────────────
+  // ── 8. Update provisioning_logs → completed ────────────────────────────────
   await db.execute(sql`
     UPDATE provisioning_logs
-    SET status              = 'completed',
-        trader_id           = ${traderId}::uuid,
-        trading_account_id  = ${tradingAccountId}::uuid,
-        completed_at        = now()
+    SET status                = 'completed',
+        trader_id             = ${traderId}::uuid,
+        challenge_account_id  = ${challengeAccountId}::uuid,
+        trading_account_id    = ${tradingAccountId}::uuid,
+        completed_at          = now()
     WHERE id = ${provId}::uuid
   `);
 
-  // ── 7. Confirm order + store credentials ───────────────────────────────────
+  // ── 9. Confirm order + store credentials ───────────────────────────────────
   if (orderId) {
     const loginEmail = user?.email ?? null;
 
@@ -199,13 +216,13 @@ export async function provisionChallenge(
 
   console.log(
     `[Provisioning] COMPLETED source=${source} order=${orderId ?? "-"} plan=${planType} ` +
-    `accountCode=${accountCode} traderId=${traderId} tradingId=${tradingAccountId}`,
+    `accountCode=${accountCode} traderId=${traderId} challengeId=${challengeAccountId} tradingId=${tradingAccountId}`,
   );
 
   return {
     provisioningLogId: provId,
     traderId,
-    challengeAccountId: "",         // terminal will set this
+    challengeAccountId,
     tradingAccountId,
     accountCode,
     accountSize: initialBalance,
