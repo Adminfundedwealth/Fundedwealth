@@ -139,6 +139,8 @@ export async function provisionChallenge(
   }
 
   // ── 6. Create challenge_accounts (confirmed real columns from DB)
+  // type CHECK constraint allows: evaluation_phase1 | evaluation_phase2 | funded
+  const challengeType = planType === "instant" ? "funded" : "evaluation_phase1";
   const challengeResult = await db.execute(sql`
     INSERT INTO challenge_accounts (
       trader_id, type, plan,
@@ -147,7 +149,7 @@ export async function provisionChallenge(
       min_trading_days, status, started_at, expires_at,
       created_at, updated_at
     ) VALUES (
-      ${traderId}::uuid, ${rules.type}, ${planType},
+      ${traderId}::uuid, ${challengeType}, ${planType},
       ${initialBalance}, ${initialBalance}, ${initialBalance},
       ${rules.profitTargetPct}, ${rules.dailyLossLimitPct}, ${rules.maxDrawdownPct},
       ${rules.minTradingDays}, 'active', now(),
