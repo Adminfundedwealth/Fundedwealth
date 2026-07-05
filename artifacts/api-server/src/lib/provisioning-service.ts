@@ -19,7 +19,7 @@
  *   5. Confirm the order + store credentials in metadata
  */
 import { randomUUID } from "crypto";
-import { db, orders, tradingAccounts } from "@workspace/db";
+import { db, orders } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import {
   getProvisioningRules,
@@ -121,37 +121,50 @@ export async function provisionChallenge(
 
   const accountCode = generateAccountCode();
 
-  // ── 5. Create trading_accounts using the Drizzle Supabase schema ───────────
-  // Columns match trading-accounts.ts exactly:
-  //   account_code, user_id, order_id, plan, phase, virtual_balance,
-  //   profit_target, max_drawdown, daily_loss_limit, fee_paid, expires_at, status
-  const [ta] = await db.insert(tradingAccounts).values({
-    id:             randomUUID(),
-    accountCode,
-    userId:         String(userId),
-    orderId:        orderId ?? null,
-    planType,                                          // mapped to "plan" column
-    phase:          "phase_1",
-    status:         "active",
-    currentBalance: initialBalance,                    // mapped to "virtual_balance"
-    profitTarget:   Math.round(initialBalance * rules.profitTargetPct  / 100),
-    maxDrawdown:    Math.round(initialBalance * rules.maxDrawdownPct    / 100),
-    dailyLossLimit: Math.round(initialBalance * rules.dailyLossLimitPct / 100),
-    profitSplit:    80,
-    tradingDays:    0,
-    feePaid:        0,
-    isFunded:       false,
-    expiresAt,
-  }).returning();
+  // ── 5. Get or create terminal_traders (real DB uses trader_id, not user_id) ─
+  const existingTrader = await db.execute(sql`
+    SELECT id FROM terminal_traders WHERE external_id = ${String(userId)} LIMIT 1
+  `);
+  let traderId: string;
+  if (existingTrader.rows && existingTrader.rows.length > 0) {
+    traderId = (existingTrader.rows[0] as any).id;
+  } else {
+    const displayName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Trader";
+    const traderInsert = await db.execute(sql`
+      INSERT INTO terminal_traders (external_id, email, display_name, plan, status, created_at, updated_at)
+      VALUES (${String(userId)}, ${user.email}, ${displayName}, ${planType}, 'active', now(), now())
+      RETURNING id
+    `);
+    traderId = (traderInsert.rows[0] as any).id;
+  }
 
-  const tradingAccountId = ta.id;
+  // ── 6. Create trading_accounts using raw SQL (real columns: trader_id, account_code, plan, …)
+  const tradingResult = await db.execute(sql`
+    INSERT INTO trading_accounts (
+      account_code, trader_id, order_id, plan, phase, status,
+      virtual_balance, profit_target, max_drawdown, daily_loss_limit,
+      profit_split, trading_days, fee_paid, is_funded, expires_at,
+      created_at, updated_at
+    ) VALUES (
+      ${accountCode}, ${traderId}::uuid, ${orderId},
+      ${planType}, 'phase_1', 'active',
+      ${initialBalance}, ${Math.round(initialBalance * rules.profitTargetPct  / 100)},
+      ${Math.round(initialBalance * rules.maxDrawdownPct    / 100)},
+      ${Math.round(initialBalance * rules.dailyLossLimitPct / 100)},
+      80, 0, 0, false,
+      ${expiresAt.toISOString()}::timestamptz,
+      now(), now()
+    )
+    RETURNING id
+  `);
 
-  // ── 6. Update provisioning_logs → completed ────────────────────────────────
-  // traderId / challengeAccountId are terminal-owned; leave as NULL here.
-  // The terminal will fill them in when it processes this log.
+  const tradingAccountId = (tradingResult.rows[0] as any).id as string;
+
+  // ── 7. Update provisioning_logs → completed ────────────────────────────────
   await db.execute(sql`
     UPDATE provisioning_logs
     SET status              = 'completed',
+        trader_id           = ${traderId}::uuid,
         trading_account_id  = ${tradingAccountId}::uuid,
         completed_at        = now()
     WHERE id = ${provId}::uuid
@@ -186,12 +199,12 @@ export async function provisionChallenge(
 
   console.log(
     `[Provisioning] COMPLETED source=${source} order=${orderId ?? "-"} plan=${planType} ` +
-    `accountCode=${accountCode} tradingId=${tradingAccountId}`,
+    `accountCode=${accountCode} traderId=${traderId} tradingId=${tradingAccountId}`,
   );
 
   return {
     provisioningLogId: provId,
-    traderId:          "",          // terminal will set this
+    traderId,
     challengeAccountId: "",         // terminal will set this
     tradingAccountId,
     accountCode,
