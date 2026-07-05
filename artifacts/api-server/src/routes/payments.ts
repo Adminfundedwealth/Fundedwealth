@@ -25,6 +25,7 @@ import {
   getOrCreateUser,
   ensureSupabaseAuthIdentity,
 } from "../lib/guest-account-service";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -934,7 +935,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     }
 
     const utrMasked = `****${utrStr.slice(-4)}`;
-    req.log.info({ utrMasked, amount, planType, userId: auth?.userId }, "manual_upi_utr_submitted");
+    logger.info({ utrMasked, amount, planType, userId: auth?.userId }, "manual_upi_utr_submitted");
 
     // Resolve actual challenge account size from plan + sizeIndex
     const accountSize = resolveAccountSize(planType as PlanType, typeof sizeIndex === "number" ? sizeIndex : 0);
@@ -957,31 +958,40 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     });
 
     // ── Onboarding: ensure a Supabase Auth identity exists for guest purchasers ──
-    // Creates an UNCONFIRMED placeholder (no usable password yet).
-    // The one-time onboarding token sent to the client is the only way to set
-    // the real password — enforced by the /auth/create-password endpoint.
+    // If the buyer supplied a password at checkout use it so they can log in
+    // immediately. Otherwise issue a signed one-time onboarding token they use
+    // to set their password via /auth/create-password.
     let onboardingToken: string | null = null;
     let tempPassword: string | null = null;
     const isGuest = !auth?.userId || (user.clerkId?.startsWith("guest_") ?? false);
     if (isGuest) {
-      const identity = await ensureSupabaseAuthIdentity({
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-      });
-      if (identity.authUserId) {
-        tempPassword = identity.tempPassword;
-        // Link public.users.clerk_id to the real Supabase auth id (was guest_*)
-        if (identity.authUserId !== user.clerkId) {
-          await db.update(users)
-            .set({ clerkId: identity.authUserId, updatedAt: new Date() })
-            .where(eq(users.id, user.id));
+      try {
+        const identity = await ensureSupabaseAuthIdentity({
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          // Pass buyer's chosen password so they can log in immediately
+          password: typeof password === "string" && password.length >= 8 ? password : null,
+        });
+        if (identity.authUserId) {
+          tempPassword = identity.tempPassword;
+          // Link public.users.clerk_id to the real Supabase auth id (was guest_*)
+          if (identity.authUserId !== user.clerkId) {
+            await db.update(users)
+              .set({ clerkId: identity.authUserId, updatedAt: new Date() })
+              .where(eq(users.id, user.id));
+          }
+          // Only issue onboarding token when no password was provided at checkout
+          if (!password || password.length < 8) {
+            const { signOnboardingToken } = await import("../lib/onboarding-token");
+            onboardingToken = signOnboardingToken(identity.authUserId, user.email);
+          }
         }
-        // Issue a signed one-time onboarding token so the client can reach
-        // /auth/create-password to set their real password.
-        const { signOnboardingToken } = await import("../lib/onboarding-token");
-        onboardingToken = signOnboardingToken(identity.authUserId, user.email);
+      } catch (identityErr) {
+        // Non-fatal: account provisioning succeeds even if auth identity creation fails.
+        // The user can reset their password later.
+        logger.error({ identityErr, email: user.email }, "verify_utr: ensureSupabaseAuthIdentity failed (non-fatal)");
       }
     }
 
@@ -1031,7 +1041,7 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
         </div>
       `,
     }).catch((emailError) => {
-      req.log.error({ emailError, userId: auth?.userId }, "utr_payment_received_email_failed");
+      logger.error({ emailError, userId: auth?.userId }, "utr_payment_received_email_failed");
     });
 
     // Notify admin panel of confirmed UPI payment
@@ -1052,8 +1062,12 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
       ...(onboardingToken ? { onboardingToken } : {}),
     });
   } catch (err) {
-    req.log.error({ err }, "verify_utr_failed");
-    return res.status(500).json({ success: false, message: "Server error" });
+    logger.error({ err }, "verify_utr_failed");
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      ...(process.env.NODE_ENV !== "production" ? { debug: String(err) } : {}),
+    });
   }
 });
 
