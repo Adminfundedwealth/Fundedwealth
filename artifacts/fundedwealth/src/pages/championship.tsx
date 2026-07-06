@@ -948,24 +948,29 @@ const ChampionshipPage = () => {
                 </CardContent>
               </Card>
 
-              <Button
-                onClick={() => formValid && setCheckoutStep(2)}
-                disabled={true}
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-fw-orange to-fw-pink text-white rounded-xl shadow-lg shadow-fw-orange/30 opacity-40 cursor-not-allowed"
-              >
-                Proceed to Verify — ₹{challengePrice}/{challenge === "weekly" ? "week" : "month"}
-              </Button>
-
-              {/* Waitlist Notice */}
-              <div className="w-full rounded-xl border border-fw-orange/40 bg-fw-orange/10 px-6 py-5 text-center">
-                <div className="text-2xl mb-2">🏆</div>
-                <p className="text-fw-orange font-extrabold text-base mb-1">
+              {/* Waitlist Notice — shown always when championship is paused */}
+              <div className="w-full rounded-2xl border border-fw-orange/50 bg-gradient-to-br from-fw-orange/15 via-fw-orange/5 to-transparent px-6 py-6 text-center shadow-lg shadow-fw-orange/10">
+                <div className="text-3xl mb-3">🏆</div>
+                <p className="text-fw-orange font-extrabold text-lg mb-1">
                   Thank you — FundedWealth Championship
                 </p>
-                <p className="text-white/70 text-sm">
-                  You're on the waitlist! We'll notify you at <span className="text-white font-semibold">{form.email || "your email"}</span> when registration opens.
+                <p className="text-white/80 text-sm leading-relaxed">
+                  {form.email
+                    ? <>You're on the waitlist! We'll notify you at <span className="text-white font-semibold">{form.email}</span> when registration opens.</>
+                    : "You're on the waitlist! Fill in your details above and we'll notify you when registration opens."
+                  }
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/60 text-xs font-semibold">
+                  🔒 Registration Currently Paused
+                </div>
               </div>
+
+              <button
+                disabled
+                className="w-full h-14 text-lg font-bold rounded-xl bg-white/10 border border-white/10 text-white/30 cursor-not-allowed select-none"
+              >
+                🔒 Registration Paused — Coming Soon
+              </button>
 
               <p className="text-center text-white/30 text-xs">
                 By registering you agree to the FundedWealth competition rules and terms.
