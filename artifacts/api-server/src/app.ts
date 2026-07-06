@@ -66,6 +66,8 @@ app.use(cors({
       }
     }
   },
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 }));
 
 // Attach raw body buffer to req so the Razorpay webhook handler can verify
