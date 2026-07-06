@@ -367,16 +367,18 @@ export default function SignUpPage() {
                 )}
               </div>
 
-              <label className="flex items-start gap-2.5 cursor-pointer select-none mt-1">
-                <input type="checkbox" checked={agree} onChange={e => setAgree(e.target.checked)}
+              <div className="flex items-start gap-2.5 mt-1">
+                <input id="agree" type="checkbox" checked={agree} onChange={e => setAgree(e.target.checked)}
                   className="mt-0.5 w-4 h-4 rounded border-white/20 accent-[#7C3AED] shrink-0" />
-                <span className="text-[12px] text-white/40 leading-relaxed">
-                  I agree to the{" "}
-                  <a href="/terms" className="text-[#A78BFA] hover:text-white transition">Terms of Service</a>
-                  {" "}and{" "}
-                  <a href="/privacy" className="text-[#A78BFA] hover:text-white transition">Privacy Policy</a>
-                </span>
-              </label>
+                <div className="text-[12px] text-white/40 leading-relaxed">
+                  <label htmlFor="agree" className="cursor-pointer select-none">I agree to the</label>
+                  <span className="ml-1">
+                    <a href="/terms" className="text-[#A78BFA] hover:text-white transition">Terms of Service</a>
+                    {" "}and{" "}
+                    <a href="/privacy" className="text-[#A78BFA] hover:text-white transition">Privacy Policy</a>
+                  </span>
+                </div>
+              </div>
 
               {/* Cloudflare Turnstile CAPTCHA - Feature Flag Controlled */}
               {FEATURES.ENABLE_TURNSTILE && (

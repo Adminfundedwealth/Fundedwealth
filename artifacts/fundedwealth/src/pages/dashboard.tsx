@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend, ReferenceLine } from "recharts";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
 
 type Section =
   | "home" | "accounts" | "platform" | "payouts" | "leaderboard"
@@ -301,28 +303,23 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     try {
       const token = await getToken();
       const apiBase = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${apiBase}/api/terminal/launch`, {
+      const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         credentials: "include",
-        body: JSON.stringify({ accountId: acc.id }),
+        body: JSON.stringify(buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id })),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success && data.launchUrl) {
-        // If it's an external URL, open in new tab
-        if (data.launchUrl.startsWith("http")) {
-          window.open(data.launchUrl, "_blank", "noopener,noreferrer");
-        } else {
-          // Local/relative URL — navigate in current tab
-          window.location.href = data.launchUrl;
-        }
+        window.location.href = data.launchUrl;
       } else {
         setLaunchError(data.message || "Failed to generate terminal session. Please try again.");
+        toast.error("Unable to launch terminal.");
       }
     } catch (err: any) {
-      // Network error — show credentials so user can log in manually
       setLaunchError("Terminal is offline. Use your credentials below to log in manually.");
       setShowCreds(true);
+      toast.error("Unable to launch terminal.");
     } finally {
       setLaunching(false);
     }
@@ -555,23 +552,25 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
     try {
       const token = await getToken();
       const apiBase = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${apiBase}/api/terminal/launch`, {
+      const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: "include",
-        body: JSON.stringify({ accountId: acc.id }),
+        body: JSON.stringify(buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id })),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success && data.launchUrl) {
-        window.open(data.launchUrl, "_blank");
+        window.location.href = data.launchUrl;
       } else {
         setError(data.message || "Failed to launch terminal. Please try again.");
+        toast.error("Unable to launch terminal.");
       }
     } catch {
       setError("Could not reach the server. Please try again.");
+      toast.error("Unable to launch terminal.");
     } finally {
       setLaunching(false);
     }

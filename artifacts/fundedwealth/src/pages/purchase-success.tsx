@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
 import { motion } from "framer-motion";
 import { jsPDF } from "jspdf";
+import { toast } from "sonner";
+import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
 
 type SuccessPageData = {
   accountCode: string;
@@ -201,27 +203,25 @@ export default function PurchaseSuccess() {
     try {
       const token = await getToken();
       const apiBase = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${apiBase}/api/terminal/launch`, {
+      const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json", 
           ...(token ? { Authorization: `Bearer ${token}` } : {}) 
         },
         credentials: "include",
-        body: JSON.stringify({ accountId }),
+        body: JSON.stringify(buildTerminalLaunchRequestBody({ accountId })),
       });
 
       const data = await res.json().catch(() => ({}));
       
       if (res.ok && data.success && data.launchUrl) {
-        window.open(data.launchUrl, "_blank");
-        // Don't navigate away - let user see credentials
+        window.location.href = data.launchUrl;
       } else {
-        // Fallback to accounts page
-        navigate("/dashboard/accounts");
+        toast.error("Unable to launch terminal.");
       }
     } catch {
-      navigate("/dashboard/accounts");
+      toast.error("Unable to launch terminal.");
     } finally {
       setLaunching(false);
     }

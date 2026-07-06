@@ -9,52 +9,7 @@ const router = Router();
 const TERMINAL_API_URL = (process.env.TERMINAL_API_URL || "").replace(/\/$/, "");
 const SSO_API_KEY = process.env.SSO_API_KEY || "";
 
-/**
- * Verify an activation token generated during provisioning.
- * Returns the parsed payload or null if invalid/expired.
- */
-function verifyActivationToken(token: string): { accountId: string; email: string; expiresAt: number } | null {
-  try {
-    const [payloadB64, sig] = token.split(".");
-    if (!payloadB64 || !sig) return null;
-    const secret = SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
-    const expected = createHmac("sha256", secret).update(payloadB64).digest("hex");
-    if (expected !== sig) return null;
-    const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString("utf8"));
-    if (Date.now() > payload.expiresAt) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Generate a fresh short-lived SSO token for terminal launch.
- * Used when TERMINAL_API_URL is configured but as a fallback.
- */
-function generateSSOToken(tradingAccountId: string, traderId: string, email: string): string {
-  const payload = JSON.stringify({
-    accountId: tradingAccountId,
-    traderId,
-    email,
-    issuedAt: Date.now(),
-    expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
-  });
-  const secret = SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
-  const hmac = createHmac("sha256", secret).update(payload).digest("hex");
-  return `${Buffer.from(payload).toString("base64url")}.${hmac}`;
-}
-
-/**
- * POST /api/terminal/launch
- *
- * Generates a terminal SSO launch URL.
- * Flow:
- *   1. Verify user owns the account via trader chain
- *   2. If TERMINAL_API_URL is configured → call terminal /auth/sso/generate
- *   3. If not → return local launch URL with embedded activation token
- */
-router.post("/launch", async (req: Request, res: Response) => {
+export async function handleTerminalLaunch(req: Request, res: Response) {
   try {
     // ── 1. AUTH ──────────────────────────────────────────────────────────────
     const auth = getAuth(req);
@@ -132,7 +87,6 @@ router.post("/launch", async (req: Request, res: Response) => {
     }
 
     // ── 6. FETCH CREDENTIALS FROM ORDER METADATA ────────────────────────────
-    // Orders store terminal credentials (email, password, activationToken) set at provisioning.
     let storedActivationToken: string | null = null;
     let storedTerminalPassword: string | null = null;
     let storedLoginEmail: string = user.email;
@@ -195,7 +149,6 @@ router.post("/launch", async (req: Request, res: Response) => {
             return res.json({ success: true, launchUrl });
           }
         }
-        // Terminal returned error — fall through to local token
         const errText = await terminalRes.text().catch(() => "");
         console.warn(`[Terminal Launch] Terminal SSO returned ${terminalRes.status}: ${errText} — falling back to local token`);
       } catch (fetchErr: any) {
@@ -204,13 +157,7 @@ router.post("/launch", async (req: Request, res: Response) => {
     }
 
     // ── 8. LOCAL FALLBACK — generate token from stored activation token ──────
-    // If terminal is not configured or unreachable, build a launch URL using
-    // the activation token stored at provisioning time. The terminal can verify
-    // this token using the same SSO_API_KEY / INTERNAL_PROVISION_SECRET.
     const ssoToken = generateSSOToken(prov.trading_account_id, prov.trader_id, storedLoginEmail);
-
-    // Build the terminal URL — if TERMINAL_API_URL is set use it, otherwise use
-    // a relative path (useful for local dev where terminal is embedded)
     const terminalBase = TERMINAL_API_URL || "";
     const launchUrl = terminalBase
       ? `${terminalBase}/auth/sso?token=${encodeURIComponent(ssoToken)}&account=${encodeURIComponent(storedAccountCode)}`
@@ -219,7 +166,6 @@ router.post("/launch", async (req: Request, res: Response) => {
     return res.json({
       success: true,
       launchUrl,
-      // Return credentials so dashboard can show them in a "Launch" modal
       credentials: {
         email: storedLoginEmail,
         password: storedTerminalPassword,
@@ -234,6 +180,54 @@ router.post("/launch", async (req: Request, res: Response) => {
       message: "Failed to generate terminal session. Please try again.",
     });
   }
-});
+}
+
+/**
+ * Verify an activation token generated during provisioning.
+ * Returns the parsed payload or null if invalid/expired.
+ */
+function verifyActivationToken(token: string): { accountId: string; email: string; expiresAt: number } | null {
+  try {
+    const [payloadB64, sig] = token.split(".");
+    if (!payloadB64 || !sig) return null;
+    const secret = SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
+    const expected = createHmac("sha256", secret).update(payloadB64).digest("hex");
+    if (expected !== sig) return null;
+    const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString("utf8"));
+    if (Date.now() > payload.expiresAt) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Generate a fresh short-lived SSO token for terminal launch.
+ * Used when TERMINAL_API_URL is configured but as a fallback.
+ */
+function generateSSOToken(tradingAccountId: string, traderId: string, email: string): string {
+  const payload = JSON.stringify({
+    accountId: tradingAccountId,
+    traderId,
+    email,
+    issuedAt: Date.now(),
+    expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
+  });
+  const secret = SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
+  const hmac = createHmac("sha256", secret).update(payload).digest("hex");
+  return `${Buffer.from(payload).toString("base64url")}.${hmac}`;
+}
+
+/**
+ * POST /api/terminal/launch
+ *
+ * Generates a terminal SSO launch URL.
+ * Flow:
+ *   1. Verify user owns the account via trader chain
+ *   2. If TERMINAL_API_URL is configured → call terminal /auth/sso/generate
+ *   3. If not → return local launch URL with embedded activation token
+ */
+router.post("/launch", handleTerminalLaunch);
+router.post("/terminal-launch", handleTerminalLaunch);
 
 export default router;
