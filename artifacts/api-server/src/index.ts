@@ -4,9 +4,28 @@ initializeObservability().catch((err) => {
   console.error("Failed to initialize observability", err);
 });
 import app from "./app";
+import router from "./routes";
 import { logger } from "./lib/logger";
 import { startEconomicCalendarScheduler } from "./lib/economic-calendar";
 import http from "http";
+
+function collectApiRoutes(stack: any[], prefix = "/api"): string[] {
+  const routes: string[] = [];
+
+  for (const layer of stack) {
+    if (layer.route) {
+      const methods = Object.keys(layer.route.methods)
+        .filter((method) => layer.route.methods[method])
+        .map((method) => method.toUpperCase());
+      const path = `${prefix}${layer.route.path === "/" ? "" : layer.route.path}`;
+      methods.forEach((method) => routes.push(`${method} ${path}`));
+    } else if (layer.name === "router" && layer.handle?.stack) {
+      routes.push(...collectApiRoutes(layer.handle.stack, prefix));
+    }
+  }
+
+  return routes;
+}
 
 // ── Clerk key guard ──────────────────────────────────────────────────────────
 const clerkSecret = process.env.CLERK_SECRET_KEY ?? "";
@@ -57,6 +76,17 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 const server = http.createServer(app);
+
+const railwayCommit = process.env.RAILWAY_GIT_COMMIT_SHA || process.env.COMMIT_SHA || "unknown";
+const terminalLaunchRegistered = collectApiRoutes((router as any).stack).some((route) => route.includes("/terminal-launch"));
+
+console.log(`[startup] Railway commit: ${railwayCommit}`);
+console.log("[startup] app.use('/api', router): enabled");
+console.log("[startup] router.post('/terminal-launch'):", terminalLaunchRegistered ? "enabled" : "missing");
+console.log("[startup] Registered routes:");
+for (const route of collectApiRoutes((router as any).stack).sort()) {
+  console.log(`[startup] ${route}`);
+}
 
 // Initialize Redis connection (non-blocking — falls back to memory if unavailable)
 import("./lib/redis-client").then(({ getRedisClient }) => {
