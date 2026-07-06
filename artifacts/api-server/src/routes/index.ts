@@ -25,7 +25,7 @@ import captchaRouter from "./captcha";
 import monitorRouter from "./monitor";
 import communityRouter from "./community";
 import accountsRouter from "./accounts";
-import terminalLaunchRouter from "./terminal-launch";
+import terminalLaunchRouter, { handleTerminalLaunch } from "./terminal-launch";
 import terminalSyncRouter from "./terminal-sync";
 import adminPaymentsRouter from "./admin-payments";
 import adminEventsRouter from "./admin-events";
@@ -57,6 +57,7 @@ router.use("/razorpay", razorpayRouter);
 router.use("/fingerprint", fingerprintRouter);
 router.use("/community", communityRouter);
 router.use("/accounts", accountsRouter);
+router.post("/terminal-launch", handleTerminalLaunch);
 router.use("/terminal", terminalLaunchRouter);
 router.use("/terminal", terminalSyncRouter);
 
