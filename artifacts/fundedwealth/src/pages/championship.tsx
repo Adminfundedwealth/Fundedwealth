@@ -950,11 +950,23 @@ const ChampionshipPage = () => {
 
               <Button
                 onClick={() => formValid && setCheckoutStep(2)}
-                disabled={!formValid}
-                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-fw-orange to-fw-pink text-white rounded-xl shadow-lg shadow-fw-orange/30 hover:opacity-90 transition-opacity disabled:opacity-40"
+                disabled={true}
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-fw-orange to-fw-pink text-white rounded-xl shadow-lg shadow-fw-orange/30 opacity-40 cursor-not-allowed"
               >
                 Proceed to Verify — ₹{challengePrice}/{challenge === "weekly" ? "week" : "month"}
               </Button>
+
+              {/* Waitlist Notice */}
+              <div className="w-full rounded-xl border border-fw-orange/40 bg-fw-orange/10 px-6 py-5 text-center">
+                <div className="text-2xl mb-2">🏆</div>
+                <p className="text-fw-orange font-extrabold text-base mb-1">
+                  Thank you — FundedWealth Championship
+                </p>
+                <p className="text-white/70 text-sm">
+                  You're on the waitlist! We'll notify you at <span className="text-white font-semibold">{form.email || "your email"}</span> when registration opens.
+                </p>
+              </div>
+
               <p className="text-center text-white/30 text-xs">
                 By registering you agree to the FundedWealth competition rules and terms.
               </p>
