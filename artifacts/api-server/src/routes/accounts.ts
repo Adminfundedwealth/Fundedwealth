@@ -143,7 +143,8 @@ router.get("/my", async (req: Request, res: Response) => {
         if (order?.metadata) orderMeta = JSON.parse(order.metadata);
       } catch { /* ignore */ }
       const loginEmail = orderMeta.loginEmail || null;
-      const tempPassword = orderMeta.tempPassword || null;
+      const terminalPassword = orderMeta.terminalPassword || orderMeta.tempPassword || null;
+      const activationToken = orderMeta.activationToken || null;
 
       const initialBalance = row.initial_balance != null
         ? Number(row.initial_balance)
@@ -156,21 +157,38 @@ router.get("/my", async (req: Request, res: Response) => {
       else if (challengeStatus === "passed") dashStatus = "passed";
       else if (challengeStatus === "failed" || challengeStatus === "breached") dashStatus = "breached";
 
-      // Map challenge_accounts.type to human-readable phase based on the actual product rules
-      let phase = "challenge"; // default
+      // Map challenge_accounts.plan (= purchased planType) to human-readable phase.
+      // Use plan as primary identifier — it is the purchased product and never changes.
+      // challenge_accounts.type only reflects DB storage constraint (funded/evaluation_phase1).
+      let phase = "challenge"; // default fallback
+      const planStr = String(row.plan || order?.planType || "").toLowerCase();
       const typeStr = String(row.challenge_type || "").toLowerCase();
-      
-      // Flash and 1-Step are single-phase challenges
-      if (typeStr.includes("flash")) {
+
+      // Derive phase from the PURCHASED PLAN — never from challenge_accounts.type alone
+      if (planStr === "flash") {
         phase = "flash_funding";
-      } else if (typeStr.includes("instant") || typeStr.includes("funded")) {
+      } else if (planStr === "instant") {
         phase = "funded";
-      } else if (typeStr.includes("1step")) {
+      } else if (planStr === "1step") {
         phase = "challenge"; // 1-step evaluation
-      } else if (typeStr.includes("phase2") || typeStr.includes("2step_evaluation_phase2")) {
-        phase = "phase_2";
-      } else if (typeStr.includes("phase1") || typeStr.includes("evaluation")) {
-        phase = "phase_1";
+      } else if (planStr === "2step") {
+        // 2-step: check if they're on phase2 (type = evaluation_phase2)
+        if (typeStr.includes("phase2")) {
+          phase = "phase_2";
+        } else {
+          phase = "phase_1";
+        }
+      } else {
+        // Fallback: derive from type string for legacy/manual accounts
+        if (typeStr.includes("flash")) {
+          phase = "flash_funding";
+        } else if (typeStr.includes("instant") || typeStr.includes("funded")) {
+          phase = "funded";
+        } else if (typeStr.includes("phase2")) {
+          phase = "phase_2";
+        } else if (typeStr.includes("phase1") || typeStr.includes("evaluation")) {
+          phase = "phase_1";
+        }
       }
 
       const canLaunch = challengeStatus === "active" && row.trading_status === "active";
@@ -219,9 +237,9 @@ router.get("/my", async (req: Request, res: Response) => {
         currentBalance,
         startBalance: initialBalance,
         profitLoss: currentBalance - initialBalance,
-        profitTarget: row.profit_target_pct != null ? Math.round(initialBalance * Number(row.profit_target_pct) / 100) : Math.round(initialBalance * 0.10),
-        maxDrawdown: row.max_drawdown_pct != null ? Math.round(initialBalance * Number(row.max_drawdown_pct) / 100) : Math.round(initialBalance * 0.06),
-        dailyLossLimit: row.daily_loss_limit_pct != null ? Math.round(initialBalance * Number(row.daily_loss_limit_pct) / 100) : Math.round(initialBalance * 0.03),
+        profitTarget: row.profit_target_pct != null ? Math.round(initialBalance * Number(row.profit_target_pct) / 100) : (planStr === "flash" ? 0 : Math.round(initialBalance * 0.10)),
+        maxDrawdown: row.max_drawdown_pct != null ? Math.round(initialBalance * Number(row.max_drawdown_pct) / 100) : (planStr === "flash" ? Math.round(initialBalance * 0.04) : Math.round(initialBalance * 0.06)),
+        dailyLossLimit: row.daily_loss_limit_pct != null ? Math.round(initialBalance * Number(row.daily_loss_limit_pct) / 100) : (planStr === "flash" ? Math.round(initialBalance * 0.02) : Math.round(initialBalance * 0.03)),
         dailyDrawdown: 0,
         profitSplit: 80,
         tradingDays: tradingDaysCount,  // NEW: Real trading days from analytics
@@ -240,7 +258,10 @@ router.get("/my", async (req: Request, res: Response) => {
         canLaunch,
         // Credentials stored in order metadata at provisioning time
         loginEmail,
-        tempPassword,
+        terminalPassword,
+        activationToken,
+        // Legacy field
+        tempPassword: terminalPassword,
       });
     }
 
@@ -420,13 +441,31 @@ router.get("/:accountId", async (req: Request, res: Response) => {
     const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
     const challengeStatus = challenge?.status || prov.status;
 
+    // Derive phase from the purchased plan (challenge.plan) — never from type alone
+    const acctPlan = String(challenge?.plan || prov.plan_type || prov.plan || "").toLowerCase();
+    let acctPhase: string;
+    if (acctPlan === "flash") {
+      acctPhase = "flash_funding";
+    } else if (acctPlan === "instant") {
+      acctPhase = "funded";
+    } else if (acctPlan === "1step") {
+      acctPhase = "challenge";
+    } else if (acctPlan === "2step") {
+      acctPhase = challenge?.type?.includes("phase2") ? "phase_2" : "phase_1";
+    } else {
+      // Fallback for legacy/manual accounts
+      acctPhase = challenge?.type?.includes("phase2") ? "phase_2"
+        : challenge?.type?.includes("funded") ? "funded"
+        : "phase_1";
+    }
+
     return res.json({
       success: true,
       account: {
         id: prov.trading_account_id || prov.challenge_account_id || accountId,
         accountCode: trading?.account_code || null,
         planType: challenge?.plan || prov.plan_type || prov.plan,
-        phase: challenge?.type?.includes("phase2") ? "phase_2" : challenge?.type?.includes("funded") ? "funded" : "phase_1",
+        phase: acctPhase,
         status: challengeStatus,
         currentBalance,
         startBalance: initialBalance,
@@ -438,7 +477,7 @@ router.get("/:accountId", async (req: Request, res: Response) => {
         profitSplit: 80,
         tradingDays: challenge?.min_trading_days || 0,
         scalingLevel: 1,
-        isFunded: challenge?.type?.includes("funded") || false,
+        isFunded: acctPlan === "flash" || acctPlan === "instant" || challenge?.type?.includes("funded") || false,
         fundedAt: null,
         feePaid: prov.amount || 0,
         couponUsed: null,
@@ -563,13 +602,30 @@ router.get("/order/:orderId", async (req: Request, res: Response) => {
     const initialBalance = challenge ? Number(challenge.initial_balance) : (order.accountSize || 0);
     const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
 
+    // Derive phase from the purchased plan — never from challenge type alone
+    const orderPlan = String(challenge?.plan || order.planType || "").toLowerCase();
+    let orderPhase: string;
+    if (orderPlan === "flash") {
+      orderPhase = "flash_funding";
+    } else if (orderPlan === "instant") {
+      orderPhase = "funded";
+    } else if (orderPlan === "1step") {
+      orderPhase = "challenge";
+    } else if (orderPlan === "2step") {
+      orderPhase = challenge?.type?.includes("phase2") ? "phase_2" : "phase_1";
+    } else {
+      orderPhase = challenge?.type?.includes("phase2") ? "phase_2"
+        : challenge?.type?.includes("funded") ? "funded"
+        : "phase_1";
+    }
+
     return res.json({
       success: true,
       account: {
         id: prov.trading_account_id || prov.challenge_account_id,
         accountCode: trading?.account_code || orderMeta.accountCode || "N/A",
         planType: challenge?.plan || order.planType,
-        phase: challenge?.type?.includes("phase2") ? "phase_2" : challenge?.type?.includes("funded") ? "funded" : "phase_1",
+        phase: orderPhase,
         status: challenge?.status || "active",
         currentBalance,
         startBalance: initialBalance,
@@ -577,7 +633,7 @@ router.get("/order/:orderId", async (req: Request, res: Response) => {
         profitTarget: challenge ? Math.round(initialBalance * Number(challenge.profit_target_pct) / 100) : 0,
         maxDrawdown: challenge ? Math.round(initialBalance * Number(challenge.max_drawdown_pct) / 100) : 0,
         dailyLossLimit: challenge ? Math.round(initialBalance * Number(challenge.daily_loss_limit_pct) / 100) : 0,
-        isFunded: challenge?.type?.includes("funded") || false,
+        isFunded: orderPlan === "flash" || orderPlan === "instant" || challenge?.type?.includes("funded") || false,
         createdAt: challenge?.created_at || order.createdAt,
         // Credentials from order.metadata
         loginEmail: orderMeta.loginEmail || user?.email || "Check your email",

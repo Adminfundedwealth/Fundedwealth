@@ -200,7 +200,15 @@ router.post("/emergency", allowInternalOrAdmin, async (req: Request, res: Respon
     return res.json({
       success: true,
       message: "Emergency provision completed.",
-      provisioning: result,
+      provisioning: {
+        ...result,
+        credentials: {
+          loginEmail: result.terminalEmail,
+          terminalPassword: result.terminalPassword,
+          activationToken: result.activationToken,
+          accountCode: result.accountCode,
+        },
+      },
     });
   } catch (err) {
     logger.error({ err }, "Failed founder emergency provision");

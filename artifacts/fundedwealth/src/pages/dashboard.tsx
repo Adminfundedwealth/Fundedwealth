@@ -30,7 +30,7 @@ type JournalEntry = { id: number; date: string; title: string; note: string; tag
 
 type TradingAccount = {
   id: string;
-  phase: "challenge" | "verification" | "funded";
+  phase: "flash" | "challenge" | "verification" | "funded";
   status: string;
   balance: number;
   startBalance: number;
@@ -244,9 +244,19 @@ const RULES_LIST = [
 function AccountCard({ acc }: { acc: TradingAccount }) {
   const pnl = acc.balance - acc.startBalance;
   const pnlPct = (pnl / acc.startBalance) * 100;
-  const progressPct = Math.min((pnlPct / acc.profitTarget) * 100, 100);
-  const phaseColor = { challenge: "text-amber-400", verification: "text-blue-400", funded: "text-green-400" }[acc.phase];
-  const phaseLabel = { challenge: "Challenge", verification: "Verification", funded: "Funded" }[acc.phase];
+  const progressPct = Math.min((pnlPct / (acc.profitTarget || 1)) * 100, 100);
+  const phaseColor = {
+    flash: "text-[#FF8A3D]",
+    challenge: "text-amber-400",
+    verification: "text-blue-400",
+    funded: "text-green-400",
+  }[acc.phase] ?? "text-amber-400";
+  const phaseLabel = {
+    flash: "Flash",
+    challenge: "Challenge",
+    verification: "Verification",
+    funded: "Funded",
+  }[acc.phase] ?? "Challenge";
 
   const [copied, setCopied] = useState<string | null>(null);
   const [showCreds, setShowCreds] = useState(false);
@@ -261,18 +271,22 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
   };
 
   const downloadCreds = () => {
-    const tempPass = (acc as any).tempPassword 
-      ? (acc as any).tempPassword 
+    const termPass = (acc as any).terminalPassword || (acc as any).tempPassword
+      ? ((acc as any).terminalPassword || (acc as any).tempPassword)
       : "Reset via 'Forgot Password' on fundedwealth.com/sign-in";
+    const phaseDisplay = acc.phase === "flash" ? "Flash Funding"
+      : acc.phase === "funded" ? "Funded"
+      : acc.phase === "verification" ? "Verification"
+      : "Phase 1";
     const lines = [
       `FundedWealth — Trading Account Credentials`,
       `==========================================`,
-      `Account Code : ${acc.accountCode}`,
-      `Login Email  : ${(acc as any).loginEmail || "Check your registered email"}`,
-      `Password     : ${tempPass}`,
-      `Challenge    : ${acc.phase === "funded" ? "Funded" : acc.phase === "verification" ? "Verification" : "Phase 1"}`,
-      `Account Size : ₹${acc.size.toLocaleString("en-IN")}`,
-      `Generated on : ${new Date().toLocaleString("en-IN")}`,
+      `Account Code    : ${acc.accountCode}`,
+      `Login Email     : ${(acc as any).loginEmail || "Check your registered email"}`,
+      `Terminal Password: ${termPass}`,
+      `Challenge       : ${phaseDisplay}`,
+      `Account Size    : ₹${acc.size.toLocaleString("en-IN")}`,
+      `Generated on    : ${new Date().toLocaleString("en-IN")}`,
     ].join("\n");
     const blob = new Blob([lines], { type: "text/plain" });
     const a = document.createElement("a");
@@ -295,12 +309,20 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success && data.launchUrl) {
-        window.open(data.launchUrl, "_blank");
+        // If it's an external URL, open in new tab
+        if (data.launchUrl.startsWith("http")) {
+          window.open(data.launchUrl, "_blank", "noopener,noreferrer");
+        } else {
+          // Local/relative URL — navigate in current tab
+          window.location.href = data.launchUrl;
+        }
       } else {
-        setLaunchError(data.message || "Failed to launch terminal. Please try again.");
+        setLaunchError(data.message || "Failed to generate terminal session. Please try again.");
       }
-    } catch {
-      setLaunchError("Could not reach the server. Please try again.");
+    } catch (err: any) {
+      // Network error — show credentials so user can log in manually
+      setLaunchError("Terminal is offline. Use your credentials below to log in manually.");
+      setShowCreds(true);
     } finally {
       setLaunching(false);
     }
@@ -339,8 +361,13 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
           <div className="text-white/40 text-xs mt-2 font-mono">Code: {acc.accountCode}</div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${acc.phase === "funded" ? "bg-green-500/15 border-green-500/30 text-green-400"
-            : acc.phase === "challenge" ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+          <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${
+            acc.phase === "funded"
+              ? "bg-green-500/15 border-green-500/30 text-green-400"
+              : acc.phase === "flash"
+              ? "bg-[#FF8A3D]/15 border-[#FF8A3D]/40 text-[#FF8A3D]"
+              : acc.phase === "challenge"
+              ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
               : "bg-blue-500/15 border-blue-500/30 text-blue-400"
             }`}>{phaseLabel}</span>
           <span className={`text-xs font-semibold ${pnlColor(pnlPct)}`}>
@@ -361,16 +388,24 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 
       {/* Progress bars */}
       <div className="space-y-3 mb-4">
-        <div>
-          <div className="flex justify-between text-xs mb-1">
+        {/* Profit Target — hidden for Flash (no profit target) */}
+        {acc.phase !== "flash" ? (
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-white/50">Profit Target</span>
+              <span className={phaseColor}>{pnlPct.toFixed(1)}% / {acc.profitTarget}%</span>
+            </div>
+            <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #FF8A3D, #D63384)" }} />
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-between text-xs">
             <span className="text-white/50">Profit Target</span>
-            <span className={phaseColor}>{pnlPct.toFixed(1)}% / {acc.profitTarget}%</span>
+            <span className="text-[#FF8A3D] font-bold">None (Flash Funding)</span>
           </div>
-          <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${progressPct}%`, background: "linear-gradient(90deg, #FF8A3D, #D63384)" }} />
-          </div>
-        </div>
+        )}
         {/* Trading days tracking will be added in future update - requires backend integration */}
         <div>
           <div className="flex justify-between text-xs mb-1">
@@ -416,16 +451,16 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="text-white/40 text-[10px] uppercase tracking-wider">Terminal Password</div>
-                {(acc as any).tempPassword ? (
-                  <div className="text-white text-xs font-mono break-all">{(acc as any).tempPassword}</div>
+                {(acc as any).terminalPassword || (acc as any).tempPassword ? (
+                  <div className="text-white text-xs font-mono break-all">{(acc as any).terminalPassword || (acc as any).tempPassword}</div>
                 ) : (
                   <div className="text-white/50 text-xs">
                     <a href="/sign-in" className="text-fw-pink hover:underline">Reset on login page</a>
                   </div>
                 )}
               </div>
-              {(acc as any).tempPassword && (
-                <button onClick={() => copyField("password", (acc as any).tempPassword)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
+              {((acc as any).terminalPassword || (acc as any).tempPassword) && (
+                <button onClick={() => copyField("password", (acc as any).terminalPassword || (acc as any).tempPassword)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
                   <Copy size={11} className="inline mr-1" />{copied === "password" ? "Copied" : "Copy"}
                 </button>
               )}
@@ -471,7 +506,9 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
                   const lines = [
                     `Account Code: ${acc.accountCode}`,
                     `Login Email: ${(acc as any).loginEmail || "—"}`,
-                    (acc as any).tempPassword ? `Password: ${(acc as any).tempPassword}` : "Password: Reset at fundedwealth.com/sign-in",
+                    ((acc as any).terminalPassword || (acc as any).tempPassword)
+                      ? `Password: ${(acc as any).terminalPassword || (acc as any).tempPassword}`
+                      : "Password: Reset at fundedwealth.com/sign-in",
                     `Challenge: ${phaseLabel}`,
                     `Size: ₹${acc.size.toLocaleString("en-IN")}`,
                   ];
@@ -546,14 +583,15 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         <div>
           <div className="text-white font-bold text-lg">{acc.accountCode}</div>
           <div className="text-white/50 text-xs mt-0.5">
-            {acc.phase === "funded" ? "Funded Account" : acc.phase === "verification" ? "Verification Phase" : "Challenge Phase"} · Balance: ₹{acc.balance.toLocaleString("en-IN")}
+            {acc.phase === "funded" ? "Funded Account" : acc.phase === "verification" ? "Verification Phase" : acc.phase === "flash" ? "Flash Funding" : "Challenge Phase"} · Balance: ₹{acc.balance.toLocaleString("en-IN")}
           </div>
         </div>
         <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${
           acc.phase === "funded" ? "bg-green-500/15 border-green-500/30 text-green-400"
+            : acc.phase === "flash" ? "bg-[#FF8A3D]/15 border-[#FF8A3D]/40 text-[#FF8A3D]"
             : "bg-amber-500/15 border-amber-500/30 text-amber-400"
         }`}>
-          {acc.phase === "funded" ? "Funded" : acc.phase === "verification" ? "Phase 2" : "Phase 1"}
+          {acc.phase === "funded" ? "Funded" : acc.phase === "verification" ? "Phase 2" : acc.phase === "flash" ? "Flash" : "Phase 1"}
         </span>
       </div>
       <button

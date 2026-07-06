@@ -1,24 +1,4 @@
-/**
- * Provisioning Service — the SINGLE account-creation path.
- *
- * Uses only tables that exist in the main site's Supabase DB:
- *   - provisioning_logs  (bridge: main site writes, terminal reads)
- *   - trading_accounts   (Drizzle schema: user_id, plan, virtual_balance, …)
- *   - orders             (confirm + store credentials in metadata)
- *   - users              (resolve user)
- *
- * terminal_traders and challenge_accounts are TERMINAL-OWNED tables that do
- * NOT exist in this DB. The terminal picks up provisioning_logs rows with
- * status='pending' and creates those records in its own DB.
- *
- * Steps:
- *   1. Insert provisioning_logs (status='processing')
- *   2. Resolve user + account size
- *   3. Create trading_accounts (using Drizzle schema columns)
- *   4. Update provisioning_logs → 'completed' (tradingAccountId filled)
- *   5. Confirm the order + store credentials in metadata
- */
-import { randomUUID } from "crypto";
+import { randomUUID, createHmac } from "crypto";
 import { db, orders } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import {
@@ -48,6 +28,9 @@ export interface ProvisionChallengeResult {
   tradingAccountId: string;
   accountCode: string;
   accountSize: number;
+  terminalEmail: string;
+  terminalPassword: string;
+  activationToken: string;
 }
 
 function generateAccountCode(): string {
@@ -55,6 +38,36 @@ function generateAccountCode(): string {
   const ts = Date.now().toString(36).toUpperCase().slice(-4);
   const rand = Math.random().toString(36).toUpperCase().slice(2, 8);
   return `${prefix}-${ts}${rand}`;
+}
+
+/**
+ * Generate a strong terminal password: 16 chars, upper+lower+digit+special.
+ * Format: Fw1!<12 random chars>
+ */
+function generateTerminalPassword(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  const special = "!@#$%";
+  let pw = "Fw1" + special[Math.floor(Math.random() * special.length)];
+  for (let i = 0; i < 12; i++) {
+    pw += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return pw;
+}
+
+/**
+ * Generate a signed activation token for terminal auto-login.
+ * Format: base64(payload).hmac-sha256
+ */
+function generateActivationToken(tradingAccountId: string, email: string): string {
+  const payload = JSON.stringify({
+    accountId: tradingAccountId,
+    email,
+    issuedAt: Date.now(),
+    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+  const secret = process.env.SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
+  const hmac = createHmac("sha256", secret).update(payload).digest("hex");
+  return `${Buffer.from(payload).toString("base64url")}.${hmac}`;
 }
 
 export async function provisionChallenge(
@@ -113,15 +126,28 @@ export async function provisionChallenge(
   const user = (userResult.rows as any[])[0];
   if (!user) throw new Error(`User ${userId} not found during provisioning`);
 
-  // ── 4. Risk settings from shared catalog ───────────────────────────────────
-  const rules       = getProvisioningRules(planType);
+  // ── 4. Risk settings directly from product catalog — NO hardcoding ─────────
+  // getProvisioningRules reads PRODUCTS[planType].rules exactly as defined.
+  // Flash → profitTargetPct:0, dailyLossLimitPct:2, maxDrawdownPct:4
+  // Instant → profitTargetPct:0, dailyLossLimitPct:3, maxDrawdownPct:5
+  // 1-Step → profitTargetPct:10, dailyLossLimitPct:3, maxDrawdownPct:6
+  // 2-Step → profitTargetPct:8, dailyLossLimitPct:3, maxDrawdownPct:8
+  const rules = getProvisioningRules(planType);
   const initialBalance = accountSize;
-  const expiresAt   = new Date();
+  const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + rules.maxDaysAllowed);
 
   const accountCode = generateAccountCode();
 
-  // ── 5. Get or create terminal_traders (real DB uses trader_id, not user_id) ─
+  // ── 5. Generate terminal credentials ───────────────────────────────────────
+  // terminalEmail = user's email (same as dashboard login)
+  // terminalPassword = strong random password generated fresh each provision
+  // activationToken = signed JWT-like token for auto-login from dashboard
+  const terminalEmail = user.email as string;
+  const terminalPassword = generateTerminalPassword();
+  // activationToken is generated after tradingAccountId is known (step 7)
+
+  // ── 6. Get or create terminal_traders ──────────────────────────────────────
   const existingTrader = await db.execute(sql`
     SELECT id FROM terminal_traders WHERE external_id = ${String(userId)} LIMIT 1
   `);
@@ -138,9 +164,12 @@ export async function provisionChallenge(
     traderId = (traderInsert.rows[0] as any).id;
   }
 
-  // ── 6. Create challenge_accounts (confirmed real columns from DB)
-  // type CHECK constraint allows: evaluation_phase1 | evaluation_phase2 | funded
-  const challengeType = planType === "instant" ? "funded" : "evaluation_phase1";
+  // ── 7. Create challenge_accounts ──────────────────────────────────────────
+  // type CHECK constraint: evaluation_phase1 | evaluation_phase2 | funded
+  // Flash & Instant are funded immediately. 1-Step & 2-Step are evaluation.
+  const challengeType =
+    planType === "instant" || planType === "flash" ? "funded" : "evaluation_phase1";
+
   const challengeResult = await db.execute(sql`
     INSERT INTO challenge_accounts (
       trader_id, type, plan,
@@ -160,7 +189,7 @@ export async function provisionChallenge(
   `);
   const challengeAccountId = (challengeResult.rows[0] as any).id as string;
 
-  // ── 7. Create trading_accounts (confirmed real columns: trader_id, challenge_id, broker_provider, …)
+  // ── 8. Create trading_accounts ──────────────────────────────────────────────
   const tradingResult = await db.execute(sql`
     INSERT INTO trading_accounts (
       trader_id, challenge_id, account_code,
@@ -175,10 +204,12 @@ export async function provisionChallenge(
     )
     RETURNING id
   `);
-
   const tradingAccountId = (tradingResult.rows[0] as any).id as string;
 
-  // ── 8. Update provisioning_logs → completed ────────────────────────────────
+  // ── 9. Generate activation token now that we have tradingAccountId ──────────
+  const activationToken = generateActivationToken(tradingAccountId, terminalEmail);
+
+  // ── 10. Update provisioning_logs → completed ────────────────────────────────
   await db.execute(sql`
     UPDATE provisioning_logs
     SET status                = 'completed',
@@ -189,10 +220,11 @@ export async function provisionChallenge(
     WHERE id = ${provId}::uuid
   `);
 
-  // ── 9. Confirm order + store credentials ───────────────────────────────────
+  // ── 11. Confirm order + store ALL credentials in metadata ───────────────────
+  // loginEmail, accountCode, terminalPassword, activationToken all stored here.
+  // Dashboard reads these from orders.metadata via GET /api/accounts/my.
+  // Admin reads them from the same source via provisioning result.
   if (orderId) {
-    const loginEmail = user?.email ?? null;
-
     let existingMeta: Record<string, unknown> = {};
     try {
       const [ord] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
@@ -201,9 +233,12 @@ export async function provisionChallenge(
 
     const updatedMeta = JSON.stringify({
       ...existingMeta,
-      loginEmail,
+      loginEmail: terminalEmail,
       accountCode,
-      tempPassword: tempPassword ?? existingMeta.tempPassword ?? null,
+      terminalPassword,
+      activationToken,
+      // Keep legacy tempPassword field for compatibility
+      tempPassword: tempPassword ?? terminalPassword,
     });
 
     await db.execute(sql`
@@ -218,6 +253,7 @@ export async function provisionChallenge(
 
   console.log(
     `[Provisioning] COMPLETED source=${source} order=${orderId ?? "-"} plan=${planType} ` +
+    `rules={profitTarget:${rules.profitTargetPct}%,dailyDD:${rules.dailyLossLimitPct}%,maxDD:${rules.maxDrawdownPct}%} ` +
     `accountCode=${accountCode} traderId=${traderId} challengeId=${challengeAccountId} tradingId=${tradingAccountId}`,
   );
 
@@ -228,5 +264,8 @@ export async function provisionChallenge(
     tradingAccountId,
     accountCode,
     accountSize: initialBalance,
+    terminalEmail,
+    terminalPassword,
+    activationToken,
   };
 }

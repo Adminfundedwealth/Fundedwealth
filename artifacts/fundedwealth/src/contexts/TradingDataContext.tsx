@@ -71,7 +71,7 @@ export interface TradingProfile {
 /** Shape expected by dashboard AccountCard component */
 export interface DashboardAccount {
   id: string;
-  phase: "challenge" | "verification" | "funded";
+  phase: "flash" | "challenge" | "verification" | "funded";
   status: string;
   balance: number;
   startBalance: number;
@@ -116,7 +116,8 @@ const defaultProfile: TradingProfile = {
 
 const TradingDataCtx = createContext<TradingDataContextType | null>(null);
 
-function mapPhase(phase: string): "challenge" | "verification" | "funded" {
+function mapPhase(phase: string): "flash" | "challenge" | "verification" | "funded" {
+  if (phase === "flash_funding" || phase === "flash") return "flash";
   if (phase === "funded" || phase === "phase_funded") return "funded";
   if (phase === "phase_2" || phase === "verification") return "verification";
   return "challenge";
@@ -129,12 +130,17 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
   const pnlPercent = startBalance > 0 ? (pnl / startBalance) * 100 : 0;
 
   // Map provisioning states to dashboard phase
-  let phase: "challenge" | "verification" | "funded";
+  let phase: "flash" | "challenge" | "verification" | "funded";
   if (acc.status === "provisioning_pending" || acc.status === "provisioning_failed") {
-    phase = "challenge"; // show as challenge card with special status
+    // Preserve correct phase type even for pending/failed — use planType as hint
+    const pendingPlan = String(acc.planType || "").toLowerCase();
+    phase = pendingPlan === "flash" ? "flash" : "challenge";
   } else {
     phase = mapPhase(acc.phase);
   }
+
+  // Determine if this is a Flash account — Flash has no profit target, 2% daily DD, 4% max DD
+  const isFlash = phase === "flash" || String(acc.planType || "").toLowerCase() === "flash";
 
   return {
     id: acc.id,
@@ -143,15 +149,15 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
     balance,
     startBalance,
     size: startBalance,
-    profitTarget: acc.profitTarget > 0 && startBalance > 0
-      ? (acc.profitTarget / startBalance) * 100
-      : 10,
-    dailyLoss: acc.dailyLossLimit > 0 && startBalance > 0
-      ? (acc.dailyLossLimit / startBalance) * 100
-      : 3,
-    maxLoss: acc.maxDrawdown > 0 && startBalance > 0
-      ? (acc.maxDrawdown / startBalance) * 100
-      : 6,
+    profitTarget: isFlash
+      ? 0
+      : (acc.profitTarget > 0 && startBalance > 0 ? (acc.profitTarget / startBalance) * 100 : 10),
+    dailyLoss: isFlash
+      ? 2
+      : (acc.dailyLossLimit > 0 && startBalance > 0 ? (acc.dailyLossLimit / startBalance) * 100 : 3),
+    maxLoss: isFlash
+      ? 4
+      : (acc.maxDrawdown > 0 && startBalance > 0 ? (acc.maxDrawdown / startBalance) * 100 : 6),
     profitSplit: acc.profitSplit || 80,
     winRate: acc.winRate || 0, // Real win rate from session_analytics (synced by terminal)
     tradeCount: acc.totalTrades || 0, // Real trade count from session_analytics (synced by terminal)
