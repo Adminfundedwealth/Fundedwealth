@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
-import { db, users, orders } from "@workspace/db";
+import { db, users } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { createHmac } from "crypto";
 
