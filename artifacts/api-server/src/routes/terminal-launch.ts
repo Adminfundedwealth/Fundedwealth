@@ -2,17 +2,86 @@ import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
-import { createHmac, randomUUID } from "crypto";
+import { createHmac } from "crypto";
 
 const router = Router();
 
 const TERMINAL_API_URL = (process.env.TERMINAL_API_URL || "").replace(/\/$/, "");
 const SSO_API_KEY = process.env.SSO_API_KEY || "";
-const SSO_SHARED_SECRET = process.env.SSO_SHARED_SECRET || SSO_API_KEY || "";
-const JWT_SECRET = process.env.SSO_SECRET || process.env.JWT_SECRET || SSO_SHARED_SECRET || "";
-const JWT_EXPIRY_SECONDS = 15 * 60; // 15 minutes
 
-export async function handleTerminalLaunch(req: Request, res: Response) {
+/**
+ * Returns the shared SSO secret that the terminal uses for jwt.verify().
+ * Read at request time — never cached at module load — so Railway env var
+ * changes take effect without a full redeploy.
+ */
+function getSSOSecret(): string {
+  return (
+    process.env.JWT_SECRET ||
+    process.env.SSO_SECRET ||
+    process.env.SSO_SHARED_SECRET ||
+    SSO_API_KEY ||
+    "fw-dev-secret"
+  );
+}
+
+/**
+ * Generate a standard HS256 JWT matching what terminal's auth.service.js
+ * produces via: jwt.sign(claims, JWT_SECRET, { expiresIn: JWT_EXPIRY })
+ *
+ * Claims match what terminal's verifySessionJWT extracts:
+ *   userId      = decoded.sub
+ *   accountId   = decoded.accountId
+ *   challengeId = decoded.challengeId
+ *   accountCode = decoded.accountCode
+ */
+function generateSSOToken(opts: {
+  tradingAccountId: string;
+  traderId: string;
+  challengeAccountId: string | null;
+  email: string;
+  accountCode: string;
+}): string {
+  const secret = getSSOSecret();
+  const now = Math.floor(Date.now() / 1000);
+  const expiresInSeconds = 15 * 60; // 15 minutes
+
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({
+    sub: opts.traderId,
+    accountId: opts.tradingAccountId,
+    challengeId: opts.challengeAccountId,
+    accountCode: opts.accountCode,
+    brokerProvider: null,
+    permissions: [],
+    email: opts.email,
+    iat: now,
+    exp: now + expiresInSeconds,
+  })).toString("base64url");
+
+  const signature = createHmac("sha256", secret)
+    .update(`${header}.${payload}`)
+    .digest("base64url");
+
+  return `${header}.${payload}.${signature}`;
+}
+
+/**
+ * POST /api/terminal/launch
+ *
+ * Universal terminal launch endpoint for ALL challenge types.
+ * Challenge-type differences (flash / instant / 1step / 2step) do not affect
+ * this flow — only the rules inside challenge_accounts differ.
+ *
+ * Flow:
+ *   1. Verify Supabase JWT
+ *   2. Resolve user (with email-based auto-link for new sessions)
+ *   3. Verify account ownership via trader chain
+ *   4. Check account is active
+ *   5. Fetch credentials from order metadata
+ *   6. Generate HS256 JWT signed with JWT_SECRET (same secret terminal uses)
+ *   7. Return launchUrl → browser opens terminal.fundedwealth.com → auto-login
+ */
+async function handleTerminalLaunch(req: Request, res: Response) {
   try {
     // ── 1. AUTH ──────────────────────────────────────────────────────────────
     const auth = getAuth(req);
@@ -20,31 +89,35 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    // ── 2. VALIDATE REQUEST ─────────────────────────────────────────────────
+    // ── 2. VALIDATE REQUEST ──────────────────────────────────────────────────
     const { accountId } = req.body;
     if (!accountId || typeof accountId !== "string") {
       return res.status(400).json({ success: false, message: "accountId is required" });
     }
-
     if (accountId.startsWith("pending-") || accountId.startsWith("failed-")) {
-      return res.status(400).json({
-        success: false,
-        message: "This account is not ready for terminal launch.",
-      });
+      return res.status(400).json({ success: false, message: "Account is not ready for terminal launch." });
     }
 
-    // ── 3. RESOLVE USER ─────────────────────────────────────────────────────
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, auth.userId))
-      .limit(1);
+    // ── 3. RESOLVE USER (with email fallback for new browser sessions) ────────
+    let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+
+    if (!user && auth.email) {
+      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
+      if (byEmail) {
+        [user] = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
+      }
+    }
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // ── 4. VERIFY OWNERSHIP VIA TRADER CHAIN ────────────────────────────────
+    // ── 4. VERIFY OWNERSHIP VIA TRADER CHAIN ─────────────────────────────────
+    // Works identically for Flash, Instant, 1-Step, 2-Step, and Funded accounts.
     let ownershipResult;
     try {
       ownershipResult = await db.execute(sql`
@@ -65,179 +138,83 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
         LIMIT 1
       `);
     } catch (dbErr: any) {
-      console.error("[Terminal Launch] DB ownership query failed:", dbErr.message);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to verify account ownership. Please try again.",
-      });
+      console.error("[Terminal Launch] DB query failed:", dbErr.message);
+      return res.status(500).json({ success: false, message: "Failed to verify account ownership." });
     }
 
-    if (!ownershipResult.rows || ownershipResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Account not found or does not belong to this user.",
-      });
+    if (!ownershipResult.rows?.length) {
+      return res.status(404).json({ success: false, message: "Account not found or does not belong to this user." });
     }
 
     const prov = ownershipResult.rows[0] as any;
 
-    // ── 5. CHECK ACCOUNT STATE ───────────────────────────────────────────────
+    // ── 5. CHECK ACCOUNT IS ACTIVE ────────────────────────────────────────────
     if (prov.challenge_status && prov.challenge_status !== "active") {
       return res.status(400).json({
         success: false,
-        message: `Account is not active. Status: ${prov.challenge_status}`,
+        message: `Account is not active. Current status: ${prov.challenge_status}`,
       });
     }
 
-    // ── 6. FETCH CREDENTIALS FROM ORDER METADATA ────────────────────────────
-    let storedActivationToken: string | null = null;
-    let storedTerminalPassword: string | null = null;
+    // ── 6. FETCH CREDENTIALS FROM ORDER METADATA ─────────────────────────────
     let storedLoginEmail: string = user.email;
+    let storedTerminalPassword: string | null = null;
     let storedAccountCode: string = prov.account_code || "";
 
     try {
       const orderResult = await db.execute(sql`
-        SELECT o.metadata, o.id
+        SELECT o.metadata
         FROM orders o
         JOIN provisioning_logs pl ON pl.order_id::text = o.id::text
         WHERE pl.trading_account_id = ${prov.trading_account_id}::uuid
         ORDER BY o.created_at DESC
         LIMIT 1
       `);
-      if (orderResult.rows && orderResult.rows.length > 0) {
-        const ord = orderResult.rows[0] as any;
-        if (ord.metadata) {
-          try {
-            const meta = JSON.parse(ord.metadata);
-            storedActivationToken = meta.activationToken || null;
-            storedTerminalPassword = meta.terminalPassword || meta.tempPassword || null;
-            storedLoginEmail = meta.loginEmail || user.email;
-            storedAccountCode = meta.accountCode || prov.account_code || "";
-          } catch { /* ignore */ }
-        }
+      if (orderResult.rows?.length) {
+        const meta = (() => {
+          try { return JSON.parse((orderResult.rows[0] as any).metadata || "{}"); } catch { return {}; }
+        })();
+        storedLoginEmail = meta.loginEmail || user.email;
+        storedTerminalPassword = meta.terminalPassword || meta.tempPassword || null;
+        storedAccountCode = meta.accountCode || prov.account_code || "";
       }
-    } catch { /* non-fatal */ }
+    } catch { /* non-fatal — use defaults */ }
 
-    // ── 7. CALL TERMINAL SSO IF CONFIGURED ──────────────────────────────────
-    if (TERMINAL_API_URL && SSO_API_KEY) {
-      try {
-        const terminalPayload = {
-          fwUserId: String(user.id),
-          traderId: prov.trader_id,
-          accountId: prov.trading_account_id,
-          challengeId: prov.challenge_account_id,
-          accountCode: storedAccountCode,
-          plan: prov.plan,
-          email: storedLoginEmail,
-          name: [user.firstName, user.lastName].filter(Boolean).join(" ") || "Trader",
-          activationToken: storedActivationToken,
-        };
+    // ── 7. GENERATE SSO JWT ───────────────────────────────────────────────────
+    // Secret is read at request time so Railway env var changes apply immediately
+    // without requiring a full redeploy or process restart.
+    const ssoToken = generateSSOToken({
+      tradingAccountId: prov.trading_account_id,
+      traderId: prov.trader_id,
+      challengeAccountId: prov.challenge_account_id || null,
+      email: storedLoginEmail,
+      accountCode: storedAccountCode,
+    });
 
-        const terminalRes = await fetch(`${TERMINAL_API_URL}/auth/sso/generate`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-sso-api-key": SSO_API_KEY,
-          },
-          body: JSON.stringify(terminalPayload),
-          signal: AbortSignal.timeout(8000),
-        });
-
-        if (terminalRes.ok) {
-          const terminalData = await terminalRes.json() as { launchUrl?: string; url?: string; token?: string };
-          const launchUrl = terminalData.launchUrl || terminalData.url ||
-            (terminalData.token ? `${TERMINAL_API_URL}/auth/sso?token=${encodeURIComponent(terminalData.token)}` : null);
-
-          if (launchUrl) {
-            return res.json({ success: true, launchUrl });
-          }
-        }
-        const errText = await terminalRes.text().catch(() => "");
-        console.warn(`[Terminal Launch] Terminal SSO returned ${terminalRes.status}: ${errText} — falling back to local token`);
-      } catch (fetchErr: any) {
-        console.warn(`[Terminal Launch] Terminal SSO fetch failed: ${fetchErr.message} — falling back to local token`);
-      }
-    }
-
-    // ── 8. LOCAL FALLBACK — generate JWT signed with JWT_SECRET ──────────────
-    const ssoToken = generateSSOToken(prov.trading_account_id, prov.trader_id, storedLoginEmail, storedAccountCode);
-    const terminalBase = TERMINAL_API_URL || "";
-    const launchUrl = terminalBase
-      ? `${terminalBase}/auth/sso?token=${encodeURIComponent(ssoToken)}&account=${encodeURIComponent(storedAccountCode)}`
-      : `/terminal?token=${encodeURIComponent(ssoToken)}&account=${encodeURIComponent(storedAccountCode)}`;
+    const terminalBase = TERMINAL_API_URL || "https://terminal.fundedwealth.com";
+    const launchUrl = `${terminalBase}/auth/sso?token=${encodeURIComponent(ssoToken)}`;
 
     return res.json({
       success: true,
       launchUrl,
+      // Credentials returned so dashboard can display them without a second API call
       credentials: {
+        accountId: prov.trading_account_id,
         email: storedLoginEmail,
         password: storedTerminalPassword,
         accountCode: storedAccountCode,
-        activationToken: storedActivationToken,
+        server: terminalBase,
+        status: prov.challenge_status || "active",
       },
     });
+
   } catch (error: any) {
     console.error("[Terminal Launch] Unhandled error:", error.message || error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to generate terminal session. Please try again.",
-    });
+    return res.status(500).json({ success: false, message: "Failed to generate terminal session. Please try again." });
   }
 }
 
-/**
- * Verify an activation token generated during provisioning.
- * Returns the parsed payload or null if invalid/expired.
- */
-function verifyActivationToken(token: string): { accountId: string; email: string; expiresAt: number } | null {
-  try {
-    const [payloadB64, sig] = token.split(".");
-    if (!payloadB64 || !sig) return null;
-    const secret = SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
-    const expected = createHmac("sha256", secret).update(payloadB64).digest("hex");
-    if (expected !== sig) return null;
-    const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString("utf8"));
-    if (Date.now() > payload.expiresAt) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Generate a standard HS256 JWT signed with JWT_SECRET.
- * Matches what terminal's auth.service.js does: jwt.sign(claims, JWT_SECRET, { expiresIn: JWT_EXPIRY })
- */
-function generateSSOToken(tradingAccountId: string, traderId: string, email: string): string {
-  const secret = JWT_SECRET || SSO_SHARED_SECRET || "fw-dev-secret";
-  const now = Math.floor(Date.now() / 1000);
-
-  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
-  const payload = Buffer.from(JSON.stringify({
-    accountId: tradingAccountId,
-    traderId,
-    email,
-    iat: now,
-    exp: now + JWT_EXPIRY_SECONDS,
-  })).toString("base64url");
-
-  const signature = createHmac("sha256", secret)
-    .update(`${header}.${payload}`)
-    .digest("base64url");
-
-  return `${header}.${payload}.${signature}`;
-}
-
-/**
- * POST /api/terminal/launch
- *
- * Generates a terminal SSO launch URL.
- * Flow:
- *   1. Verify user owns the account via trader chain
- *   2. If TERMINAL_API_URL is configured → call terminal /auth/sso/generate
- *   3. If not → return local launch URL with embedded activation token
- */
 router.post("/launch", handleTerminalLaunch);
-router.post("/terminal-launch", handleTerminalLaunch);
+router.post("/terminal-launch", handleTerminalLaunch); // keep alias for compatibility
 
 export default router;

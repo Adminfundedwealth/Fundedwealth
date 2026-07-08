@@ -307,11 +307,11 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         credentials: "include",
-        body: JSON.stringify(buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id })),
+        body: JSON.stringify({ accountId: acc.id }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success && data.launchUrl) {
-        window.location.href = data.launchUrl;
+        window.open(data.launchUrl, "_blank", "noopener,noreferrer");
       } else {
         setLaunchError(data.message || "Failed to generate terminal session. Please try again.");
         toast.error("Unable to launch terminal.");
@@ -541,20 +541,40 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
   );
 }
 
+/**
+ * Single universal Launch Terminal card — works for ALL challenge types.
+ * Flash / Instant / 1-Step / 2-Step all use POST /api/terminal/launch.
+ */
 function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
   const { getToken } = useAuth();
   const [launching, setLaunching] = useState(false);
   const [error, setError] = useState("");
+  const [creds, setCreds] = useState<{ email: string; password: string | null; accountCode: string; server: string; status: string } | null>(null);
+  const [copiedCred, setCopiedCred] = useState<string | null>(null);
+
+  const phaseLabel =
+    acc.phase === "funded" ? "Funded" :
+    acc.phase === "verification" ? "Phase 2" :
+    acc.phase === "flash" ? "Flash" :
+    acc.phase === "challenge" ? "Phase 1" : acc.phase;
+
+  const phaseColor =
+    acc.phase === "funded" ? "bg-green-500/15 border-green-500/30 text-green-400" :
+    acc.phase === "flash" ? "bg-[#FF8A3D]/15 border-[#FF8A3D]/40 text-[#FF8A3D]" :
+    "bg-amber-500/15 border-amber-500/30 text-amber-400";
+
+  const copyCred = (key: string, value: string) => {
+    navigator.clipboard.writeText(value).catch(() => {});
+    setCopiedCred(key);
+    setTimeout(() => setCopiedCred(null), 2000);
+  };
 
   const handleLaunch = async () => {
     setLaunching(true);
     setError("");
     try {
-      console.log("[Launch] clicked");
       const token = await getToken();
-      console.log("[Launch] token:", token ? "present" : "NULL — session missing");
       const apiBase = import.meta.env.VITE_API_URL || "";
-      console.log("[Launch] before fetch:", `${apiBase}/api/terminal/launch`, "accountId:", acc.id);
       const res = await fetch(`${apiBase}/api/terminal/launch`, {
         method: "POST",
         headers: {
@@ -562,61 +582,79 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: "include",
-        body: JSON.stringify(buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id })),
+        body: JSON.stringify({ accountId: acc.id }),
       });
       const data = await res.json().catch(() => ({}));
-      console.log("[Launch] response:", res.status, data);
       if (res.ok && data.success && data.launchUrl) {
-        window.location.href = data.launchUrl;
+        // Cache credentials for display
+        if (data.credentials) setCreds(data.credentials);
+        window.open(data.launchUrl, "_blank", "noopener,noreferrer");
       } else {
         setError(data.message || "Failed to launch terminal. Please try again.");
-        toast.error("Unable to launch terminal.");
       }
-    } catch (err: any) {
-      console.error("[Launch] exception:", err);
+    } catch {
       setError("Could not reach the server. Please try again.");
-      toast.error("Unable to launch terminal.");
     } finally {
       setLaunching(false);
     }
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <div className="text-white font-bold text-lg">{acc.accountCode}</div>
+          <div className="text-white font-bold text-lg">{acc.accountCode || "—"}</div>
           <div className="text-white/50 text-xs mt-0.5">
-            {acc.phase === "funded" ? "Funded Account" : acc.phase === "verification" ? "Verification Phase" : acc.phase === "flash" ? "Flash Funding" : "Challenge Phase"} · Balance: ₹{acc.balance.toLocaleString("en-IN")}
+            {phaseLabel} · Balance: ₹{(acc.balance || 0).toLocaleString("en-IN")}
           </div>
         </div>
-        <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${
-          acc.phase === "funded" ? "bg-green-500/15 border-green-500/30 text-green-400"
-            : acc.phase === "flash" ? "bg-[#FF8A3D]/15 border-[#FF8A3D]/40 text-[#FF8A3D]"
-            : "bg-amber-500/15 border-amber-500/30 text-amber-400"
-        }`}>
-          {acc.phase === "funded" ? "Funded" : acc.phase === "verification" ? "Phase 2" : acc.phase === "flash" ? "Flash" : "Phase 1"}
+        <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${phaseColor}`}>
+          {phaseLabel}
         </span>
       </div>
+
+      {/* Credentials grid */}
+      <div className="bg-black/20 border border-white/10 rounded-xl p-4 grid grid-cols-1 gap-2.5">
+        {[
+          { label: "Account ID", key: "accountId", value: acc.id },
+          { label: "Login Email", key: "email", value: (acc as any).loginEmail || creds?.email || "—" },
+          { label: "Password", key: "password", value: (acc as any).terminalPassword || (acc as any).tempPassword || creds?.password || "—" },
+          { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "—" },
+          { label: "Server", key: "server", value: import.meta.env.VITE_TERMINAL_URL || "terminal.fundedwealth.com" },
+          { label: "Status", key: "status", value: acc.status || creds?.status || "active" },
+        ].map(({ label, key, value }) => (
+          <div key={key} className="flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="text-white/40 text-[10px] uppercase tracking-wider">{label}</div>
+              <div className="text-white text-xs font-mono truncate">{value}</div>
+            </div>
+            {value && value !== "—" && (
+              <button
+                onClick={() => copyCred(key, value)}
+                className={`shrink-0 text-xs font-bold px-2 py-1 rounded-lg transition-all ${copiedCred === key ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/50 hover:bg-white/20"}`}
+              >
+                <Copy size={10} className="inline" />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Launch button */}
       <button
         onClick={handleLaunch}
         disabled={launching}
         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold py-3 px-5 rounded-xl text-sm hover:shadow-lg hover:shadow-[#D63384]/30 transition-all disabled:opacity-60 disabled:cursor-wait"
       >
         {launching ? (
-          <>
-            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            Launching…
-          </>
+          <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Launching…</>
         ) : (
-          <>
-            <Monitor size={16} /> Launch Terminal <ExternalLink size={13} />
-          </>
+          <><Monitor size={16} /> Launch Terminal <ExternalLink size={13} /></>
         )}
       </button>
-      {error && (
-        <p className="text-red-400 text-xs mt-2 text-center">{error}</p>
-      )}
+
+      {error && <p className="text-red-400 text-xs text-center">{error}</p>}
     </div>
   );
 }
@@ -1517,12 +1555,14 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <p className="text-white/50 text-sm mt-1">Launch the FundedWealth Trading Terminal to start trading on your active accounts.</p>
           </div>
 
-          {/* Active accounts with Launch Terminal */}
-          {profile.accounts.length > 0 ? (
+          {/* All provisioned accounts with Launch Terminal */}
+          {profile.accounts.filter(a => !a.status.startsWith("provisioning")).length > 0 ? (
             <div className="space-y-4">
-              {profile.accounts.filter(a => a.status === "active").map(acc => (
-                <LaunchTerminalCard key={acc.id} acc={acc} />
-              ))}
+              {profile.accounts
+                .filter(a => !a.status.startsWith("provisioning"))
+                .map(acc => (
+                  <LaunchTerminalCard key={acc.id} acc={acc} />
+                ))}
             </div>
           ) : (
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
