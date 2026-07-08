@@ -999,7 +999,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       })
       .catch(() => setLeaderboardError(true))
       .finally(() => setLeaderboardLoading(false));
-  }, [user]);
+  }, [user?.id]);
 
   // Analytics trades — terminal data removed, stubs kept to avoid UI crash
   type TradeLog = { symbol: string; pnl: number; createdAt: string };
@@ -1190,12 +1190,12 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
     loadAffiliateClicks();
     loadAffiliateLeaderboard();
     loadAffiliatePayoutHistory();
-  }, [user]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!user) return;
     loadAffiliateHistory(historyFilter);
-  }, [historyFilter, user]);
+  }, [historyFilter, user?.id]);
 
   const handleClaimCommission = async () => {
     if (affiliateProcessing || affiliateStats.totalPending < 500) return;
