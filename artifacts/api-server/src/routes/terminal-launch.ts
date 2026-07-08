@@ -9,7 +9,7 @@ const router = Router();
 const TERMINAL_API_URL = (process.env.TERMINAL_API_URL || "").replace(/\/$/, "");
 const SSO_API_KEY = process.env.SSO_API_KEY || "";
 const SSO_SHARED_SECRET = process.env.SSO_SHARED_SECRET || SSO_API_KEY || "";
-const JWT_SECRET = process.env.JWT_SECRET || SSO_SHARED_SECRET || "";
+const JWT_SECRET = process.env.SSO_SECRET || process.env.JWT_SECRET || SSO_SHARED_SECRET || "";
 const JWT_EXPIRY_SECONDS = 15 * 60; // 15 minutes
 
 export async function handleTerminalLaunch(req: Request, res: Response) {
