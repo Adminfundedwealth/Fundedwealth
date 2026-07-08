@@ -32,11 +32,23 @@ router.get("/my", async (req: Request, res: Response) => {
     }
 
     // 1. Find user by Supabase auth ID
-    const [user] = await db
+    let [user] = await db
       .select()
       .from(users)
       .where(eq(users.clerkId, auth.userId))
       .limit(1);
+
+    // Auto-link by email if not found (handles Clerk → Supabase migration and new browser sessions)
+    if (!user && auth.email) {
+      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
+      if (byEmail) {
+        [user] = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
+      }
+    }
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
