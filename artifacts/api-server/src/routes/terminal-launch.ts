@@ -8,6 +8,7 @@ const router = Router();
 
 const TERMINAL_API_URL = (process.env.TERMINAL_API_URL || "").replace(/\/$/, "");
 const SSO_API_KEY = process.env.SSO_API_KEY || "";
+const SSO_SHARED_SECRET = process.env.SSO_SHARED_SECRET || SSO_API_KEY || "";
 
 export async function handleTerminalLaunch(req: Request, res: Response) {
   try {
@@ -213,7 +214,8 @@ function generateSSOToken(tradingAccountId: string, traderId: string, email: str
     issuedAt: Date.now(),
     expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
   });
-  const secret = SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
+  // Must match the secret the terminal uses to verify — SSO_SHARED_SECRET
+  const secret = SSO_SHARED_SECRET || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
   const hmac = createHmac("sha256", secret).update(payload).digest("hex");
   return `${Buffer.from(payload).toString("base64url")}.${hmac}`;
 }
