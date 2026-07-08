@@ -3,7 +3,7 @@ nixPkgs = ["nodejs_22"]
 
 [phases.install]
 cmds = [
-  "npm install -g pnpm@11.9.0 --no-fund --no-audit",
+  "npm install -g pnpm@9 --no-fund --no-audit",
   "pnpm install --no-frozen-lockfile || true"
 ]
 
