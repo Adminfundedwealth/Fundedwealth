@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm install -g pnpm@11.9.0 --no-fund --no-audit && pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build"
+
+[deploy]
+startCommand = "node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
