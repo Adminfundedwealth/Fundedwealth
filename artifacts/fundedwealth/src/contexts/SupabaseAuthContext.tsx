@@ -33,12 +33,17 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const [accountSuspended, setAccountSuspended] = useState(false);
 
     useEffect(() => {
-        // Get initial session
-        supabase.auth.getSession().then(({ data: { session: s } }) => {
-            setSession(s);
-            setUser(s?.user ?? null);
-            setIsLoaded(true);
-        });
+        // Get initial session — always resolve isLoaded even on error
+        supabase.auth.getSession()
+            .then(({ data: { session: s } }) => {
+                setSession(s);
+                setUser(s?.user ?? null);
+                setIsLoaded(true);
+            })
+            .catch(() => {
+                // Supabase unreachable or misconfigured — mark loaded so the app doesn't hang
+                setIsLoaded(true);
+            });
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(

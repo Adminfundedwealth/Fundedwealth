@@ -125,7 +125,11 @@ function App() {
                             <TooltipProvider>
                                 <OrganizationSchema />
                                 <WebsiteSchema />
-                                <Suspense fallback={<div className="min-h-screen bg-[#0D0020] flex items-center justify-center text-white">Loading...</div>}>
+                                <Suspense fallback={
+                    <div className="min-h-screen bg-[#0D0020] flex items-center justify-center">
+                        <div className="w-8 h-8 border-2 border-[#4A00E0] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                }>
                                     <MobileShell>
                                         <AppRouter />
                                         <ChatWidget />
