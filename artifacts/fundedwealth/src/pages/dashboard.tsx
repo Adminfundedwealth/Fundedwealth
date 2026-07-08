@@ -303,7 +303,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     try {
       const token = await getToken();
       const apiBase = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${apiBase}/api/terminal-launch`, {
+      const res = await fetch(`${apiBase}/api/terminal/launch`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         credentials: "include",
@@ -550,9 +550,12 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
     setLaunching(true);
     setError("");
     try {
+      console.log("[Launch] clicked");
       const token = await getToken();
+      console.log("[Launch] token:", token ? "present" : "NULL — session missing");
       const apiBase = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(`${apiBase}/api/terminal-launch`, {
+      console.log("[Launch] before fetch:", `${apiBase}/api/terminal/launch`, "accountId:", acc.id);
+      const res = await fetch(`${apiBase}/api/terminal/launch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -562,13 +565,15 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         body: JSON.stringify(buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id })),
       });
       const data = await res.json().catch(() => ({}));
+      console.log("[Launch] response:", res.status, data);
       if (res.ok && data.success && data.launchUrl) {
         window.location.href = data.launchUrl;
       } else {
         setError(data.message || "Failed to launch terminal. Please try again.");
         toast.error("Unable to launch terminal.");
       }
-    } catch {
+    } catch (err: any) {
+      console.error("[Launch] exception:", err);
       setError("Could not reach the server. Please try again.");
       toast.error("Unable to launch terminal.");
     } finally {
