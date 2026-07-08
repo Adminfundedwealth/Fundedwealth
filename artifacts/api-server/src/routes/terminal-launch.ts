@@ -160,7 +160,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     }
 
     // ── 8. LOCAL FALLBACK — generate JWT signed with JWT_SECRET ──────────────
-    const ssoToken = generateSSOToken(prov.trading_account_id, prov.trader_id, storedLoginEmail);
+    const ssoToken = generateSSOToken(prov.trading_account_id, prov.trader_id, storedLoginEmail, storedAccountCode);
     const terminalBase = TERMINAL_API_URL || "";
     const launchUrl = terminalBase
       ? `${terminalBase}/auth/sso?token=${encodeURIComponent(ssoToken)}&account=${encodeURIComponent(storedAccountCode)}`
