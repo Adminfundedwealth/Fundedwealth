@@ -2,13 +2,15 @@ import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
-import { createHmac } from "crypto";
+import { createHmac, randomUUID } from "crypto";
 
 const router = Router();
 
 const TERMINAL_API_URL = (process.env.TERMINAL_API_URL || "").replace(/\/$/, "");
 const SSO_API_KEY = process.env.SSO_API_KEY || "";
 const SSO_SHARED_SECRET = process.env.SSO_SHARED_SECRET || SSO_API_KEY || "";
+const JWT_SECRET = process.env.JWT_SECRET || SSO_SHARED_SECRET || "";
+const JWT_EXPIRY_SECONDS = 15 * 60; // 15 minutes
 
 export async function handleTerminalLaunch(req: Request, res: Response) {
   try {
@@ -157,7 +159,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
       }
     }
 
-    // ── 8. LOCAL FALLBACK — generate token from stored activation token ──────
+    // ── 8. LOCAL FALLBACK — generate JWT signed with JWT_SECRET ──────────────
     const ssoToken = generateSSOToken(prov.trading_account_id, prov.trader_id, storedLoginEmail);
     const terminalBase = TERMINAL_API_URL || "";
     const launchUrl = terminalBase
@@ -203,21 +205,27 @@ function verifyActivationToken(token: string): { accountId: string; email: strin
 }
 
 /**
- * Generate a fresh short-lived SSO token for terminal launch.
- * Used when TERMINAL_API_URL is configured but as a fallback.
+ * Generate a standard HS256 JWT signed with JWT_SECRET.
+ * Matches what terminal's auth.service.js does: jwt.sign(claims, JWT_SECRET, { expiresIn: JWT_EXPIRY })
  */
 function generateSSOToken(tradingAccountId: string, traderId: string, email: string): string {
-  const payload = JSON.stringify({
+  const secret = JWT_SECRET || SSO_SHARED_SECRET || "fw-dev-secret";
+  const now = Math.floor(Date.now() / 1000);
+
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({
     accountId: tradingAccountId,
     traderId,
     email,
-    issuedAt: Date.now(),
-    expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
-  });
-  // Must match the secret the terminal uses to verify — SSO_SHARED_SECRET
-  const secret = SSO_SHARED_SECRET || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
-  const hmac = createHmac("sha256", secret).update(payload).digest("hex");
-  return `${Buffer.from(payload).toString("base64url")}.${hmac}`;
+    iat: now,
+    exp: now + JWT_EXPIRY_SECONDS,
+  })).toString("base64url");
+
+  const signature = createHmac("sha256", secret)
+    .update(`${header}.${payload}`)
+    .digest("base64url");
+
+  return `${header}.${payload}.${signature}`;
 }
 
 /**
