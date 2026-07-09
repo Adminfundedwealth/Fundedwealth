@@ -1,10 +1,11 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import ws from "ws";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const supabaseAdmin: SupabaseClient | null = (supabaseUrl && supabaseServiceRoleKey)
-  ? createClient(supabaseUrl, supabaseServiceRoleKey, { auth: { persistSession: false } })
+  ? createClient(supabaseUrl, supabaseServiceRoleKey, { auth: { persistSession: false }, realtime: { transport: ws } })
   : null;
 
 export const isSupabaseEnabled = (): boolean => Boolean(supabaseAdmin);

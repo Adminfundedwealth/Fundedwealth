@@ -729,6 +729,7 @@ router.get("/onboarding-status", async (req, res) => {
  */
 import { verifyOnboardingToken } from "../lib/onboarding-token";
 import { createClient } from "@supabase/supabase-js";
+import ws from "ws";
 
 router.post("/create-password", async (req, res) => {
   try {
@@ -767,7 +768,7 @@ router.post("/create-password", async (req, res) => {
     if (!supabaseUrl || !serviceKey) {
       return res.status(503).json({ error: "Auth service not configured" });
     }
-    const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false }, realtime: { transport: ws } });
 
     // Set the password on the Supabase auth user
     const { error: updateErr } = await admin.auth.admin.updateUserById(payload.userId, {
@@ -787,7 +788,7 @@ router.post("/create-password", async (req, res) => {
 
     // Sign the user in so the frontend gets a live session immediately
     const anonKey = process.env.SUPABASE_ANON_KEY || "";
-    const anonClient = createClient(supabaseUrl, anonKey);
+    const anonClient = createClient(supabaseUrl, anonKey, { realtime: { transport: ws } });
     const { data: session, error: signInErr } = await anonClient.auth.signInWithPassword({
       email: payload.email,
       password: newPassword,

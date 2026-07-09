@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 import { db } from "@workspace/db";
+// ws is an optionalDependency — provides WebSocket on Node < 22 (which lacks native WebSocket)
+import ws from "ws";
 import { users } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
@@ -31,6 +33,7 @@ const supabaseKey = supabaseServiceKey || supabaseAnonKey;
 const supabaseAdmin = supabaseUrl && supabaseKey
     ? createClient(supabaseUrl, supabaseKey, {
         auth: { autoRefreshToken: false, persistSession: false },
+        realtime: { transport: ws },
     })
     : null;
 
