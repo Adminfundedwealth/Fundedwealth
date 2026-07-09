@@ -7,8 +7,8 @@
 
 FROM node:20-slim AS builder
 
-# Install pnpm directly via npm to avoid corepack signature issues
-RUN npm install -g pnpm@8.15.0
+# Install pnpm directly via npm to match the workspace lockfile version
+RUN npm install -g pnpm@11.1.1
 
 WORKDIR /app
 
@@ -20,6 +20,7 @@ COPY lib/db/package.json lib/db/tsconfig.json ./lib/db/
 COPY lib/api-zod/package.json lib/api-zod/tsconfig.json ./lib/api-zod/
 COPY lib/api-client-react/package.json lib/api-client-react/tsconfig.json ./lib/api-client-react/
 COPY lib/integrations-gemini-ai/package.json lib/integrations-gemini-ai/tsconfig.json ./lib/integrations-gemini-ai/
+COPY lib/products/package.json lib/products/tsconfig.json ./lib/products/
 COPY artifacts/api-server/package.json artifacts/api-server/tsconfig.json ./artifacts/api-server/
 COPY artifacts/fundedwealth/package.json ./artifacts/fundedwealth/
 COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
