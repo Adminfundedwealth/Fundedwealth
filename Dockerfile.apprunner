@@ -26,8 +26,8 @@ COPY artifacts/fundedwealth/package.json ./artifacts/fundedwealth/
 COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY scripts/package.json ./scripts/
 
-# Install dependencies
-RUN pnpm install --no-frozen-lockfile --prod=false
+# Install dependencies and keep the pnpm store inside the build context so runner can reuse it
+RUN pnpm install --no-frozen-lockfile --prod=false --store ./.pnpm
 
 # Copy source code
 COPY lib/ ./lib/
