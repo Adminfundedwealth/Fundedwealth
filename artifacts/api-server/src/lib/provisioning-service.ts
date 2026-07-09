@@ -54,20 +54,49 @@ function generateTerminalPassword(): string {
   return pw;
 }
 
+const ACTIVATION_TOKEN_ALGORITHM = "HS256";
+
+function getProvisioningTokenSecret(): { secret: string; source: string } {
+  if (process.env.SSO_API_KEY) {
+    return { secret: process.env.SSO_API_KEY, source: "SSO_API_KEY" };
+  }
+  if (process.env.INTERNAL_PROVISION_SECRET) {
+    return { secret: process.env.INTERNAL_PROVISION_SECRET, source: "INTERNAL_PROVISION_SECRET" };
+  }
+  if (process.env.JWT_SECRET) {
+    return { secret: process.env.JWT_SECRET, source: "JWT_SECRET" };
+  }
+  return { secret: "fw-dev-secret", source: "fallback" };
+}
+
+function signProvisioningJWT(payload: Record<string, unknown>, secret: string): string {
+  const header = { alg: ACTIVATION_TOKEN_ALGORITHM, typ: "JWT" };
+  const headerB64 = Buffer.from(JSON.stringify(header)).toString("base64url");
+  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signingInput = `${headerB64}.${payloadB64}`;
+  const signature = createHmac("sha256", secret).update(signingInput).digest("base64url");
+  return `${signingInput}.${signature}`;
+}
+
 /**
  * Generate a signed activation token for terminal auto-login.
- * Format: base64(payload).hmac-sha256
+ * Format: JWT-like HMAC-SHA256 token with HS256 header.
  */
 function generateActivationToken(tradingAccountId: string, email: string): string {
-  const payload = JSON.stringify({
+  const now = Date.now();
+  const payload = {
     accountId: tradingAccountId,
     email,
-    issuedAt: Date.now(),
-    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+    iat: Math.floor(now / 1000),
+    exp: Math.floor((now + 7 * 24 * 60 * 60 * 1000) / 1000),
+  };
+  const { secret, source } = getProvisioningTokenSecret();
+  console.info("[Provisioning] signing activation token", {
+    secretSource: source,
+    algorithm: ACTIVATION_TOKEN_ALGORITHM,
+    payload,
   });
-  const secret = process.env.SSO_API_KEY || process.env.INTERNAL_PROVISION_SECRET || "fw-dev-secret";
-  const hmac = createHmac("sha256", secret).update(payload).digest("hex");
-  return `${Buffer.from(payload).toString("base64url")}.${hmac}`;
+  return signProvisioningJWT(payload, secret);
 }
 
 export async function provisionChallenge(

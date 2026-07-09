@@ -33,12 +33,17 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const [accountSuspended, setAccountSuspended] = useState(false);
 
     useEffect(() => {
-        // Get initial session
-        supabase.auth.getSession().then(({ data: { session: s } }) => {
-            setSession(s);
-            setUser(s?.user ?? null);
-            setIsLoaded(true);
-        });
+        // Get initial session — always resolve isLoaded even on error
+        supabase.auth.getSession()
+            .then(({ data: { session: s } }) => {
+                setSession(s);
+                setUser(s?.user ?? null);
+                setIsLoaded(true);
+            })
+            .catch(() => {
+                // Supabase unreachable or misconfigured — mark loaded so the app doesn't hang
+                setIsLoaded(true);
+            });
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -63,19 +68,22 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         fetch(`${apiUrl}/api/auth/account-status`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
         })
-            .then((res) => res.json())
+            .then((res) => {
+                // Only act on a clean 200 — never sign out due to network errors or non-200
+                if (!res.ok) return null;
+                return res.json();
+            })
             .then((data) => {
+                if (!data) return; // non-200 or parse failure — leave session intact
                 if (data.accountStatus === "suspended" || data.accountStatus === "banned") {
                     setAccountSuspended(true);
-                    // Force sign out
                     supabase.auth.signOut();
                 } else {
                     setAccountSuspended(false);
                 }
             })
             .catch(() => {
-                // Don't block on network errors
-                setAccountSuspended(false);
+                // Network error — leave session intact, do not change suspended state
             });
     }, [session?.access_token]);
 

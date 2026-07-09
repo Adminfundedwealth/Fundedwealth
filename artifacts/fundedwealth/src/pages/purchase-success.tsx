@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
 
 type SuccessPageData = {
+  id?: string;
   accountCode: string;
   loginEmail: string;
   tempPassword: string;
@@ -50,6 +51,7 @@ export default function PurchaseSuccess() {
 
   const [loading, setLoading] = useState(true);
   const [accountData, setAccountData] = useState<SuccessPageData | null>(null);
+  const [resolvedAccountId, setResolvedAccountId] = useState<string | null>(getQueryParam(search, "accountId"));
   const [error, setError] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [launching, setLaunching] = useState(false);
@@ -84,8 +86,17 @@ export default function PurchaseSuccess() {
 
         if (res.ok && data.success && data.account) {
           const acc = data.account;
+          const resolvedId = acc.id || acc.accountId || acc.tradingAccountId || acc.challengeAccountId || accountId || null;
+
+          setResolvedAccountId(resolvedId);
+          if (resolvedId && !accountId) {
+            const nextParams = new URLSearchParams(window.location.search);
+            nextParams.set("accountId", resolvedId);
+            window.history.replaceState({}, "", `${window.location.pathname}?${nextParams.toString()}`);
+          }
           
           setAccountData({
+            id: resolvedId || undefined,
             accountCode: acc.accountCode || "N/A",
             loginEmail: acc.loginEmail || acc.email || "Check your email",
             tempPassword: acc.tempPassword || "Use 'Forgot Password' to reset",
@@ -194,7 +205,8 @@ export default function PurchaseSuccess() {
   };
 
   const handleLaunchTerminal = async () => {
-    if (!accountId) {
+    const launchAccountId = resolvedAccountId || accountId;
+    if (!launchAccountId) {
       navigate("/dashboard/accounts");
       return;
     }
@@ -210,7 +222,7 @@ export default function PurchaseSuccess() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}) 
         },
         credentials: "include",
-        body: JSON.stringify(buildTerminalLaunchRequestBody({ accountId })),
+        body: JSON.stringify(buildTerminalLaunchRequestBody({ ...accountData, accountId: launchAccountId })),
       });
 
       const data = await res.json().catch(() => ({}));

@@ -271,7 +271,9 @@ export default function PaymentPending() {
       if (res.ok && data.success) {
         if (data.status === "completed") {
           setStatus("completed");
-          setTimeout(() => navigate(`/purchase-success?orderId=${encodeURIComponent(orderId)}`), 2500);
+          const params = new URLSearchParams({ orderId });
+          if (data.accountId) params.set("accountId", data.accountId);
+          setTimeout(() => navigate(`/purchase-success?${params.toString()}`), 2500);
         } else if (data.status === "failed") {
           setStatus("Failed");
           setApiError(data.error || "Provisioning failed. Contact support.");

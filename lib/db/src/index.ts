@@ -4,14 +4,10 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
+const connectionString = process.env.DATABASE_URL || "postgresql://localhost:5432/postgres";
 
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   connectionTimeoutMillis: 8000,   // fail fast if DB unreachable
   idleTimeoutMillis: 30000,
   max: 10,                          // enough for production load

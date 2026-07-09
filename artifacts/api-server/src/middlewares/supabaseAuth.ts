@@ -25,9 +25,11 @@ const ADMIN_ROLES = ["super_admin", "admin", "support", "compliance", "finance"]
 
 const supabaseUrl = process.env.SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
+const supabaseKey = supabaseServiceKey || supabaseAnonKey;
 
-const supabaseAdmin = supabaseUrl && supabaseServiceKey
-    ? createClient(supabaseUrl, supabaseServiceKey, {
+const supabaseAdmin = supabaseUrl && supabaseKey
+    ? createClient(supabaseUrl, supabaseKey, {
         auth: { autoRefreshToken: false, persistSession: false },
     })
     : null;
@@ -47,19 +49,20 @@ function extractToken(req: Request): string | null {
  */
 export async function supabaseAuthMiddleware(req: Request, _res: Response, next: NextFunction) {
     const token = extractToken(req);
-    if (!token || !supabaseAdmin) {
-        // No token or Supabase not configured — proceed without auth
-        if (token && !supabaseAdmin) {
-            // Token provided but we can't verify it — log this as a config issue
-            console.warn("[supabaseAuth] Token present but SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY not configured — cannot verify JWT");
-        }
+    if (!token) {
+        return next();
+    }
+
+    if (!supabaseAdmin) {
+        console.warn("[supabaseAuth] Token present but SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY/SUPABASE_ANON_KEY are not configured — cannot verify JWT");
         return next();
     }
 
     try {
         const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
         if (error || !user) {
-            return next(); // Invalid token — proceed without auth
+            console.warn(`[supabaseAuth] JWT verification failed: ${error?.message || "no user returned"}`);
+            return next();
         }
 
         (req as any).auth = {
@@ -67,8 +70,8 @@ export async function supabaseAuthMiddleware(req: Request, _res: Response, next:
             sessionId: undefined,
             email: user.email,
         };
-    } catch {
-        // Token verification failed — proceed without auth
+    } catch (err: any) {
+        console.warn(`[supabaseAuth] JWT verification threw: ${err?.message || String(err)}`);
     }
 
     next();

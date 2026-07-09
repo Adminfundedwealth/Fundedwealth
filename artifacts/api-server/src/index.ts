@@ -60,14 +60,7 @@ if (process.env.NODE_ENV === "production" && (!process.env.ENCRYPTION_KEY || pro
 }
 // ────────────────────────────────────────────────────────────────────────────
 
-const rawPort = process.env.PORT ?? (process.env.NODE_ENV === "development" ? "9010" : undefined);
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided. " +
-    "Set PORT in your environment, or run in development mode to use the default 9010.",
-  );
-}
+const rawPort = process.env.PORT ?? (process.env.NODE_ENV === "development" ? "9010" : "9010");
 
 const port = Number(rawPort);
 

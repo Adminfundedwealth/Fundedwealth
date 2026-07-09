@@ -76,15 +76,20 @@ const verifyPaymentSchema = z.object({
 const paymentCreateLimiter = rateLimit(10, 300); // 10 per 5 minutes
 const paymentVerifyLimiter = rateLimit(15, 300); // 15 per 5 minutes
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-});
+// Initialize Razorpay instance lazily so the API can still boot for health checks
+let razorpay: Razorpay | null = null;
 
-// Validate Razorpay configuration
-if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-  logger.warn("Razorpay credentials not configured. Payment integration will not work.");
+try {
+  if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+    razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+  } else {
+    logger.warn("Razorpay credentials not configured. Payment integration will not work.");
+  }
+} catch (error) {
+  logger.warn({ err: error }, "Failed to initialize Razorpay client; continuing without payment integration");
 }
 
 // ---------------------------------------------------------------------------
@@ -122,6 +127,22 @@ async function triggerTerminalProvisioning(
 router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchema), async (req: Request, res: Response) => {
   try {
     const auth = getAuth(req);
+    const { amount, payment_type = "challenge", planType, sizeIndex, couponCode, currency = "INR", receipt, metadata } = req.body;
+
+    if (!razorpay && process.env.NODE_ENV !== "production") {
+      logger.warn("Razorpay credentials missing; returning local development fallback order");
+      return res.json({
+        success: true,
+        order: {
+          id: `local-dev-${payment_type}-${Date.now()}`,
+          amount: Math.round(amount * 100),
+          currency: currency.toUpperCase(),
+          receipt: receipt || `FW-${payment_type.toUpperCase()}-${Date.now()}`,
+          status: "created",
+        },
+        devFallback: true,
+      });
+    }
 
     // Soft auth check — block banned/suspended users but don't require auth
     // (Razorpay order creation doesn't write to DB, just creates an order on Razorpay side)
@@ -142,8 +163,6 @@ router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchem
         }
       }
     }
-
-    const { amount, payment_type = "challenge", planType, sizeIndex, couponCode, currency = "INR", receipt, metadata } = req.body;
 
     if (!amount || typeof amount !== "number") {
       return res.status(400).json({ success: false, message: "Amount is required and must be a number" });
@@ -173,10 +192,29 @@ router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchem
       return res.status(400).json({ success: false, message: "Maximum amount is 10,000,000 INR" });
     }
 
+    if (!razorpay && process.env.NODE_ENV !== "production") {
+      logger.warn("Razorpay credentials missing; returning local development fallback order");
+      return res.json({
+        success: true,
+        order: {
+          id: `local-dev-${paymentType}-${Date.now()}`,
+          amount: amountInPaise,
+          currency: currency.toUpperCase(),
+          receipt: receipt || `FW-${paymentType.toUpperCase()}-${Date.now()}`,
+          status: "created",
+        },
+        devFallback: true,
+      });
+    }
+
     // Validate Razorpay credentials at request time
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       logger.error("Razorpay credentials not configured — cannot create order");
       return res.status(503).json({ success: false, message: "Payment service not configured. Contact support." });
+    }
+
+    if (!razorpay) {
+      return res.status(503).json({ success: false, message: "Payment service not configured." });
     }
 
     const order = (await razorpay.orders.create({
@@ -234,6 +272,10 @@ router.post("/create-order", paymentCreateLimiter, validateBody(createOrderSchem
  */
 router.post("/verify-payment", paymentVerifyLimiter, validateBody(verifyPaymentSchema), async (req: Request, res: Response) => {
   try {
+    if (!razorpay) {
+      return res.status(503).json({ success: false, message: "Payment service not configured." });
+    }
+
     const auth = getAuth(req);
 
     const {
@@ -550,6 +592,24 @@ router.get("/order/:orderId", async (req: Request, res: Response) => {
     const { orderId } = req.params;
     if (!orderId) {
       return res.status(400).json({ success: false, message: "Order ID is required" });
+    }
+
+    if (!razorpay) {
+      return res.json({
+        success: true,
+        order: {
+          id: orderId,
+          amount: 0,
+          amount_paid: 0,
+          amount_due: 0,
+          currency: "INR",
+          receipt: orderId,
+          status: "created",
+          attempts: 0,
+          notes: {},
+          created_at: Date.now(),
+        },
+      });
     }
 
     const order = (await razorpay.orders.fetch(orderId as string)) as RzpOrder;

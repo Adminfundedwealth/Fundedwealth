@@ -2,7 +2,6 @@
   "name": "workspace",
   "version": "0.0.0",
   "license": "MIT",
-  "packageManager": "pnpm@11.9.0",
   "scripts": {
     "preinstall": "node -e \"const fs = require('fs'); ['package-lock.json', 'yarn.lock'].forEach((f) => { try { fs.rmSync(f, { force: true }) } catch {} }); const ua = process.env.npm_config_user_agent || ''; if (ua && !ua.startsWith('pnpm/') && !ua.startsWith('npm/')) { console.error('Use pnpm instead'); process.exit(1); }\"",
     "dev": "pnpm -r --parallel --filter @workspace/fundedwealth --filter @workspace/api-server dev",
