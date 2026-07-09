@@ -43,10 +43,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 WORKDIR /app
 
-# Copy only the built output
+# Copy only the built output and pnpm workspace install state
 COPY --from=builder /app/artifacts/api-server/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.pnpm ./.pnpm
 ENV NODE_ENV=production
 ENV PORT=9000
 
