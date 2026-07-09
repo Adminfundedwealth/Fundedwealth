@@ -1,4 +1,5 @@
 import express, { type Express } from "express";
+import { createHash } from "crypto";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
@@ -121,6 +122,15 @@ app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   next();
+});
+
+app.get("/debug/secret-hash", (_req, res) => {
+  const secret = process.env.SSO_API_KEY || "";
+  res.json({
+    hash: createHash("sha256").update(secret).digest("hex"),
+    length: secret.length,
+    varName: "SSO_API_KEY",
+  });
 });
 
 app.use("/metrics", metricsRouter);
