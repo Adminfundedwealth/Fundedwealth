@@ -65,13 +65,9 @@ export function useTerminalLaunch(): UseTerminalLaunch {
       }
 
       if (res.ok && data.success && data.launchUrl) {
-        // Open in new tab — use window.open without noopener to avoid popup blockers
-        // Fall back to same-tab navigation if popup is blocked
-        const newTab = window.open(data.launchUrl, "_blank");
-        if (!newTab) {
-          // Popup blocked — navigate in same tab
-          window.location.href = data.launchUrl;
-        }
+        // Use location.assign for immediate navigation — avoids popup blockers
+        // and minimises the window between token generation and browser redirect
+        window.location.assign(data.launchUrl);
       } else {
         setLaunchError(data.message ?? "Failed to launch terminal. Please try again.");
       }

@@ -490,6 +490,7 @@ function generateSSOToken(tradingAccountId: string, traderId: string, email: str
 
 /**
  * POST /api/terminal/launch
+ * POST /api/terminal-launch  (alias)
  *
  * Generates a terminal SSO launch URL.
  * Flow:
@@ -499,5 +500,37 @@ function generateSSOToken(tradingAccountId: string, traderId: string, email: str
  */
 router.post("/launch", handleTerminalLaunch);
 router.post("/terminal-launch", handleTerminalLaunch); // keep alias for compatibility
+
+/**
+ * GET /api/terminal/redirect?accountId=xxx
+ *
+ * Server-side redirect endpoint — generates a fresh SSO token and immediately
+ * issues a 302 redirect to terminal.fundedwealth.com/auth/sso?token=...
+ *
+ * This avoids the JS async delay that causes token expiry before the browser
+ * receives the URL. The browser follows the redirect instantly.
+ */
+router.get("/redirect", async (req: Request, res: Response) => {
+  try {
+    // Reuse the same launch logic but return a redirect instead of JSON
+    const accountId = req.query.accountId as string;
+    if (!accountId) {
+      return res.redirect(`${PRODUCTION_TERMINAL_URL}/error?reason=Missing+accountId`);
+    }
+    // Attach accountId to body so handleTerminalLaunch can read it
+    (req as any).body = { accountId };
+    // Override res.json to intercept the launchUrl and redirect instead
+    const originalJson = res.json.bind(res);
+    (res as any).json = (data: any) => {
+      if (data?.success && data?.launchUrl) {
+        return res.redirect(302, data.launchUrl);
+      }
+      return originalJson(data);
+    };
+    return handleTerminalLaunch(req, res);
+  } catch (err: any) {
+    return res.redirect(`${PRODUCTION_TERMINAL_URL}/error?reason=${encodeURIComponent(err.message || "Unknown error")}`);
+  }
+});
 
 export default router;
