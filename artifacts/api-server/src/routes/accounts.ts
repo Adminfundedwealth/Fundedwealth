@@ -203,7 +203,7 @@ router.get("/my", async (req: Request, res: Response) => {
         }
       }
 
-      const canLaunch = challengeStatus === "active" && row.trading_status === "active";
+      const canLaunch = ["active", "funded", "passed"].includes(challengeStatus) && row.trading_status === "active";
 
       // NEW: Fetch real trading statistics from session_analytics
       let totalTrades = 0;
@@ -496,7 +496,7 @@ router.get("/:accountId", async (req: Request, res: Response) => {
         createdAt: challenge?.created_at || prov.created_at,
         updatedAt: challenge?.updated_at || prov.created_at,
         expiresAt: challenge?.expires_at || null,
-        canLaunch: challengeStatus === "active" && trading?.status === "active",
+        canLaunch: ["active", "funded", "passed"].includes(challengeStatus) && trading?.status === "active",
         // Credentials from order.metadata
         loginEmail: orderCreds.loginEmail || user.email,
         tempPassword: orderCreds.tempPassword || null,
