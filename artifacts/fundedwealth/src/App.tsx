@@ -110,6 +110,22 @@ function AppRouter() {
             <Route path="/register">{() => { window.location.replace(basePath + "/sign-up"); return null; }}</Route>
             <Route path="/dashboard" component={DashboardRoute} />
             <Route path="/dashboard/:section" component={DashboardRoute} />
+            <Route path="/terminal-error">{() => {
+                const params = new URLSearchParams(window.location.search);
+                const reason = params.get("reason") || "An error occurred launching the terminal.";
+                return (
+                    <div style={{ minHeight: "100vh", background: "#0a0a0f", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+                        <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", padding: "40px", maxWidth: "480px", width: "100%", textAlign: "center" }}>
+                            <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+                            <h1 style={{ color: "#fff", fontSize: "22px", fontWeight: "700", marginBottom: "12px" }}>Terminal Launch Failed</h1>
+                            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", marginBottom: "24px", lineHeight: "1.6" }}>{reason}</p>
+                            <a href="/dashboard" style={{ display: "inline-block", background: "linear-gradient(90deg,#4A00E0,#D63384)", color: "#fff", fontWeight: "700", padding: "12px 32px", borderRadius: "12px", textDecoration: "none", fontSize: "14px" }}>
+                                ← Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                );
+            }}</Route>
             <Route component={NotFound} />
         </Switch>
     );
