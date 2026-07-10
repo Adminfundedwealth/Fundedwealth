@@ -476,7 +476,10 @@ function generateSSOToken(tradingAccountId: string, traderId: string, email: str
     iat: Math.floor(now / 1000),
     exp: Math.floor((now + 15 * 60 * 1000) / 1000),
   };
-  const { secret, source } = getTerminalSSOSecret();
+  // Terminal verifies SSO tokens using SSO_API_KEY (confirmed via /debug/secret-hash).
+  // Must sign with SSO_API_KEY so the signature matches what terminal expects.
+  const secret = process.env.SSO_API_KEY || SSO_API_KEY || "fw-dev-secret";
+  const source = process.env.SSO_API_KEY ? "SSO_API_KEY" : "fallback";
   console.info("[Terminal Launch] signing SSO token", {
     secretSource: source,
     algorithm: SSO_TOKEN_ALGORITHM,
