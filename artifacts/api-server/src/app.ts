@@ -133,6 +133,9 @@ app.get("/debug/secret-hash", (_req, res) => {
     terminalApiUrl: process.env.TERMINAL_API_URL || "(not set)",
     hasTerminalApiUrl: Boolean(process.env.TERMINAL_API_URL),
     hasSSOApiKey: Boolean(process.env.SSO_API_KEY),
+    hasSupabaseUrl: Boolean(process.env.SUPABASE_URL),
+    hasSupabaseServiceKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    supabaseUrl: process.env.SUPABASE_URL ? process.env.SUPABASE_URL.substring(0, 40) + "..." : "(not set)",
   });
 });
 
