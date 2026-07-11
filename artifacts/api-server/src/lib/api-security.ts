@@ -106,14 +106,19 @@ export function sanitizeError(error: unknown): { message: string; code?: string 
  * Global error handler middleware — sanitizes all unhandled errors.
  */
 export function securityErrorHandler(error: unknown, req: Request, res: Response, _next: NextFunction) {
-  const sanitized = sanitizeError(error);
+  // Always log full error for Railway logs
+  const errMsg = error instanceof Error ? error.message : String(error);
+  const errStack = error instanceof Error ? error.stack : undefined;
+  logger.error({ error: errMsg, stack: errStack, path: req.path, method: req.method }, "Unhandled error");
 
-  // Never send 200 for errors
+  const sanitized = sanitizeError(error);
   const statusCode = res.statusCode >= 400 ? res.statusCode : 500;
 
   res.status(statusCode).json({
     error: sanitized.message,
     ...(sanitized.code ? { code: sanitized.code } : {}),
+    // Expose raw error in non-production for debugging
+    ...(process.env.NODE_ENV !== "production" ? { debug: errMsg } : {}),
   });
 }
 

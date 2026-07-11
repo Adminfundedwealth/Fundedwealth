@@ -155,6 +155,8 @@ app.use((req, res) => {
   res.status(404).send("Not found");
 });
 
+// SECURITY: Sanitize all unhandled errors — never leak internal details
+
 // Body parser errors
 app.use((error: unknown, req: any, res: any, next: any) => {
   if (error instanceof SyntaxError && (error as any).type === "entity.parse.failed") {
