@@ -130,6 +130,9 @@ app.get("/debug/secret-hash", (_req, res) => {
     hash: createHash("sha256").update(secret).digest("hex"),
     length: secret.length,
     varName: "SSO_API_KEY",
+    terminalApiUrl: process.env.TERMINAL_API_URL || "(not set)",
+    hasTerminalApiUrl: Boolean(process.env.TERMINAL_API_URL),
+    hasSSOApiKey: Boolean(process.env.SSO_API_KEY),
   });
 });
 

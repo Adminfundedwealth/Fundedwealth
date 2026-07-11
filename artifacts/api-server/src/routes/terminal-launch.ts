@@ -337,7 +337,10 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     });
 
     // ── 7. CALL TERMINAL SSO IF CONFIGURED ──────────────────────────────────
-    if (TERMINAL_API_URL && SSO_API_KEY) {
+    // Read SSO_API_KEY at request time (not cached at module load) so Railway
+    // env var changes take effect without a full redeploy.
+    const runtimeSSOApiKey = process.env.SSO_API_KEY || SSO_API_KEY;
+    if (TERMINAL_API_URL && runtimeSSOApiKey) {
       try {
         console.info("[Terminal Launch] calling terminal SSO", {
           terminalApiUrl: TERMINAL_API_URL,
@@ -362,7 +365,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-sso-api-key": SSO_API_KEY,
+            "x-sso-api-key": runtimeSSOApiKey,
           },
           body: JSON.stringify(terminalPayload),
           signal: AbortSignal.timeout(8000),
