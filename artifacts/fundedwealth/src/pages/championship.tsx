@@ -56,7 +56,7 @@ const ChampionshipPage = () => {
     setUtrError("");
     setUtrStatus("verifying");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const res = await fetch(`${apiBase}/api/payments/verify-utr`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,7 +86,7 @@ const ChampionshipPage = () => {
     setOxapayLoading(true);
     setOxapayError("");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const res = await fetch(`${apiBase}/api/payments/create-crypto-payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -115,7 +115,7 @@ const ChampionshipPage = () => {
     setRazorpayLoading(true);
     setRazorpayError("");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const res = await fetch(`${apiBase}/api/razorpay/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

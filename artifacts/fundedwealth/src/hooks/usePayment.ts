@@ -26,13 +26,10 @@ interface BillingInfo {
  * if the backend is on Render, we hit it directly in production.
  */
 function getApiBase(): string {
-  const configured = import.meta.env.VITE_API_URL || "";
-  // In dev mode, prefer relative paths (Vite proxy handles /api → localhost:9000)
-  // In production, use the configured URL directly
-  if (import.meta.env.DEV) {
-    return ""; // Vite proxy: /api → http://localhost:9000/api
-  }
-  return configured;
+  return (
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? "" : "https://fundedwealth-api-production.up.railway.app")
+  );
 }
 
 export const usePayment = (

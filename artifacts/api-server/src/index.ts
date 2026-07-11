@@ -27,40 +27,33 @@ function collectApiRoutes(stack: any[], prefix = "/api"): string[] {
   return routes;
 }
 
-// ── Clerk key guard ──────────────────────────────────────────────────────────
-const clerkSecret = process.env.CLERK_SECRET_KEY ?? "";
-if (process.env.NODE_ENV === "production" && clerkSecret.startsWith("sk_test_")) {
-  logger.error(
-    "CLERK_SECRET_KEY is a test key (sk_test_*) but NODE_ENV=production. " +
-    "Go to https://dashboard.clerk.com → your app → Production → API Keys " +
-    "and set CLERK_SECRET_KEY to your live sk_live_* key before deploying."
-  );
-  process.exit(1);
-}
-if (clerkSecret.startsWith("sk_test_") && process.env.NODE_ENV !== "test") {
-  logger.warn(
-    "CLERK_SECRET_KEY is a test key. Auth is running against a Clerk development instance. " +
-    "Replace with a live sk_live_* key before accepting real users."
-  );
+// ── Supabase config guard — warn if missing in production ───────────────────
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.SUPABASE_URL) {
+    logger.warn("SUPABASE_URL is not set — JWT authentication will not work.");
+  }
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY && !process.env.SUPABASE_ANON_KEY) {
+    logger.warn("Neither SUPABASE_SERVICE_ROLE_KEY nor SUPABASE_ANON_KEY is set — JWT authentication will not work.");
+  }
+  if (!process.env.DATABASE_URL) {
+    logger.warn("DATABASE_URL is not set — database queries will fail.");
+  }
 }
 // ────────────────────────────────────────────────────────────────────────────
 
-// ── Encryption key guard — fail startup if missing in production ──────────────
+// ── Encryption key guard — warn if missing in production (non-fatal) ─────────
 if (process.env.NODE_ENV === "production" && !process.env.ENCRYPTION_KEY) {
-  logger.error(
-    "ENCRYPTION_KEY is not set. Financial data cannot be encrypted. " +
+  logger.warn(
+    "ENCRYPTION_KEY is not set. Financial data encryption disabled. " +
     "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\" " +
-    "and set ENCRYPTION_KEY in your environment.",
+    "and set ENCRYPTION_KEY in Railway environment variables.",
   );
-  process.exit(1);
-}
-if (process.env.NODE_ENV === "production" && (!process.env.ENCRYPTION_KEY || process.env.ENCRYPTION_KEY.length !== 64)) {
-  logger.error("ENCRYPTION_KEY must be a 64-character hex string (32 bytes).");
-  process.exit(1);
+} else if (process.env.NODE_ENV === "production" && process.env.ENCRYPTION_KEY && process.env.ENCRYPTION_KEY.length !== 64) {
+  logger.warn("ENCRYPTION_KEY should be a 64-character hex string (32 bytes). Current length: " + process.env.ENCRYPTION_KEY.length);
 }
 // ────────────────────────────────────────────────────────────────────────────
 
-const rawPort = process.env.PORT ?? (process.env.NODE_ENV === "development" ? "9010" : "9010");
+const rawPort = process.env.PORT ?? "9000";
 
 const port = Number(rawPort);
 

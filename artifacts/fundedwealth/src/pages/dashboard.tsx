@@ -302,7 +302,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     setLaunchError("");
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
       console.info("[Launch Terminal] request start", {
         accountId: acc.id,
@@ -591,7 +591,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
     setError("");
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
       console.info("[Launch Terminal] request start", {
         accountId: acc.id,
@@ -3224,7 +3224,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
     try {
       // 1. Create Razorpay order via backend
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const orderRes = await fetch(`${apiBase}/api/razorpay/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

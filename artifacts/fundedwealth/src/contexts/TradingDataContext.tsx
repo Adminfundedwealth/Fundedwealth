@@ -192,7 +192,7 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
 
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const res = await fetch(`${apiBase}/api/accounts/my`, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -238,7 +238,7 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
     const fetchMeta = async () => {
       try {
         const token = await getToken();
-        const apiBase = import.meta.env.VITE_API_URL || "";
+        const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
         const res = await fetch(`${apiBase}/api/users/me`, {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           credentials: "include",

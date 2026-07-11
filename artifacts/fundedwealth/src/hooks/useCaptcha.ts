@@ -12,9 +12,10 @@
  *   // Before submit: const ok = await verifyCaptcha("signup"); if (!ok) return;
  */
 
+import { getApiBase } from "@/lib/api-base";
 import { useState, useCallback } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "";
+const API_URL = getApiBase();
 
 export function useCaptcha() {
     // Only bypass CAPTCHA when running locally on the Vite dev server

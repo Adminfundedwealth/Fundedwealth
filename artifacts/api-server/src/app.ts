@@ -124,6 +124,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root health-check — avoids "Cannot GET /" when browser hits the API server directly
+app.get("/", (_req, res) => {
+  res.json({ service: "FundedWealth API", status: "ok" });
+});
+
 app.get("/debug/secret-hash", (_req, res) => {
   const secret = process.env.SSO_API_KEY || "";
   res.json({

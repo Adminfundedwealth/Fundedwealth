@@ -140,7 +140,7 @@ export default function Checkout() {
     setUtrError("");
     setUtrStatus("verifying");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "";
+      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
       const token = isLoaded ? await getToken().catch(() => null) : null;
       const res = await fetch(`${apiBase}/api/payments/verify-utr`, {
         method: "POST",

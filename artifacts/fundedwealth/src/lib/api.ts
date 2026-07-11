@@ -7,11 +7,13 @@
  * - In development: relative /api/* (Vite proxy forwards to localhost:9000 or Render)
  */
 
+const RAILWAY_API = "https://fundedwealth-api-production.up.railway.app";
+
 const API_PREFIX = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : import.meta.env.VITE_API_BASE_URL
     ? `${import.meta.env.VITE_API_BASE_URL}/api`
-    : "https://fundedwealth-api-production.up.railway.app/api";
+    : `${RAILWAY_API}/api`;
 
 async function apiFetch(path: string, options?: RequestInit) {
   const res = await fetch(`${API_PREFIX}${path}`, {
