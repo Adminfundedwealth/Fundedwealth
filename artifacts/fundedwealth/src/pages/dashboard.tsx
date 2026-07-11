@@ -1118,7 +1118,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
   useEffect(() => {
     if (!user) return;
-    fetch(`${import.meta.env.BASE_URL}api/users/me`, {
+    const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+    fetch(`${apiBase}/api/users/me`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
