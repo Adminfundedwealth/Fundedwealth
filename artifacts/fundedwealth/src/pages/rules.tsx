@@ -5,7 +5,7 @@ import {
   ArrowLeft, Shield, CheckCircle, XCircle, AlertTriangle, Info,
   BookOpen, Clock, Target, Activity, Calendar, Scale, FileText,
   LifeBuoy, ArrowRight, Zap, Search, CreditCard, TrendingUp,
-  Lock, BarChart2, HelpCircle,
+  Lock, BarChart2, HelpCircle, Share2, Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -682,9 +682,30 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
 export default function Rules() {
   const [activePlan, setActivePlan] = useState<PlanKey | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [flashLinkCopied, setFlashLinkCopied] = useState(false);
 
   // Flash plan — show its own full detail page
   if (activePlan === "flash") {
+    const flashUrl = "https://fundedwealth.com/rules?plan=flash";
+
+    const handleShare = async () => {
+      if (navigator.share) {
+        // Native share sheet on mobile
+        try {
+          await navigator.share({
+            title: "FundedWealth Flash Rules",
+            text: "Check out the Flash trading account rules on FundedWealth — 24-hour funded account, 80% profit split, no profit target.",
+            url: flashUrl,
+          });
+        } catch (_) { /* user dismissed */ }
+      } else {
+        // Desktop — copy to clipboard + show tick
+        await navigator.clipboard.writeText(flashUrl);
+        setFlashLinkCopied(true);
+        setTimeout(() => setFlashLinkCopied(false), 2000);
+      }
+    };
+
     return (
       <div className="min-h-screen bg-[#0D0020] text-white">
         <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
@@ -697,7 +718,23 @@ export default function Rules() {
             <h1 className="text-lg font-heading font-bold flex items-center gap-2">
               <Zap className="text-amber-400" size={18} /> Flash Rules
             </h1>
-            <Link href="/"><Button variant="ghost" className="text-white/70 hover:text-white">Home</Button></Link>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleShare}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all duration-200
+                  ${flashLinkCopied
+                    ? "bg-green-500/15 border-green-500/40 text-green-300"
+                    : "bg-white/[0.05] border-white/15 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/30"
+                  }`}
+                title="Share Flash Rules link"
+              >
+                {flashLinkCopied
+                  ? <><Check size={13} /> Copied!</>
+                  : <><Share2 size={13} /> Share</>
+                }
+              </button>
+              <Link href="/"><Button variant="ghost" className="text-white/70 hover:text-white">Home</Button></Link>
+            </div>
           </div>
         </div>
         <div className="container mx-auto px-4 py-12">
