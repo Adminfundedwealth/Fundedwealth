@@ -299,39 +299,38 @@ export default function Rules() {
               </Button>
             </Link>
           </div>
-          <div className="mt-8 max-w-3xl mx-auto rounded-xl bg-amber-500/5 border border-amber-500/25 p-4 text-left">
+          {/* ── Plan filter pill tabs ── */}
+          <div className="flex justify-center mt-8 mb-2">
+            <div className="inline-flex items-center gap-1 p-1.5 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm shadow-lg">
+              {PLAN_TABS.map((tab) => {
+                const isActive = activePlan === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActivePlan(tab.key)}
+                    className={`
+                      flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200
+                      ${isActive
+                        ? "bg-white text-[#1A0030] shadow-md"
+                        : "text-white/55 hover:text-white/90 hover:bg-white/8"
+                      }
+                    `}
+                  >
+                    {tab.icon}
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 max-w-3xl mx-auto rounded-xl bg-amber-500/5 border border-amber-500/25 p-4 text-left">
             <p className="text-white/75 text-sm leading-relaxed">
               <strong className="text-amber-300">Important:</strong> Breaking a{" "}
               <strong className="text-red-400">Critical</strong> rule (e.g. Daily loss limit, Maximum Loss Limit) disqualifies your evaluation immediately. Hitting the{" "}
               <strong className="text-amber-200">4% Daily profit</strong> cap triggers{" "}
               <strong className="text-amber-200">kill-switch</strong>: no new trades for that day.
             </p>
-          </div>
-        </div>
-
-        {/* ── Plan selector pill tabs ── */}
-        <div className="flex justify-center mb-10">
-          <div className="inline-flex items-center gap-1 p-1.5 rounded-2xl bg-white/[0.05] border border-white/10 backdrop-blur-sm">
-            {PLAN_TABS.map((tab) => {
-              const isActive = activePlan === tab.key;
-              const a = PLAN_ACCENT[tab.key];
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActivePlan(tab.key)}
-                  className={`
-                    flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200
-                    ${isActive
-                      ? `${a.bg} ${a.border} border ${a.text} shadow-sm`
-                      : "text-white/50 hover:text-white/80 border border-transparent hover:bg-white/5"
-                    }
-                  `}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              );
-            })}
           </div>
         </div>
 
