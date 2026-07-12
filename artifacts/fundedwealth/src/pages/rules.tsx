@@ -236,6 +236,124 @@ const PLAN_ACCENT: Record<PlanKey, { bg: string; border: string; text: string; p
   "2step": { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-300", pill: "bg-purple-500/20 border-purple-400/40 text-purple-200" },
 };
 
+// ─── Flash payout calculator ─────────────────────────────────────────────────
+const FLASH_SIZES = [
+  { label: "₹50,000",     value: 50000   },
+  { label: "₹1,00,000",   value: 100000  },
+  { label: "₹2,50,000",   value: 250000  },
+  { label: "₹5,00,000",   value: 500000  },
+  { label: "₹10,00,000",  value: 1000000 },
+];
+
+function formatINR(n: number): string {
+  return "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+}
+
+function PayoutCalculator() {
+  const [bestTrade, setBestTrade] = useState("");
+  const [accountSize, setAccountSize] = useState(250000);
+
+  const bestTradeNum = parseFloat(bestTrade.replace(/,/g, "")) || 0;
+
+  // Rule 1 — consistency: best trade ≤ 15% of total profit → total ≥ best ÷ 0.15
+  const fromConsistency = bestTradeNum > 0 ? bestTradeNum / 0.15 : 0;
+  // Rule 2 — 3% floor on starting balance
+  const fromFloor = accountSize * 0.03;
+  // Required = whichever is higher
+  const required = Math.max(fromConsistency, fromFloor);
+
+  const activeRule: "consistency" | "floor" | null =
+    bestTradeNum > 0
+      ? fromConsistency >= fromFloor ? "consistency" : "floor"
+      : null;
+
+  return (
+    <div className="mb-5 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-4">
+      <p className="text-amber-300 text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5">
+        <Zap size={11} /> Calculate your required overall profit
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+        {/* Account size selector */}
+        <div>
+          <label className="block text-white/45 text-[11px] font-semibold mb-1.5 uppercase tracking-wider">Account size</label>
+          <select
+            value={accountSize}
+            onChange={(e) => setAccountSize(Number(e.target.value))}
+            className="w-full h-10 px-3 rounded-lg bg-white/[0.06] border border-white/15 text-white text-sm font-medium focus:outline-none focus:border-amber-500/50 transition-colors appearance-none cursor-pointer"
+          >
+            {FLASH_SIZES.map((s) => (
+              <option key={s.value} value={s.value} className="bg-[#1A0030] text-white">
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Best trade input */}
+        <div>
+          <label className="block text-white/45 text-[11px] font-semibold mb-1.5 uppercase tracking-wider">Best trade profit (₹)</label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm pointer-events-none">₹</span>
+            <input
+              type="number"
+              min="0"
+              placeholder="e.g. 1500"
+              value={bestTrade}
+              onChange={(e) => setBestTrade(e.target.value)}
+              className="w-full h-10 pl-7 pr-3 rounded-lg bg-white/[0.06] border border-white/15 text-white text-sm font-medium placeholder-white/25 focus:outline-none focus:border-amber-500/50 transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Result */}
+        <div>
+          <label className="block text-white/45 text-[11px] font-semibold mb-1.5 uppercase tracking-wider">Overall profit should be</label>
+          <div className={`h-10 px-3 rounded-lg border flex items-center text-sm font-bold transition-all ${
+            bestTradeNum > 0
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+              : "bg-white/[0.03] border-white/10 text-white/30"
+          }`}>
+            {bestTradeNum > 0 ? formatINR(required) : "—"}
+          </div>
+          {bestTradeNum > 0 && (
+            <p className="text-white/40 text-[11px] mt-1">
+              or more
+              {activeRule === "floor" && (
+                <span className="ml-1 text-amber-300/70">(3% floor applies)</span>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Breakdown */}
+      {bestTradeNum > 0 && (
+        <div className="grid grid-cols-2 gap-2 mt-1">
+          <div className={`px-3 py-2 rounded-lg border text-xs transition-all ${
+            activeRule === "consistency"
+              ? "bg-amber-500/10 border-amber-500/30 text-amber-200"
+              : "bg-white/[0.02] border-white/5 text-white/35"
+          }`}>
+            <span className="font-bold block mb-0.5">15% consistency rule</span>
+            {formatINR(fromConsistency)}
+            {activeRule === "consistency" && <span className="ml-1 font-extrabold">← applies</span>}
+          </div>
+          <div className={`px-3 py-2 rounded-lg border text-xs transition-all ${
+            activeRule === "floor"
+              ? "bg-amber-500/10 border-amber-500/30 text-amber-200"
+              : "bg-white/[0.02] border-white/5 text-white/35"
+          }`}>
+            <span className="font-bold block mb-0.5">3% floor ({formatINR(accountSize)} account)</span>
+            {formatINR(fromFloor)}
+            {activeRule === "floor" && <span className="ml-1 font-extrabold">← applies</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Flash Rules full detail page ────────────────────────────────────────────
 function FlashRulesDetail({ onBack }: { onBack: () => void }) {
   const BASICS = [
@@ -402,6 +520,10 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
                 <span className="text-white/80 text-sm">Your net profit is at least <strong className="text-amber-200">3%</strong> of your starting balance</span>
               </div>
             </div>
+
+            {/* ── Payout calculator ── */}
+            <PayoutCalculator />
+
             <div className="border-t border-white/5 pt-4">
               <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-3">How to request a withdrawal</p>
               <div className="space-y-2">
