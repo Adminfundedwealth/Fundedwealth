@@ -327,7 +327,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         message: data.message,
       });
       if (res.ok && data.success && data.launchUrl) {
-        window.open(data.launchUrl, "_blank", "noopener,noreferrer");
+        window.location.assign(data.launchUrl);
       } else {
         setLaunchError(data.message || "Failed to generate terminal session. Please try again.");
         toast.error("Unable to launch terminal.");
@@ -621,7 +621,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
       if (res.ok && data.success && data.launchUrl) {
         // Cache credentials for display
         if (data.credentials) setCreds(data.credentials);
-        window.open(data.launchUrl, "_blank", "noopener,noreferrer");
+        window.location.assign(data.launchUrl);
       } else {
         setError(data.message || "Failed to launch terminal. Please try again.");
       }
