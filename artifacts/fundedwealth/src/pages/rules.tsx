@@ -4,7 +4,7 @@ import SEOHead from "@/components/SEOHead";
 import {
   ArrowLeft, Shield, CheckCircle, XCircle, AlertTriangle, Info,
   BookOpen, Clock, Target, Activity, Calendar, Scale, FileText,
-  LifeBuoy, ArrowRight, Zap,
+  LifeBuoy, ArrowRight, Zap, Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,10 +13,10 @@ import { Card, CardContent } from "@/components/ui/card";
 type PlanKey = "flash" | "instant" | "1step" | "2step";
 
 const PLAN_TABS: { key: PlanKey; label: string }[] = [
-  { key: "flash",   label: "Flash"   },
-  { key: "instant", label: "Instant" },
-  { key: "1step",   label: "1-Step"  },
-  { key: "2step",   label: "2-Step"  },
+  { key: "flash",   label: "Flash Rules"           },
+  { key: "instant", label: "Instant Funding Rules" },
+  { key: "1step",   label: "1-Step Rules"           },
+  { key: "2step",   label: "2-Step Rules"           },
 ];
 
 // ─── Per-plan quick reference data ───────────────────────────────────────────
@@ -237,11 +237,14 @@ const PLAN_ACCENT: Record<PlanKey, { bg: string; border: string; text: string; p
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function Rules() {
-  const [activePlan, setActivePlan] = useState<PlanKey>("flash");
+  const [activePlan, setActivePlan] = useState<PlanKey | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const qr     = QUICK_REF[activePlan];
-  const detail = PLAN_DETAIL[activePlan];
-  const accent = PLAN_ACCENT[activePlan];
+  // When no plan selected, default detail/qr to flash for the detail cards
+  const selectedPlan: PlanKey = activePlan ?? "flash";
+  const qr     = QUICK_REF[selectedPlan];
+  const detail = PLAN_DETAIL[selectedPlan];
+  const accent = PLAN_ACCENT[selectedPlan];
 
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
@@ -299,20 +302,32 @@ export default function Rules() {
               </Button>
             </Link>
           </div>
-          {/* ── Plan filter pill tabs ── */}
-          <div className="flex justify-center mt-8 mb-2">
-            <div className="inline-flex items-center gap-1 p-1.5 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm shadow-lg">
+          {/* ── Search + plan filter buttons ── */}
+          <div className="mt-10 max-w-2xl mx-auto space-y-4">
+            {/* Search input */}
+            <div className="relative">
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search rules…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/[0.06] border border-white/15 text-white placeholder-white/35 text-sm font-medium focus:outline-none focus:border-blue-500/60 focus:bg-white/[0.08] transition-all"
+              />
+            </div>
+            {/* Plan filter buttons */}
+            <div className="flex flex-wrap gap-2 justify-center">
               {PLAN_TABS.map((tab) => {
                 const isActive = activePlan === tab.key;
                 return (
                   <button
                     key={tab.key}
-                    onClick={() => setActivePlan(tab.key)}
+                    onClick={() => setActivePlan(isActive ? null : tab.key)}
                     className={`
-                      flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200
+                      flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold border transition-all duration-200
                       ${isActive
-                        ? "bg-white text-[#1A0030] shadow-md"
-                        : "text-white/55 hover:text-white/90"
+                        ? "bg-white text-[#1A0030] border-white shadow-md"
+                        : "bg-white/[0.05] border-white/15 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/30"
                       }
                     `}
                   >
@@ -560,12 +575,12 @@ export default function Rules() {
                     key={k}
                     onClick={() => setActivePlan(k)}
                     className={`p-4 border-b border-r border-white/10 font-bold text-center transition-colors
-                      ${activePlan === k
+                      ${selectedPlan === k && activePlan !== null
                         ? `${PLAN_ACCENT[k].text} ${PLAN_ACCENT[k].bg}`
                         : "text-white/60 hover:text-white hover:bg-white/[0.03]"}`}
                   >
                     {PLAN_DETAIL[k].headline.split(" — ")[0]}
-                    {activePlan === k && (
+                    {selectedPlan === k && activePlan !== null && (
                       <span className={`block text-[9px] mt-0.5 font-bold uppercase tracking-wide ${PLAN_ACCENT[k].text} opacity-70`}>
                         selected ↑
                       </span>
@@ -587,7 +602,7 @@ export default function Rules() {
                       <div
                         key={`v-${ri}-${ci}`}
                         className={`p-4 border-b border-r border-white/10 text-center font-semibold transition-colors
-                          ${activePlan === k ? `${PLAN_ACCENT[k].text} ${PLAN_ACCENT[k].bg}` : "text-white"}`}
+                          ${selectedPlan === k && activePlan !== null ? `${PLAN_ACCENT[k].text} ${PLAN_ACCENT[k].bg}` : "text-white"}`}
                       >
                         {vals[ci]}
                       </div>
