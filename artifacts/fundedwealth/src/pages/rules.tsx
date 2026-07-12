@@ -4,7 +4,7 @@ import SEOHead from "@/components/SEOHead";
 import {
   ArrowLeft, Shield, CheckCircle, XCircle, AlertTriangle, Info,
   BookOpen, Clock, Target, Activity, Calendar, Scale, FileText,
-  LifeBuoy, ArrowRight, Zap, Flame, TrendingUp, Layers,
+  LifeBuoy, ArrowRight, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,11 +12,11 @@ import { Card, CardContent } from "@/components/ui/card";
 // ─── Plan tab definitions ────────────────────────────────────────────────────
 type PlanKey = "flash" | "instant" | "1step" | "2step";
 
-const PLAN_TABS: { key: PlanKey; label: string; icon?: React.ReactNode; color: string; activeColor: string }[] = [
-  { key: "flash",   label: "Flash",  icon: <Zap size={14} className="text-amber-400" />, color: "text-white/70", activeColor: "text-white" },
-  { key: "instant", label: "Instant", color: "text-white/70", activeColor: "text-white" },
-  { key: "1step",   label: "1-Step",  color: "text-white/70", activeColor: "text-white" },
-  { key: "2step",   label: "2-Step",  color: "text-white/70", activeColor: "text-white" },
+const PLAN_TABS: { key: PlanKey; label: string }[] = [
+  { key: "flash",   label: "Flash"   },
+  { key: "instant", label: "Instant" },
+  { key: "1step",   label: "1-Step"  },
+  { key: "2step",   label: "2-Step"  },
 ];
 
 // ─── Per-plan quick reference data ───────────────────────────────────────────
@@ -312,11 +312,11 @@ export default function Rules() {
                       flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200
                       ${isActive
                         ? "bg-white text-[#1A0030] shadow-md"
-                        : "text-white/55 hover:text-white/90 hover:bg-white/8"
+                        : "text-white/55 hover:text-white/90"
                       }
                     `}
                   >
-                    {tab.icon}
+                    {tab.key === "flash" && <Zap size={13} className={isActive ? "text-amber-500" : "text-amber-400"} />}
                     {tab.label}
                   </button>
                 );
