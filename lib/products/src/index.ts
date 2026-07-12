@@ -45,6 +45,19 @@ export interface ProvisioningRules {
   maxDaysAllowed: number;
   /** challenge_accounts.type discriminator. */
   type: string;
+  // Extended fields (optional — used by Instant Funding and future plans)
+  consistencyRulePct?: number;       // best trade ≤ X% of total profit
+  dailyProfitCapPct?: number;        // kill-switch at X% daily profit
+  riskPerTradeIdeaPct?: number;      // max 1% of starting balance per trade idea
+  payoutThresholdPct?: number;       // net profit ≥ X% before payout
+  scalingTriggerPct?: number;        // grow balance X% over 90 days → scale
+  scalingRewardPct?: number;         // +X% of starting balance added
+  scalingCapPct?: number;            // total scale cap
+  scalingCycleDays?: number;         // days per scaling cycle
+  inactivityCloseDays?: number;      // auto-close if no trades in X days
+  noOvernight?: boolean;             // block overnight positions
+  leverage?: string;                 // display leverage string
+  profitSplit?: number;              // % profit split to trader
 }
 
 /** Full canonical definition for a product/plan. */
@@ -113,7 +126,26 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
       { accountSize: 2000000, fee: 29999, sizeLabel: "₹20,00,000", origFeeLabel: "₹29,999", discFeeLabel: "₹16,499" },
     ],
     // Instant: No profit target, 3% daily, 5% max drawdown, 7-day min, 1:50 leverage
-    rules: { profitTargetPct: 0, dailyLossLimitPct: 3, maxDrawdownPct: 5, minTradingDays: 7, maxDaysAllowed: 365, type: "instant_funding" },
+    rules: {
+      profitTargetPct: 0,
+      dailyLossLimitPct: 3,
+      maxDrawdownPct: 5,
+      minTradingDays: 7,
+      maxDaysAllowed: 365,
+      type: "instant_funding",
+      consistencyRulePct: 15,
+      dailyProfitCapPct: 4,
+      riskPerTradeIdeaPct: 1,
+      payoutThresholdPct: 5,
+      scalingTriggerPct: 10,
+      scalingRewardPct: 25,
+      scalingCapPct: 100,
+      scalingCycleDays: 90,
+      inactivityCloseDays: 60,
+      noOvernight: true,
+      leverage: "1:50",
+      profitSplit: 80,
+    },
   },
   "1step": {
     key: "1step",
