@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users, orders } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
+import { decrypt, isEncrypted } from "../lib/encryption-service";
 
 const router = Router();
 
@@ -79,6 +80,7 @@ router.get("/my", async (req: Request, res: Response) => {
           ta.balance          AS ta_balance,
           ta.available_margin AS available_margin,
           ta.status           AS trading_status,
+          ta.broker_credentials_encrypted AS broker_credentials_encrypted,
           ca.id               AS challenge_account_id,
           ca.type             AS challenge_type,
           ca.plan             AS plan,
@@ -154,8 +156,19 @@ router.get("/my", async (req: Request, res: Response) => {
       try {
         if (order?.metadata) orderMeta = JSON.parse(order.metadata);
       } catch { /* ignore */ }
-      const loginEmail = orderMeta.loginEmail || null;
-      const terminalPassword = orderMeta.terminalPassword || orderMeta.tempPassword || null;
+      const loginEmail = orderMeta.loginEmail || user.email || null;
+      const terminalPassword = orderMeta.terminalPassword || orderMeta.tempPassword || (() => {
+        // Fallback: decrypt broker_credentials_encrypted from trading_accounts
+        if (row.broker_credentials_encrypted) {
+          try {
+            const raw = row.broker_credentials_encrypted as string;
+            const decrypted = isEncrypted(raw) ? decrypt(raw) : raw;
+            // Try parse as JSON {password: "..."} or return as-is
+            try { return JSON.parse(decrypted)?.password ?? decrypted; } catch { return decrypted; }
+          } catch { return null; }
+        }
+        return null;
+      })();
       const activationToken = orderMeta.activationToken || null;
 
       const initialBalance = row.initial_balance != null
