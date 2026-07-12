@@ -38,17 +38,24 @@ const QUICK_REF: Record<PlanKey, QuickRefRow[]> = {
     { label: "Scaling",              value: "Not available — account closes after 24 hours" },
   ],
   instant: [
-    { label: "Profit Target",        value: "None — funded immediately" },
-    { label: "Daily Loss Limit",     value: "3% of starting balance", critical: true },
-    { label: "Max Drawdown",         value: "5% of starting balance", critical: true },
-    { label: "Account Duration",     value: "Unlimited" },
-    { label: "Profit Split",         value: "70 – 80% to trader" },
-    { label: "Min Trading Days",     value: "7 days before first payout" },
-    { label: "Leverage",             value: "1:50" },
-    { label: "Trade Window",         value: "9:15 AM – 3:15 PM IST" },
-    { label: "Auto Square-off",      value: "3:15 PM IST" },
-    { label: "Overnight Positions",  value: "Not allowed" },
-    { label: "Max Position Size",    value: "70% of account" },
+    { label: "Profit Target",          value: "None — funded immediately" },
+    { label: "Daily Loss Limit",       value: "3% of starting balance", critical: true },
+    { label: "Max Drawdown",           value: "5% of starting balance", critical: true },
+    { label: "Daily Profit Cap",       value: "4% — kill-switch, no new trades rest of day", note: true },
+    { label: "Account Duration",       value: "Unlimited" },
+    { label: "Profit Split",           value: "80% to trader" },
+    { label: "Payout Threshold",       value: "Net profit ≥ 5% of starting balance" },
+    { label: "Payout Cadence",         value: "On-demand, anytime once conditions met" },
+    { label: "Min Trading Days",       value: "7 days before first payout" },
+    { label: "Consistency Rule",       value: "Best single trade ≤ 15% of total profit", note: true },
+    { label: "Risk per Trade Idea",    value: "1% of starting balance max per idea", note: true },
+    { label: "Leverage",               value: "1:50" },
+    { label: "Trade Window",           value: "9:15 AM – 3:15 PM IST" },
+    { label: "Auto Square-off",        value: "3:15 PM IST sharp" },
+    { label: "Overnight Positions",    value: "Not allowed" },
+    { label: "Max Position Size",      value: "70% of account" },
+    { label: "Scaling",                value: "+25% of starting balance every 90 days (≥10% growth), up to +100% total" },
+    { label: "Inactivity",             value: "Auto-close after 60 days of no trades" },
   ],
   "1step": [
     { label: "Profit Target",        value: "10% (challenge phase)", note: true },
@@ -128,11 +135,14 @@ const PLAN_DETAIL: Record<PlanKey, PlanDetail> = {
     profitTargets: [
       { text: "No profit target — funded from day one", ok: true },
       { text: "First payout after minimum 7 trading days", ok: true },
+      { text: "Payout threshold: net profit ≥ 5% of starting balance", ok: true },
+      { text: "Consistency rule: best trade ≤ 15% of total profit", ok: true },
     ],
     riskMgmt: [
       { text: "Daily loss limit: 3%", ok: true, tag: "Critical" },
       { text: "Max drawdown: 5% of starting balance", ok: true, tag: "Critical" },
       { text: "Max daily profit: 4% — kill-switch activates at cap", ok: true },
+      { text: "Risk per trade idea: 1% of starting balance", ok: true },
       { text: "Index options: buying only — writing not allowed", ok: false, tag: "Critical" },
       { text: "Hedging not allowed", ok: false, tag: "Critical" },
     ],
@@ -144,10 +154,13 @@ const PLAN_DETAIL: Record<PlanKey, PlanDetail> = {
     positionSizing: [
       { text: "Maximum position size: 70% of account", ok: true },
       { text: "Leverage: 1:50", ok: true },
+      { text: "Profit split: 80% to trader", ok: true },
     ],
     evalPeriod: [
       { text: "No evaluation phase — account is live immediately", ok: true },
       { text: "Duration: unlimited", ok: true },
+      { text: "Scaling: +25% balance every 90 days (≥10% growth), up to +100% total", ok: true },
+      { text: "Inactivity: auto-close after 60 days with no trades", ok: true },
     ],
   },
   "1step": {
@@ -236,7 +249,408 @@ const PLAN_ACCENT: Record<PlanKey, { bg: string; border: string; text: string; p
   "2step": { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-300", pill: "bg-purple-500/20 border-purple-400/40 text-purple-200" },
 };
 
-// ─── Flash payout calculator ─────────────────────────────────────────────────
+// ─── Instant Funding full detail page ────────────────────────────────────────
+function InstantRulesDetail({ onBack }: { onBack: () => void }) {
+  const [instantLinkCopied, setInstantLinkCopied] = useState(false);
+
+  const BASICS = [
+    { param: "Profit Target",       spec: "None — funded immediately" },
+    { param: "Open trades limit",   spec: "Multiple (70% max position size)" },
+    { param: "Profit split",        spec: "80%" },
+    { param: "Payout cadence",      spec: "On-demand, anytime once conditions met" },
+    { param: "Payout threshold",    spec: "Net profit ≥ 5% of starting balance" },
+    { param: "Consistency rule",    spec: "Best single trade ≤ 15% of total profit" },
+    { param: "Daily profit cap",    spec: "4% — triggers kill-switch for the day" },
+    { param: "Risk per trade idea", spec: "1% of starting balance" },
+    { param: "Leverage",            spec: "1:50" },
+    { param: "Min trading days",    spec: "7 days before first payout" },
+    { param: "Scaling",             spec: "+25% of starting balance per 90-day cycle, up to +100%" },
+    { param: "Inactivity close",    spec: "60 days with no trades" },
+  ];
+
+  const LOT_TABLE = [
+    { asset: "Nifty 50 Futures",   l1: "2",  l5: "10",  l10: "20",  l20: "40"  },
+    { asset: "Bank Nifty Futures", l1: "1",  l5: "5",   l10: "10",  l20: "20"  },
+    { asset: "Fin Nifty Futures",  l1: "1",  l5: "5",   l10: "10",  l20: "20"  },
+    { asset: "Stock Futures",      l1: "1",  l5: "3",   l10: "5",   l20: "10"  },
+    { asset: "Index Options (CE/PE)", l1: "5", l5: "25", l10: "50", l20: "100" },
+    { asset: "Stock Options",      l1: "2",  l5: "10",  l10: "20",  l20: "40"  },
+    { asset: "Currency Futures",   l1: "5",  l5: "25",  l10: "50",  l20: "100" },
+    { asset: "Commodity Futures",  l1: "1",  l5: "5",   l10: "10",  l20: "20"  },
+  ];
+
+  const PROHIBITED_IF = [
+    "One-sided bets",
+    "Grid trading",
+    "High-frequency trading (trades under 60 seconds or excessive volume)",
+    "Copy trading between unrelated accounts",
+    "Usage of public third-party expert advisors (EAs)",
+    "Reverse trading and group hedging",
+    "Group copying / account management",
+    "Account churning (rolling)",
+    "Exploiting system glitches or platform inefficiencies",
+  ];
+
+  const INSTANT_SIZES = [
+    { label: "₹1,00,000",  value: 100000  },
+    { label: "₹5,00,000",  value: 500000  },
+    { label: "₹10,00,000", value: 1000000 },
+    { label: "₹20,00,000", value: 2000000 },
+  ];
+
+  const [acctSize, setAcctSize] = useState(500000);
+  const [bestTrade2, setBestTrade2] = useState("");
+  const bestNum2 = parseFloat(bestTrade2.replace(/,/g, "")) || 0;
+  const fromCons2 = bestNum2 > 0 ? bestNum2 / 0.15 : 0;
+  const fromFloor2 = acctSize * 0.05;
+  const required2 = Math.max(fromCons2, fromFloor2);
+  const rule2: "consistency" | "floor" | null = bestNum2 > 0 ? (fromCons2 >= fromFloor2 ? "consistency" : "floor") : null;
+  const fmtINR = (n: number) => "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white text-sm mb-8 transition-colors">
+        <ArrowLeft size={15} /> Back to all rules
+      </button>
+
+      {/* Header */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center">
+            <TrendingUp size={22} className="text-cyan-400" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-heading font-extrabold text-white">Instant Funding Rules</h2>
+            <span className="text-cyan-300 text-sm font-semibold">Funded immediately · no evaluation phase</span>
+          </div>
+        </div>
+        <p className="text-white/65 text-base leading-relaxed max-w-3xl">
+          FundedWealth Instant gives you a <strong className="text-white">live funded account</strong> from day one — no challenge, no evaluation. Trade within the risk limits, hit the payout threshold, and withdraw on demand. Accounts scale automatically every 90 days based on performance.
+        </p>
+        <div className="mt-5 p-4 rounded-xl bg-amber-500/5 border border-amber-500/25">
+          <p className="text-white/75 text-sm leading-relaxed">
+            <strong className="text-amber-300">Important:</strong> Breaking a <strong className="text-red-400">Critical</strong> rule (Daily Drawdown, Max Drawdown) closes your account immediately. Hitting the <strong className="text-amber-200">4% Daily Profit Cap</strong> triggers a <strong className="text-amber-200">kill-switch</strong> — no new trades for the rest of that day.
+          </p>
+        </div>
+      </div>
+
+      {/* 1. Basics */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <BarChart2 size={20} className="text-cyan-400" /> The Basics
+        </h3>
+        <Card className="glass-card border-white/10 overflow-hidden">
+          <div className="divide-y divide-white/5">
+            <div className="grid grid-cols-2 px-5 py-3 bg-white/[0.03]">
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">Parameter</span>
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">Specification</span>
+            </div>
+            {BASICS.map((row, i) => (
+              <div key={i} className="grid grid-cols-2 px-5 py-3.5 hover:bg-white/[0.02] transition-colors">
+                <span className="text-white/70 text-sm font-medium">{row.param}</span>
+                <span className="text-white text-sm font-semibold">{row.spec}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* 2. Risk Limits */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <AlertTriangle size={20} className="text-red-400" /> Risk Limits
+        </h3>
+        <div className="space-y-4">
+          <Card className="glass-card border-red-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-red-500/15 border border-red-500/30 text-red-300 uppercase">Critical</span>
+                <h4 className="text-white font-extrabold text-base">Daily Drawdown — 3%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed mb-3">You may not lose more than <strong className="text-white">3%</strong> of your account value per day. Limit recalculates at rollover based on the higher of Balance or Equity.</p>
+              <div className="px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5 text-sm text-white/55">
+                <strong className="text-white/80">Example:</strong> ₹5,00,000 account → max daily loss = <strong className="text-red-300">₹15,000</strong>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-red-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-red-500/15 border border-red-500/30 text-red-300 uppercase">Critical</span>
+                <h4 className="text-white font-extrabold text-base">Max Drawdown — 5%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed mb-3">Total account loss cannot exceed <strong className="text-white">5%</strong> of starting balance.</p>
+              <div className="px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5 text-sm text-white/55">
+                <strong className="text-white/80">Example:</strong> ₹5,00,000 account → balance cannot drop below <strong className="text-red-300">₹4,75,000</strong>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-amber-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 uppercase">Kill-switch</span>
+                <h4 className="text-white font-extrabold text-base">Daily Profit Cap — 4%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed">Once daily profit reaches <strong className="text-white">4%</strong>, the kill-switch activates. No new trades for the rest of that day. Existing positions follow normal square-off rules.</p>
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-cyan-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 uppercase">Per-trade</span>
+                <h4 className="text-white font-extrabold text-base">Risk per Trade Idea — 1%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed">Max <strong className="text-white">1%</strong> of starting balance per trade idea. A trade idea = all open positions on the same instrument in the same direction. Reopening same-direction on same instrument within <strong className="text-white">10 minutes</strong> = same idea, limit does not reset.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Max Lot Table */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Scale size={20} className="text-emerald-400" /> Max Lot Rule
+        </h3>
+        <Card className="glass-card border-white/10 overflow-x-auto">
+          <div className="min-w-[580px]">
+            <div className="grid grid-cols-5 px-4 py-3 bg-white/[0.03] text-xs font-bold text-white/40 uppercase tracking-widest">
+              <span>Asset Class</span><span className="text-center">₹1L</span><span className="text-center">₹5L</span><span className="text-center">₹10L</span><span className="text-center">₹20L</span>
+            </div>
+            <div className="divide-y divide-white/5">
+              {LOT_TABLE.map((row, i) => (
+                <div key={i} className="grid grid-cols-5 px-4 py-3 hover:bg-white/[0.02] transition-colors text-sm">
+                  <span className="text-white/70">{row.asset}</span>
+                  <span className="text-center text-white font-semibold">{row.l1}</span>
+                  <span className="text-center text-white font-semibold">{row.l5}</span>
+                  <span className="text-center text-white font-semibold">{row.l10}</span>
+                  <span className="text-center text-white font-semibold">{row.l20}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+        <p className="text-white/35 text-xs mt-2">Max lots per open position, per instrument per direction.</p>
+      </div>
+
+      {/* 3. Payouts */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <CreditCard size={20} className="text-green-400" /> Payouts
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6">
+            <p className="text-white/65 text-sm mb-4">Request a payout <strong className="text-white">on demand, anytime</strong>, once all of the following apply:</p>
+            <div className="space-y-3 mb-5">
+              {[
+                { t: <>Minimum <strong className="text-cyan-200">7 trading days</strong> have passed</> },
+                { t: <>Net profit is at least <strong className="text-cyan-200">5%</strong> of your starting balance</> },
+                { t: <>Best single trade does not exceed <strong className="text-cyan-200">15%</strong> of total profit</> },
+              ].map((row, i) => (
+                <div key={i} className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+                  <CheckCircle size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-white/80 text-sm">{row.t}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Payout calculator */}
+            <div className="mb-5 rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-4">
+              <p className="text-cyan-300 text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                <TrendingUp size={11} /> Calculate your required overall profit
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="block text-white/45 text-[11px] font-semibold mb-1.5 uppercase tracking-wider">Account size</label>
+                  <select value={acctSize} onChange={(e) => setAcctSize(Number(e.target.value))}
+                    className="w-full h-10 px-3 rounded-lg bg-white/[0.06] border border-white/15 text-white text-sm font-medium focus:outline-none focus:border-cyan-500/50 transition-colors appearance-none cursor-pointer">
+                    {INSTANT_SIZES.map((s) => (
+                      <option key={s.value} value={s.value} className="bg-[#1A0030] text-white">{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-white/45 text-[11px] font-semibold mb-1.5 uppercase tracking-wider">Best trade profit (₹)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm pointer-events-none">₹</span>
+                    <input type="number" min="0" placeholder="e.g. 5000" value={bestTrade2} onChange={(e) => setBestTrade2(e.target.value)}
+                      className="w-full h-10 pl-7 pr-3 rounded-lg bg-white/[0.06] border border-white/15 text-white text-sm font-medium placeholder-white/25 focus:outline-none focus:border-cyan-500/50 transition-colors" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-white/45 text-[11px] font-semibold mb-1.5 uppercase tracking-wider">Overall profit should be</label>
+                  <div className={`h-10 px-3 rounded-lg border flex items-center text-sm font-bold transition-all ${bestNum2 > 0 ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300" : "bg-white/[0.03] border-white/10 text-white/30"}`}>
+                    {bestNum2 > 0 ? fmtINR(required2) : "—"}
+                  </div>
+                  {bestNum2 > 0 && <p className="text-white/40 text-[11px] mt-1">or more{rule2 === "floor" && <span className="ml-1 text-cyan-300/70"> (5% floor applies)</span>}</p>}
+                </div>
+              </div>
+              {bestNum2 > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className={`px-3 py-2 rounded-lg border text-xs ${rule2 === "consistency" ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-200" : "bg-white/[0.02] border-white/5 text-white/35"}`}>
+                    <span className="font-bold block mb-0.5">15% consistency rule</span>
+                    {fmtINR(fromCons2)}{rule2 === "consistency" && <span className="ml-1 font-extrabold">← applies</span>}
+                  </div>
+                  <div className={`px-3 py-2 rounded-lg border text-xs ${rule2 === "floor" ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-200" : "bg-white/[0.02] border-white/5 text-white/35"}`}>
+                    <span className="font-bold block mb-0.5">5% floor ({fmtINR(acctSize)} account)</span>
+                    {fmtINR(fromFloor2)}{rule2 === "floor" && <span className="ml-1 font-extrabold">← applies</span>}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-white/5 pt-4">
+              <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-3">How to request a withdrawal</p>
+              <div className="space-y-2">
+                {["Ensure 7+ trading days have passed and profit ≥ 5% of starting balance",
+                  "Verify consistency: best trade ≤ 15% of total profit",
+                  "Go to Dashboard → Withdrawals → choose UPI / bank transfer"].map((step, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-white/65">
+                    <span className="w-5 h-5 rounded-full bg-white/10 text-white/50 text-xs flex items-center justify-center shrink-0 mt-0.5 font-bold">{i + 1}</span>
+                    {step}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 4. Prohibited Practices */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <XCircle size={20} className="text-red-400" /> Prohibited Practices
+        </h3>
+        <Card className="glass-card border-red-500/15">
+          <CardContent className="p-6 space-y-2.5">
+            {PROHIBITED_IF.map((item, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <XCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                <span className="text-white/70 text-sm">{item}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 5. News Trading */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <TrendingUp size={20} className="text-blue-400" /> News Trading
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 text-white/65 text-sm leading-relaxed">
+            Enabled by default. You're free to trade around major events (RBI policy, US Fed, NFP, etc.). <strong className="text-white">News straddling or execution designed to gain an unfair advantage is not permitted.</strong>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 6. Holding Rules */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Clock size={20} className="text-cyan-400" /> Holding Rules
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 space-y-3">
+            <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+              <XCircle size={15} className="text-red-400 shrink-0 mt-0.5" />
+              <span className="text-white/80 text-sm"><strong className="text-white">Overnight positions not allowed.</strong> All open positions squared off at <strong className="text-white">3:15 PM IST</strong>.</span>
+            </div>
+            <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+              <XCircle size={15} className="text-red-400 shrink-0 mt-0.5" />
+              <span className="text-white/80 text-sm"><strong className="text-white">Weekend holding not allowed.</strong> Close all positions by Friday 3:15 PM IST.</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 7. Trading Window */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Clock size={20} className="text-blue-400" /> Trading Window
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 space-y-2.5">
+            {["Market hours: 9:15 AM – 3:30 PM IST",
+              "Trading allowed: 9:15 AM – 3:15 PM IST",
+              "Auto square-off: 3:15 PM IST sharp — all positions closed automatically",
+              "New orders blocked after 3:15 PM IST"].map((item, i) => (
+              <div key={i} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.03] border border-white/5">
+                <Clock size={14} className="text-blue-400 shrink-0" />
+                <span className="text-white/80 text-sm">{item}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 8. Account Limits */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Lock size={20} className="text-purple-400" /> Account Limits
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 text-white/65 text-sm leading-relaxed space-y-2">
+            <p>A <strong className="text-white">combined cap</strong> applies across all account types based on <strong className="text-white">starting balance only</strong>.</p>
+            <p>Scaling balance increases do <strong className="text-white">not</strong> count toward the cap — only original funded amounts.</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 9. Scaling */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Target size={20} className="text-emerald-400" /> Scaling
+        </h3>
+        <Card className="glass-card border-emerald-500/20">
+          <CardContent className="p-6">
+            <div className="space-y-3">
+              {[
+                { label: "Trigger",    value: "Grow balance by ≥ 10% over a 90-day cycle" },
+                { label: "Reward",     value: "+25% of your original starting balance added to account" },
+                { label: "Frequency",  value: "Repeatable every 90 days" },
+                { label: "Cap",        value: "Up to +100% of starting balance total increase" },
+              ].map((row, i) => (
+                <div key={i} className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+                  <CheckCircle size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-white/80 text-sm"><strong className="text-white">{row.label}:</strong> {row.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 px-4 py-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-sm text-white/55">
+              <strong className="text-emerald-300">Example:</strong> ₹5,00,000 → 10% growth in 90 days → account becomes ₹6,25,000. Repeat up to ₹10,00,000 total.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 10. Inactivity */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Calendar size={20} className="text-white/40" /> Inactivity
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 text-white/65 text-sm leading-relaxed">
+            If no trades are placed within <strong className="text-white">60 days</strong> of account purchase or since the last trade, the account is automatically closed.
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* CTA */}
+      <Card className="border-0 overflow-hidden bg-gradient-to-br from-cyan-600 via-teal-600 to-cyan-700 shadow-2xl shadow-cyan-500/20">
+        <CardContent className="p-8 text-center">
+          <h3 className="text-2xl font-heading font-extrabold text-white mb-2">Ready to trade Instant?</h3>
+          <p className="text-white/80 mb-5 text-sm">Live funded account. No evaluation. Withdraw on demand.</p>
+          <Link href="/sign-up">
+            <Button size="lg" className="bg-white text-cyan-700 hover:bg-white/90 rounded-full px-8 h-11 font-extrabold shadow-lg">
+              <TrendingUp size={15} className="mr-2" /> Get Instant account
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 const FLASH_SIZES = [
   { label: "₹50,000",     value: 50000   },
   { label: "₹1,00,000",   value: 100000  },
@@ -683,6 +1097,7 @@ export default function Rules() {
   const [activePlan, setActivePlan] = useState<PlanKey | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [flashLinkCopied, setFlashLinkCopied] = useState(false);
+  const [instantLinkCopied, setInstantLinkCopied] = useState(false);
 
   // Flash plan — show its own full detail page
   if (activePlan === "flash") {
@@ -739,6 +1154,59 @@ export default function Rules() {
         </div>
         <div className="container mx-auto px-4 py-12">
           <FlashRulesDetail onBack={() => setActivePlan(null)} />
+        </div>
+      </div>
+    );
+  }
+
+  // Instant Funding plan — show its own full detail page
+  if (activePlan === "instant") {
+    const instantUrl = "https://fundedwealth.com/rules?plan=instant";
+    const handleInstantShare = async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "FundedWealth Instant Funding Rules",
+            text: "Check out the Instant Funding rules on FundedWealth — live funded account, 80% profit split, no evaluation.",
+            url: instantUrl,
+          });
+        } catch (_) { /* dismissed */ }
+      } else {
+        await navigator.clipboard.writeText(instantUrl);
+        setInstantLinkCopied(true);
+        setTimeout(() => setInstantLinkCopied(false), 2000);
+      }
+    };
+    return (
+      <div className="min-h-screen bg-[#0D0020] text-white">
+        <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
+          <div className="container mx-auto px-4 flex items-center justify-between">
+            <button onClick={() => setActivePlan(null)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <ArrowLeft size={20} />
+              <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+              <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
+            </button>
+            <h1 className="text-lg font-heading font-bold flex items-center gap-2">
+              <TrendingUp className="text-cyan-400" size={18} /> Instant Funding Rules
+            </h1>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleInstantShare}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all duration-200
+                  ${instantLinkCopied
+                    ? "bg-green-500/15 border-green-500/40 text-green-300"
+                    : "bg-white/[0.05] border-white/15 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/30"
+                  }`}
+                title="Share Instant Funding Rules link"
+              >
+                {instantLinkCopied ? <><Check size={13} /> Copied!</> : <><Share2 size={13} /> Share</>}
+              </button>
+              <Link href="/"><Button variant="ghost" className="text-white/70 hover:text-white">Home</Button></Link>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-12">
+          <InstantRulesDetail onBack={() => setActivePlan(null)} />
         </div>
       </div>
     );
