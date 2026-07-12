@@ -4,7 +4,8 @@ import SEOHead from "@/components/SEOHead";
 import {
   ArrowLeft, Shield, CheckCircle, XCircle, AlertTriangle, Info,
   BookOpen, Clock, Target, Activity, Calendar, Scale, FileText,
-  LifeBuoy, ArrowRight, Zap, Search,
+  LifeBuoy, ArrowRight, Zap, Search, CreditCard, TrendingUp,
+  Lock, BarChart2, HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -235,10 +236,354 @@ const PLAN_ACCENT: Record<PlanKey, { bg: string; border: string; text: string; p
   "2step": { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-300", pill: "bg-purple-500/20 border-purple-400/40 text-purple-200" },
 };
 
+// ─── Flash Rules full detail page ────────────────────────────────────────────
+function FlashRulesDetail({ onBack }: { onBack: () => void }) {
+  const BASICS = [
+    { param: "Trading time",        spec: "24 hours from the first trade" },
+    { param: "Open trades limit",   spec: "One open trade at a time" },
+    { param: "Profit split",        spec: "80%" },
+    { param: "Payout cycle",        spec: "Eligible after 24 hours" },
+    { param: "Payout threshold",    spec: "3% net profit" },
+    { param: "Profit target",       spec: "None — instant funded" },
+    { param: "Consistency rule",    spec: "15% best-trade rule" },
+    { param: "Daily profit cap",    spec: "4% — triggers kill-switch for the day" },
+    { param: "Scaling",             spec: "Not available" },
+  ];
+
+  const PROHIBITED = [
+    "Opening multiple small trades of the same idea to bypass the consistency rule",
+    "One-sided bets",
+    "Grid trading",
+    "High-frequency trading (trades under 60 seconds or excessive volume)",
+    "Copy trading between unrelated accounts",
+    "Usage of public third-party expert advisors (EAs)",
+    "Reverse trading and group hedging",
+    "Group copying / account management",
+    "Account churning (rolling)",
+    "Exploiting system glitches or platform inefficiencies",
+  ];
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-white/50 hover:text-white text-sm mb-8 transition-colors"
+      >
+        <ArrowLeft size={15} /> Back to all rules
+      </button>
+
+      {/* Header */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+            <Zap size={22} className="text-amber-400" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-heading font-extrabold text-white">Flash Rules</h2>
+            <span className="text-amber-300 text-sm font-semibold">Instant funded · 24-hour account</span>
+          </div>
+        </div>
+        <p className="text-white/65 text-base leading-relaxed max-w-3xl">
+          FundedWealth Flash gives instant access to a live trading account, active for <strong className="text-white">24 hours</strong> from your first trade.
+          Only <strong className="text-white">one trade</strong> can be open at a time. Profits are shared at an <strong className="text-white">80% split</strong>,
+          and the account closes automatically when the period ends. Meet the payout threshold and the consistency rule to qualify for a payout.
+        </p>
+        <div className="mt-5 p-4 rounded-xl bg-amber-500/5 border border-amber-500/25">
+          <p className="text-white/75 text-sm leading-relaxed">
+            <strong className="text-amber-300">Important:</strong> Breaking a <strong className="text-red-400">Critical</strong> rule
+            (Daily Drawdown, Max Drawdown) disqualifies your account immediately. Hitting the{" "}
+            <strong className="text-amber-200">4% Daily Profit Cap</strong> triggers a{" "}
+            <strong className="text-amber-200">kill-switch</strong> — no new trades for the rest of that day.
+          </p>
+        </div>
+      </div>
+
+      {/* The Basics table */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <BarChart2 size={20} className="text-amber-400" /> The Basics
+        </h3>
+        <Card className="glass-card border-white/10 overflow-hidden">
+          <div className="divide-y divide-white/5">
+            <div className="grid grid-cols-2 px-5 py-3 bg-white/[0.03]">
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">Parameter</span>
+              <span className="text-white/40 text-xs font-bold uppercase tracking-widest">Specification</span>
+            </div>
+            {BASICS.map((row, i) => (
+              <div key={i} className="grid grid-cols-2 px-5 py-3.5 hover:bg-white/[0.02] transition-colors">
+                <span className="text-white/70 text-sm font-medium">{row.param}</span>
+                <span className={`text-sm font-semibold ${
+                  row.param.includes("profit cap") || row.param.includes("consistency") ? "text-amber-200" : "text-white"
+                }`}>{row.spec}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Risk Limits */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <AlertTriangle size={20} className="text-red-400" /> Risk Limits
+        </h3>
+        <div className="space-y-4">
+          {/* Daily Drawdown */}
+          <Card className="glass-card border-red-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-red-500/15 border border-red-500/30 text-red-300 uppercase">Critical</span>
+                <h4 className="text-white font-extrabold text-base">Daily Drawdown — 2%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed mb-3">
+                You may not lose more than <strong className="text-white">2%</strong> of your account value per day.
+                At day rollover, your Daily Drawdown limit is recalculated based on the <strong className="text-white">higher</strong> of
+                your Balance (excluding open trades) or your Equity (including open trades).
+              </p>
+              <div className="px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5 text-sm text-white/55">
+                <strong className="text-white/80">Example:</strong> Balance ₹2,50,000, Equity ₹2,62,500 at rollover → next day's Daily Drawdown limit = 2% of ₹2,62,500 = <strong className="text-amber-200">₹5,250</strong>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Max Drawdown */}
+          <Card className="glass-card border-red-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-red-500/15 border border-red-500/30 text-red-300 uppercase">Critical</span>
+                <h4 className="text-white font-extrabold text-base">Max Drawdown — 4%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed mb-3">
+                Your maximum loss is limited to <strong className="text-white">4%</strong> of your starting balance.
+              </p>
+              <div className="px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5 text-sm text-white/55">
+                <strong className="text-white/80">Example:</strong> With a ₹2,50,000 starting balance, your account can't drop below <strong className="text-amber-200">₹2,40,000</strong>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Risk per trade */}
+          <Card className="glass-card border-amber-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300 uppercase">Suggested</span>
+                <h4 className="text-white font-extrabold text-base">Risk per Trade Idea — 1%</h4>
+              </div>
+              <p className="text-white/65 text-sm leading-relaxed">
+                You may not risk more than <strong className="text-white">1%</strong> of your starting account balance at any time in one trade idea.
+                A trade idea includes all open positions on the same instrument in the same direction (Buy or Sell).
+                Closing and reopening a position in the same direction on the same instrument within <strong className="text-white">10 minutes</strong> is
+                treated as the same trade idea and does not reset the limit. Exceeding this results in a hard breach.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Payouts */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <CreditCard size={20} className="text-green-400" /> Payouts
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6">
+            <p className="text-white/65 text-sm mb-4">
+              You can request <strong className="text-white">one payout</strong> after the 24-hour account period ends, if <strong className="text-white">both</strong> of the following apply:
+            </p>
+            <div className="space-y-3 mb-5">
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+                <CheckCircle size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                <span className="text-white/80 text-sm">Your best single trade does not exceed <strong className="text-amber-200">15%</strong> of your total profit
+                  <span className="text-white/45 ml-1">(e.g. total profit ₹10,000 → best trade must be ₹1,500 or less)</span>
+                </span>
+              </div>
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+                <CheckCircle size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                <span className="text-white/80 text-sm">Your net profit is at least <strong className="text-amber-200">3%</strong> of your starting balance</span>
+              </div>
+            </div>
+            <div className="border-t border-white/5 pt-4">
+              <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-3">How to request a withdrawal</p>
+              <div className="space-y-2">
+                {[
+                  "Confirm your account has passed its 24-hour lifetime",
+                  "Go to your dashboard and choose your withdrawal method (UPI / bank transfer)",
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm text-white/65">
+                    <span className="w-5 h-5 rounded-full bg-white/10 text-white/50 text-xs flex items-center justify-center shrink-0 mt-0.5 font-bold">{i + 1}</span>
+                    {step}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Prohibited Practices */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <XCircle size={20} className="text-red-400" /> Prohibited Practices
+          <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300">Needs confirmation</span>
+        </h3>
+        <Card className="glass-card border-red-500/15">
+          <CardContent className="p-6">
+            <div className="space-y-2.5">
+              {PROHIBITED.map((item, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <XCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                  <span className="text-white/70 text-sm">{item}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* News Trading */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <TrendingUp size={20} className="text-blue-400" /> News Trading
+          <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300">Needs confirmation</span>
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 text-white/65 text-sm leading-relaxed">
+            Enabled by default. You're free to open and close trades around major economic events (RBI policy, US Fed announcements, etc.).
+            News straddling or execution designed to gain an unfair advantage is not permitted.
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Holding Rules */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Clock size={20} className="text-cyan-400" /> Holding Rules
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+                <CheckCircle size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+                <span className="text-white/80 text-sm"><strong className="text-white">Overnight holding</strong> is allowed within the 24-hour window.</span>
+              </div>
+              <div className="flex items-start gap-3 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5">
+                <AlertTriangle size={15} className="text-amber-400 shrink-0 mt-0.5" />
+                <span className="text-white/80 text-sm"><strong className="text-white">Weekend holding</strong> is technically allowed, but positions may close automatically if the market shuts before your 24-hour period ends.</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Account Limits */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <Lock size={20} className="text-purple-400" /> Account Limits
+          <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-300">Needs confirmation</span>
+        </h3>
+        <Card className="glass-card border-white/10">
+          <CardContent className="p-6 text-white/65 text-sm">
+            You can hold up to <strong className="text-white">three Flash accounts</strong> of any size simultaneously.
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Confirmed vs needs decision */}
+      <div className="mb-10">
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
+          <HelpCircle size={20} className="text-white/40" /> What's Confirmed vs What Needs a Decision
+        </h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="glass-card border-green-500/20">
+            <CardContent className="p-5">
+              <p className="text-green-400 text-xs font-bold uppercase tracking-widest mb-3">✅ Confirmed — already live</p>
+              <div className="space-y-1.5 text-sm text-white/65">
+                {[
+                  "Trading time (24 hours)",
+                  "Open trades limit (1 at a time)",
+                  "Profit split (80%)",
+                  "Payout cycle (after 24 hours)",
+                  "Payout threshold (3% net)",
+                  "No profit target",
+                  "Consistency rule (15%)",
+                  "Daily drawdown (2%)",
+                  "Max drawdown (4%)",
+                  "Daily profit cap / kill-switch (4%)",
+                  "Scaling: not available",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <CheckCircle size={12} className="text-green-400 shrink-0" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-amber-500/20">
+            <CardContent className="p-5">
+              <p className="text-amber-300 text-xs font-bold uppercase tracking-widest mb-3">🆕 New — needs your sign-off</p>
+              <div className="space-y-1.5 text-sm text-white/65">
+                {[
+                  "Risk per Trade Idea (1%)",
+                  "Prohibited Practices list",
+                  "News Trading policy",
+                  "Account Limits (max 3 Flash accounts)",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <AlertTriangle size={12} className="text-amber-400 shrink-0" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <Card className="border-0 overflow-hidden bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 shadow-2xl shadow-amber-500/20">
+        <CardContent className="p-8 text-center">
+          <h3 className="text-2xl font-heading font-extrabold text-white mb-2">Ready to trade Flash?</h3>
+          <p className="text-white/80 mb-5 text-sm">24-hour funded account. No profit target. Start now.</p>
+          <Link href="/sign-up">
+            <Button size="lg" className="bg-white text-amber-700 hover:bg-white/90 rounded-full px-8 h-11 font-extrabold shadow-lg">
+              <Zap size={15} className="mr-2" /> Get Flash account
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function Rules() {
   const [activePlan, setActivePlan] = useState<PlanKey | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Flash plan — show its own full detail page
+  if (activePlan === "flash") {
+    return (
+      <div className="min-h-screen bg-[#0D0020] text-white">
+        <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
+          <div className="container mx-auto px-4 flex items-center justify-between">
+            <button onClick={() => setActivePlan(null)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <ArrowLeft size={20} />
+              <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+              <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
+            </button>
+            <h1 className="text-lg font-heading font-bold flex items-center gap-2">
+              <Zap className="text-amber-400" size={18} /> Flash Rules
+            </h1>
+            <Link href="/"><Button variant="ghost" className="text-white/70 hover:text-white">Home</Button></Link>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-12">
+          <FlashRulesDetail onBack={() => setActivePlan(null)} />
+        </div>
+      </div>
+    );
+  }
 
   // When no plan selected, default detail/qr to flash for the detail cards
   const selectedPlan: PlanKey = activePlan ?? "flash";
