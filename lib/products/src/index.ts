@@ -78,8 +78,12 @@ export interface ProductDefinition {
   profitSplit: string;
   duration: string;
   sizes: ProductSize[];
-  /** Numeric risk settings used for account provisioning. */
+  /** Numeric risk settings used for account provisioning — Phase 1 (or only phase). */
   rules: ProvisioningRules;
+  /** Phase 2 rules (2-Step only). Undefined for Flash/Instant/1-Step. */
+  rulesPhase2?: ProvisioningRules;
+  /** Funded-trader rules (after passing all eval phases). */
+  rulesFunded?: ProvisioningRules;
 }
 
 export const PRODUCTS: Record<PlanType, ProductDefinition> = {
@@ -189,6 +193,10 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     ],
     // 2-Step: Phase1=8% target, Phase2=5% target, 3% daily, 8% max drawdown, 5 min days/phase, 1:30 leverage
     rules: { profitTargetPct: 8, dailyLossLimitPct: 3, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 365, type: "2step_evaluation_phase1" },
+    // Phase 2 rules (stored separately for provisioning at promotion time)
+    rulesPhase2: { profitTargetPct: 5, dailyLossLimitPct: 3, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 365, type: "evaluation_phase2" },
+    // Funded rules (after passing both phases — max drawdown drops to 6%)
+    rulesFunded: { profitTargetPct: 0, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 3, maxDaysAllowed: 365, type: "funded" },
   },
 };
 
