@@ -417,7 +417,7 @@ router.post("/login", loginLimiter, requireTurnstile, async (req, res) => {
 router.post("/logout", authMiddleware, async (req, res) => {
   try {
     if (req.auth?.sessionId) {
-      await SecurityService.revokeSession(req.auth.sessionId);
+      await SecurityService.revokeSession(req.legacyAuth?.sessionId as unknown as number ?? 0);
     }
 
     logger.info({ userId: req.auth?.userId }, "User logged out");
@@ -472,8 +472,10 @@ router.post(
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      const user = req.auth.user;
-      const setup = TOTPService.generateSetup(user.email);
+      // legacyAuth.user is set by authMiddleware (session-based); fall back to DB lookup
+      const legacyUser = (req as any).legacyAuth?.user;
+      const userEmail = legacyUser?.email ?? req.auth.email ?? "";
+      const setup = TOTPService.generateSetup(userEmail);
 
       // Store secret temporarily (not enabled until verified)
       await db
@@ -550,13 +552,15 @@ router.post(
       }
 
       // Mark session MFA as verified
-      if (req.auth.sessionId) {
-        await SecurityService.verifyMfaForSession(req.auth.sessionId, true);
+      const legacySessionId = (req as any).legacyAuth?.sessionId as number | undefined;
+      const legacySessionToken = (req as any).legacyAuth?.sessionToken as string | undefined;
+      if (legacySessionId) {
+        await SecurityService.verifyMfaForSession(legacySessionId, true);
 
         // Rotate session after MFA verification (privilege escalation)
         const ipAddress = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket.remoteAddress || "";
         const newToken = await SessionHardeningService.rotateSession(
-          req.auth.sessionId, String(req.auth.userId), ipAddress, req.headers["user-agent"]
+          legacySessionId, String(req.auth.userId), ipAddress, req.headers["user-agent"]
         );
 
         if (newToken) {
@@ -612,8 +616,9 @@ router.post(
         .where(eq(twoFactorSettings.userId, req.auth.userId));
 
       // Mark session MFA verified
-      if (req.auth.sessionId) {
-        await SecurityService.verifyMfaForSession(req.auth.sessionId, true);
+      const legacySessionId2 = (req as any).legacyAuth?.sessionId as number | undefined;
+      if (legacySessionId2) {
+        await SecurityService.verifyMfaForSession(legacySessionId2, true);
       }
 
       logger.info({ userId: req.auth.userId, remainingCodes: result.remainingCodes.length }, "Backup code used");
@@ -803,6 +808,81 @@ router.post("/create-password", async (req, res) => {
   } catch (err) {
     logger.error({ err }, "create-password error");
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+/**
+ * POST /api/auth/forgot-password
+ * Sends a password reset email via Resend (bypasses Supabase email rate limit).
+ * Body: { email: string }
+ */
+import { sendEmail } from "../lib/email";
+
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return res.status(400).json({ error: "Valid email is required." });
+    }
+
+    const normalizedEmail = ValidationService.normalizeEmail(email);
+
+    // Build admin client to generate the reset link server-side
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) {
+      return res.status(503).json({ error: "Auth service not configured." });
+    }
+    const admin = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false },
+      realtime: { transport: ws },
+    });
+
+    // Generate the reset link via admin API (no email sent by Supabase)
+    const { data, error: linkErr } = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email: normalizedEmail,
+      options: {
+        redirectTo: `${process.env.SITE_URL || "https://fundedwealth.com"}/sign-in?reset=true`,
+      },
+    });
+
+    if (linkErr) {
+      logger.error({ linkErr, email: normalizedEmail }, "forgot-password: generate link failed");
+      // Always return 200 to avoid email enumeration
+      return res.json({ success: true });
+    }
+
+    const resetLink = data?.properties?.action_link;
+    if (resetLink) {
+      await sendEmail({
+        to: normalizedEmail,
+        subject: "Reset Your FundedWealth Password",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1A0030; color: white; padding: 40px; border-radius: 16px;">
+            <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height: 40px; margin-bottom: 24px;" />
+            <h2 style="color: #FF8A3D; margin-bottom: 16px;">Reset Your Password</h2>
+            <p style="color: rgba(255,255,255,0.7); line-height: 1.6;">You requested a password reset for your FundedWealth account.</p>
+            <p style="color: rgba(255,255,255,0.7); line-height: 1.6;">Click the button below to set a new password. This link expires in 1 hour.</p>
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #4A00E0, #7C3AED); color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: bold; font-size: 16px;">
+                Reset Password
+              </a>
+            </div>
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.6;">If you didn't request this, you can safely ignore this email. Your password will not change.</p>
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0;" />
+            <p style="color: rgba(255,255,255,0.4); font-size: 12px;">FundedWealth — India's #1 Prop Trading Firm</p>
+          </div>
+        `,
+      });
+    }
+
+    logger.info({ email: normalizedEmail }, "Password reset email dispatched via Resend");
+    return res.json({ success: true });
+  } catch (err) {
+    logger.error({ err }, "forgot-password error");
+    // Always 200 — don't leak whether account exists
+    return res.json({ success: true });
   }
 });
 

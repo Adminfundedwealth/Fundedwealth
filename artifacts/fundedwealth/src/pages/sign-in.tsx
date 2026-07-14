@@ -199,14 +199,15 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
     if (!isLoaded || cooldown > 0) return;
     setError(""); setLoading(true);
     try {
-      const { error: err } = await resetPassword(email);
-      if (err) {
-        setError(friendlyResetError(err));
-        // If rate limited, start cooldown automatically
-        const msg = err.toLowerCase();
-        if (msg.includes("rate limit") || msg.includes("too many") || msg.includes("exceeded")) {
-          setCooldown(RESET_COOLDOWN_SECS);
-        }
+      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://fundedwealth-api-production.up.railway.app";
+      const res = await fetch(`${apiUrl}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(friendlyResetError(data?.error || "Failed to send reset email."));
       } else {
         setSuccess("Password reset link sent! Check your email (including spam folder).");
         setCooldown(RESET_COOLDOWN_SECS);
