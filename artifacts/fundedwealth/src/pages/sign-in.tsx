@@ -195,15 +195,15 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(friendlyResetError(data?.error || "Failed to send reset email."));
+        setError(friendlyResetError(data?.error || "Failed to send reset email. Please try again."));
       } else {
         setSuccess("Password reset link sent! Check your email (including spam folder).");
         setCooldown(RESET_COOLDOWN_SECS);
       }
     } catch (err: any) {
-      setError(friendlyResetError(err?.message || "Failed to send reset email."));
+      setError(friendlyResetError(err?.message || "Network error. Please check your connection and try again."));
     } finally { setLoading(false); }
   }
 

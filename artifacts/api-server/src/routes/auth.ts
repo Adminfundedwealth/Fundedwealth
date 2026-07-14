@@ -818,6 +818,63 @@ router.post("/create-password", async (req, res) => {
  */
 import { sendEmail } from "../lib/email";
 
+/**
+ * GET /api/auth/email-diagnostic
+ * Returns the email/Supabase config state (no secrets exposed).
+ * Used to diagnose why reset emails aren't sending.
+ */
+router.get("/email-diagnostic", async (_req, res) => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const resendKey = process.env.RESEND_API_KEY;
+  const siteUrl = process.env.SITE_URL;
+
+  // Test Resend connectivity if key present
+  let resendStatus = "not_configured";
+  let resendError = "";
+  if (resendKey) {
+    try {
+      const r = await fetch("https://api.resend.com/domains", {
+        headers: { Authorization: `Bearer ${resendKey}` },
+      });
+      resendStatus = r.ok ? "connected" : `error_${r.status}`;
+      if (!r.ok) resendError = await r.text();
+    } catch (e: any) {
+      resendStatus = "fetch_failed";
+      resendError = e.message;
+    }
+  }
+
+  // Test Supabase admin connectivity
+  let supabaseStatus = "not_configured";
+  if (supabaseUrl && serviceKey) {
+    try {
+      const admin = createClient(supabaseUrl, serviceKey, {
+        auth: { persistSession: false },
+        realtime: { transport: ws },
+      });
+      const { error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 });
+      supabaseStatus = error ? `error: ${error.message}` : "connected";
+    } catch (e: any) {
+      supabaseStatus = `fetch_failed: ${e.message}`;
+    }
+  }
+
+  res.json({
+    supabase: {
+      url: supabaseUrl ? supabaseUrl.substring(0, 30) + "..." : "MISSING",
+      serviceKey: serviceKey ? "set (" + serviceKey.length + " chars)" : "MISSING",
+      status: supabaseStatus,
+    },
+    resend: {
+      apiKey: resendKey ? "set (" + resendKey.length + " chars)" : "MISSING",
+      status: resendStatus,
+      error: resendError || undefined,
+    },
+    siteUrl: siteUrl || "NOT SET (using https://fundedwealth.com)",
+  });
+});
+
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body || {};
@@ -827,10 +884,18 @@ router.post("/forgot-password", async (req, res) => {
 
     const normalizedEmail = ValidationService.normalizeEmail(email);
 
-    // Build admin client to generate the reset link server-side
+    // ── Check RESEND_API_KEY first ──────────────────────────────────────────
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) {
+      logger.error({ email: normalizedEmail }, "forgot-password: RESEND_API_KEY not set — email cannot be sent");
+      return res.status(503).json({ error: "Email service not configured. Please contact support." });
+    }
+
+    // ── Build Supabase admin client ─────────────────────────────────────────
     const supabaseUrl = process.env.SUPABASE_URL;
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseUrl || !serviceKey) {
+      logger.error({ email: normalizedEmail }, "forgot-password: Supabase env vars missing");
       return res.status(503).json({ error: "Auth service not configured." });
     }
     const admin = createClient(supabaseUrl, serviceKey, {
@@ -838,7 +903,7 @@ router.post("/forgot-password", async (req, res) => {
       realtime: { transport: ws },
     });
 
-    // Generate the reset link via admin API (no email sent by Supabase)
+    // ── Generate reset link (server-side, no Supabase email) ────────────────
     const { data, error: linkErr } = await admin.auth.admin.generateLink({
       type: "recovery",
       email: normalizedEmail,
@@ -848,41 +913,50 @@ router.post("/forgot-password", async (req, res) => {
     });
 
     if (linkErr) {
-      logger.error({ linkErr, email: normalizedEmail }, "forgot-password: generate link failed");
-      // Always return 200 to avoid email enumeration
-      return res.json({ success: true });
+      logger.error({ linkErr, email: normalizedEmail }, "forgot-password: generateLink failed");
+      // Return 200 to avoid email enumeration — but log clearly
+      return res.json({ success: true, _debug: "link_gen_failed" });
     }
 
     const resetLink = data?.properties?.action_link;
-    if (resetLink) {
-      await sendEmail({
-        to: normalizedEmail,
-        subject: "Reset Your FundedWealth Password",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1A0030; color: white; padding: 40px; border-radius: 16px;">
-            <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height: 40px; margin-bottom: 24px;" />
-            <h2 style="color: #FF8A3D; margin-bottom: 16px;">Reset Your Password</h2>
-            <p style="color: rgba(255,255,255,0.7); line-height: 1.6;">You requested a password reset for your FundedWealth account.</p>
-            <p style="color: rgba(255,255,255,0.7); line-height: 1.6;">Click the button below to set a new password. This link expires in 1 hour.</p>
-            <div style="text-align: center; margin: 32px 0;">
-              <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #4A00E0, #7C3AED); color: white; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: bold; font-size: 16px;">
-                Reset Password
-              </a>
-            </div>
-            <p style="color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.6;">If you didn't request this, you can safely ignore this email. Your password will not change.</p>
-            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0;" />
-            <p style="color: rgba(255,255,255,0.4); font-size: 12px;">FundedWealth — India's #1 Prop Trading Firm</p>
-          </div>
-        `,
-      });
+    if (!resetLink) {
+      logger.error({ email: normalizedEmail, data }, "forgot-password: no action_link in response");
+      return res.json({ success: true, _debug: "no_action_link" });
     }
 
-    logger.info({ email: normalizedEmail }, "Password reset email dispatched via Resend");
+    // ── Send via Resend ─────────────────────────────────────────────────────
+    const sent = await sendEmail({
+      to: normalizedEmail,
+      subject: "Reset Your FundedWealth Password",
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
+          <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+          <h2 style="color:#FF8A3D;margin-bottom:16px;">Reset Your Password</h2>
+          <p style="color:rgba(255,255,255,0.7);line-height:1.6;">You requested a password reset for your FundedWealth account.</p>
+          <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
+          <div style="text-align:center;margin:32px 0;">
+            <a href="${resetLink}" style="display:inline-block;background:linear-gradient(135deg,#4A00E0,#7C3AED);color:white;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:bold;font-size:16px;">
+              Reset Password
+            </a>
+          </div>
+          <p style="color:rgba(255,255,255,0.4);font-size:13px;line-height:1.6;">If you didn't request this, you can safely ignore this email. Your password will not change.</p>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0;" />
+          <p style="color:rgba(255,255,255,0.4);font-size:12px;">FundedWealth — India's #1 Prop Trading Firm · support@fundedwealth.com</p>
+        </div>
+      `,
+    });
+
+    if (!sent) {
+      logger.error({ email: normalizedEmail }, "forgot-password: Resend API call failed — check RESEND_API_KEY and domain verification");
+      return res.status(503).json({ error: "Failed to send reset email. Please try again or contact support." });
+    }
+
+    logger.info({ email: normalizedEmail }, "forgot-password: reset email sent via Resend");
     return res.json({ success: true });
+
   } catch (err) {
-    logger.error({ err }, "forgot-password error");
-    // Always 200 — don't leak whether account exists
-    return res.json({ success: true });
+    logger.error({ err }, "forgot-password: unexpected error");
+    return res.status(500).json({ error: "Server error. Please try again." });
   }
 });
 
