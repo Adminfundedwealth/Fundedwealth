@@ -52,7 +52,8 @@
   <link rel="alternate" hreflang="x-default" href="https://fundedwealth.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://kzomfotqxuisolnsvnwh.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://nysrxvpjdlvzvcawysvh.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://fundedwealth-api-production.up.railway.app" crossorigin>
   <link rel="dns-prefetch" href="https://checkout.razorpay.com">
   <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
@@ -62,10 +63,44 @@
   <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="/urgency-system.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="/urgency-system.css"></noscript>
+  <style>
+    #fw-init-loader {
+      position: fixed; inset: 0;
+      background: #0D0020;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    #fw-init-loader.hide { opacity: 0; pointer-events: none; }
+    .fw-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(139,92,246,0.2);
+      border-top-color: #7C3AED;
+      border-radius: 50%;
+      animation: fw-spin 0.7s linear infinite;
+    }
+    @keyframes fw-spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 
 <body>
+  <!-- Inline loading screen — visible instantly, hidden once React mounts -->
+  <div id="fw-init-loader">
+    <div class="fw-spinner"></div>
+  </div>
   <div id="root"></div>
+  <script>
+    // Hide loader once React has rendered
+    var _fwObs = new MutationObserver(function() {
+      var root = document.getElementById('root');
+      if (root && root.firstChild) {
+        var loader = document.getElementById('fw-init-loader');
+        if (loader) { loader.classList.add('hide'); setTimeout(function(){ loader.remove(); }, 350); }
+        _fwObs.disconnect();
+      }
+    });
+    _fwObs.observe(document.getElementById('root'), { childList: true });
+  </script>
   <script type="module" src="/src/main.tsx"></script>
   <script>
     // Defer urgency system until after main content is interactive

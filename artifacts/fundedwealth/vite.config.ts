@@ -85,24 +85,27 @@ export default defineConfig({
     reportCompressedSize: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"],
-          radix: [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-tooltip",
-            "@radix-ui/react-toast",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-select",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-accordion",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-scroll-area",
-          ],
-          supabase: ["@supabase/supabase-js"],
-          icons: ["lucide-react"],
-          "framer-motion": ["framer-motion"],
-          charts: ["recharts"],
-          i18n: ["i18next", "react-i18next"],
+        manualChunks(id) {
+          // Core React — always needed first
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/") || id.includes("node_modules/scheduler/")) {
+            return "vendor";
+          }
+          // Supabase
+          if (id.includes("@supabase")) return "supabase";
+          // Radix UI
+          if (id.includes("@radix-ui")) return "radix";
+          // Charts — heavy, only on dashboard
+          if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-")) return "charts";
+          // Framer Motion — only on animated pages
+          if (id.includes("framer-motion")) return "framer-motion";
+          // html2canvas — only on dashboard share
+          if (id.includes("html2canvas")) return "html2canvas";
+          // i18n
+          if (id.includes("i18next") || id.includes("react-i18next")) return "i18n";
+          // Lucide icons
+          if (id.includes("lucide-react")) return "icons";
+          // lightweight-charts — trading terminal
+          if (id.includes("lightweight-charts")) return "lwcharts";
         },
       },
     },
