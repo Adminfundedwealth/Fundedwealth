@@ -832,16 +832,49 @@ router.get("/email-diagnostic", async (_req, res) => {
   // Test Resend connectivity if key present
   let resendStatus = "not_configured";
   let resendError = "";
+  let resendDomains: string[] = [];
   if (resendKey) {
     try {
       const r = await fetch("https://api.resend.com/domains", {
         headers: { Authorization: `Bearer ${resendKey}` },
       });
       resendStatus = r.ok ? "connected" : `error_${r.status}`;
-      if (!r.ok) resendError = await r.text();
+      if (r.ok) {
+        const d = await r.json() as any;
+        resendDomains = (d?.data || []).map((x: any) => `${x.name} [${x.status}]`);
+      } else {
+        resendError = await r.text();
+      }
     } catch (e: any) {
       resendStatus = "fetch_failed";
       resendError = e.message;
+    }
+  }
+
+  // Do a real test send to capture exact error
+  let sendTestResult = "skipped";
+  let sendTestError = "";
+  if (resendKey) {
+    try {
+      const r = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "no-reply@fundedwealth.com",
+          to: "diagnostic-test@resend.dev",
+          subject: "FundedWealth diagnostic test",
+          html: "<p>test</p>",
+        }),
+      });
+      if (r.ok) {
+        sendTestResult = "success";
+      } else {
+        sendTestResult = `failed_${r.status}`;
+        sendTestError = await r.text();
+      }
+    } catch (e: any) {
+      sendTestResult = "exception";
+      sendTestError = e.message;
     }
   }
 
@@ -862,7 +895,7 @@ router.get("/email-diagnostic", async (_req, res) => {
 
   res.json({
     supabase: {
-      url: supabaseUrl ? supabaseUrl.substring(0, 30) + "..." : "MISSING",
+      url: supabaseUrl ? supabaseUrl.substring(0, 40) + "..." : "MISSING",
       serviceKey: serviceKey ? "set (" + serviceKey.length + " chars)" : "MISSING",
       status: supabaseStatus,
     },
@@ -870,6 +903,9 @@ router.get("/email-diagnostic", async (_req, res) => {
       apiKey: resendKey ? "set (" + resendKey.length + " chars)" : "MISSING",
       status: resendStatus,
       error: resendError || undefined,
+      verifiedDomains: resendDomains,
+      sendTest: sendTestResult,
+      sendTestError: sendTestError || undefined,
     },
     siteUrl: siteUrl || "NOT SET (using https://fundedwealth.com)",
   });
