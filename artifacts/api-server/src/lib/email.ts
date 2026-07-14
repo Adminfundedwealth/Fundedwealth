@@ -20,7 +20,7 @@ async function sendResendEmail(options: EmailOptions): Promise<boolean> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "no-reply@fundedwealth.com",
+      from: process.env.EMAIL_FROM || "FundedWealth <onboarding@resend.dev>",
       to: options.to,
       subject: options.subject,
       html: options.html,

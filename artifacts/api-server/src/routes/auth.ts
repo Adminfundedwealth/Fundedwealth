@@ -860,7 +860,7 @@ router.get("/email-diagnostic", async (_req, res) => {
         method: "POST",
         headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "no-reply@fundedwealth.com",
+          from: process.env.EMAIL_FROM || "FundedWealth <onboarding@resend.dev>",
           to: "diagnostic-test@resend.dev",
           subject: "FundedWealth diagnostic test",
           html: "<p>test</p>",
