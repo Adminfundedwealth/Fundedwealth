@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
-import { createHash, createHmac } from "crypto";
+import { createHash, createHmac, randomUUID } from "crypto";
 import { resolveTerminalLaunchUser } from "../lib/terminalLaunchAuth.js";
 
 const router = Router();
@@ -13,14 +13,14 @@ const SSO_TOKEN_ALGORITHM = "HS256";
 let lastReturnedTerminalJwt: string | null = null;
 
 function getTerminalSSOSecret(): { secret: string; source: string } {
+  // Priority must match terminal's sso.service.js:
+  //   SSO_SHARED_SECRET || SSO_API_KEY
+  // Both sides MUST resolve to the same value for signatures to match.
+  if (process.env.SSO_SHARED_SECRET) {
+    return { secret: process.env.SSO_SHARED_SECRET, source: "SSO_SHARED_SECRET" };
+  }
   if (process.env.SSO_API_KEY) {
     return { secret: process.env.SSO_API_KEY, source: "SSO_API_KEY" };
-  }
-  if (process.env.INTERNAL_PROVISION_SECRET) {
-    return { secret: process.env.INTERNAL_PROVISION_SECRET, source: "INTERNAL_PROVISION_SECRET" };
-  }
-  if (process.env.JWT_SECRET) {
-    return { secret: process.env.JWT_SECRET, source: "JWT_SECRET" };
   }
   return { secret: "fw-dev-secret", source: "fallback" };
 }
@@ -125,14 +125,14 @@ const TERMINAL_API_URL = resolveTerminalApiUrl();
 
 /**
  * Returns the shared SSO secret that the terminal uses for jwt.verify().
+ * Priority matches terminal's sso.service.js: SSO_SHARED_SECRET || SSO_API_KEY
  * Read at request time — never cached at module load — so Railway env var
  * changes take effect without a full redeploy.
  */
 function getSSOSecret(): string {
   return (
-    process.env.JWT_SECRET ||
-    process.env.SSO_SECRET ||
     process.env.SSO_SHARED_SECRET ||
+    process.env.SSO_API_KEY ||
     SSO_API_KEY ||
     "fw-dev-secret"
   );
@@ -337,8 +337,8 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     });
 
     // ── 7. CALL TERMINAL SSO IF CONFIGURED ──────────────────────────────────
-    // Read SSO_API_KEY at request time (not cached at module load) so Railway
-    // env var changes take effect without a full redeploy.
+    // Read at request time so Railway env var changes take effect without redeploy.
+    // Use SSO_SHARED_SECRET || SSO_API_KEY to match the terminal's own auth gate.
     const runtimeSSOApiKey = process.env.SSO_API_KEY || SSO_API_KEY;
     if (TERMINAL_API_URL && runtimeSSOApiKey) {
       try {
@@ -398,8 +398,8 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
       }
     }
 
-    // ── 8. LOCAL FALLBACK — generate token from stored activation token ──────
-    const ssoToken = generateSSOToken(prov.trading_account_id, prov.trader_id, storedLoginEmail);
+    // ── 8. LOCAL FALLBACK — generate token signed with shared SSO secret ──────
+    const ssoToken = generateSSOToken(String(user.id), prov.trading_account_id, storedLoginEmail);
     const terminalBase = TERMINAL_API_URL || PRODUCTION_TERMINAL_URL;
     const launchUrl = buildTerminalLaunchUrl(terminalBase, ssoToken, storedAccountCode);
     lastReturnedTerminalJwt = ssoToken;
@@ -470,23 +470,36 @@ function verifyActivationToken(token: string): { accountId: string; email: strin
  * Generate a fresh short-lived SSO token for terminal launch.
  * Used when TERMINAL_API_URL is configured but as a fallback.
  */
-function generateSSOToken(tradingAccountId: string, traderId: string, email: string): string {
-  const now = Date.now();
+/**
+ * Generate a fresh short-lived SSO token for terminal launch (local fallback).
+ *
+ * Uses signTerminalJWT() (HS256, base64url) to produce a standard JWT that
+ * jsonwebtoken.verify() on the terminal side accepts. Payload matches what
+ * terminal's validateSSOToken() requires:
+ *   - sub       = fwUserId  (required by validateSSOToken)
+ *   - accountId = tradingAccountId (required by validateSSOToken)
+ *   - email, nonce
+ *   - exp = now + 60s  (terminal's maxAge: '120s' check will pass)
+ *
+ * Signed with SSO_SHARED_SECRET || SSO_API_KEY — same priority as the
+ * terminal's sso.service.js so secrets always align.
+ */
+function generateSSOToken(fwUserId: string, tradingAccountId: string, email: string): string {
+  const { secret, source } = getTerminalSSOSecret();
+  const now = Math.floor(Date.now() / 1000);
   const payload = {
+    sub: fwUserId,
     accountId: tradingAccountId,
-    traderId,
     email,
-    iat: Math.floor(now / 1000),
-    exp: Math.floor((now + 15 * 60 * 1000) / 1000),
+    nonce: randomUUID(),
+    iat: now,
+    exp: now + 60,
   };
-  // Terminal verifies SSO tokens using SSO_API_KEY (confirmed via /debug/secret-hash).
-  // Must sign with SSO_API_KEY so the signature matches what terminal expects.
-  const secret = process.env.SSO_API_KEY || SSO_API_KEY || "fw-dev-secret";
-  const source = process.env.SSO_API_KEY ? "SSO_API_KEY" : "fallback";
   console.info("[Terminal Launch] signing SSO token", {
     secretSource: source,
     algorithm: SSO_TOKEN_ALGORITHM,
-    payload,
+    sub: fwUserId,
+    accountId: tradingAccountId,
   });
   return signTerminalJWT(payload, secret);
 }
