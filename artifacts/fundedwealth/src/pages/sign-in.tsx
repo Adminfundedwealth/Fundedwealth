@@ -153,6 +153,22 @@ function InstallAppButton() {
 }
 
 /* ─── Forgot-password view ───────────────────────────────────────────────── */
+const RESET_COOLDOWN_SECS = 60;
+
+function friendlyResetError(raw: string): string {
+  const msg = raw.toLowerCase();
+  if (msg.includes("rate limit") || msg.includes("too many") || msg.includes("exceeded")) {
+    return `Too many reset attempts. Please wait a minute before trying again.`;
+  }
+  if (msg.includes("user not found") || msg.includes("no user found")) {
+    return "No account found with that email address.";
+  }
+  if (msg.includes("invalid email")) {
+    return "Please enter a valid email address.";
+  }
+  return raw;
+}
+
 function ForgotPasswordView({ onBack }: { onBack: () => void }) {
   const { resetPassword, updatePassword, isLoaded } = useAuth();
   const [email, setEmail] = useState("");
@@ -161,6 +177,7 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [cooldown, setCooldown] = useState(0);
 
   // Check if we're on a password reset flow (redirected from email link)
   useEffect(() => {
@@ -170,15 +187,32 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
     }
   }, []);
 
+  // Cooldown countdown timer
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setTimeout(() => setCooldown(c => c - 1), 1000);
+    return () => clearTimeout(id);
+  }, [cooldown]);
+
   async function handleRequest(e: React.FormEvent) {
-    e.preventDefault(); if (!isLoaded) return;
+    e.preventDefault();
+    if (!isLoaded || cooldown > 0) return;
     setError(""); setLoading(true);
     try {
       const { error: err } = await resetPassword(email);
-      if (err) { setError(err); }
-      else { setSuccess("Password reset link sent! Check your email."); }
+      if (err) {
+        setError(friendlyResetError(err));
+        // If rate limited, start cooldown automatically
+        const msg = err.toLowerCase();
+        if (msg.includes("rate limit") || msg.includes("too many") || msg.includes("exceeded")) {
+          setCooldown(RESET_COOLDOWN_SECS);
+        }
+      } else {
+        setSuccess("Password reset link sent! Check your email (including spam folder).");
+        setCooldown(RESET_COOLDOWN_SECS);
+      }
     } catch (err: any) {
-      setError(err?.message || "Failed to send reset email.");
+      setError(friendlyResetError(err?.message || "Failed to send reset email."));
     } finally { setLoading(false); }
   }
 
@@ -218,9 +252,9 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
             <input type="email" autoComplete="email" required placeholder="your@email.com"
               value={email} onChange={e => setEmail(e.target.value)} className={INPUT} />
           </div>
-          <button type="submit" disabled={loading || !isLoaded}
+          <button type="submit" disabled={loading || !isLoaded || cooldown > 0}
             className="w-full h-12 rounded-xl bg-gradient-to-r from-[#4A00E0] to-[#7C3AED] hover:from-[#5510f0] hover:to-[#8B4FF0] text-white font-bold text-[14px] transition disabled:opacity-50">
-            {loading ? <Spinner /> : "Send Reset Link"}
+            {loading ? <Spinner /> : cooldown > 0 ? `Resend in ${cooldown}s` : "Send Reset Link"}
           </button>
         </form>
       ) : (
