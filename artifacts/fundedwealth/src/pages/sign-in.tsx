@@ -170,22 +170,12 @@ function friendlyResetError(raw: string): string {
 }
 
 function ForgotPasswordView({ onBack }: { onBack: () => void }) {
-  const { resetPassword, updatePassword, isLoaded } = useAuth();
+  const { isLoaded } = useAuth();
   const [email, setEmail] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [step, setStep] = useState<"request" | "reset">("request");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [cooldown, setCooldown] = useState(0);
-
-  // Check if we're on a password reset flow (redirected from email link)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("reset") === "true") {
-      setStep("reset");
-    }
-  }, []);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -217,66 +207,26 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
     } finally { setLoading(false); }
   }
 
-  async function handleReset(e: React.FormEvent) {
-    e.preventDefault(); if (!isLoaded) return;
-    setError(""); setLoading(true);
-    const newPw = (e.target as any).newPassword.value;
-    try {
-      const { error: err } = await updatePassword(newPw);
-      if (err) { setError(err); }
-      else {
-        setSuccess("Password reset! Redirecting…");
-        setTimeout(() => window.location.replace(`${basePath}/dashboard`), 1500);
-      }
-    } catch (err: any) {
-      setError(err?.message || "Reset failed.");
-    } finally { setLoading(false); }
-  }
-
   return (
     <div className="w-full flex flex-col">
       <button onClick={onBack} className="self-start text-[12px] text-[#A78BFA] hover:text-white mb-4 flex items-center gap-1 transition">
         ← Back to login
       </button>
-      <h2 className="text-[20px] font-bold text-white mb-1">
-        {step === "request" ? "Forgot Password?" : "Reset Password"}
-      </h2>
-      <p className="text-[12px] text-white/40 mb-5">
-        {step === "request" ? "We'll email you a password reset link." : "Enter your new password below."}
-      </p>
+      <h2 className="text-[20px] font-bold text-white mb-1">Forgot Password?</h2>
+      <p className="text-[12px] text-white/40 mb-5">We'll email you a password reset link.</p>
       {error && <div className="w-full mb-3 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">{error}</div>}
       {success && <div className="w-full mb-3 px-4 py-2.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-sm">{success}</div>}
-      {step === "request" ? (
-        <form onSubmit={handleRequest} className="flex flex-col gap-4">
-          <div>
-            <label className={LABEL}>Email Address</label>
-            <input type="email" autoComplete="email" required placeholder="your@email.com"
-              value={email} onChange={e => setEmail(e.target.value)} className={INPUT} />
-          </div>
-          <button type="submit" disabled={loading || !isLoaded || cooldown > 0}
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-[#4A00E0] to-[#7C3AED] hover:from-[#5510f0] hover:to-[#8B4FF0] text-white font-bold text-[14px] transition disabled:opacity-50">
-            {loading ? <Spinner /> : cooldown > 0 ? `Resend in ${cooldown}s` : "Send Reset Link"}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleReset} className="flex flex-col gap-4">
-          <div>
-            <label className={LABEL}>New Password</label>
-            <div className="relative">
-              <input name="newPassword" type={showPw ? "text" : "password"} autoComplete="new-password" required
-                placeholder="New password" className={INPUT + " pr-11"} />
-              <button type="button" tabIndex={-1} onClick={() => setShowPw(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition">
-                {showPw ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
-            </div>
-          </div>
-          <button type="submit" disabled={loading || !isLoaded}
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-[#4A00E0] to-[#7C3AED] hover:from-[#5510f0] hover:to-[#8B4FF0] text-white font-bold text-[14px] transition disabled:opacity-50">
-            {loading ? <Spinner /> : "Reset Password"}
-          </button>
-        </form>
-      )}
+      <form onSubmit={handleRequest} className="flex flex-col gap-4">
+        <div>
+          <label className={LABEL}>Email Address</label>
+          <input type="email" autoComplete="email" required placeholder="your@email.com"
+            value={email} onChange={e => setEmail(e.target.value)} className={INPUT} />
+        </div>
+        <button type="submit" disabled={loading || !isLoaded || cooldown > 0}
+          className="w-full h-12 rounded-xl bg-gradient-to-r from-[#4A00E0] to-[#7C3AED] hover:from-[#5510f0] hover:to-[#8B4FF0] text-white font-bold text-[14px] transition disabled:opacity-50">
+          {loading ? <Spinner /> : cooldown > 0 ? `Resend in ${cooldown}s` : "Send Reset Link"}
+        </button>
+      </form>
     </div>
   );
 }
@@ -296,11 +246,11 @@ export default function SignInPage() {
     if (isSignedIn) window.location.replace(`${basePath}/dashboard`);
   }, [isSignedIn]);
 
-  // Check for reset password flow
+  // Check for reset password flow — redirect to dedicated page
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "true") {
-      setView("forgot");
+      window.location.replace(`${basePath}/reset-password`);
     }
   }, []);
 

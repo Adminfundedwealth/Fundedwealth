@@ -37,6 +37,7 @@ const KYC = lazy(() => import("@/pages/kyc"));
 const SSOCallback = lazy(() => import("@/pages/sso-callback"));
 const AuthCallback = lazy(() => import("@/pages/auth-callback"));
 const CreatePassword = lazy(() => import("@/pages/create-password"));
+const ResetPassword = lazy(() => import("@/pages/reset-password"));
 const ChatWidget = lazy(() => import("@/components/ChatWidget"));
 const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
@@ -105,6 +106,7 @@ function AppRouter() {
             <Route path="/sso-callback" component={SSOCallback} />
             <Route path="/auth/callback" component={AuthCallback} />
             <Route path="/auth/create-password" component={CreatePassword} />
+            <Route path="/reset-password" component={ResetPassword} />
             <Route path="/economic-calendar" component={EconomicCalendar} />
             <Route path="/login">{() => { window.location.replace(basePath + "/sign-in"); return null; }}</Route>
             <Route path="/register">{() => { window.location.replace(basePath + "/sign-up"); return null; }}</Route>

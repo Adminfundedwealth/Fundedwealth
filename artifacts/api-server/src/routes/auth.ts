@@ -843,7 +843,7 @@ router.post("/forgot-password", async (req, res) => {
       type: "recovery",
       email: normalizedEmail,
       options: {
-        redirectTo: `${process.env.SITE_URL || "https://fundedwealth.com"}/sign-in?reset=true`,
+        redirectTo: `${process.env.SITE_URL || "https://fundedwealth.com"}/reset-password`,
       },
     });
 
