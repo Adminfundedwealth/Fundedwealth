@@ -36,13 +36,7 @@ export function installFetchInterceptor(visitorId: string): void {
                 ? input.href
                 : (input as Request).url;
 
-        // Only inject header for our API
-        if (installedVisitorId && isOurApi(url)) {
-            const headers = new Headers(init?.headers || {});
-            headers.set("X-Device-Fingerprint", installedVisitorId);
-            return originalFetch!(input, { ...init, headers });
-        }
-
+        // Pass through without header injection — fingerprint sent via request body
         return originalFetch!(input, init);
     };
 }
