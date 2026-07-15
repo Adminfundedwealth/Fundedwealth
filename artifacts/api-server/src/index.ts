@@ -3,7 +3,6 @@ import { initializeObservability } from "./lib/observability";
 initializeObservability().catch((err) => {
   console.error("Failed to initialize observability", err);
 });
-import { verifySmtpConnection } from "./lib/email";
 import app from "./app";
 import router from "./routes";
 import { logger } from "./lib/logger";
@@ -86,9 +85,6 @@ server.listen(port, (err?: any) => {
     process.exit(1);
   }
   logger.info({ port }, "Server listening");
-
-  // Verify Zoho SMTP connection after server starts (non-blocking)
-  verifySmtpConnection().catch(() => {});
 });
 
 startEconomicCalendarScheduler().catch((err) => {

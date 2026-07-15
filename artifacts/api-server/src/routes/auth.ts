@@ -813,10 +813,186 @@ router.post("/create-password", async (req, res) => {
 
 /**
  * POST /api/auth/forgot-password
- * Sends a password reset email via Zoho SMTP.
+ * Sends a password reset email via Resend.
  * Body: { email: string }
  */
 import { sendEmail, getSmtpConfig } from "../lib/email";
+
+/**
+ * GET /api/auth/email-diagnostic
+ * Returns email provider config state (no secrets exposed).
+ */
+router.get("/email-diagnostic", async (_req, res) => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const siteUrl     = process.env.SITE_URL;
+  const emailCfg    = getSmtpConfig();
+
+  // Live Resend connectivity test
+  const resendKey = process.env.RESEND_API_KEY;
+  let resendStatus = "not_configured";
+  let resendError  = "";
+  let resendDomains: string[] = [];
+  let sendTestResult = "skipped";
+  let sendTestError  = "";
+
+  if (resendKey) {
+    try {
+      const r = await fetch("https://api.resend.com/domains", {
+        headers: { Authorization: `Bearer ${resendKey}` },
+      });
+      resendStatus = r.ok ? "connected" : `error_${r.status}`;
+      if (r.ok) {
+        const d = await r.json() as any;
+        resendDomains = (d?.data || []).map((x: any) => `${x.name} [${x.status}]`);
+      } else {
+        resendError = await r.text();
+      }
+    } catch (e: any) {
+      resendStatus = "fetch_failed";
+      resendError  = e.message;
+    }
+
+    try {
+      const r = await fetch("https://api.resend.com/emails", {
+        method:  "POST",
+        headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from:    process.env.EMAIL_FROM || "FundedWealth <support@fundedwealth.com>",
+          to:      "diagnostic-test@resend.dev",
+          subject: "FundedWealth diagnostic test",
+          html:    "<p>test</p>",
+        }),
+      });
+      sendTestResult = r.ok ? "success" : `failed_${r.status}`;
+      if (!r.ok) sendTestError = await r.text();
+    } catch (e: any) {
+      sendTestResult = "exception";
+      sendTestError  = e.message;
+    }
+  }
+
+  // Supabase connectivity
+  let supabaseStatus = "not_configured";
+  if (supabaseUrl && serviceKey) {
+    try {
+      const admin = createClient(supabaseUrl, serviceKey, {
+        auth: { persistSession: false },
+        realtime: { transport: ws },
+      });
+      const { error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 });
+      supabaseStatus = error ? `error: ${error.message}` : "connected";
+    } catch (e: any) {
+      supabaseStatus = `fetch_failed: ${e.message}`;
+    }
+  }
+
+  res.json({
+    email: {
+      provider:    emailCfg.provider,
+      apiKeySet:   emailCfg.apiKeySet,
+      from:        emailCfg.from,
+    },
+    resend: {
+      apiKey:          resendKey ? `set (${resendKey.length} chars)` : "MISSING",
+      status:          resendStatus,
+      error:           resendError  || undefined,
+      verifiedDomains: resendDomains,
+      sendTest:        sendTestResult,
+      sendTestError:   sendTestError || undefined,
+    },
+    supabase: {
+      url:        supabaseUrl ? supabaseUrl.substring(0, 40) + "..." : "MISSING",
+      serviceKey: serviceKey  ? `set (${serviceKey.length} chars)` : "MISSING",
+      status:     supabaseStatus,
+    },
+    siteUrl: siteUrl || "NOT SET (using https://fundedwealth.com)",
+  });
+});
+
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return res.status(400).json({ error: "Valid email is required." });
+    }
+
+    const normalizedEmail = ValidationService.normalizeEmail(email);
+
+    // ── Guard: Resend must be configured ───────────────────────────────────
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) {
+      logger.error({ email: normalizedEmail }, "forgot-password: RESEND_API_KEY not set");
+      return res.status(503).json({ error: "Email service not configured. Please contact support." });
+    }
+
+    // ── Build Supabase admin client ─────────────────────────────────────────
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) {
+      logger.error({ email: normalizedEmail }, "forgot-password: Supabase env vars missing");
+      return res.status(503).json({ error: "Auth service not configured." });
+    }
+    const admin = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false },
+      realtime: { transport: ws },
+    });
+
+    // ── Generate reset link ─────────────────────────────────────────────────
+    const { data, error: linkErr } = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email: normalizedEmail,
+      options: {
+        redirectTo: `${process.env.SITE_URL || "https://fundedwealth.com"}/reset-password`,
+      },
+    });
+
+    if (linkErr) {
+      logger.error({ linkErr, email: normalizedEmail }, "forgot-password: generateLink failed");
+      return res.json({ success: true, _debug: "link_gen_failed" });
+    }
+
+    const resetLink = data?.properties?.action_link;
+    if (!resetLink) {
+      logger.error({ email: normalizedEmail, data }, "forgot-password: no action_link in response");
+      return res.json({ success: true, _debug: "no_action_link" });
+    }
+
+    // ── Send via Resend ─────────────────────────────────────────────────────
+    const sent = await sendEmail({
+      to:      normalizedEmail,
+      subject: "Reset Your FundedWealth Password",
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
+          <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+          <h2 style="color:#FF8A3D;margin-bottom:16px;">Reset Your Password</h2>
+          <p style="color:rgba(255,255,255,0.7);line-height:1.6;">You requested a password reset for your FundedWealth account.</p>
+          <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
+          <div style="text-align:center;margin:32px 0;">
+            <a href="${resetLink}" style="display:inline-block;background:linear-gradient(135deg,#4A00E0,#7C3AED);color:white;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:bold;font-size:16px;">
+              Reset Password
+            </a>
+          </div>
+          <p style="color:rgba(255,255,255,0.4);font-size:13px;line-height:1.6;">If you didn't request this, you can safely ignore this email.</p>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0;" />
+          <p style="color:rgba(255,255,255,0.4);font-size:12px;">FundedWealth — India's #1 Prop Trading Firm · support@fundedwealth.com</p>
+        </div>
+      `,
+    });
+
+    if (!sent) {
+      logger.error({ email: normalizedEmail }, "forgot-password: Resend send failed");
+      return res.status(503).json({ error: "Failed to send reset email. Please try again or contact support." });
+    }
+
+    logger.info({ email: normalizedEmail }, "forgot-password: reset email sent via Resend ✓");
+    return res.json({ success: true });
+
+  } catch (err) {
+    logger.error({ err }, "forgot-password: unexpected error");
+    return res.status(500).json({ error: "Server error. Please try again." });
+  }
+});
 
 /**
  * GET /api/auth/email-diagnostic
