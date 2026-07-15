@@ -115,7 +115,12 @@ chatRouter.post("/", async (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    const stream = await ai!.models.generateContentStream({
+    if (!ai) {
+      res.write(`data: ${JSON.stringify({ error: "AI service not configured" })}\n\n`);
+      res.end();
+      return;
+    }
+    const stream = await ai.models.generateContentStream({
       model: "gemini-2.5-flash",
       contents,
       config: {

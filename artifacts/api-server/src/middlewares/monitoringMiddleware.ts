@@ -19,7 +19,7 @@ export async function recordApiLog(req: Request, res: Response) {
         statusCode: res.statusCode,
         durationMs,
         userId: req.auth?.userId,
-        userEmail: req.auth?.user?.email,
+        userEmail: req.auth?.email,
         ipAddress:
           (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
           req.socket.remoteAddress ||
@@ -53,7 +53,7 @@ export function monitoringErrorHandler(error: unknown, req: Request, res: Respon
   MonitoringService.logError(error, {
     req,
     userId: req.auth?.userId,
-    userEmail: req.auth?.user?.email,
+    userEmail: req.auth?.email,
     metadata: {
       body: req.body ?? null,
       query: req.query ?? null,

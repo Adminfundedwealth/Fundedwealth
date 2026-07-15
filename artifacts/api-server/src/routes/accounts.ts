@@ -145,7 +145,42 @@ router.get("/my", async (req: Request, res: Response) => {
     const accounts: any[] = [];
     const accountedOrderIds = new Set<string>();
 
-    // 5. Map every LIVE account to the dashboard shape (provisioningStatus: "completed").
+    // 5a. Batch-fetch session_analytics for ALL live trading accounts in one query.
+    //     This replaces the N+1 per-account subquery that caused timeouts.
+    const tradingAccountIds = liveRows
+      .map(r => r.trading_account_id)
+      .filter(Boolean);
+
+    const batchStatsMap = new Map<string, { totalTrades: number; winRate: number; tradingDays: number }>();
+    if (tradingAccountIds.length > 0 && traderId) {
+      try {
+        const idLiterals = sql.join(
+          tradingAccountIds.map(id => sql`${id}::uuid`),
+          sql`, `
+        );
+        const batchStats = await db.execute(sql`
+          SELECT
+            ta.id AS trading_account_id,
+            COALESCE(SUM(sa.trades), 0)                          AS total_trades,
+            COALESCE(AVG(sa.win_rate), 0)                        AS avg_win_rate,
+            COUNT(DISTINCT DATE(sa.start_at))                    AS trading_days
+          FROM trading_accounts ta
+          LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id
+          LEFT JOIN session_analytics sa ON sa.user_id = tt.external_id
+          WHERE ta.id IN (${idLiterals})
+          GROUP BY ta.id
+        `);
+        for (const row of batchStats.rows as any[]) {
+          batchStatsMap.set(String(row.trading_account_id), {
+            totalTrades: Number(row.total_trades) || 0,
+            winRate: Number(row.avg_win_rate) || 0,
+            tradingDays: Number(row.trading_days) || 0,
+          });
+        }
+      } catch (batchErr) {
+        console.error("[Accounts] Batch stats fetch failed (non-fatal):", batchErr);
+      }
+    }
     for (const row of liveRows) {
       const linkedOrderId = tradingToOrder.get(String(row.trading_account_id)) || null;
       const order = linkedOrderId ? orderById.get(linkedOrderId) : null;
@@ -218,37 +253,11 @@ router.get("/my", async (req: Request, res: Response) => {
 
       const canLaunch = ["active", "funded", "passed"].includes(challengeStatus) && row.trading_status === "active";
 
-      // NEW: Fetch real trading statistics from session_analytics
-      let totalTrades = 0;
-      let winRate = 0;
-      let tradingDaysCount = 0;
-
-      try {
-        const statsRes = await db.execute(sql`
-          SELECT 
-            COALESCE(SUM(trades), 0) AS total_trades,
-            COALESCE(AVG(win_rate), 0) AS avg_win_rate,
-            COUNT(DISTINCT DATE(start_at)) AS trading_days
-          FROM session_analytics
-          WHERE user_id = (
-            SELECT tt.external_id 
-            FROM trading_accounts ta
-            JOIN terminal_traders tt ON tt.id = ta.trader_id
-            WHERE ta.id = ${row.trading_account_id}::uuid
-            LIMIT 1
-          )
-        `);
-        
-        if (statsRes.rows && statsRes.rows.length > 0) {
-          const stats = statsRes.rows[0] as any;
-          totalTrades = Number(stats.total_trades) || 0;
-          winRate = Number(stats.avg_win_rate) || 0;
-          tradingDaysCount = Number(stats.trading_days) || 0;
-        }
-      } catch (statsErr) {
-        console.error("[Accounts] Failed to fetch trading stats (non-fatal):", statsErr);
-        // Continue with 0 values if stats fetch fails
-      }
+      // Use pre-fetched batch stats (replaces N+1 per-account DB query)
+      const batchedStats = batchStatsMap.get(String(row.trading_account_id));
+      const totalTrades = batchedStats?.totalTrades ?? 0;
+      const winRate = batchedStats?.winRate ?? 0;
+      const tradingDaysCount = batchedStats?.tradingDays ?? 0;
 
       accounts.push({
         // trading_account ID is the canonical identifier used by the launch flow.
@@ -669,6 +678,65 @@ router.get("/order/:orderId", async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("[Accounts] Failed to fetch account by orderId:", error);
     return res.status(500).json({ success: false, message: "Failed to load account" });
+  }
+});
+
+/**
+ * GET /api/accounts/:accountId/trades
+ * Returns trade history for a specific account from trade_logs table.
+ * Used by dashboard analytics to show real P&L data.
+ */
+router.get("/:accountId/trades", async (req: Request, res: Response) => {
+  try {
+    const auth = getAuth(req);
+    if (!auth?.userId) {
+      return res.status(401).json({ success: false, message: "Authentication required" });
+    }
+
+    const { accountId } = req.params;
+
+    // Verify ownership via trader chain
+    const [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    const ownerCheck = await db.execute(sql`
+      SELECT ta.id
+      FROM trading_accounts ta
+      JOIN terminal_traders tt ON tt.id = ta.trader_id
+      WHERE (ta.id = ${accountId}::uuid OR ta.challenge_id = ${accountId}::uuid)
+        AND tt.external_id = ${String(user.id)}
+      LIMIT 1
+    `);
+    if (!ownerCheck.rows || ownerCheck.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Account not found" });
+    }
+
+    const tradingAccountId = (ownerCheck.rows[0] as any).id;
+
+    // Fetch from trade_logs — gracefully return empty if table doesn't exist
+    const tradesResult = await db.execute(sql`
+      SELECT
+        trade_id,
+        symbol,
+        side,
+        entry_price,
+        exit_price,
+        quantity,
+        pnl,
+        commission,
+        entered_at,
+        exited_at,
+        created_at
+      FROM trade_logs
+      WHERE trading_account_id = ${tradingAccountId}::uuid
+      ORDER BY exited_at DESC NULLS LAST
+      LIMIT 200
+    `).catch(() => ({ rows: [] }));
+
+    return res.json({ success: true, trades: tradesResult.rows });
+  } catch (err: any) {
+    // trade_logs table may not exist in all environments
+    return res.json({ success: true, trades: [] });
   }
 });
 

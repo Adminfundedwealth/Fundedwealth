@@ -6,6 +6,25 @@ import { users } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger";
 
+// Augment Express Request to carry the richer session-based auth fields
+// used by the legacy session middleware (authMiddleware below).
+// This is separate from the Supabase JWT auth set in supabaseAuth.ts.
+declare global {
+  namespace Express {
+    interface Request {
+      /** Populated by authMiddleware (session-based) or supabaseAuthMiddleware (JWT-based) */
+      legacyAuth?: {
+        userId: string;
+        sessionId: number;
+        sessionToken: string;
+        user: any;
+        email: string;
+        role: string;
+      };
+    }
+  }
+}
+
 /**
  * Session & Authentication Middleware
  */
@@ -64,7 +83,7 @@ export async function authMiddleware(
     }
 
     // Set auth context
-    req.auth = {
+    req.legacyAuth = {
       userId: user.id,
       sessionId: session.id,
       sessionToken,
@@ -100,7 +119,7 @@ export async function authMiddleware(
 export function rbacMiddleware(requiredPermissions: string | string[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.auth?.userId) {
+      if (!req.legacyAuth?.userId) {
         return res
           .status(401)
           .json({ error: "Authentication required" });
@@ -111,14 +130,14 @@ export function rbacMiddleware(requiredPermissions: string | string[]) {
         : [requiredPermissions];
 
       const hasPermission = await RBACService.hasAnyPermission(
-        req.auth.userId,
+        req.legacyAuth.userId,
         permissions,
       );
 
       if (!hasPermission) {
         logger.warn(
           {
-            userId: req.auth.userId,
+            userId: req.legacyAuth.userId,
             requiredPermissions: permissions,
             userPermissions: req.permissions,
           },
@@ -147,13 +166,13 @@ export async function adminSecurityMiddleware(
   next: NextFunction,
 ) {
   try {
-    if (!req.auth?.userId) {
+    if (!req.legacyAuth?.userId) {
       return res
         .status(401)
         .json({ error: "Authentication required" });
     }
 
-    const user = req.auth.user;
+    const user = req.legacyAuth.user;
 
     // Check if admin
     if (!["admin", "super_admin"].includes(user.role)) {
@@ -163,7 +182,7 @@ export async function adminSecurityMiddleware(
     }
 
     // SECURITY: Enforce 2FA for all admin actions
-    const session = await SecurityService.getSession(req.auth.sessionToken!);
+    const session = await SecurityService.getSession(req.legacyAuth.sessionToken);
     if (session?.requiresMfa && !session.mfaVerified) {
       return res
         .status(403)
@@ -173,7 +192,7 @@ export async function adminSecurityMiddleware(
     // Log admin action for audit trail
     logger.info(
       {
-        userId: req.auth.userId,
+        userId: req.legacyAuth.userId,
         method: req.method,
         path: req.path,
         ip: req.ip,
@@ -198,9 +217,9 @@ export async function sessionActivityMiddleware(
   next: NextFunction,
 ) {
   try {
-    if (req.auth?.sessionId) {
+    if (req.legacyAuth?.sessionId) {
       // Update last activity (async, non-blocking)
-      SecurityService.getSession(req.auth.sessionToken!).catch((err) =>
+      SecurityService.getSession(req.legacyAuth.sessionToken).catch((err) =>
         logger.error(err, "Failed to update session activity"),
       );
     }
@@ -221,7 +240,7 @@ export async function threatDetectionMiddleware(
   next: NextFunction,
 ) {
   try {
-    if (!req.auth?.userId) {
+    if (!req.legacyAuth?.userId) {
       return next();
     }
 

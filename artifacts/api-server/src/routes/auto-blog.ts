@@ -172,7 +172,10 @@ Return ONLY a valid JSON object with these exact fields (no markdown, no code bl
   "readTime": "X min read"
 }`;
 
-  const response = await ai!.models.generateContent({
+  if (!ai) {
+    throw new Error("AI service not configured (GEMINI_API_KEY missing)");
+  }
+  const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: { maxOutputTokens: 8192 },
