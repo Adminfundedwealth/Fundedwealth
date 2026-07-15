@@ -67,10 +67,27 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     (async () => {
       try {
-        // ── 1. PKCE flow: ?code=... ──────────────────────────────────────
         const searchParams = new URLSearchParams(window.location.search);
+        const hash = window.location.hash;
+
+        console.log("[reset-password] URL search:", window.location.search);
+        console.log("[reset-password] URL hash:", hash ? hash.substring(0, 80) + "..." : "(none)");
+
+        // ── 0. Check if Supabase already established a session via redirect ─
+        // When using generateLink(), Supabase verifies the token server-side
+        // and redirects here — sometimes with session already in storage.
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        if (existingSession) {
+          console.log("[reset-password] Session already active — ready");
+          window.history.replaceState({}, "", window.location.pathname);
+          setPageState("ready");
+          return;
+        }
+
+        // ── 1. PKCE flow: ?code=... ──────────────────────────────────────
         const code = searchParams.get("code");
         if (code) {
+          console.log("[reset-password] PKCE code found, exchanging...");
           const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
           if (error) {
             console.error("[reset-password] PKCE exchange failed:", error.message);
@@ -86,6 +103,7 @@ export default function ResetPasswordPage() {
         const tokenHash = searchParams.get("token_hash");
         const type = searchParams.get("type");
         if (tokenHash && type === "recovery") {
+          console.log("[reset-password] token_hash found, verifying OTP...");
           const { error } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: "recovery",
@@ -101,14 +119,10 @@ export default function ResetPasswordPage() {
         }
 
         // ── 3. Implicit / fragment flow: #access_token=...&type=recovery ──
-        // Supabase's detectSessionInUrl handles this automatically via
-        // onAuthStateChange. We just wait for the PASSWORD_RECOVERY event.
-        const hash = window.location.hash;
-        if (hash && hash.includes("type=recovery")) {
-          // detectSessionInUrl=true already handled it; check session
+        if (hash && (hash.includes("type=recovery") || hash.includes("access_token"))) {
+          console.log("[reset-password] Fragment tokens detected, checking session...");
           const { data: { session } } = await supabase.auth.getSession();
           if (session) {
-            // Clean the ugly fragment from the URL without reloading
             window.history.replaceState({}, "", window.location.pathname);
             setPageState("ready");
             return;
@@ -116,26 +130,27 @@ export default function ResetPasswordPage() {
         }
 
         // ── 4. Listen for PASSWORD_RECOVERY event (fragment flow fallback) ─
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-          if (event === "PASSWORD_RECOVERY") {
+        console.log("[reset-password] Waiting for PASSWORD_RECOVERY event...");
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          console.log("[reset-password] auth event:", event);
+          if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
             subscription.unsubscribe();
             window.history.replaceState({}, "", window.location.pathname);
             setPageState("ready");
           }
         });
 
-        // Give the fragment flow 4 seconds before giving up
-        const timeout = setTimeout(() => {
+        // Give the fragment flow 8 seconds before giving up
+        const timeout = setTimeout(async () => {
           subscription.unsubscribe();
-          // One last check — maybe session was already set
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-              setPageState("ready");
-            } else {
-              setPageState("expired");
-            }
-          });
-        }, 4000);
+          const { data: { session } } = await supabase.auth.getSession();
+          console.log("[reset-password] Timeout — session:", !!session);
+          if (session) {
+            setPageState("ready");
+          } else {
+            setPageState("expired");
+          }
+        }, 8000);
 
         return () => {
           clearTimeout(timeout);

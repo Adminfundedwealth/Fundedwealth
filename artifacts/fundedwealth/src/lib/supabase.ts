@@ -18,7 +18,7 @@ export const supabase: SupabaseClient = createClient(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
-      flowType: "pkce",
+      flowType: "implicit",  // generateLink() returns implicit-flow tokens in the URL fragment
     },
   }
 );
