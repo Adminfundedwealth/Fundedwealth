@@ -13,9 +13,9 @@ import { logger } from "./logger";
 // ── Configuration ─────────────────────────────────────────────────────────────
 
 const RESEND_API_URL  = "https://api.resend.com/emails";
-const RESEND_API_KEY  = process.env.RESEND_API_KEY ?? "";
-const EMAIL_FROM      = process.env.EMAIL_FROM ?? "FundedWealth <support@fundedwealth.com>";
-const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME ?? "FundedWealth";
+const RESEND_API_KEY  = (process.env.RESEND_API_KEY ?? "").trim();
+const EMAIL_FROM      = (process.env.EMAIL_FROM ?? "FundedWealth <support@fundedwealth.com>").trim();
+const EMAIL_FROM_NAME = (process.env.EMAIL_FROM_NAME ?? "FundedWealth").trim();
 
 // ── Startup check ─────────────────────────────────────────────────────────────
 
