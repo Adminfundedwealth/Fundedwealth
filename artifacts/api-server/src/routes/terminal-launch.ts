@@ -13,14 +13,19 @@ const SSO_TOKEN_ALGORITHM = "HS256";
 let lastReturnedTerminalJwt: string | null = null;
 
 function getTerminalSSOSecret(): { secret: string; source: string } {
-  // Priority must match terminal's sso.service.js:
-  //   SSO_SHARED_SECRET || SSO_API_KEY
-  // Both sides MUST resolve to the same value for signatures to match.
-  if (process.env.SSO_SHARED_SECRET) {
-    return { secret: process.env.SSO_SHARED_SECRET, source: "SSO_SHARED_SECRET" };
-  }
-  if (process.env.SSO_API_KEY) {
-    return { secret: process.env.SSO_API_KEY, source: "SSO_API_KEY" };
+  // Try every variable name that could hold the shared SSO secret.
+  // The terminal's sso.service.js reads: SSO_SHARED_SECRET || SSO_API_KEY
+  // We must sign with whichever value the terminal will verify against.
+  const candidates: Array<[string | undefined, string]> = [
+    [process.env.SSO_SHARED_SECRET, "SSO_SHARED_SECRET"],
+    [process.env.SSO_API_KEY,       "SSO_API_KEY"],
+    [process.env.SSO_SECRET,        "SSO_SECRET"],
+    [process.env.JWT_SECRET,        "JWT_SECRET"],
+  ];
+  for (const [val, name] of candidates) {
+    if (val && val.trim().length > 0) {
+      return { secret: val.trim(), source: name };
+    }
   }
   return { secret: "fw-dev-secret", source: "fallback" };
 }
@@ -130,12 +135,7 @@ const TERMINAL_API_URL = resolveTerminalApiUrl();
  * changes take effect without a full redeploy.
  */
 function getSSOSecret(): string {
-  return (
-    process.env.SSO_SHARED_SECRET ||
-    process.env.SSO_API_KEY ||
-    SSO_API_KEY ||
-    "fw-dev-secret"
-  );
+  return getTerminalSSOSecret().secret;
 }
 
 /**
