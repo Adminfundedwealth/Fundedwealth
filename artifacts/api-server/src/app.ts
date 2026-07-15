@@ -74,7 +74,7 @@ app.use(cors({
       }
     }
   },
-  allowedHeaders: ["Content-Type", "Authorization", "x-device-fingerprint"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-device-fingerprint", "x-internal-provision-secret"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 }));
 
