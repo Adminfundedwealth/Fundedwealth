@@ -813,68 +813,33 @@ router.post("/create-password", async (req, res) => {
 
 /**
  * POST /api/auth/forgot-password
- * Sends a password reset email via Resend (bypasses Supabase email rate limit).
+ * Sends a password reset email via Zoho SMTP.
  * Body: { email: string }
  */
-import { sendEmail } from "../lib/email";
+import { sendEmail, getSmtpConfig } from "../lib/email";
 
 /**
  * GET /api/auth/email-diagnostic
- * Returns the email/Supabase config state (no secrets exposed).
- * Used to diagnose why reset emails aren't sending.
+ * Returns SMTP + Supabase config state (no secrets exposed).
+ * Used to diagnose why emails aren't sending.
  */
 router.get("/email-diagnostic", async (_req, res) => {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const resendKey = process.env.RESEND_API_KEY;
-  const siteUrl = process.env.SITE_URL;
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const siteUrl     = process.env.SITE_URL;
+  const smtpCfg     = getSmtpConfig();
 
-  // Test Resend connectivity if key present
-  let resendStatus = "not_configured";
-  let resendError = "";
-  let resendDomains: string[] = [];
-  if (resendKey) {
+  // Live SMTP connectivity test (open + close connection)
+  let smtpTestResult = "skipped";
+  let smtpTestError  = "";
+  if (smtpCfg.passSet) {
     try {
-      const r = await fetch("https://api.resend.com/domains", {
-        headers: { Authorization: `Bearer ${resendKey}` },
-      });
-      resendStatus = r.ok ? "connected" : `error_${r.status}`;
-      if (r.ok) {
-        const d = await r.json() as any;
-        resendDomains = (d?.data || []).map((x: any) => `${x.name} [${x.status}]`);
-      } else {
-        resendError = await r.text();
-      }
+      const { verifySmtpConnection } = await import("../lib/email");
+      await verifySmtpConnection();
+      smtpTestResult = smtpCfg.verified ? "connected" : "verify_failed";
     } catch (e: any) {
-      resendStatus = "fetch_failed";
-      resendError = e.message;
-    }
-  }
-
-  // Do a real test send to capture exact error
-  let sendTestResult = "skipped";
-  let sendTestError = "";
-  if (resendKey) {
-    try {
-      const r = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from: process.env.EMAIL_FROM || "FundedWealth <onboarding@resend.dev>",
-          to: "diagnostic-test@resend.dev",
-          subject: "FundedWealth diagnostic test",
-          html: "<p>test</p>",
-        }),
-      });
-      if (r.ok) {
-        sendTestResult = "success";
-      } else {
-        sendTestResult = `failed_${r.status}`;
-        sendTestError = await r.text();
-      }
-    } catch (e: any) {
-      sendTestResult = "exception";
-      sendTestError = e.message;
+      smtpTestResult = "exception";
+      smtpTestError  = e.message;
     }
   }
 
@@ -894,18 +859,20 @@ router.get("/email-diagnostic", async (_req, res) => {
   }
 
   res.json({
-    supabase: {
-      url: supabaseUrl ? supabaseUrl.substring(0, 40) + "..." : "MISSING",
-      serviceKey: serviceKey ? "set (" + serviceKey.length + " chars)" : "MISSING",
-      status: supabaseStatus,
+    smtp: {
+      host:       smtpCfg.host,
+      port:       smtpCfg.port,
+      secure:     smtpCfg.secure,
+      user:       smtpCfg.user,
+      from:       smtpCfg.from,
+      passSet:    smtpCfg.passSet,
+      testResult: smtpTestResult,
+      testError:  smtpTestError || undefined,
     },
-    resend: {
-      apiKey: resendKey ? "set (" + resendKey.length + " chars)" : "MISSING",
-      status: resendStatus,
-      error: resendError || undefined,
-      verifiedDomains: resendDomains,
-      sendTest: sendTestResult,
-      sendTestError: sendTestError || undefined,
+    supabase: {
+      url:        supabaseUrl ? supabaseUrl.substring(0, 40) + "..." : "MISSING",
+      serviceKey: serviceKey ? "set (" + serviceKey.length + " chars)" : "MISSING",
+      status:     supabaseStatus,
     },
     siteUrl: siteUrl || "NOT SET (using https://fundedwealth.com)",
   });
@@ -920,16 +887,16 @@ router.post("/forgot-password", async (req, res) => {
 
     const normalizedEmail = ValidationService.normalizeEmail(email);
 
-    // ── Check RESEND_API_KEY first ──────────────────────────────────────────
-    const resendKey = process.env.RESEND_API_KEY;
-    if (!resendKey) {
-      logger.error({ email: normalizedEmail }, "forgot-password: RESEND_API_KEY not set — email cannot be sent");
+    // ── Guard: SMTP must be configured ─────────────────────────────────────
+    const smtpCfg = getSmtpConfig();
+    if (!smtpCfg.passSet) {
+      logger.error({ email: normalizedEmail }, "forgot-password: SMTP not configured (SMTP_PASS missing) — email cannot be sent");
       return res.status(503).json({ error: "Email service not configured. Please contact support." });
     }
 
     // ── Build Supabase admin client ─────────────────────────────────────────
     const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseUrl || !serviceKey) {
       logger.error({ email: normalizedEmail }, "forgot-password: Supabase env vars missing");
       return res.status(503).json({ error: "Auth service not configured." });
@@ -950,7 +917,7 @@ router.post("/forgot-password", async (req, res) => {
 
     if (linkErr) {
       logger.error({ linkErr, email: normalizedEmail }, "forgot-password: generateLink failed");
-      // Return 200 to avoid email enumeration — but log clearly
+      // Return 200 to avoid email enumeration
       return res.json({ success: true, _debug: "link_gen_failed" });
     }
 
@@ -960,9 +927,9 @@ router.post("/forgot-password", async (req, res) => {
       return res.json({ success: true, _debug: "no_action_link" });
     }
 
-    // ── Send via Resend ─────────────────────────────────────────────────────
+    // ── Send via Zoho SMTP ──────────────────────────────────────────────────
     const sent = await sendEmail({
-      to: normalizedEmail,
+      to:      normalizedEmail,
       subject: "Reset Your FundedWealth Password",
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
@@ -983,11 +950,11 @@ router.post("/forgot-password", async (req, res) => {
     });
 
     if (!sent) {
-      logger.error({ email: normalizedEmail }, "forgot-password: Resend API call failed — check RESEND_API_KEY and domain verification");
+      logger.error({ email: normalizedEmail }, "forgot-password: Zoho SMTP send failed — check SMTP credentials");
       return res.status(503).json({ error: "Failed to send reset email. Please try again or contact support." });
     }
 
-    logger.info({ email: normalizedEmail }, "forgot-password: reset email sent via Resend");
+    logger.info({ email: normalizedEmail }, "forgot-password: reset email sent via Zoho SMTP ✓");
     return res.json({ success: true });
 
   } catch (err) {
