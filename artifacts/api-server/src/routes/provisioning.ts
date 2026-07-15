@@ -24,14 +24,16 @@ const router = Router();
 /**
  * Allow EITHER an authenticated admin (Supabase JWT) OR a trusted internal
  * service call (the Admin panel) identified by a shared secret header.
- * This lets the Admin panel reuse THIS production provisioning pipeline
- * without minting a Supabase user JWT, so Founder Emergency Provision and a
- * website purchase create identical accounts via the same code path.
+ * Also accepts the Supabase service role key as a fallback for server-to-server calls.
  */
 function allowInternalOrAdmin(req: Request, res: Response, next: NextFunction) {
   const secret = process.env.INTERNAL_PROVISION_SECRET;
   const provided = req.header("x-internal-provision-secret");
+  // Match by shared secret
   if (secret && provided && provided === secret) return next();
+  // Fallback: accept Supabase service role key (admin-app server-to-server)
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (supabaseServiceKey && provided && provided === supabaseServiceKey) return next();
   return requireAdminAuth(req, res, next);
 }
 
