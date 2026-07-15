@@ -189,7 +189,7 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
     if (!isLoaded || cooldown > 0) return;
     setError(""); setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiUrl}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

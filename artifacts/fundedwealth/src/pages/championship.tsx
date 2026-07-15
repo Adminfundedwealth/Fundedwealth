@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Trophy, ArrowRight, CheckCircle2, Medal, ShieldCheck, BarChart3, Users, Zap, Star, Copy, Smartphone, CreditCard } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
@@ -56,7 +56,7 @@ const ChampionshipPage = () => {
     setUtrError("");
     setUtrStatus("verifying");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiBase}/api/payments/verify-utr`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,7 +86,7 @@ const ChampionshipPage = () => {
     setOxapayLoading(true);
     setOxapayError("");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiBase}/api/payments/create-crypto-payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -115,7 +115,7 @@ const ChampionshipPage = () => {
     setRazorpayLoading(true);
     setRazorpayError("");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiBase}/api/razorpay/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,7 +133,7 @@ const ChampionshipPage = () => {
         amount: data.order.amount,
         currency: data.order.currency || "INR",
         name: "FundedWealth Championship",
-        description: `${challengeLabel} — ₹${challengePrice}`,
+        description: `${challengeLabel} � ?${challengePrice}`,
         order_id: data.order.id,
         image: "/logo.png",
         prefill: { name: form.name, email: form.email, contact: form.mobile },
@@ -182,7 +182,7 @@ const ChampionshipPage = () => {
   return (
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
-        title="Trading Championship India 2026 — Win iPhone, MacBook & Cash Prizes"
+        title="Trading Championship India 2026 � Win iPhone, MacBook & Cash Prizes"
         description="Join FundedWealth's monthly trading championship. Compete with India's best prop traders and win iPhone 16, MacBook, Royal Enfield & cash prizes. Free entry for funded traders. Weekly & monthly trading contests."
         keywords="trading championship India, prop trading competition India, trading contest India 2026, win prizes trading, FundedWealth championship, monthly trading challenge India, trading tournament India, best trading competition"
         canonical="/championship"
@@ -197,13 +197,13 @@ const ChampionshipPage = () => {
           </Link>
           <Link href="/">
             <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 text-sm">
-              ← Back to Home
+              ? Back to Home
             </Button>
           </Link>
         </div>
       </nav>
 
-      {/* Premium page-wide floating particles — multiple types */}
+      {/* Premium page-wide floating particles � multiple types */}
       <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
         {/* Round glowing dots */}
         {Array.from({ length: 35 }).map((_, i) => {
@@ -343,9 +343,9 @@ const ChampionshipPage = () => {
         })}
       </div>
 
-      {/* Hero — Full-screen background image */}
+      {/* Hero � Full-screen background image */}
       <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
-        {/* Background image — full cover */}
+        {/* Background image � full cover */}
         <div className="absolute inset-0">
           <img
             src="/maps/champ-man.png"
@@ -415,9 +415,9 @@ const ChampionshipPage = () => {
             {/* Prize cards */}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { place: "1st Place", amount: "₹1,00,000", border: "border-fw-orange/60", bg: "bg-fw-orange/10", text: "text-fw-orange", medal: "🥇" },
-                { place: "2nd Place", amount: "₹50,000", border: "border-white/30", bg: "bg-white/10", text: "text-white", medal: "🥈" },
-                { place: "3rd Place", amount: "₹25,000", border: "border-amber-600/40", bg: "bg-amber-900/20", text: "text-amber-400", medal: "🥉" },
+                { place: "1st Place", amount: "?1,00,000", border: "border-fw-orange/60", bg: "bg-fw-orange/10", text: "text-fw-orange", medal: "??" },
+                { place: "2nd Place", amount: "?50,000", border: "border-white/30", bg: "bg-white/10", text: "text-white", medal: "??" },
+                { place: "3rd Place", amount: "?25,000", border: "border-amber-600/40", bg: "bg-amber-900/20", text: "text-amber-400", medal: "??" },
               ].map((p, i) => (
                 <div key={i} className={`rounded-2xl border ${p.border} ${p.bg} backdrop-blur-md p-3 text-center`}>
                   <div className="text-[11px] font-bold text-white/70 mb-1 flex items-center justify-center gap-1">
@@ -470,7 +470,7 @@ const ChampionshipPage = () => {
             <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-white mb-4">
               Competition <span className="text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink">Prizes & Giveaways</span>
             </h2>
-            <p className="text-white/60 text-lg">Win up to <span className="text-fw-orange font-bold">₹10 Lakh + MacBook + ₹30K Cash</span> every month!</p>
+            <p className="text-white/60 text-lg">Win up to <span className="text-fw-orange font-bold">?10 Lakh + MacBook + ?30K Cash</span> every month!</p>
           </div>
 
           {/* Tab switcher: Monthly / Weekly */}
@@ -480,18 +480,18 @@ const ChampionshipPage = () => {
                 onClick={() => setPrizeTab("monthly")}
                 className={`px-4 md:px-6 lg:px-8 xl:px-10 py-3 rounded-xl font-bold text-sm transition-all ${prizeTab === "monthly" ? "bg-gradient-to-r from-fw-orange to-fw-pink text-white shadow-lg shadow-fw-orange/30" : "text-white/60 hover:text-white"}`}
               >
-                🏆 Monthly Prizes
+                ?? Monthly Prizes
               </button>
               <button
                 onClick={() => setPrizeTab("weekly")}
                 className={`px-4 md:px-6 lg:px-8 xl:px-10 py-3 rounded-xl font-bold text-sm transition-all ${prizeTab === "weekly" ? "bg-gradient-to-r from-fw-pink to-fw-purple text-white shadow-lg shadow-fw-pink/30" : "text-white/60 hover:text-white"}`}
               >
-                📅 Weekly Prizes
+                ?? Weekly Prizes
               </button>
             </div>
           </div>
 
-          {/* ── WEEKLY PRIZES ── */}
+          {/* -- WEEKLY PRIZES -- */}
           {prizeTab === "weekly" && (
             <div className="max-w-5xl mx-auto space-y-10">
 
@@ -501,16 +501,16 @@ const ChampionshipPage = () => {
                   {/* Left: text info */}
                   <div className="p-8 md:p-10 flex flex-col gap-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-fw-pink/20 border border-fw-pink/30 text-fw-pink text-sm font-bold w-fit">
-                      🎁 Weekly & Daily Giveaways
+                      ?? Weekly & Daily Giveaways
                     </div>
                     <div>
                       <div className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Bumper Prize</div>
                       <h3 className="text-4xl font-heading font-extrabold text-white mb-1">MacBook <span className="text-fw-orange">+</span> iPhone 16</h3>
-                      <p className="text-white/60 text-sm mt-2">Randomly selected from REAL traders who follow all rules. No gambling — pure skill rewarded every week!</p>
+                      <p className="text-white/60 text-sm mt-2">Randomly selected from REAL traders who follow all rules. No gambling � pure skill rewarded every week!</p>
                     </div>
                     <div className="border-t border-white/10 pt-4">
                       <div className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Every Day Prize</div>
-                      <h4 className="text-2xl font-heading font-extrabold text-blue-300">⌚ Smart Watch</h4>
+                      <h4 className="text-2xl font-heading font-extrabold text-blue-300">? Smart Watch</h4>
                       <p className="text-white/60 text-sm mt-1">Top-performing active trader wins daily. Trade consistently to be in the running!</p>
                     </div>
                     <a href="#join">
@@ -523,7 +523,7 @@ const ChampionshipPage = () => {
                   <div className="relative h-72 md:h-full min-h-[280px]">
                     <img
                       src="/weekly-prizes.png"
-                      alt="Weekly Prizes — MacBook, iPhone 16, Smart Watch"
+                      alt="Weekly Prizes � MacBook, iPhone 16, Smart Watch"
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-center"
@@ -536,45 +536,45 @@ const ChampionshipPage = () => {
 
               {/* Weekly Top 3 Podium */}
               <div>
-                <h3 className="text-2xl font-heading font-extrabold text-white text-center mb-8">🥇 Top 3 Weekly Winners</h3>
+                <h3 className="text-2xl font-heading font-extrabold text-white text-center mb-8">?? Top 3 Weekly Winners</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
 
                   {/* 2nd */}
                   <div className="rounded-3xl border border-white/20 bg-white/5 p-6 text-center flex flex-col gap-3">
-                    <div className="text-5xl">🥈</div>
+                    <div className="text-5xl">??</div>
                     <div className="text-white/60 text-sm font-bold uppercase tracking-widest">2nd Place</div>
-                    <div className="text-3xl font-heading font-extrabold text-white">₹2 Lakh</div>
+                    <div className="text-3xl font-heading font-extrabold text-white">?2 Lakh</div>
                     <div className="text-xs text-white/50 font-semibold bg-white/10 rounded-lg px-3 py-1.5 inline-block mx-auto">Evaluation Account</div>
-                    <div className="text-xs text-white/40 font-medium">(Worth ₹9,999)</div>
+                    <div className="text-xs text-white/40 font-medium">(Worth ?9,999)</div>
                     <a href="#join">
                       <Button className="w-full mt-2 bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 rounded-xl">Compete Now</Button>
                     </a>
                   </div>
 
-                  {/* 1st — elevated */}
+                  {/* 1st � elevated */}
                   <div className="rounded-3xl border-2 border-fw-pink bg-gradient-to-b from-fw-pink/20 via-fw-pink/5 to-transparent p-6 text-center flex flex-col gap-3 shadow-2xl shadow-fw-pink/20 md:-mt-8 relative">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <div className="bg-gradient-to-r from-fw-pink to-fw-purple text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-lg">
-                        🔥 WEEKLY TOP PRIZE
+                        ?? WEEKLY TOP PRIZE
                       </div>
                     </div>
-                    <div className="text-5xl mt-2">🥇</div>
+                    <div className="text-5xl mt-2">??</div>
                     <div className="text-fw-pink text-sm font-bold uppercase tracking-widest">1st Place</div>
-                    <div className="text-4xl font-heading font-extrabold text-fw-pink">₹5 Lakh</div>
+                    <div className="text-4xl font-heading font-extrabold text-fw-pink">?5 Lakh</div>
                     <div className="text-xs text-fw-pink/80 font-semibold bg-fw-pink/10 rounded-lg px-3 py-1.5 inline-block mx-auto border border-fw-pink/30">Evaluation Account</div>
-                    <div className="text-xs text-white/40 font-medium">(Worth ₹17,999)</div>
+                    <div className="text-xs text-white/40 font-medium">(Worth ?17,999)</div>
                     <a href="#join">
-                      <Button className="w-full h-12 mt-2 bg-gradient-to-r from-fw-pink to-fw-purple hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-fw-pink/30">Win This! →</Button>
+                      <Button className="w-full h-12 mt-2 bg-gradient-to-r from-fw-pink to-fw-purple hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-fw-pink/30">Win This! ?</Button>
                     </a>
                   </div>
 
                   {/* 3rd */}
                   <div className="rounded-3xl border border-amber-700/40 bg-amber-900/10 p-6 text-center flex flex-col gap-3">
-                    <div className="text-5xl">🥉</div>
+                    <div className="text-5xl">??</div>
                     <div className="text-amber-500 text-sm font-bold uppercase tracking-widest">3rd Place</div>
-                    <div className="text-3xl font-heading font-extrabold text-white">₹1 Lakh</div>
+                    <div className="text-3xl font-heading font-extrabold text-white">?1 Lakh</div>
                     <div className="text-xs text-white/50 font-semibold bg-white/10 rounded-lg px-3 py-1.5 inline-block mx-auto">Evaluation Account</div>
-                    <div className="text-xs text-white/40 font-medium">(Worth ₹5,999)</div>
+                    <div className="text-xs text-white/40 font-medium">(Worth ?5,999)</div>
                     <a href="#join">
                       <Button className="w-full mt-2 bg-amber-900/30 hover:bg-amber-900/50 text-amber-400 font-bold border border-amber-700/40 rounded-xl">Compete Now</Button>
                     </a>
@@ -582,12 +582,12 @@ const ChampionshipPage = () => {
                 </div>
               </div>
 
-              {/* Weekly 4th–10th */}
+              {/* Weekly 4th�10th */}
               <Card className="bg-white/5 border border-white/10 rounded-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Medal size={18} className="text-white/60" />
-                    <h4 className="font-bold text-white text-lg">4th – 10th Place</h4>
+                    <h4 className="font-bold text-white text-lg">4th � 10th Place</h4>
                   </div>
                   <p className="text-white/50 text-sm mb-4">Randomly selected winners from the top performers.</p>
                   <div className="space-y-3">
@@ -609,7 +609,7 @@ const ChampionshipPage = () => {
             </div>
           )}
 
-          {/* ── MONTHLY PRIZES ── */}
+          {/* -- MONTHLY PRIZES -- */}
           {prizeTab === "monthly" && <>
 
             {/* Monthly Prize Pool Banner */}
@@ -618,35 +618,35 @@ const ChampionshipPage = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,138,61,0.12)_0%,transparent_70%)]" />
                 <div className="relative z-10">
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-orange/20 border border-fw-orange/40 text-fw-orange text-sm font-bold mb-4">
-                    🏆 Monthly Prize Pool
+                    ?? Monthly Prize Pool
                   </div>
                   <div className="text-3xl sm:text-5xl md:text-7xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-fw-orange to-fw-pink mb-2">
-                    ₹17,59,000+
+                    ?17,59,000+
                   </div>
-                  <p className="text-white/60 text-lg">Total value in prizes — funding accounts, cash & gadgets every month</p>
+                  <p className="text-white/60 text-lg">Total value in prizes � funding accounts, cash & gadgets every month</p>
                 </div>
               </div>
             </div>
 
             {/* Top 3 Prize Cards */}
             <div className="max-w-5xl mx-auto mb-10">
-              <h3 className="text-2xl font-heading font-extrabold text-white text-center mb-8">🥇 Top 3 Monthly Winners</h3>
+              <h3 className="text-2xl font-heading font-extrabold text-white text-center mb-8">?? Top 3 Monthly Winners</h3>
 
               {/* Podium layout: 2nd | 1st | 3rd */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
 
                 {/* 2nd Place */}
                 <div className="rounded-3xl border border-white/20 bg-white/5 p-6 text-center flex flex-col gap-3 md:mb-0 mb-4">
-                  <div className="text-5xl">🥈</div>
+                  <div className="text-5xl">??</div>
                   <div className="text-white/60 text-sm font-bold uppercase tracking-widest">2nd Place</div>
-                  <div className="text-3xl font-heading font-extrabold text-white">₹5 Lakh</div>
+                  <div className="text-3xl font-heading font-extrabold text-white">?5 Lakh</div>
                   <div className="text-xs text-white/50 font-semibold bg-white/10 rounded-lg px-3 py-1.5 inline-block mx-auto">1-Step Evaluation Account</div>
                   <div className="border-t border-white/10 pt-3 space-y-2">
                     <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                      <span className="text-green-400 font-bold text-base">💵</span> ₹20,000 Cash Prize
+                      <span className="text-green-400 font-bold text-base">??</span> ?20,000 Cash Prize
                     </div>
                     <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                      <span className="text-fw-orange font-bold text-base">🎓</span> Winner Certificate
+                      <span className="text-fw-orange font-bold text-base">??</span> Winner Certificate
                     </div>
                   </div>
                   <a href="#join">
@@ -656,16 +656,16 @@ const ChampionshipPage = () => {
                   </a>
                 </div>
 
-                {/* 1st Place — elevated */}
+                {/* 1st Place � elevated */}
                 <div className="rounded-3xl border-2 border-fw-orange bg-gradient-to-b from-fw-orange/20 via-fw-orange/5 to-transparent p-6 text-center flex flex-col gap-3 shadow-2xl shadow-fw-orange/20 md:-mt-8 relative">
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <div className="bg-gradient-to-r from-fw-orange to-fw-pink text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-lg">
-                      🔥 TOP PRIZE
+                      ?? TOP PRIZE
                     </div>
                   </div>
-                  <div className="text-5xl mt-2">🥇</div>
+                  <div className="text-5xl mt-2">??</div>
                   <div className="text-fw-orange text-sm font-bold uppercase tracking-widest">1st Place</div>
-                  <div className="text-4xl font-heading font-extrabold text-fw-orange">₹10 Lakh</div>
+                  <div className="text-4xl font-heading font-extrabold text-fw-orange">?10 Lakh</div>
                   <div className="text-xs text-fw-orange/80 font-semibold bg-fw-orange/10 rounded-lg px-3 py-1.5 inline-block mx-auto border border-fw-orange/30">1-Step Evaluation Account</div>
 
                   {/* MacBook image */}
@@ -682,37 +682,37 @@ const ChampionshipPage = () => {
                       }}
                     />
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-[#1a0030]/90 text-white text-xs font-bold px-3 py-1 rounded-full border border-yellow-400/60 whitespace-nowrap backdrop-blur-sm">
-                      🍎 Apple MacBook
+                      ?? Apple MacBook
                     </div>
                   </div>
 
                   <div className="border-t border-fw-orange/20 pt-3 space-y-2">
                     <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                      <span className="text-green-400 font-bold text-base">💵</span> ₹30,000 Cash Prize
+                      <span className="text-green-400 font-bold text-base">??</span> ?30,000 Cash Prize
                     </div>
                     <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                      <span className="text-fw-orange font-bold text-base">🎓</span> Winner Certificate
+                      <span className="text-fw-orange font-bold text-base">??</span> Winner Certificate
                     </div>
                   </div>
                   <a href="#join">
                     <Button className="w-full h-12 bg-gradient-to-r from-fw-orange to-fw-pink hover:opacity-90 text-white font-bold rounded-xl shadow-lg shadow-fw-orange/30">
-                      Win This! →
+                      Win This! ?
                     </Button>
                   </a>
                 </div>
 
                 {/* 3rd Place */}
                 <div className="rounded-3xl border border-amber-700/40 bg-amber-900/10 p-6 text-center flex flex-col gap-3 md:mb-0 mb-4">
-                  <div className="text-5xl">🥉</div>
+                  <div className="text-5xl">??</div>
                   <div className="text-amber-500 text-sm font-bold uppercase tracking-widest">3rd Place</div>
-                  <div className="text-3xl font-heading font-extrabold text-white">₹2 Lakh</div>
+                  <div className="text-3xl font-heading font-extrabold text-white">?2 Lakh</div>
                   <div className="text-xs text-white/50 font-semibold bg-white/10 rounded-lg px-3 py-1.5 inline-block mx-auto">1-Step Evaluation Account</div>
                   <div className="border-t border-amber-700/30 pt-3 space-y-2">
                     <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                      <span className="text-green-400 font-bold text-base">💵</span> ₹9,000 Cash Prize
+                      <span className="text-green-400 font-bold text-base">??</span> ?9,000 Cash Prize
                     </div>
                     <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                      <span className="text-fw-orange font-bold text-base">🎓</span> Winner Certificate
+                      <span className="text-fw-orange font-bold text-base">??</span> Winner Certificate
                     </div>
                   </div>
                   <a href="#join">
@@ -724,13 +724,13 @@ const ChampionshipPage = () => {
               </div>
             </div>
 
-            {/* 4th–10th Monthly */}
+            {/* 4th�10th Monthly */}
             <div className="max-w-5xl mx-auto">
               <Card className="bg-white/5 border border-white/10 rounded-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Medal size={18} className="text-white/60" />
-                    <h4 className="font-bold text-white text-lg">4th – 10th Place</h4>
+                    <h4 className="font-bold text-white text-lg">4th � 10th Place</h4>
                   </div>
                   <p className="text-white/50 text-sm mb-4">Randomly selected winners from the top performers.</p>
                   <div className="space-y-3">
@@ -824,7 +824,7 @@ const ChampionshipPage = () => {
         </div>
       </section>
 
-      {/* Championship Checkout — Cart → Verify → Pay */}
+      {/* Championship Checkout � Cart ? Verify ? Pay */}
       <section id="join" className="py-20 bg-[#0d0018]">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
           <div className="text-center mb-10">
@@ -839,7 +839,7 @@ const ChampionshipPage = () => {
             {[
               { num: 1, label: "Configure", icon: "Cart" },
               { num: 2, label: "Verify", icon: "Verify" },
-              { num: 3, label: "Pay", icon: "₹" },
+              { num: 3, label: "Pay", icon: "?" },
             ].map((s, i) => (
               <div key={s.num} className="flex items-center">
                 <div className="flex flex-col items-center gap-1.5">
@@ -857,7 +857,7 @@ const ChampionshipPage = () => {
             ))}
           </div>
 
-          {/* Step 1: Configure — Choose challenge + details */}
+          {/* Step 1: Configure � Choose challenge + details */}
           {checkoutStep === 1 && (
             <div className="space-y-6">
               {/* Prize tab switcher */}
@@ -886,14 +886,14 @@ const ChampionshipPage = () => {
                     <label className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${challenge === "weekly" ? "border-fw-orange bg-fw-orange/10" : "border-white/10 hover:border-white/20"}`} onClick={() => setChallenge("weekly")}>
                       <div>
                         <div className="text-white font-bold">Weekly Challenge</div>
-                        <div className="text-white/50 text-sm">₹149.00 / week</div>
+                        <div className="text-white/50 text-sm">?149.00 / week</div>
                       </div>
                       <input type="radio" name="challenge" value="weekly" checked={challenge === "weekly"} onChange={() => setChallenge("weekly")} className="accent-fw-orange w-5 h-5" />
                     </label>
                     <label className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${challenge === "monthly" ? "border-fw-orange bg-fw-orange/10" : "border-white/10 hover:border-white/20"}`} onClick={() => setChallenge("monthly")}>
                       <div>
                         <div className="text-white font-bold">Monthly Challenge</div>
-                        <div className="text-white/50 text-sm">₹399.00 / month</div>
+                        <div className="text-white/50 text-sm">?399.00 / month</div>
                       </div>
                       <input type="radio" name="challenge" value="monthly" checked={challenge === "monthly"} onChange={() => setChallenge("monthly")} className="accent-fw-orange w-5 h-5" />
                     </label>
@@ -939,20 +939,20 @@ const ChampionshipPage = () => {
                   </div>
                   <div className="flex justify-between text-sm mb-3">
                     <span className="text-white/80">FWC {challengeLabel}</span>
-                    <span className="text-white font-bold">₹{challengePrice}</span>
+                    <span className="text-white font-bold">?{challengePrice}</span>
                   </div>
                   <div className="flex justify-between text-base font-bold border-t border-white/10 pt-3">
                     <span className="text-white">Total</span>
-                    <span className="text-fw-orange text-xl">₹{challengePrice}</span>
+                    <span className="text-fw-orange text-xl">?{challengePrice}</span>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Waitlist Notice — shown always when championship is paused */}
+              {/* Waitlist Notice � shown always when championship is paused */}
               <div className="w-full rounded-2xl border border-fw-orange/50 bg-gradient-to-br from-fw-orange/15 via-fw-orange/5 to-transparent px-6 py-6 text-center shadow-lg shadow-fw-orange/10">
-                <div className="text-3xl mb-3">🏆</div>
+                <div className="text-3xl mb-3">??</div>
                 <p className="text-fw-orange font-extrabold text-lg mb-1">
-                  Thank you — FundedWealth Championship
+                  Thank you � FundedWealth Championship
                 </p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   {form.email
@@ -961,7 +961,7 @@ const ChampionshipPage = () => {
                   }
                 </p>
                 <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/60 text-xs font-semibold">
-                  🔒 Registration Currently Paused
+                  ?? Registration Currently Paused
                 </div>
               </div>
 
@@ -969,7 +969,7 @@ const ChampionshipPage = () => {
                 disabled
                 className="w-full h-14 text-lg font-bold rounded-xl bg-white/10 border border-white/10 text-white/30 cursor-not-allowed select-none"
               >
-                🔒 Registration Paused — Coming Soon
+                ?? Registration Paused � Coming Soon
               </button>
 
               <p className="text-center text-white/30 text-xs">
@@ -978,7 +978,7 @@ const ChampionshipPage = () => {
             </div>
           )}
 
-          {/* Step 2: Verify — Terms agreement */}
+          {/* Step 2: Verify � Terms agreement */}
           {checkoutStep === 2 && (
             <div className="space-y-6">
               <Card className="bg-white/5 border border-white/10 rounded-2xl">
@@ -1000,7 +1000,7 @@ const ChampionshipPage = () => {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-white/60">Amount</span>
-                        <span className="text-fw-orange font-bold">₹{challengePrice}</span>
+                        <span className="text-fw-orange font-bold">?{challengePrice}</span>
                       </div>
                     </div>
 
@@ -1031,7 +1031,7 @@ const ChampionshipPage = () => {
             </div>
           )}
 
-          {/* Step 3: Pay — UPI QR / Crypto */}
+          {/* Step 3: Pay � UPI QR / Crypto */}
           {checkoutStep === 3 && (
             <div className="space-y-6">
               {/* Payment method selector */}
@@ -1062,12 +1062,12 @@ const ChampionshipPage = () => {
                         </div>
                         <div>
                           <div className="text-white font-bold">{oxapayLoading ? "Redirecting..." : "Crypto (USDT/BTC/ETH)"}</div>
-                          <div className="text-white/50 text-sm">Pay via OxaPay — USDT TRC20, BTC, ETH, LTC</div>
+                          <div className="text-white/50 text-sm">Pay via OxaPay � USDT TRC20, BTC, ETH, LTC</div>
                         </div>
                       </button>
                       {oxapayError && <p className="text-red-400 text-sm">{oxapayError}</p>}
 
-                      {/* ── Razorpay — Cards / Net Banking / Wallets ── */}
+                      {/* -- Razorpay � Cards / Net Banking / Wallets -- */}
                       <button
                         onClick={() => handleRazorpayPayment()}
                         disabled={razorpayLoading}
@@ -1082,10 +1082,10 @@ const ChampionshipPage = () => {
                         </div>
                         <div>
                           <div className="text-white font-extrabold text-base">
-                            {razorpayLoading ? "Opening Razorpay…" : "💳 Cards / Net Banking / UPI Wallets"}
+                            {razorpayLoading ? "Opening Razorpay�" : "?? Cards / Net Banking / UPI Wallets"}
                           </div>
                           <div className="text-white/55 text-sm mt-0.5">
-                            <span className="font-bold text-blue-300">Powered by Razorpay</span> — Visa, Mastercard, RuPay, All Indian Banks
+                            <span className="font-bold text-blue-300">Powered by Razorpay</span> � Visa, Mastercard, RuPay, All Indian Banks
                           </div>
                         </div>
                       </button>
@@ -1113,7 +1113,7 @@ const ChampionshipPage = () => {
                       <div className="inline-block p-3 bg-white rounded-2xl mb-3">
                         <img src={qrSrc} alt="UPI QR Code" className="w-48 h-48" />
                       </div>
-                      <p className="text-white/60 text-sm">Scan with any UPI app to pay <span className="text-fw-orange font-bold">₹{challengePrice}</span></p>
+                      <p className="text-white/60 text-sm">Scan with any UPI app to pay <span className="text-fw-orange font-bold">?{challengePrice}</span></p>
                     </div>
 
                     {/* UPI ID */}
@@ -1132,14 +1132,14 @@ const ChampionshipPage = () => {
                     <div className="bg-white/5 rounded-xl p-4 border border-white/10 mb-4">
                       <div className="text-white/50 text-xs mb-1">Amount to Pay</div>
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-bold text-lg">₹{challengePrice}</span>
+                        <span className="text-white font-bold text-lg">?{challengePrice}</span>
                         <button onClick={() => copyToField("amount", String(challengePrice))} className="text-fw-orange hover:text-fw-orange/80 text-xs flex items-center gap-1">
                           <Copy size={12} /> {copiedField === "amount" ? "Copied!" : "Copy"}
                         </button>
                       </div>
                     </div>
 
-                    {/* Open UPI app button — works on mobile only */}
+                    {/* Open UPI app button � works on mobile only */}
                     <a href={upiPayUrl} className="block mb-4">
                       <Button className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl">
                         Open UPI App to Pay
@@ -1149,7 +1149,7 @@ const ChampionshipPage = () => {
 
                     {/* UTR Verification */}
                     <div className="border-t border-white/10 pt-4">
-                      <h4 className="text-white font-bold text-sm mb-3">After Payment — Enter UTR/Reference Number</h4>
+                      <h4 className="text-white font-bold text-sm mb-3">After Payment � Enter UTR/Reference Number</h4>
                       <div className="flex gap-2">
                         <input
                           type="text"
@@ -1195,7 +1195,7 @@ const ChampionshipPage = () => {
 
       {/* Footer strip */}
       <div className="border-t border-white/10 py-6 text-center text-white/30 text-sm bg-[#0a0010]">
-        © 2025 FundedWealth. All rights reserved. &nbsp;|&nbsp; <Link href="/" className="hover:text-white/60 transition-colors">Back to Home</Link>
+        � 2025 FundedWealth. All rights reserved. &nbsp;|&nbsp; <Link href="/" className="hover:text-white/60 transition-colors">Back to Home</Link>
       </div>
     </div>
   );

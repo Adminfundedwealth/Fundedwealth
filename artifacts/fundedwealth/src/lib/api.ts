@@ -7,7 +7,7 @@
  * - In development: relative /api/* (Vite proxy forwards to localhost:9000 or Render)
  */
 
-const RAILWAY_API = "https://fundedwealth-api-production.up.railway.app";
+const RAILWAY_API = "https://api.fundedwealth.com";
 
 const API_PREFIX = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`

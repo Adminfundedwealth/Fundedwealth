@@ -69,7 +69,7 @@ export default function PurchaseSuccess() {
       }
 
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
         const token = isLoaded ? await getToken().catch(() => null) : null;
 
         // Fetch from orders API using orderId
@@ -214,7 +214,7 @@ export default function PurchaseSuccess() {
     setLaunching(true);
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: { 

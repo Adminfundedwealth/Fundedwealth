@@ -28,7 +28,7 @@ interface BillingInfo {
 function getApiBase(): string {
   return (
     import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "" : "https://fundedwealth-api-production.up.railway.app")
+    (import.meta.env.DEV ? "" : "https://api.fundedwealth.com")
   );
 }
 
@@ -97,7 +97,7 @@ export const usePayment = (
       if ((err as any)?.name === "AbortError") {
         setOxapayError("Payment request timed out. The server may be starting up — please wait 30 seconds and try again.");
       } else {
-        setOxapayError("Could not reach the payment server. If you're testing locally, ensure the backend is running on port 9000.");
+        setOxapayError("Could not reach the payment server. Please check your connection and try again.");
       }
     } finally {
       setOxapayLoading(false);
@@ -120,15 +120,26 @@ export const usePayment = (
     try {
       const apiBase = getApiBase();
       const token = isLoaded ? await getToken().catch(() => null) : null;
-      const res = await fetch(`${apiBase}/api/razorpay/create-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        credentials: "include",
-        body: JSON.stringify({ amount: finalTotal, planType: selectedPlan, sizeIndex: selectedSizeIdx, couponCode: appliedCoupon || undefined }),
-      });
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      let res: Response;
+      try {
+        res = await fetch(`${apiBase}/api/razorpay/create-order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          credentials: "include",
+          signal: controller.signal,
+          body: JSON.stringify({ amount: finalTotal, planType: selectedPlan, sizeIndex: selectedSizeIdx, couponCode: appliedCoupon || undefined }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success || !data.order?.id) {
         setRazorpayError(data.message || data.error || "Could not create payment order. Please try again.");
@@ -211,17 +222,50 @@ export const usePayment = (
         },
       };
       if (typeof (window as any).Razorpay === "undefined") {
-        setRazorpayError("Razorpay SDK is loading. Please wait a moment and try again.");
-        setRazorpayLoading(false);
-        return;
+        // SDK may not have loaded yet (defer script) — try loading it dynamically
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+            if (existing) {
+              // Script tag exists but may still be loading — poll briefly
+              let attempts = 0;
+              const poll = setInterval(() => {
+                attempts++;
+                if (typeof (window as any).Razorpay !== "undefined") {
+                  clearInterval(poll);
+                  resolve();
+                } else if (attempts >= 20) {
+                  clearInterval(poll);
+                  reject(new Error("Razorpay SDK failed to load"));
+                }
+              }, 200);
+            } else {
+              const script = document.createElement("script");
+              script.src = "https://checkout.razorpay.com/v1/checkout.js";
+              script.onload = () => resolve();
+              script.onerror = () => reject(new Error("Razorpay SDK failed to load"));
+              document.head.appendChild(script);
+            }
+          });
+        } catch {
+          setRazorpayError("Razorpay payment SDK could not be loaded. Please refresh the page and try again.");
+          setRazorpayLoading(false);
+          return;
+        }
       }
-      const rzp = new (window as any).Razorpay(options);      rzp.on("payment.failed", (response: any) => {
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on("payment.failed", (response: any) => {
         setRazorpayError("Payment failed: " + (response.error?.description || "Unknown error"));
         setRazorpayLoading(false);
       });
       rzp.open();
     } catch (err: any) {
-      setRazorpayError("Could not reach the payment server. If you're testing locally, ensure the backend is running on port 9000.");
+      const isAbort = err?.name === "AbortError";
+      setRazorpayError(
+        isAbort
+          ? "Payment request timed out. The server may be starting up — please wait 30 seconds and try again."
+          : "Could not reach the payment server. Please check your connection and try again."
+      );
       setRazorpayLoading(false);
     }
   };

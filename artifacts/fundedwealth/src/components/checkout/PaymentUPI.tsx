@@ -16,6 +16,7 @@ interface PaymentUPIProps {
   setUtrInput: (v: string) => void;
   utrStatus: string;
   utrError: string;
+  utrPendingOrderId?: string | null;
   handleVerifyUtr: () => void;
   onCancel: () => void;
 }
@@ -33,6 +34,7 @@ export const PaymentUPI = ({
   setUtrInput,
   utrStatus,
   utrError,
+  utrPendingOrderId,
   handleVerifyUtr,
   onCancel,
 }: PaymentUPIProps) => (
@@ -96,17 +98,41 @@ export const PaymentUPI = ({
             onChange={(e) => setUtrInput(e.target.value.replace(/\D/g, "").slice(0, 12))}
             placeholder="Enter 10-12 digit UTR"
             className="bg-black/30 border-white/10 text-white placeholder:text-white/30 font-mono"
-            disabled={utrStatus === "verifying" || utrStatus === "success"}
+            disabled={utrStatus === "verifying" || utrStatus === "success" || utrStatus === "pending"}
           />
           <Button
             onClick={handleVerifyUtr}
-            disabled={utrStatus === "verifying" || utrStatus === "success" || utrInput.length < 10}
-            className="bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white font-bold px-6"
+            disabled={utrStatus === "verifying" || utrStatus === "success" || utrStatus === "pending" || utrInput.length < 10}
+            className="bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white font-bold px-6 min-w-[90px]"
           >
-            {utrStatus === "verifying" ? "..." : utrStatus === "success" ? "Verified" : "Verify"}
+            {utrStatus === "verifying"
+              ? <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin inline-block" />Checking</span>
+              : utrStatus === "success"
+              ? "✓ Verified"
+              : utrStatus === "pending"
+              ? "Pending…"
+              : "Verify"}
           </Button>
         </div>
         {utrError && <p className="text-red-400 text-xs mt-2">{utrError}</p>}
+        {utrStatus === "pending" && !utrError && (
+          <p className="text-amber-400 text-xs mt-2">
+            Payment received — your account is being set up.{" "}
+            {utrPendingOrderId ? (
+              <a
+                href={`/payment-pending?orderId=${encodeURIComponent(utrPendingOrderId)}&method=upi`}
+                className="underline hover:text-amber-300"
+              >
+                Track provisioning status →
+              </a>
+            ) : (
+              "Please wait a moment and try again."
+            )}
+          </p>
+        )}
+        {utrStatus === "success" && (
+          <p className="text-emerald-400 text-xs mt-2">Payment verified! Redirecting to your dashboard…</p>
+        )}
       </div>
 
       <div className="text-center pt-2">

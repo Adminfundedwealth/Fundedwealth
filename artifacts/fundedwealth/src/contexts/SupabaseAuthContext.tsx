@@ -64,7 +64,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://fundedwealth-api-production.up.railway.app";
+        const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
         fetch(`${apiUrl}/api/auth/account-status`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
         })

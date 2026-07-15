@@ -9,7 +9,7 @@
  * NOTE: Never return "" — that causes fetch("/api/...") which goes to Vercel
  * instead of Railway, triggering 405 on POST endpoints.
  */
-export const RAILWAY_API_BASE = "https://fundedwealth-api-production.up.railway.app";
+export const RAILWAY_API_BASE = "https://api.fundedwealth.com";
 
 export function getApiBase(): string {
   return (

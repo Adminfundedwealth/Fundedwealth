@@ -84,7 +84,7 @@ export default function BlogArticle() {
     setLoading(true);
     setError(null);
 
-    const apiBase = (import.meta.env.VITE_API_URL as string) || "https://fundedwealth-api-production.up.railway.app";
+    const apiBase = (import.meta.env.VITE_API_URL as string) || "https://api.fundedwealth.com";
     fetch(`${apiBase}/api/blog/${encodeURIComponent(slug)}`)
       .then(async (res) => {
         if (res.status === 404) throw new Error("Article not found");

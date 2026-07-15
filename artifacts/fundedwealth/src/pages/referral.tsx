@@ -23,7 +23,7 @@ export default function ReferralLandingPage() {
     const trackClick = async () => {
       setStatus("saving");
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
         const res = await fetch(`${apiBase}/api/affiliate/click`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

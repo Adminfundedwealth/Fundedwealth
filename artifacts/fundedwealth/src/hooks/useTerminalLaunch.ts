@@ -38,7 +38,7 @@ export function useTerminalLaunch(): UseTerminalLaunch {
     try {
       // Try refreshing session first to get a fresh token
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL ?? "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL ?? "https://api.fundedwealth.com";
 
       if (!token) {
         // No session — redirect to sign-in

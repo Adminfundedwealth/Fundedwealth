@@ -41,7 +41,7 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
       }
       
       // Signed in - check onboarding status
-      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
       fetch(`${apiUrl}/api/auth/onboarding-status`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
@@ -72,7 +72,7 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
     setState("submitting");
     setErrorMsg("");
 
-    try {      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://fundedwealth-api-production.up.railway.app";
+    try {      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiUrl}/api/auth/create-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

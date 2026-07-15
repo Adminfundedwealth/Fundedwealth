@@ -108,6 +108,7 @@ export default function Checkout() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [utrStatus, setUtrStatus] = useState<"idle" | "verifying" | "pending" | "success" | "failed">("idle");
   const [utrError, setUtrError] = useState("");
+  const [utrPendingOrderId, setUtrPendingOrderId] = useState<string | null>(null);
   const [paySecondsLeft, setPaySecondsLeft] = useState(900);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -140,41 +141,57 @@ export default function Checkout() {
     setUtrError("");
     setUtrStatus("verifying");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const token = isLoaded ? await getToken().catch(() => null) : null;
-      const res = await fetch(`${apiBase}/api/payments/verify-utr`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({
-          utr: utrInput.trim(),
-          amount: finalTotal,
-          planType: selectedPlan,
-          sizeIndex: selectedSizeIdx,
-          couponCode: appliedCoupon || undefined,
-          referralCode: referralCode || undefined,
-          // Guest-chosen account password — backend creates the Supabase auth
-          // identity with this exact password so we can auto-login below.
-          password: !isSignedIn ? password : undefined,
-          billing: {
-            firstName: billing.firstName,
-            lastName: billing.lastName,
-            email: billing.email,
-            phone: billing.phone,
-            city: billing.city,
-            state: billing.country,
-            zipcode: billing.postalCode,
-            address: billing.street,
-          },
-        }),
-      });
+
+      // Use AbortController so we don't hang indefinitely
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      let res: Response;
+      try {
+        res = await fetch(`${apiBase}/api/payments/verify-utr`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          credentials: "include",
+          signal: controller.signal,
+          body: JSON.stringify({
+            utr: utrInput.trim(),
+            amount: finalTotal,
+            planType: selectedPlan,
+            sizeIndex: selectedSizeIdx,
+            couponCode: appliedCoupon || undefined,
+            referralCode: referralCode || undefined,
+            // Guest-chosen account password — backend creates the Supabase auth
+            // identity with this exact password so we can auto-login below.
+            password: !isSignedIn ? password : undefined,
+            billing: {
+              firstName: billing.firstName,
+              lastName: billing.lastName,
+              email: billing.email,
+              phone: billing.phone,
+              city: billing.city,
+              state: billing.country,
+              zipcode: billing.postalCode,
+              address: billing.street,
+            },
+          }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
       const data = await res.json().catch(() => ({}));
+
       if (res.ok && data.success) {
         setUtrStatus("success");
 
         if (isSignedIn) {
-          // Already authenticated → go straight to accounts page — never login
+          // Already authenticated → go straight to accounts page
+          // Small delay so the "Verified" button state is visible briefly
+          await new Promise((r) => setTimeout(r, 500));
           window.location.href = "/dashboard/accounts";
-        } else if (!isSignedIn && data.onboardingToken) {
+        } else if (data.onboardingToken) {
           // Guest purchaser: backend has created a Supabase auth identity.
           // Auto-sign-in using the password they chose at checkout.
           if (password && billing.email) {
@@ -182,7 +199,7 @@ export default function Checkout() {
               const { error: signInErr } = await signIn(billing.email, password);
               if (!signInErr) {
                 // Wait for session to persist then redirect to accounts
-                await new Promise((r) => setTimeout(r, 300));
+                await new Promise((r) => setTimeout(r, 500));
                 window.location.href = "/dashboard/accounts";
               } else {
                 // Sign-in failed — redirect to onboarding token page
@@ -196,19 +213,44 @@ export default function Checkout() {
             window.location.href = `/auth/create-password?token=${encodeURIComponent(data.onboardingToken)}`;
           }
         } else {
-          // Provisioning done. Show provisioning status page.
+          // Provisioning is already done (provisioningStatus === "completed").
+          // Route to purchase-success if we have an orderId, otherwise accounts.
+          await new Promise((r) => setTimeout(r, 500));
+          if (data.orderId) {
+            window.location.href = `/purchase-success?orderId=${encodeURIComponent(data.orderId)}`;
+          } else {
+            window.location.href = "/dashboard/accounts";
+          }
+        }
+      } else if (res.status === 202 || data.status === "pending") {
+        // Payment received but provisioning is still queued — send to payment-pending page
+        if (data.orderId) {
           const pending = new URLSearchParams({
-            orderId: data.orderId || "",
+            orderId: data.orderId,
             plan: selectedPlan,
             amount: String(finalTotal),
             method: "upi",
           });
+          setUtrStatus("success");
+          await new Promise((r) => setTimeout(r, 500));
           window.location.href = `/payment-pending?${pending.toString()}`;
+        } else {
+          setUtrPendingOrderId(data.orderId || null);
+          setUtrStatus("pending");
         }
+      } else {
+        setUtrStatus("failed");
+        setUtrError(data.message || data.error || "Verification failed. Please try again or contact support.");
       }
-      else if (res.status === 202 || data.status === "pending") setUtrStatus("pending");
-      else { setUtrStatus("failed"); setUtrError(data.message || data.error || "Verification failed. Please try again or contact support."); }
-    } catch { setUtrStatus("pending"); }
+    } catch (err: unknown) {
+      const isAbort = err instanceof Error && err.name === "AbortError";
+      setUtrStatus("failed");
+      setUtrError(
+        isAbort
+          ? "Request timed out. Please check your connection and try again."
+          : "Network error. Please check your connection and try again."
+      );
+    }
   };
 
   const fmtTimer = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -444,8 +486,9 @@ export default function Checkout() {
                       setUtrInput={(v) => { setUtrInput(v); setUtrError(""); }}
                       utrStatus={utrStatus}
                       utrError={utrError}
+                      utrPendingOrderId={utrPendingOrderId}
                       handleVerifyUtr={handleVerifyUtr}
-                      onCancel={() => { setPayCategory(null); setUtrStatus("idle"); setUtrInput(""); setUtrError(""); }}
+                      onCancel={() => { setPayCategory(null); setUtrStatus("idle"); setUtrInput(""); setUtrError(""); setUtrPendingOrderId(null); }}
                     />
                   ) : payCategory === "card" ? (
                     <div className="space-y-4">

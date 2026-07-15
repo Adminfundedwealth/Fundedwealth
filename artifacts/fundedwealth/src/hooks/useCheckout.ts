@@ -50,7 +50,7 @@ export const useCheckout = () => {
     setEmailChecking(true);
     const timer = setTimeout(async () => {
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
         const res = await fetch(`${apiBase}/api/auth/check-email?email=${encodeURIComponent(email)}`);
         const data = await res.json().catch(() => ({ exists: false }));
         setEmailExists(!!data.exists);

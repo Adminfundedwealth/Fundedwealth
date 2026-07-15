@@ -302,7 +302,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     setLaunchError("");
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
       console.info("[Launch Terminal] request start", {
         accountId: acc.id,
@@ -591,7 +591,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
     setError("");
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
       console.info("[Launch Terminal] request start", {
         accountId: acc.id,
@@ -1073,10 +1073,33 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       .finally(() => setLeaderboardLoading(false));
   }, [user?.id]);
 
-  // Analytics trades — terminal data removed, stubs kept to avoid UI crash
+  // Analytics trades — fetched from real API (trade_logs via terminal-sync)
   type TradeLog = { symbol: string; pnl: number; createdAt: string };
-  const analyticsTradesData: TradeLog[] = [];
+  const [analyticsTradesData, setAnalyticsTradesData] = useState<TradeLog[]>([]);
   const analyticsTradesLoading = false;
+
+  // Load real trade data when user is available
+  useEffect(() => {
+    if (!user || profile.accounts.length === 0) return;
+    const activeAccount = profile.accounts.find(a => a.status === "active") || profile.accounts[0];
+    if (!activeAccount) return;
+    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    fetch(`${apiBase}/api/accounts/${activeAccount.id}/trades`, {
+      credentials: "include",
+    })
+      .then(r => { if (!r.ok) throw new Error("not found"); return r.json(); })
+      .then((data: any) => {
+        const logs: TradeLog[] = (data.trades || []).map((t: any) => ({
+          symbol: String(t.symbol || ""),
+          pnl: Number(t.pnl || 0),
+          createdAt: String(t.exited_at || t.created_at || new Date().toISOString()),
+        }));
+        setAnalyticsTradesData(logs);
+      })
+      .catch(() => {
+        // Non-critical — analytics will show empty state
+      });
+  }, [user?.id, profile.accounts.length]);
 
   const [affiliateStats, setAffiliateStats] = useState({
     affiliateCode: profile.referralCode,
@@ -1118,7 +1141,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
   useEffect(() => {
     if (!user) return;
-    const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
     fetch(`${apiBase}/api/users/me`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1322,12 +1345,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         setKycMsg(err.error || "Submission failed. Please try again.");
       }
     } catch {
-      // Backend offline — save locally and show success so user isn't blocked
-      try {
-        localStorage.setItem("fw_kyc_pending", JSON.stringify({ ...kycForm, submittedAt: new Date().toISOString() }));
-      } catch { /* ignore */ }
-      setKycMsg("KYC saved locally. It will sync automatically when the server is available.");
-      setKycStatus({ kycStatus: "submitted", submission: kycForm });
+      // Backend offline — show real error instead of fake "submitted" state
+      setKycMsg("Unable to submit KYC — server is unreachable. Please check your connection and try again.");
     }
     setKycSubmitting(false);
   };
@@ -1341,11 +1360,16 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
     { id: "home" as Section, icon: Home, label: "Home" },
     { id: "accounts" as Section, icon: BarChart2, label: "Accounts" },
     { id: "platform" as Section, icon: Monitor, label: "Trading Platform" },
+    { id: "analytics" as Section, icon: TrendingUp, label: "Analytics" },
     { id: "payouts" as Section, icon: DollarSign, label: "Payouts" },
+    { id: "leaderboard" as Section, icon: Trophy, label: "Leaderboard" },
+    { id: "affiliate" as Section, icon: Users, label: "Affiliate" },
+    { id: "impact" as Section, icon: Heart, label: "FW Impact" },
     { id: "withdrawal-details" as Section, icon: CreditCard, label: "Withdrawal Details" },
   ];
   const navOther = [
     { id: "kyc" as Section, icon: FileText, label: "KYC Verification" },
+    { id: "coupon" as Section, icon: Tag, label: "Coupons" },
     { id: "support" as Section, icon: LifeBuoy, label: "Help & Support" },
     { id: "settings" as Section, icon: Settings, label: "Settings" },
   ];
@@ -3225,7 +3249,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
     try {
       // 1. Create Razorpay order via backend
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const orderRes = await fetch(`${apiBase}/api/razorpay/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

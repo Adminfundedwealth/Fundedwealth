@@ -43,11 +43,15 @@ app.use(
 const ALLOWED_ORIGINS = [
   "https://www.fundedwealth.com",
   "https://fundedwealth.com",
+  "https://www.fundedwealth.in",
+  "https://fundedwealth.in",
   "https://admin.fundedwealth.com",
   "https://terminal.fundedwealth.com",
   "https://fundedwealth.vercel.app",
   "https://d-fundedwealth.cloudfront.net", // CloudFront distribution
-  ...(process.env.NODE_ENV !== "production" ? ["http://localhost:5200", "http://localhost:5201", "http://localhost:5202"] : []),
+  ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim()).filter(Boolean) : []),
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.trim()] : []),
+  ...(process.env.NODE_ENV !== "production" ? ["http://localhost:5200", "http://localhost:5201", "http://localhost:5202", "http://localhost:3000"] : []),
 ];
 app.use(cors({
   credentials: true,
@@ -61,6 +65,9 @@ app.use(cors({
         callback(null, true);
       } else if (origin.match(/^https:\/\/(admin|terminal)\.fundedwealth\.(com|in)$/)) {
         // Allow admin and terminal subdomains
+        callback(null, true);
+      } else if (origin.match(/^https:\/\/[a-z0-9-]+\.(replit\.dev|repl\.co|replit\.app)$/)) {
+        // Allow Replit dev/preview environments
         callback(null, true);
       } else {
         callback(new Error(`Origin ${origin} not allowed by CORS`));
@@ -129,20 +136,7 @@ app.get("/", (_req, res) => {
   res.json({ service: "FundedWealth API", status: "ok" });
 });
 
-app.get("/debug/secret-hash", (_req, res) => {
-  const secret = process.env.SSO_API_KEY || "";
-  res.json({
-    hash: createHash("sha256").update(secret).digest("hex"),
-    length: secret.length,
-    varName: "SSO_API_KEY",
-    terminalApiUrl: process.env.TERMINAL_API_URL || "(not set)",
-    hasTerminalApiUrl: Boolean(process.env.TERMINAL_API_URL),
-    hasSSOApiKey: Boolean(process.env.SSO_API_KEY),
-    hasSupabaseUrl: Boolean(process.env.SUPABASE_URL),
-    hasSupabaseServiceKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
-    supabaseUrl: process.env.SUPABASE_URL ? process.env.SUPABASE_URL.substring(0, 40) + "..." : "(not set)",
-  });
-});
+// Debug endpoint removed — was unauthenticated and leaked environment config.
 
 app.use("/metrics", metricsRouter);
 app.use("/api", router);

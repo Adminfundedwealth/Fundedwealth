@@ -199,7 +199,7 @@ export default function PaymentPending() {
     }
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const token = isLoaded ? await getToken().catch(() => null) : null;
 
       const res = await fetch(`${apiBase}/api/payments/payment-status/${trackId}`, {
@@ -252,7 +252,7 @@ export default function PaymentPending() {
     }
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://fundedwealth-api-production.up.railway.app";
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
 
       const res = await fetch(`${apiBase}/api/payments/provisioning-status/${orderId}`, {
         credentials: "include",
