@@ -98,6 +98,7 @@ router.get("/my", async (req: Request, res: Response) => {
         FROM trading_accounts ta
         LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
         WHERE ta.trader_id = ${traderId}::uuid
+          AND ta.status != 'inactive'
         ORDER BY ca.created_at DESC NULLS LAST
       `);
       liveRows = liveRes.rows as any[];
