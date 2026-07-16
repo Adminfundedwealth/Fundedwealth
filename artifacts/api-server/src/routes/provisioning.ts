@@ -27,12 +27,14 @@ const router = Router();
  * Also accepts the Supabase service role key as a fallback for server-to-server calls.
  */
 function allowInternalOrAdmin(req: Request, res: Response, next: NextFunction) {
-  const secret = process.env.INTERNAL_PROVISION_SECRET;
-  const provided = req.header("x-internal-provision-secret");
+  const secret = (process.env.INTERNAL_PROVISION_SECRET || '').trim();
+  const provided = (req.header("x-internal-provision-secret") || '').trim();
+  // Debug log (remove after fix confirmed)
+  logger.info({ secretLen: secret.length, providedLen: provided.length, match: provided === secret }, "[allowInternalOrAdmin]");
   // Match by shared secret
   if (secret && provided && provided === secret) return next();
   // Fallback: accept Supabase service role key (admin-app server-to-server)
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
   if (supabaseServiceKey && provided && provided === supabaseServiceKey) return next();
   return requireAdminAuth(req, res, next);
 }
