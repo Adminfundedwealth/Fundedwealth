@@ -8,9 +8,9 @@ export const useCheckout = () => {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("1step");
   const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
   const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
-  const AUTO_COUPON = "FW";
-  const [appliedCoupon] = useState<string>(AUTO_COUPON);
-  const [couponDiscount] = useState<number>(COUPON_CODES[AUTO_COUPON] ?? 0);
+  // Use each plan's own coupon code so server validation matches displayed price
+  const appliedCoupon = PLANS[selectedPlan].code;
+  const couponDiscount = COUPON_CODES[appliedCoupon] ?? 0;
   const [termsOpen, setTermsOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);

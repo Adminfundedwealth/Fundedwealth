@@ -178,7 +178,7 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     displayLabel: "2-Step",
     serverLabel: "2-Step Evaluation",
     discount: "70%",
-    code: "FW",
+    code: "FW70",
     profitTarget: "8% + 5%",
     maxLoss: "8%",
     dailyLoss: "3%",

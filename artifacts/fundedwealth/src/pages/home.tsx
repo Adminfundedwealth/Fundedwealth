@@ -3057,7 +3057,7 @@ const Plans = () => {
                 { size: "₹1,00,000", origFee: "₹2,999", discFee: "₹1,049", evalSplit: "–", fundedBonuses: "From ₹499" },
                 { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹4,199", evalSplit: "–", fundedBonuses: "From ₹1,500", popular: true },
                 { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹7,699", evalSplit: "–", fundedBonuses: "From ₹2,500" },
-                { size: "₹25,00,000", origFee: "₹48,999", discFee: "₹16,974", evalSplit: "–", fundedBonuses: "From ₹5,250" },
+                { size: "₹25,00,000", origFee: "₹48,499", discFee: "₹16,974", evalSplit: "–", fundedBonuses: "From ₹5,250" },
               ].map((plan, idx) => (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (

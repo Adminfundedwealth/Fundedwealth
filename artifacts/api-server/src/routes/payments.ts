@@ -902,7 +902,8 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     if (!expectedPricing) {
       return res.status(400).json({ success: false, message: "Invalid plan/size combination." });
     }
-    if (amount < expectedPricing.finalTotal) {
+    // Allow ₹1 rounding tolerance — display prices may differ by ₹1 due to Math.round()
+    if (amount < expectedPricing.finalTotal - 1) {
       return res.status(400).json({
         success: false,
         message: `Amount ₹${amount} is less than the required ₹${expectedPricing.finalTotal} for this plan.`,
