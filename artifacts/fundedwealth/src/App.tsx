@@ -58,11 +58,14 @@ function DashboardRoute() {
 
     useEffect(() => {
         if (!isLoaded) return;
-        if (!isSignedIn) { navigate("/sign-in"); return; }
-
-        // If user can sign in, they don't need onboarding - just allow dashboard access
+        if (!isSignedIn) {
+            // Preserve the intended destination so after sign-in they land back here
+            const dest = window.location.pathname + window.location.search;
+            window.location.href = `${basePath}/sign-in?redirect=${encodeURIComponent(dest)}`;
+            return;
+        }
         setOnboardingReady(true);
-    }, [isLoaded, isSignedIn, navigate]);
+    }, [isLoaded, isSignedIn]);
 
     if (!isLoaded || onboardingReady === null) {
         return (

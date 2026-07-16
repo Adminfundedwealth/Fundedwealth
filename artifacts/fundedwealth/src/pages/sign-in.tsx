@@ -242,8 +242,18 @@ export default function SignInPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Resolve redirect destination — honour ?redirect= param, default to /dashboard
+  function getRedirectDest() {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+      return `${basePath}${redirect}`;
+    }
+    return `${basePath}/dashboard`;
+  }
+
   useEffect(() => {
-    if (isSignedIn) window.location.replace(`${basePath}/dashboard`);
+    if (isSignedIn) window.location.replace(getRedirectDest());
   }, [isSignedIn]);
 
   // Check for reset password flow — redirect to dedicated page
@@ -260,7 +270,7 @@ export default function SignInPage() {
     try {
       const { error: err } = await signIn(identifier, password);
       if (err) { setError(err); }
-      else { window.location.replace(`${basePath}/dashboard`); }
+      else { window.location.replace(getRedirectDest()); }
     } catch (err: any) {
       setError(err?.message || "Invalid credentials.");
     } finally { setLoading(false); }
