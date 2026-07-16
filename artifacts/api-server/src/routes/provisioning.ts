@@ -252,4 +252,73 @@ router.get("/catalog", allowInternalOrAdmin, (_req: Request, res: Response) => {
   res.json({ products });
 });
 
+/**
+ * DELETE /api/provisioning/account/:accountCode
+ * Admin: Revoke/remove a specific trading account by its account code.
+ * Sets trading_account status to 'inactive' and challenge_account status to 'breached'
+ * so the user can no longer access or see the account.
+ *
+ * Auth: admin or internal secret
+ */
+router.delete("/account/:accountCode", allowInternalOrAdmin, async (req: Request, res: Response) => {
+  try {
+    const { accountCode } = req.params;
+    const { reason } = req.body || {};
+
+    if (!accountCode || typeof accountCode !== "string") {
+      return res.status(400).json({ success: false, message: "accountCode is required" });
+    }
+
+    const code = accountCode.trim().toUpperCase();
+
+    // 1. Find the trading_account by account_code
+    const taResult = await db.execute(sql`
+      SELECT ta.id AS trading_account_id, ta.challenge_id, ta.trader_id, ta.status
+      FROM trading_accounts ta
+      WHERE UPPER(ta.account_code) = ${code}
+      LIMIT 1
+    `);
+
+    if (!taResult.rows || taResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: `Account ${code} not found` });
+    }
+
+    const ta = taResult.rows[0] as any;
+
+    // 2. Revoke: set trading_account inactive + challenge_account breached
+    await db.execute(sql`
+      UPDATE trading_accounts
+      SET status = 'inactive', updated_at = NOW()
+      WHERE id = ${ta.trading_account_id}::uuid
+    `);
+
+    if (ta.challenge_id) {
+      await db.execute(sql`
+        UPDATE challenge_accounts
+        SET status = 'breached', updated_at = NOW()
+        WHERE id = ${ta.challenge_id}::uuid
+      `);
+    }
+
+    // 3. Also cancel any linked pending orders for this account
+    await db.execute(sql`
+      UPDATE provisioning_logs
+      SET status = 'revoked', updated_at = NOW()
+      WHERE trading_account_id = ${ta.trading_account_id}::uuid
+        AND status NOT IN ('revoked', 'failed')
+    `);
+
+    logger.info({ accountCode: code, reason: reason || "admin_revoke" }, "account_revoked_by_admin");
+
+    return res.json({
+      success: true,
+      message: `Account ${code} has been revoked successfully.`,
+      accountCode: code,
+    });
+  } catch (err: any) {
+    logger.error({ err: err.message }, "admin_revoke_account_failed");
+    return res.status(500).json({ success: false, message: "Failed to revoke account" });
+  }
+});
+
 export default router;
