@@ -212,8 +212,13 @@ router.get("/my", async (req: Request, res: Response) => {
           try {
             const raw = row.broker_credentials_encrypted as string;
             const decrypted = isEncrypted(raw) ? decrypt(raw) : raw;
-            // Try parse as JSON {password: "..."} or return as-is
-            try { return JSON.parse(decrypted)?.password ?? decrypted; } catch { return decrypted; }
+            // Try parse as JSON — handle both key variants; never return raw JSON blob
+            try {
+              const parsed = JSON.parse(decrypted);
+              const pw = parsed?.temporary_password ?? parsed?.password ?? parsed?.tempPassword;
+              // If we got a real string password back, use it; otherwise fall back to raw (plain-string creds)
+              return (typeof pw === "string" && pw.length > 0) ? pw : (typeof parsed === "string" ? parsed : null);
+            } catch { return decrypted; }
           } catch { return null; }
         }
         return null;

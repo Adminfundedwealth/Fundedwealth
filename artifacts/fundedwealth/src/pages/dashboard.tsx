@@ -243,6 +243,29 @@ const RULES_LIST = [
   { title: "Consistent Trading", desc: "Trades must be consistent — no single-day > 50% of total profit.", ok: false },
 ];
 
+/**
+ * Safely extract the temporary_password from a credentials value.
+ * The value may be a plain string (the password itself) or a JSON blob
+ * with various key names. Returns null if extraction fails.
+ */
+function safeExtractPassword(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  // If it doesn't look like JSON, assume it's already a plain password
+  if (!trimmed.startsWith("{")) return trimmed;
+  try {
+    const parsed = JSON.parse(trimmed);
+    const pw =
+      parsed?.temporary_password ??
+      parsed?.password ??
+      parsed?.tempPassword ??
+      parsed?.terminal_password;
+    return typeof pw === "string" && pw.length > 0 ? pw : null;
+  } catch {
+    return null;
+  }
+}
+
 function AccountCard({ acc }: { acc: TradingAccount }) {
   const pnl = acc.balance - acc.startBalance;
   const pnlPct = (pnl / acc.startBalance) * 100;
@@ -274,9 +297,8 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
   };
 
   const downloadCreds = () => {
-    const termPass = (acc as any).terminalPassword || (acc as any).tempPassword
-      ? ((acc as any).terminalPassword || (acc as any).tempPassword)
-      : "Reset via 'Forgot Password' on fundedwealth.com/sign-in";
+    const termPass = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword)
+      || "Reset via 'Forgot Password' on fundedwealth.com/sign-in";
     const phaseDisplay = acc.phase === "flash" ? "Flash Funding"
       : acc.phase === "funded" ? "Funded"
       : acc.phase === "verification" ? "Verification"
@@ -397,8 +419,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         <div><div className="text-white/45 text-xs mb-0.5">P&L</div><div className={`font-bold ${pnlColor(pnl)}`}>{pnl >= 0 ? "+" : ""}{fmt(Math.abs(pnl))}</div></div>
         <div><div className="text-white/45 text-xs mb-0.5">Daily Loss Limit</div><div className="text-white font-bold">{acc.dailyLoss}%</div></div>
         <div><div className="text-white/45 text-xs mb-0.5">Max Drawdown</div><div className="text-white font-bold">{acc.maxLoss}%</div></div>
-        <div><div className="text-white/45 text-xs mb-0.5">Profit Split</div><div className="text-[#FF8A3D] font-bold">{acc.profitSplit}%</div></div>
-        <div><div className="text-white/45 text-xs mb-0.5">Win Rate</div><div className="text-green-400 font-bold">{acc.winRate}%</div></div>
+        {/* Profit Split and Win Rate hidden intentionally */}
       </div>
 
       {/* Progress bars */}
@@ -466,16 +487,19 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="text-white/40 text-[10px] uppercase tracking-wider">Terminal Password</div>
-                {(acc as any).terminalPassword || (acc as any).tempPassword ? (
-                  <div className="text-white text-xs font-mono break-all">{(acc as any).terminalPassword || (acc as any).tempPassword}</div>
-                ) : (
-                  <div className="text-white/50 text-xs">
-                    <a href="/sign-in" className="text-fw-pink hover:underline">Reset on login page</a>
-                  </div>
-                )}
+                {(() => {
+                  const pw = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword);
+                  return pw ? (
+                    <div className="text-white text-xs font-mono break-all">{pw}</div>
+                  ) : (
+                    <div className="text-white/50 text-xs">
+                      <a href="/sign-in" className="text-fw-pink hover:underline">Reset on login page</a>
+                    </div>
+                  );
+                })()}
               </div>
-              {((acc as any).terminalPassword || (acc as any).tempPassword) && (
-                <button onClick={() => copyField("password", (acc as any).terminalPassword || (acc as any).tempPassword)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
+              {safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword) && (
+                <button onClick={() => copyField("password", safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword)!)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
                   <Copy size={11} className="inline mr-1" />{copied === "password" ? "Copied" : "Copy"}
                 </button>
               )}
@@ -518,12 +542,11 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
               {/* Copy all credentials */}
               <button
                 onClick={() => {
+                  const pw = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword);
                   const lines = [
                     `Account Code: ${acc.accountCode}`,
                     `Login Email: ${(acc as any).loginEmail || "—"}`,
-                    ((acc as any).terminalPassword || (acc as any).tempPassword)
-                      ? `Password: ${(acc as any).terminalPassword || (acc as any).tempPassword}`
-                      : "Password: Reset at fundedwealth.com/sign-in",
+                    pw ? `Password: ${pw}` : "Password: Reset at fundedwealth.com/sign-in",
                     `Challenge: ${phaseLabel}`,
                     `Size: ₹${acc.size.toLocaleString("en-IN")}`,
                   ];
@@ -654,7 +677,10 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         {[
           { label: "Account ID", key: "accountId", value: acc.id },
           { label: "Login Email", key: "email", value: (acc as any).loginEmail || creds?.email || "—" },
-          { label: "Password", key: "password", value: (acc as any).terminalPassword || (acc as any).tempPassword || creds?.password || "—" },
+          {
+            label: "Password", key: "password",
+            value: safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword || creds?.password) || "Password unavailable",
+          },
           { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "—" },
           { label: "Server", key: "server", value: import.meta.env.VITE_TERMINAL_URL || "terminal.fundedwealth.com" },
           { label: "Status", key: "status", value: acc.status || creds?.status || "active" },

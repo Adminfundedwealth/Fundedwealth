@@ -27,6 +27,28 @@ const fmt = (n: number) =>
 
 const pnlColor = (v: number) => v >= 0 ? "text-green-400" : "text-red-400";
 
+/**
+ * Safely extract the temporary_password from a credentials value.
+ * The value may be a plain string (the password itself) or a JSON blob
+ * with various key names. Returns null if extraction fails.
+ */
+function safeExtractPassword(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith("{")) return trimmed;
+  try {
+    const parsed = JSON.parse(trimmed);
+    const pw =
+      parsed?.temporary_password ??
+      parsed?.password ??
+      parsed?.tempPassword ??
+      parsed?.terminal_password;
+    return typeof pw === "string" && pw.length > 0 ? pw : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AccountCard({ acc }: { acc: TradingAccount }) {
   const pnl = acc.balance - acc.startBalance;
   const pnlPct = (pnl / acc.startBalance) * 100;
@@ -58,9 +80,8 @@ export function AccountCard({ acc }: { acc: TradingAccount }) {
   };
 
   const downloadCreds = () => {
-    const termPass = (acc as any).terminalPassword || (acc as any).tempPassword
-      ? ((acc as any).terminalPassword || (acc as any).tempPassword)
-      : "Reset via 'Forgot Password' on fundedwealth.com/sign-in";
+    const termPass = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword)
+      || "Reset via 'Forgot Password' on fundedwealth.com/sign-in";
     const phaseDisplay = acc.phase === "flash" ? "Flash Funding"
       : acc.phase === "funded" ? "Funded"
       : acc.phase === "verification" ? "Verification"
@@ -213,16 +234,19 @@ export function AccountCard({ acc }: { acc: TradingAccount }) {
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="text-white/40 text-[10px] uppercase tracking-wider">Terminal Password</div>
-                {(acc as any).terminalPassword || (acc as any).tempPassword ? (
-                  <div className="text-white text-xs font-mono break-all">{(acc as any).terminalPassword || (acc as any).tempPassword}</div>
-                ) : (
-                  <div className="text-white/50 text-xs">
-                    <a href="/sign-in" className="text-fw-pink hover:underline">Reset on login page</a>
-                  </div>
-                )}
+                {(() => {
+                  const pw = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword);
+                  return pw ? (
+                    <div className="text-white text-xs font-mono break-all">{pw}</div>
+                  ) : (
+                    <div className="text-white/50 text-xs">
+                      <a href="/sign-in" className="text-fw-pink hover:underline">Reset on login page</a>
+                    </div>
+                  );
+                })()}
               </div>
-              {((acc as any).terminalPassword || (acc as any).tempPassword) && (
-                <button onClick={() => copyField("password", (acc as any).terminalPassword || (acc as any).tempPassword)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
+              {safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword) && (
+                <button onClick={() => copyField("password", safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword)!)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "password" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
                   <Copy size={11} className="inline mr-1" />{copied === "password" ? "Copied" : "Copy"}
                 </button>
               )}
@@ -264,12 +288,11 @@ export function AccountCard({ acc }: { acc: TradingAccount }) {
               {/* Copy all */}
               <button
                 onClick={() => {
+                  const pw = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword);
                   const text = [
                     `Account Code: ${acc.accountCode}`,
                     `Login Email: ${(acc as any).loginEmail || "—"}`,
-                    ((acc as any).terminalPassword || (acc as any).tempPassword)
-                      ? `Password: ${(acc as any).terminalPassword || (acc as any).tempPassword}`
-                      : "Password: Reset at fundedwealth.com/sign-in",
+                    pw ? `Password: ${pw}` : "Password: Reset at fundedwealth.com/sign-in",
                     `Challenge: ${phaseLabel}`,
                     `Size: ₹${acc.size.toLocaleString("en-IN")}`,
                   ].join("\n");
