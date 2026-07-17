@@ -399,7 +399,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     }
 
     // ── 8. LOCAL FALLBACK — generate token signed with shared SSO secret ──────
-    const ssoToken = generateSSOToken(String(user.id), prov.trading_account_id, storedLoginEmail);
+    const ssoToken = generateSSOToken(String(user.id), prov.trading_account_id, storedLoginEmail, prov.challenge_account_id, storedAccountCode);
     const terminalBase = TERMINAL_API_URL || PRODUCTION_TERMINAL_URL;
     const launchUrl = buildTerminalLaunchUrl(terminalBase, ssoToken, storedAccountCode);
     lastReturnedTerminalJwt = ssoToken;
@@ -476,18 +476,20 @@ function verifyActivationToken(token: string): { accountId: string; email: strin
  * Uses signTerminalJWT() (HS256, base64url) to produce a standard JWT that
  * jsonwebtoken.verify() on the terminal side accepts. Payload matches what
  * terminal's validateSSOToken() requires:
- *   - sub       = fwUserId  (required by validateSSOToken)
- *   - accountId = tradingAccountId (required by validateSSOToken)
+ *   - sub         = fwUserId  (required by validateSSOToken)
+ *   - accountId   = tradingAccountId (required by validateSSOToken)
+ *   - challengeId = challenge_account_id
+ *   - accountCode = account_code (passed through so terminal can use it directly)
  *   - email, nonce
  *   - exp = now + 60s  (terminal's maxAge: '120s' check will pass)
  *
  * Signed with SSO_SHARED_SECRET || SSO_API_KEY — same priority as the
  * terminal's sso.service.js so secrets always align.
  */
-function generateSSOToken(fwUserId: string, tradingAccountId: string, email: string): string {
+function generateSSOToken(fwUserId: string, tradingAccountId: string, email: string, challengeId?: string | null, accountCode?: string): string {
   const { secret, source } = getTerminalSSOSecret();
   const now = Math.floor(Date.now() / 1000);
-  const payload = {
+  const payload: Record<string, unknown> = {
     sub: fwUserId,
     accountId: tradingAccountId,
     email,
@@ -495,11 +497,15 @@ function generateSSOToken(fwUserId: string, tradingAccountId: string, email: str
     iat: now,
     exp: now + 60,
   };
+  if (challengeId) payload.challengeId = challengeId;
+  if (accountCode) payload.accountCode = accountCode;
   console.info("[Terminal Launch] signing SSO token", {
     secretSource: source,
     algorithm: SSO_TOKEN_ALGORITHM,
     sub: fwUserId,
     accountId: tradingAccountId,
+    challengeId: challengeId ?? null,
+    accountCode: accountCode ?? null,
   });
   return signTerminalJWT(payload, secret);
 }
