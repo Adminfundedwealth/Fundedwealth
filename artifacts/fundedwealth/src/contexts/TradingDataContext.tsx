@@ -137,8 +137,8 @@ function getPlanRuleDefault(planType: string | null | undefined, field: keyof (t
 }
 
 function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
-  const balance = acc.currentBalance || 0;
-  const startBalance = acc.startBalance || balance;
+  const balance = acc.currentBalance ?? 0;
+  const startBalance = acc.startBalance ?? balance;
   const pnl = balance - startBalance;
   const pnlPercent = startBalance > 0 ? (pnl / startBalance) * 100 : 0;
 
@@ -146,18 +146,34 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
   let phase: "flash" | "challenge" | "verification" | "funded";
   if (acc.status === "provisioning_pending" || acc.status === "provisioning_failed") {
     // Preserve correct phase type even for pending/failed — use planType as hint
-    const pendingPlan = String(acc.planType || "").toLowerCase();
+    const pendingPlan = String(acc.planType ?? "").toLowerCase();
     phase = pendingPlan === "flash" ? "flash" : "challenge";
   } else {
     phase = mapPhase(acc.phase);
   }
 
   // Determine if this is a Flash account — Flash has no profit target, 2% daily DD, 4% max DD
-  const planType = String(acc.planType || "").toLowerCase();
+  const planType = String(acc.planType ?? "").toLowerCase();
   const isFlash = phase === "flash" || planType === "flash";
   const fallbackProfitTargetPct = isFlash ? 0 : getPlanRuleDefault(planType, "profitTargetPct");
   const fallbackDailyLossPct = isFlash ? 2 : getPlanRuleDefault(planType, "dailyLossLimitPct");
   const fallbackMaxLossPct = isFlash ? 4 : getPlanRuleDefault(planType, "maxDrawdownPct");
+
+  const profitTargetPct = isFlash
+    ? 0
+    : (startBalance > 0 && acc.profitTarget != null
+      ? (acc.profitTarget / startBalance) * 100
+      : fallbackProfitTargetPct);
+  const dailyLossPct = isFlash
+    ? 2
+    : (startBalance > 0 && acc.dailyLossLimit != null
+      ? (acc.dailyLossLimit / startBalance) * 100
+      : fallbackDailyLossPct);
+  const maxLossPct = isFlash
+    ? 4
+    : (startBalance > 0 && acc.maxDrawdown != null
+      ? (acc.maxDrawdown / startBalance) * 100
+      : fallbackMaxLossPct);
 
   return {
     id: acc.id,
@@ -166,27 +182,21 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
     balance,
     startBalance,
     size: startBalance,
-    profitTarget: isFlash
-      ? 0
-      : (acc.profitTarget > 0 && startBalance > 0 ? (acc.profitTarget / startBalance) * 100 : fallbackProfitTargetPct),
-    dailyLoss: isFlash
-      ? 2
-      : (acc.dailyLossLimit > 0 && startBalance > 0 ? (acc.dailyLossLimit / startBalance) * 100 : fallbackDailyLossPct),
-    maxLoss: isFlash
-      ? 4
-      : (acc.maxDrawdown > 0 && startBalance > 0 ? (acc.maxDrawdown / startBalance) * 100 : fallbackMaxLossPct),
-    profitSplit: acc.profitSplit || 80,
-    winRate: acc.winRate || 0, // Real win rate from session_analytics (synced by terminal)
-    tradeCount: acc.totalTrades || 0, // Real trade count from session_analytics (synced by terminal)
+    profitTarget: profitTargetPct,
+    dailyLoss: dailyLossPct,
+    maxLoss: maxLossPct,
+    profitSplit: acc.profitSplit ?? 80,
+    winRate: acc.winRate ?? 0, // Real win rate from session_analytics (synced by terminal)
+    tradeCount: acc.totalTrades ?? 0, // Real trade count from session_analytics (synced by terminal)
     startDate: acc.createdAt,
-    accountCode: acc.accountCode || "Provisioning...",
-    brokerLogin: acc.brokerLogin || acc.accountCode || null,
+    accountCode: acc.accountCode ?? "Provisioning...",
+    brokerLogin: acc.brokerLogin ?? acc.accountCode ?? null,
     pnlPercent,
     canLaunch: acc.canLaunch,
     provisioningStatus: acc.provisioningStatus,
     provisioningError: acc.provisioningError,
-    loginEmail: acc.loginEmail || null,
-    tempPassword: acc.tempPassword || null,
+    loginEmail: acc.loginEmail ?? null,
+    tempPassword: acc.tempPassword ?? null,
   };
 }
 
@@ -264,7 +274,7 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
           const user = await res.json();
           setProfile((prev) => ({
             ...prev,
-            totalPayout: user.totalPayout || 0,
+            totalPayout: user.totalPayout ?? 0,
             referralCode: user.affiliateCode || "",
             referralCount: 0,
           }));

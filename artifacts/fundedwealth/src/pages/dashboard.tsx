@@ -246,7 +246,8 @@ const RULES_LIST = [
 function AccountCard({ acc }: { acc: TradingAccount }) {
   const pnl = acc.balance - acc.startBalance;
   const pnlPct = (pnl / acc.startBalance) * 100;
-  const progressPct = Math.min((pnlPct / (acc.profitTarget || 1)) * 100, 100);
+  const profitDenom = acc.profitTarget === 0 ? 1 : (acc.profitTarget ?? 1);
+  const progressPct = Math.min((pnlPct / profitDenom) * 100, 100);
   const phaseColor = {
     flash: "text-[#FF8A3D]",
     challenge: "text-amber-400",
@@ -640,7 +641,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         <div>
           <div className="text-white font-bold text-lg">{acc.accountCode || "—"}</div>
           <div className="text-white/50 text-xs mt-0.5">
-            {phaseLabel} · Balance: ₹{(acc.balance || 0).toLocaleString("en-IN")}
+            {phaseLabel} · Balance: ₹{(acc.balance ?? 0).toLocaleString("en-IN")}
           </div>
         </div>
         <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${phaseColor}`}>
@@ -1064,7 +1065,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             rank: i + 1,
             firstName: row.firstName || row.name || "Trader",
             city: row.city || null,
-            totalPayout: row.totalPayout || 0,
+            totalPayout: row.totalPayout ?? 0,
             badge: BADGES[i] || "",
           }))
         );
@@ -1827,7 +1828,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     .then(r => r.ok ? r.json() : Promise.reject())
                     .then((rows: any[]) => {
                       const BADGES = ["🏆", "🥈", "🥉"];
-                      setLeaderboardData(rows.map((row, i) => ({ rank: i + 1, firstName: row.firstName || row.name || "Trader", city: row.city || null, totalPayout: row.totalPayout || 0, badge: BADGES[i] || "" })));
+                      setLeaderboardData(rows.map((row, i) => ({ rank: i + 1, firstName: row.firstName || row.name || "Trader", city: row.city || null, totalPayout: row.totalPayout ?? 0, badge: BADGES[i] || "" })));
                     })
                     .catch(() => setLeaderboardError(true))
                     .finally(() => setLeaderboardLoading(false));
@@ -1931,7 +1932,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         const totalBalance = profile.accounts.reduce((sum, acc) => sum + acc.balance, 0) || activeAccount.balance;
         const totalTrades = profile.accounts.reduce((sum, acc) => sum + acc.tradeCount, 0) || activeAccount.tradeCount;
         const totalPnl = totalBalance - totalStart;
-        const profitTargetProgress = Math.min(100, Math.max(0, ((totalPnl / totalStart) * 100) / (activeAccount.profitTarget || 1) * 100));
+        const targetDenom = activeAccount.profitTarget === 0 ? 1 : (activeAccount.profitTarget ?? 1);
+        const profitTargetProgress = Math.min(100, Math.max(0, ((totalPnl / totalStart) * 100) / targetDenom * 100));
         const consistencyScore = Math.min(100, Math.max(45, Math.round((activeAccount.winRate * 0.55) + (100 - activeAccount.maxLoss * 3) * 0.45)));
         const disciplineScore = Math.min(100, Math.max(40, Math.round((consistencyScore * 0.7) + ((100 - activeAccount.dailyLoss * 6) * 0.3))));
         // Sharpe/Sortino/VaR/passProbability kept as-is — medium/large effort tasks, out of scope

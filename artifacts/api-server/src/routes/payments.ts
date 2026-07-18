@@ -75,7 +75,7 @@ router.post("/manual-bank-transfer", upload.single("proof"), requireActiveAccoun
     const [order] = await db.insert(orders).values({
       userId: user.id,
       amount,
-      accountSize: resolveAccountSize(planType as PlanType, typeof req.body.sizeIndex === "number" ? req.body.sizeIndex : 0) || 0,
+      accountSize: resolveAccountSize(planType as PlanType, typeof req.body.sizeIndex === "number" ? req.body.sizeIndex : 0) ?? 0,
       planType,
       status: "pending_review",
       paymentMethod: "bank_manual",
@@ -393,7 +393,7 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
       const [order] = await db.insert(orders).values({
         userId: user.id,
         amount: pricing.finalTotal,
-        accountSize: resolveAccountSize(planType as PlanType, sizeIndex) || 0,
+        accountSize: resolveAccountSize(planType as PlanType, sizeIndex) ?? 0,
         planType,
         status: "pending",
         paymentMethod: paymentMethod,

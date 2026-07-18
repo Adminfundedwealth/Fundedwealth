@@ -318,7 +318,7 @@ router.post(
           verificationStatus: "PENDING",
           uploadedAt: new Date(),
           isLatestVersion: true,
-          version: (existingDoc[0]?.version || 0) + 1,
+          version: (existingDoc[0]?.version ?? 0) + 1,
         })
         .returning();
 

@@ -1008,7 +1008,7 @@ router.get("/email-diagnostic", async (_req, res) => {
   // Live SMTP connectivity test (open + close connection)
   let smtpTestResult = "skipped";
   let smtpTestError  = "";
-  if (smtpCfg.passSet) {
+  if (smtpCfg.verified) {
     try {
       const { verifySmtpConnection } = await import("../lib/email");
       await verifySmtpConnection();
@@ -1036,12 +1036,10 @@ router.get("/email-diagnostic", async (_req, res) => {
 
   res.json({
     smtp: {
-      host:       smtpCfg.host,
-      port:       smtpCfg.port,
-      secure:     smtpCfg.secure,
-      user:       smtpCfg.user,
-      from:       smtpCfg.from,
-      passSet:    smtpCfg.passSet,
+      provider:  smtpCfg.provider,
+      apiKeySet: smtpCfg.apiKeySet,
+      from:      smtpCfg.from,
+      verified:  smtpCfg.verified,
       testResult: smtpTestResult,
       testError:  smtpTestError || undefined,
     },
@@ -1063,10 +1061,10 @@ router.post("/forgot-password", async (req, res) => {
 
     const normalizedEmail = ValidationService.normalizeEmail(email);
 
-    // ── Guard: SMTP must be configured ─────────────────────────────────────
-    const smtpCfg = getSmtpConfig();
-    if (!smtpCfg.passSet) {
-      logger.error({ email: normalizedEmail }, "forgot-password: SMTP not configured (SMTP_PASS missing) — email cannot be sent");
+// ── Guard: Resend must be configured ───────────────────────────────────
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) {
+    logger.error({ email: normalizedEmail }, "forgot-password: RESEND_API_KEY not set");
       return res.status(503).json({ error: "Email service not configured. Please contact support." });
     }
 

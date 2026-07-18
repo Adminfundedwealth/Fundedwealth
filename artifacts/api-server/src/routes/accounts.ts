@@ -164,8 +164,8 @@ router.get("/my", async (req: Request, res: Response) => {
     const tradingAccountIds = liveRows
       .map(r => r.trading_account_id)
       .filter(Boolean);
-
     const batchStatsMap = new Map<string, { totalTrades: number; winRate: number; tradingDays: number }>();
+
     if (tradingAccountIds.length > 0 && traderId) {
       try {
         const idLiterals = sql.join(
@@ -222,7 +222,7 @@ router.get("/my", async (req: Request, res: Response) => {
 
       const initialBalance = row.initial_balance != null
         ? Number(row.initial_balance)
-        : (row.ta_balance != null ? Number(row.ta_balance) : (order?.accountSize || 0));
+        : (row.ta_balance != null ? Number(row.ta_balance) : (order?.accountSize ?? 0));
       const currentBalance = row.current_balance != null ? Number(row.current_balance) : initialBalance;
       const challengeStatus = row.challenge_status || "active";
 
@@ -269,9 +269,9 @@ router.get("/my", async (req: Request, res: Response) => {
 
       // Use pre-fetched batch stats (replaces N+1 per-account DB query)
       const batchedStats = batchStatsMap.get(String(row.trading_account_id));
-      const totalTrades = batchedStats?.totalTrades ?? 0;
-      const winRate = batchedStats?.winRate ?? 0;
-      const tradingDaysCount = batchedStats?.tradingDays ?? 0;
+      const totalTrades = batchedStats?.totalTrades != null ? batchedStats.totalTrades : 0;
+      const winRate = batchedStats?.winRate != null ? batchedStats.winRate : 0;
+      const tradingDaysCount = batchedStats?.tradingDays != null ? batchedStats.tradingDays : 0;
 
       const profitTargetPct = row.profit_target_pct !== null && row.profit_target_pct !== undefined
         ? Number(row.profit_target_pct)
@@ -306,7 +306,7 @@ router.get("/my", async (req: Request, res: Response) => {
         scalingLevel: 1,
         isFunded: phase === "funded",
         fundedAt: null,
-        feePaid: order?.amount || 0,
+        feePaid: order?.amount ?? 0,
         couponUsed: null,
         createdAt: row.created_at || order?.createdAt || null,
         updatedAt: row.updated_at || order?.updatedAt || null,
@@ -346,7 +346,7 @@ router.get("/my", async (req: Request, res: Response) => {
           phase: "failed",
           status: "provisioning_failed",
           currentBalance: 0,
-          startBalance: order.accountSize || 0,
+          startBalance: order.accountSize ?? 0,
           profitLoss: 0,
           profitTarget: 0,
           maxDrawdown: 0,
@@ -357,7 +357,7 @@ router.get("/my", async (req: Request, res: Response) => {
           scalingLevel: 1,
           isFunded: false,
           fundedAt: null,
-          feePaid: order.amount || 0,
+          feePaid: order.amount ?? 0,
           couponUsed: null,
           createdAt: order.createdAt,
           updatedAt: prov.completed_at || order.updatedAt,
@@ -374,19 +374,19 @@ router.get("/my", async (req: Request, res: Response) => {
           planType: order.planType,
           phase: "pending",
           status: "provisioning_pending",
-          currentBalance: order.accountSize || 0,
-          startBalance: order.accountSize || 0,
+          currentBalance: order.accountSize ?? 0,
+          startBalance: order.accountSize ?? 0,
           profitLoss: 0,
-          profitTarget: Math.round((order.accountSize || 0) * 0.10),
-          maxDrawdown: Math.round((order.accountSize || 0) * 0.06),
-          dailyLossLimit: Math.round((order.accountSize || 0) * 0.03),
+          profitTarget: Math.round((order.accountSize ?? 0) * 0.10),
+          maxDrawdown: Math.round((order.accountSize ?? 0) * 0.06),
+          dailyLossLimit: Math.round((order.accountSize ?? 0) * 0.03),
           dailyDrawdown: 0,
           profitSplit: 80,
           tradingDays: 0,
           scalingLevel: 1,
           isFunded: false,
           fundedAt: null,
-          feePaid: order.amount || 0,
+          feePaid: order.amount ?? 0,
           couponUsed: null,
           createdAt: order.createdAt,
           updatedAt: prov?.started_at || order.updatedAt,
@@ -495,7 +495,7 @@ router.get("/:accountId", async (req: Request, res: Response) => {
       }
     } catch { /* non-fatal */ }
 
-    const initialBalance = challenge ? Number(challenge.initial_balance) : (prov.account_size || 0);
+    const initialBalance = challenge ? Number(challenge.initial_balance) : (prov.account_size ?? 0);
     const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
     const challengeStatus = challenge?.status || prov.status;
 
@@ -533,11 +533,11 @@ router.get("/:accountId", async (req: Request, res: Response) => {
         dailyLossLimit: challenge ? Math.round(initialBalance * Number(challenge.daily_loss_limit_pct) / 100) : 0,
         dailyDrawdown: 0,
         profitSplit: 80,
-        tradingDays: challenge?.min_trading_days || 0,
+        tradingDays: challenge?.min_trading_days != null ? challenge.min_trading_days : 0,
         scalingLevel: 1,
         isFunded: acctPlan === "flash" || acctPlan === "instant" || challenge?.type?.includes("funded") || false,
         fundedAt: null,
-        feePaid: prov.amount || 0,
+        feePaid: prov.amount != null ? prov.amount : 0,
         couponUsed: null,
         createdAt: challenge?.created_at || prov.created_at,
         updatedAt: challenge?.updated_at || prov.created_at,
@@ -657,7 +657,7 @@ router.get("/order/:orderId", async (req: Request, res: Response) => {
     `);
     const user = (userResult.rows as any[])[0] || null;
 
-    const initialBalance = challenge ? Number(challenge.initial_balance) : (order.accountSize || 0);
+    const initialBalance = challenge ? Number(challenge.initial_balance) : (order.accountSize ?? 0);
     const currentBalance = challenge ? Number(challenge.current_balance) : initialBalance;
 
     // Derive phase from the purchased plan — never from challenge type alone

@@ -103,7 +103,7 @@ export default function PurchaseSuccess() {
             server: "FundedWealth Paper Trading",
             challengeType: acc.phase === "funded" ? "Funded Account" : 
                           acc.phase === "phase_2" ? "Phase 2" : "Phase 1",
-            accountSize: acc.startBalance || acc.currentBalance || 0,
+            accountSize: acc.startBalance ?? acc.currentBalance ?? 0,
             planType: acc.planType || "challenge",
             phase: acc.phase || "phase_1",
             orderId: orderId || undefined,

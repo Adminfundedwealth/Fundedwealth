@@ -189,7 +189,7 @@ export default function KYCFlow() {
     "APPROVED": 100,
     "REJECTED": 25,
     "RESUBMISSION_REQUIRED": 50,
-  }[profile.status] || 0;
+  }[profile.status] ?? 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-black p-6">

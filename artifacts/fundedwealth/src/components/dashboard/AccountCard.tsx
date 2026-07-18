@@ -30,7 +30,8 @@ const pnlColor = (v: number) => v >= 0 ? "text-green-400" : "text-red-400";
 export function AccountCard({ acc }: { acc: TradingAccount }) {
   const pnl = acc.balance - acc.startBalance;
   const pnlPct = (pnl / acc.startBalance) * 100;
-  const progressPct = Math.min((pnlPct / (acc.profitTarget || 1)) * 100, 100);
+  const profitDenom = acc.profitTarget === 0 ? 1 : (acc.profitTarget ?? 1);
+  const progressPct = Math.min((pnlPct / profitDenom) * 100, 100);
   const phaseColor = {
     flash: "text-[#FF8A3D]",
     challenge: "text-amber-400",

@@ -24,7 +24,7 @@ export function LeaderboardSection() {
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((rows: any[]) => {
         const BADGES = ["🏆", "🥈", "🥉"];
-        setData(rows.map((row, i) => ({ rank: i + 1, firstName: row.firstName || row.name || "Trader", city: row.city || null, totalPayout: row.totalPayout || 0, badge: BADGES[i] || "" })));
+        setData(rows.map((row, i) => ({ rank: i + 1, firstName: row.firstName || row.name || "Trader", city: row.city || null, totalPayout: row.totalPayout ?? 0, badge: BADGES[i] || "" })));
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));

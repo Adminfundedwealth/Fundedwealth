@@ -235,7 +235,7 @@ export class FraudDetectionService {
       }
 
       // Check for rapid logins
-      const accountAge = context.accountAge || 0;
+      const accountAge = context.accountAge ?? 0;
       if (accountAge < 7 && recentFraudEvents.length > 0) {
         risk += 10; // New account with suspicious behavior
       }

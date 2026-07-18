@@ -65,6 +65,8 @@ export default function ResetPasswordPage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
+    let subscription: any;
+    let timeout: any;
     (async () => {
       try {
         const searchParams = new URLSearchParams(window.location.search);
@@ -131,18 +133,18 @@ export default function ResetPasswordPage() {
 
         // ── 4. Listen for PASSWORD_RECOVERY event (fragment flow fallback) ─
         console.log("[reset-password] Waiting for PASSWORD_RECOVERY event...");
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        const res = supabase.auth.onAuthStateChange((event, session) => {
           console.log("[reset-password] auth event:", event);
           if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-            subscription.unsubscribe();
+            res.data.subscription.unsubscribe();
             window.history.replaceState({}, "", window.location.pathname);
             setPageState("ready");
           }
         });
 
         // Give the fragment flow 8 seconds before giving up
-        const timeout = setTimeout(async () => {
-          subscription.unsubscribe();
+        timeout = setTimeout(async () => {
+          subscription?.unsubscribe();
           const { data: { session } } = await supabase.auth.getSession();
           console.log("[reset-password] Timeout — session:", !!session);
           if (session) {
@@ -152,16 +154,17 @@ export default function ResetPasswordPage() {
           }
         }, 8000);
 
-        return () => {
-          clearTimeout(timeout);
-          subscription.unsubscribe();
-        };
+        // cleanup will be returned from the outer effect
       } catch (err: any) {
         console.error("[reset-password] unexpected error:", err);
         setPageState("error");
         setErrorMsg(err?.message || "An unexpected error occurred.");
       }
     })();
+    return () => {
+      clearTimeout(timeout);
+      subscription?.unsubscribe();
+    };
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {

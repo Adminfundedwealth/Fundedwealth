@@ -60,7 +60,7 @@ export async function getFingerprint(): Promise<FingerprintData> {
         screenResolution: `${screen.width}x${screen.height}`,
         language: navigator.language || "en",
         platform: navigator.platform || "unknown",
-        hardwareConcurrency: navigator.hardwareConcurrency || 0,
+        hardwareConcurrency: navigator.hardwareConcurrency ?? 0,
         touchSupport: navigator.maxTouchPoints > 0,
     };
 }

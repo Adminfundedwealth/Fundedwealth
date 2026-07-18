@@ -50,7 +50,7 @@ export class PerformanceMonitor {
 
   recordError(endpoint: string, error: string) {
     const key = `${endpoint}:${error}`;
-    this.errors.set(key, (this.errors.get(key) || 0) + 1);
+    this.errors.set(key, (this.errors.get(key) ?? 0) + 1);
   }
 
   recordDbQuery(query: string, duration: number) {
