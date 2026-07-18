@@ -123,6 +123,19 @@ function mapPhase(phase: string): "flash" | "challenge" | "verification" | "fund
   return "challenge";
 }
 
+const planRuleDefaults = {
+  flash: { profitTargetPct: 0, dailyLossLimitPct: 2, maxDrawdownPct: 4 },
+  instant: { profitTargetPct: 0, dailyLossLimitPct: 3, maxDrawdownPct: 5 },
+  '1step': { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6 },
+  '2step': { profitTargetPct: 8, dailyLossLimitPct: 3, maxDrawdownPct: 8 },
+} as const;
+
+function getPlanRuleDefault(planType: string | null | undefined, field: keyof (typeof planRuleDefaults)['flash']) {
+  const normalizedPlan = String(planType || "").toLowerCase();
+  const defaults = planRuleDefaults[normalizedPlan as keyof typeof planRuleDefaults] || planRuleDefaults.flash;
+  return defaults[field];
+}
+
 function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
   const balance = acc.currentBalance || 0;
   const startBalance = acc.startBalance || balance;
@@ -140,7 +153,11 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
   }
 
   // Determine if this is a Flash account — Flash has no profit target, 2% daily DD, 4% max DD
-  const isFlash = phase === "flash" || String(acc.planType || "").toLowerCase() === "flash";
+  const planType = String(acc.planType || "").toLowerCase();
+  const isFlash = phase === "flash" || planType === "flash";
+  const fallbackProfitTargetPct = isFlash ? 0 : getPlanRuleDefault(planType, "profitTargetPct");
+  const fallbackDailyLossPct = isFlash ? 2 : getPlanRuleDefault(planType, "dailyLossLimitPct");
+  const fallbackMaxLossPct = isFlash ? 4 : getPlanRuleDefault(planType, "maxDrawdownPct");
 
   return {
     id: acc.id,
@@ -151,13 +168,13 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
     size: startBalance,
     profitTarget: isFlash
       ? 0
-      : (acc.profitTarget > 0 && startBalance > 0 ? (acc.profitTarget / startBalance) * 100 : 10),
+      : (acc.profitTarget > 0 && startBalance > 0 ? (acc.profitTarget / startBalance) * 100 : fallbackProfitTargetPct),
     dailyLoss: isFlash
       ? 2
-      : (acc.dailyLossLimit > 0 && startBalance > 0 ? (acc.dailyLossLimit / startBalance) * 100 : 3),
+      : (acc.dailyLossLimit > 0 && startBalance > 0 ? (acc.dailyLossLimit / startBalance) * 100 : fallbackDailyLossPct),
     maxLoss: isFlash
       ? 4
-      : (acc.maxDrawdown > 0 && startBalance > 0 ? (acc.maxDrawdown / startBalance) * 100 : 6),
+      : (acc.maxDrawdown > 0 && startBalance > 0 ? (acc.maxDrawdown / startBalance) * 100 : fallbackMaxLossPct),
     profitSplit: acc.profitSplit || 80,
     winRate: acc.winRate || 0, // Real win rate from session_analytics (synced by terminal)
     tradeCount: acc.totalTrades || 0, // Real trade count from session_analytics (synced by terminal)

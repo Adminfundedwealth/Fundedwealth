@@ -6,6 +6,19 @@ import { decrypt, isEncrypted } from "../lib/encryption-service";
 
 const router = Router();
 
+const planRuleDefaults = {
+  flash: { profitTargetPct: 0, dailyLossLimitPct: 2, maxDrawdownPct: 4 },
+  instant: { profitTargetPct: 0, dailyLossLimitPct: 3, maxDrawdownPct: 5 },
+  '1step': { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6 },
+  '2step': { profitTargetPct: 8, dailyLossLimitPct: 3, maxDrawdownPct: 8 },
+} as const;
+
+function getPlanRuleDefault(planType: string | null | undefined, field: keyof (typeof planRuleDefaults)['flash']) {
+  const normalizedPlan = String(planType || "").toLowerCase();
+  const defaults = planRuleDefaults[normalizedPlan as keyof typeof planRuleDefaults] || planRuleDefaults.flash;
+  return defaults[field];
+}
+
 /**
  * GET /api/accounts/my
  * Returns all accounts/provisioning records for the authenticated user.
@@ -260,6 +273,16 @@ router.get("/my", async (req: Request, res: Response) => {
       const winRate = batchedStats?.winRate ?? 0;
       const tradingDaysCount = batchedStats?.tradingDays ?? 0;
 
+      const profitTargetPct = row.profit_target_pct !== null && row.profit_target_pct !== undefined
+        ? Number(row.profit_target_pct)
+        : getPlanRuleDefault(planStr, "profitTargetPct");
+      const dailyLossLimitPct = row.daily_loss_limit_pct !== null && row.daily_loss_limit_pct !== undefined
+        ? Number(row.daily_loss_limit_pct)
+        : getPlanRuleDefault(planStr, "dailyLossLimitPct");
+      const maxDrawdownPct = row.max_drawdown_pct !== null && row.max_drawdown_pct !== undefined
+        ? Number(row.max_drawdown_pct)
+        : getPlanRuleDefault(planStr, "maxDrawdownPct");
+
       accounts.push({
         // trading_account ID is the canonical identifier used by the launch flow.
         id: row.trading_account_id || row.challenge_account_id,
@@ -272,9 +295,9 @@ router.get("/my", async (req: Request, res: Response) => {
         currentBalance,
         startBalance: initialBalance,
         profitLoss: currentBalance - initialBalance,
-        profitTarget: row.profit_target_pct != null ? Math.round(initialBalance * Number(row.profit_target_pct) / 100) : (planStr === "flash" ? 0 : Math.round(initialBalance * 0.10)),
-        maxDrawdown: row.max_drawdown_pct != null ? Math.round(initialBalance * Number(row.max_drawdown_pct) / 100) : (planStr === "flash" ? Math.round(initialBalance * 0.04) : Math.round(initialBalance * 0.06)),
-        dailyLossLimit: row.daily_loss_limit_pct != null ? Math.round(initialBalance * Number(row.daily_loss_limit_pct) / 100) : (planStr === "flash" ? Math.round(initialBalance * 0.02) : Math.round(initialBalance * 0.03)),
+        profitTarget: Math.round(initialBalance * profitTargetPct / 100),
+        maxDrawdown: Math.round(initialBalance * maxDrawdownPct / 100),
+        dailyLossLimit: Math.round(initialBalance * dailyLossLimitPct / 100),
         dailyDrawdown: 0,
         profitSplit: 80,
         tradingDays: tradingDaysCount,  // NEW: Real trading days from analytics
