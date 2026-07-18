@@ -38,7 +38,7 @@ export function AccountCard({ acc }: { acc: TradingAccount }) {
     funded: "text-green-400",
   }[acc.phase] ?? "text-amber-400";
   const phaseLabel = {
-    flash: "Flash",
+    flash: "Flash Funded",
     challenge: "Challenge",
     verification: "Verification",
     funded: "Funded",
@@ -137,6 +137,16 @@ export function AccountCard({ acc }: { acc: TradingAccount }) {
         <div><div className="text-white/45 text-xs mb-0.5">Max Drawdown</div><div className="text-white font-bold">{acc.maxLoss}%</div></div>
         <div><div className="text-white/45 text-xs mb-0.5">Profit Split</div><div className="text-[#FF8A3D] font-bold">{acc.profitSplit}%</div></div>
         <div><div className="text-white/45 text-xs mb-0.5">Win Rate</div><div className="text-green-400 font-bold">{acc.winRate}%</div></div>
+      </div>
+
+      {/* Monetary left values for quick glance */}
+      <div className="flex items-center justify-between text-xs text-white/50 mb-3">
+        <div>Daily Left</div>
+        <div className="font-bold text-white">{fmt(Math.max(0, Math.round(acc.startBalance * (acc.dailyLoss / 100))))} — {acc.dailyLoss}%</div>
+      </div>
+      <div className="flex items-center justify-between text-xs text-white/50 mb-2">
+        <div>DD Left</div>
+        <div className="font-bold text-white">{fmt(Math.max(0, Math.round(acc.startBalance * (acc.maxLoss / 100))))} — {acc.maxLoss}%</div>
       </div>
 
       {/* Progress bars */}
