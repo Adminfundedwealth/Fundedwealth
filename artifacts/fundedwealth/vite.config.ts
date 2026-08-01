@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
+// Build cache bust: 2026-08-01
 const rawPort = process.env.PORT || "5200";
 const rawPortNum = Number(rawPort);
 // On Vercel / CI PORT may not be set — fall back to 5200 instead of throwing
