@@ -38,7 +38,10 @@ import {
   MapPin,
   Phone,
   Mail,
-  Banknote
+  Banknote,
+  Share2,
+  Copy,
+  CheckCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -4682,6 +4685,50 @@ const AffiliateModal = ({
   );
 };
 
+const AffiliateShareButton = () => {
+  const [copied, setCopied] = useState(false);
+  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
+  const shareText = "🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more. Check it out:";
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "FundedWealth Affiliate Program", text: shareText, url: shareUrl });
+      } catch {
+        // user cancelled
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      } catch {
+        // fallback
+      }
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      onClick={handleShare}
+      className="h-13 px-8 text-base font-bold border-white/20 text-white hover:bg-white/10 rounded-xl transition-all duration-200"
+    >
+      {copied ? (
+        <>
+          <CheckCheck size={16} className="mr-2 text-green-400" />
+          <span className="text-green-400">Link Copied!</span>
+        </>
+      ) : (
+        <>
+          <Share2 size={16} className="mr-2" />
+          Share
+        </>
+      )}
+    </Button>
+  );
+};
+
 const Affiliate = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"register" | "login">("register");
@@ -4794,6 +4841,7 @@ const Affiliate = () => {
             >
               Affiliate Login <ArrowRight size={16} className="ml-2" />
             </Button>
+            <AffiliateShareButton />
           </div>
         </div>
 
