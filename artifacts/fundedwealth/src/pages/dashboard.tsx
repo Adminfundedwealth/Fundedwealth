@@ -16,6 +16,7 @@ import {
   Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KYCFlow } from "@/components/kyc";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend, ReferenceLine } from "recharts";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -49,7 +50,6 @@ type TradingAccount = {
 };
 
 type Notification = DashboardNotification;
-type KycStatus = { kycStatus: string; submission: any | null };
 
 const fmt = (n: number) =>
   n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : `₹${n.toLocaleString("en-IN")}`;
@@ -1050,7 +1050,18 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const [copied, setCopied] = useState(false);
   const [analyticsRange, setAnalyticsRange] = useState<"1D" | "1W" | "1M" | "ALL">("ALL");
   // "all" = aggregate all accounts, otherwise = specific trading_account id
+  // Default: auto-select first active account (like real prop firms — per-account by default)
   const [analyticsAccountId, setAnalyticsAccountId] = useState<string>("all");
+
+  // Once accounts load, auto-select the first active account instead of showing "all"
+  useEffect(() => {
+    if (profile.accounts.length === 0) return;
+    if (analyticsAccountId !== "all") return; // user already chose manually
+    const first = profile.accounts.find(a => a.status === "active") ||
+                  profile.accounts.find(a => a.status === "funded") ||
+                  profile.accounts.find(a => a.status === "passed");
+    if (first) setAnalyticsAccountId(first.id);
+  }, [profile.accounts.length]);
   const [donatePopup, setDonatePopup] = useState(false);
   const [donateCause, setDonateCause] = useState<"animal" | "education">("animal");
   const [donateAmt, setDonateAmt] = useState(50);
@@ -1059,10 +1070,6 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const { notifications, unreadCount, loading: notificationsLoading, realtimeStatus, preferences, markAsRead, markAllRead, deleteNotification, updatePreferences } = useNotifications(user?.id);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
-  const [kycStatus, setKycStatus] = useState<KycStatus>({ kycStatus: "pending", submission: null });
-  const [kycForm, setKycForm] = useState({ documentType: "aadhaar", documentNumber: "", fullName: "", dateOfBirth: "", address: "" });
-  const [kycSubmitting, setKycSubmitting] = useState(false);
-  const [kycMsg, setKycMsg] = useState("");
   const [darkMode, setDarkMode] = useState(true);
 
   // Leaderboard — fetched from real API
@@ -1230,22 +1237,6 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
     }
   };
 
-  useEffect(() => {
-    if (!user) return;
-    fetch(`${import.meta.env.BASE_URL}api/kyc/status`, { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        // Ensure kycStatus string is always defined
-        setKycStatus({
-          kycStatus: d?.kycStatus || "pending",
-          submission: d?.submission || null,
-        });
-      })
-      .catch(() => {
-        // Backend offline — keep default "pending" state, don't crash
-      });
-  }, [user]);
-
   const referralUrl = affiliateLink || `https://fundedwealth.com/ref/${affiliateStats.affiliateCode || profile.referralCode || "FW0000"}`;
   const shareText = encodeURIComponent(`Join FundedWealth with my referral link and start trading smarter! ${referralUrl}`);
   const encodedReferralUrl = encodeURIComponent(referralUrl);
@@ -1385,31 +1376,6 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-
-  const submitKyc = async () => {
-    if (!kycForm.documentNumber || !kycForm.fullName) { setKycMsg("Please fill in all required fields."); return; }
-    setKycSubmitting(true);
-    setKycMsg("");
-    try {
-      const res = await fetch(`${import.meta.env.BASE_URL}api/kyc/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(kycForm),
-      });
-      if (res.ok) {
-        setKycMsg("KYC submitted successfully! Our team will review within 24–48 hours.");
-        setKycStatus({ kycStatus: "submitted", submission: kycForm });
-      } else {
-        const err = await res.json().catch(() => ({}));
-        setKycMsg(err.error || "Submission failed. Please try again.");
-      }
-    } catch {
-      // Backend offline — show real error instead of fake "submitted" state
-      setKycMsg("Unable to submit KYC — server is unreachable. Please check your connection and try again.");
-    }
-    setKycSubmitting(false);
-  };
 
   const switchLang = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -1978,36 +1944,46 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
         // ── Account selection ────────────────────────────────────────────────
         const activeAccount = profile.accounts.find(acc => acc.status === "active") || profile.accounts[0];
-        const selectableAccounts = profile.accounts.filter(a => ["active","passed","funded","breached"].includes(a.status));
+        // Only show accounts that have real trading activity (active, funded, passed)
+        const selectableAccounts = profile.accounts.filter(a =>
+          ["active", "passed", "funded"].includes(a.status)
+        );
         const selectedAccount = analyticsAccountId !== "all"
           ? (profile.accounts.find(a => a.id === analyticsAccountId) || activeAccount)
           : activeAccount;
-        const accountsForAgg = analyticsAccountId === "all" ? profile.accounts : [selectedAccount];
+        // Aggregate only live trading accounts — exclude pending/failed/breached
+        const liveAccounts = profile.accounts.filter(a =>
+          ["active", "passed", "funded"].includes(a.status)
+        );
+        const accountsForAgg = analyticsAccountId === "all" ? liveAccounts : [selectedAccount];
 
         // ── Aggregated totals ────────────────────────────────────────────────
-        const totalStart   = accountsForAgg.reduce((s,a) => s + a.startBalance, 0) || selectedAccount.startBalance;
-        const totalBalance = accountsForAgg.reduce((s,a) => s + a.balance,      0) || selectedAccount.balance;
-        const totalTrades  = accountsForAgg.reduce((s,a) => s + a.tradeCount,   0) || selectedAccount.tradeCount;
+        const totalStart   = accountsForAgg.reduce((s, a) => s + (a.startBalance || 0), 0) || selectedAccount.startBalance;
+        const totalBalance = accountsForAgg.reduce((s, a) => s + (a.balance || 0),      0) || selectedAccount.balance;
+        const totalTrades  = accountsForAgg.reduce((s, a) => s + (a.tradeCount || 0),   0) || selectedAccount.tradeCount;
         const totalPnl     = totalBalance - totalStart;
 
         // ── Metrics ──────────────────────────────────────────────────────────
         const profitTargetProgress = Math.min(100, Math.max(0,
           ((totalPnl / Math.max(1, totalStart)) * 100) / Math.max(0.01, selectedAccount.profitTarget || 10) * 100
         ));
-        const displayWinRate = accountAnalytics?.winRate != null
+        const displayWinRate = accountAnalytics?.winRate != null && accountAnalytics.winRate > 0
           ? Math.round(accountAnalytics.winRate * 10) / 10
-          : selectedAccount.winRate;
+          : selectedAccount.winRate > 0
+            ? selectedAccount.winRate
+            : null; // null = no trades yet, show "—"
+        const winRateNum = displayWinRate ?? 50; // numeric fallback for calculations
         const consistencyScore = accountAnalytics?.consistencyScore != null
           ? Math.round(accountAnalytics.consistencyScore)
-          : Math.min(100, Math.max(45, Math.round((displayWinRate * 0.55) + (100 - selectedAccount.maxLoss * 3) * 0.45)));
+          : Math.min(100, Math.max(45, Math.round((winRateNum * 0.55) + (100 - selectedAccount.maxLoss * 3) * 0.45)));
         const disciplineScore = Math.min(100, Math.max(40, Math.round((consistencyScore * 0.7) + ((100 - selectedAccount.dailyLoss * 6) * 0.3))));
-        const sharpe         = Number((1.1 + (displayWinRate - 50) * 0.02).toFixed(2));
+        const sharpe         = Number((1.1 + (winRateNum - 50) * 0.02).toFixed(2));
         const sortino        = Number((sharpe * 0.9).toFixed(2));
         const recoveryFactor = Number((Math.max(1, totalPnl / Math.max(1, selectedAccount.maxLoss / 100 * totalStart))).toFixed(2));
         const totalLots      = totalTrades * 2;
         const remainingDays  = Math.max(0, 14 - Math.round(totalTrades / 4));
         const passProbability = Math.min(98, Math.max(35, Math.round((consistencyScore + sharpe * 8) / 2)));
-        const var95 = Math.max(0, Math.round((100 - displayWinRate) * totalStart * 0.0022));
+        const var95 = Math.max(0, Math.round((100 - winRateNum) * totalStart * 0.0022));
         const es    = Math.max(0, Math.round(var95 * 1.7));
         const calmar = Number((Math.max(1, totalPnl) / Math.max(1, selectedAccount.maxLoss / 100 * totalStart)).toFixed(2));
         const ulcer  = Number(Math.pow(Math.max(1, selectedAccount.maxLoss), 0.8).toFixed(2));
@@ -2144,8 +2120,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 <h2 className="text-white font-extrabold text-xl">Analytics</h2>
                 <p className="text-white/50 text-sm mt-0.5">
                   {analyticsAccountId === "all"
-                    ? `Aggregated · ${accountsForAgg.length} account${accountsForAgg.length !== 1 ? "s" : ""}`
-                    : `Account: ${selectedAccount.accountCode || selectedAccount.id.slice(0,8)}`}
+                    ? `All Accounts · ${liveAccounts.length} active`
+                    : `${selectedAccount.accountCode || selectedAccount.id.slice(0,8)} · ${selectedAccount.phase === "funded" ? "Funded" : selectedAccount.phase === "flash" ? "Flash" : "Challenge"}`}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -2173,7 +2149,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="text-white/60 uppercase tracking-[0.35em] text-[11px] font-bold">Live Analytics</div>
                     <div className="mt-3 text-3xl md:text-4xl font-extrabold text-white">{fmt(totalBalance)}</div>
                     <div className="text-white/50 text-sm mt-1">
-                      {analyticsAccountId === "all" ? "Real-time equity across all accounts" : `Equity · ${selectedAccount.accountCode || "this account"}`}
+                      {analyticsAccountId === "all"
+                        ? `Combined equity · ${liveAccounts.length} active accounts`
+                        : `Equity · ${selectedAccount.accountCode || "this account"}`}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -2281,7 +2259,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 { label:"Sharpe Ratio",    value: sharpe.toFixed(2),                                   icon:Scale,         color:"text-sky-400" },
                 { label:"Sortino Ratio",   value: sortino.toFixed(2),                                  icon:Shield,        color:"text-violet-400" },
                 { label:"Max Drawdown",    value: `${drawdownMaxLoss}%`,                                icon:ArrowDownRight,color:"text-red-400" },
-                { label:"Win Rate",        value: `${displayWinRate}%`,                                 icon:Trophy,        color:"text-green-400" },
+                { label:"Win Rate",        value: displayWinRate != null ? `${displayWinRate}%` : "—",  icon:Trophy,        color:"text-green-400" },
                 { label:"Recovery Factor", value: recoveryFactor.toFixed(2),                            icon:ArrowUpRight,  color:"text-amber-400" },
                 { label:"Avg Win",         value: avgWin!=null ? fmt(avgWin) : "—",                    icon:ArrowUp,       color:"text-green-400" },
                 { label:"Avg Loss",        value: avgLoss!=null ? fmt(avgLoss) : "—",                  icon:ArrowDown,     color:"text-red-400" },
@@ -2330,7 +2308,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   <div className="h-full bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#D63384]" style={{width:`${disciplineScore}%`}}/>
                 </div>
                 <div className="mt-4 space-y-3 text-sm text-white/60">
-                  <div className="flex items-center justify-between"><span>Revenge trading</span><span className={`font-bold ${displayWinRate<60?"text-red-300":"text-emerald-300"}`}>{displayWinRate<60?"High":"Low"}</span></div>
+                  <div className="flex items-center justify-between"><span>Revenge trading</span><span className={`font-bold ${winRateNum<60?"text-red-300":"text-emerald-300"}`}>{winRateNum<60?"High":"Low"}</span></div>
                   <div className="flex items-center justify-between"><span>Overtrading alert</span><span className={`font-bold ${totalTrades>40?"text-red-300":"text-emerald-300"}`}>{totalTrades>40?"Active":"Stable"}</span></div>
                   <div className="flex items-center justify-between"><span>FOMO signals</span><span className={`font-bold ${selectedAccount.dailyLoss>4?"text-amber-300":"text-emerald-300"}`}>{selectedAccount.dailyLoss>4?"Monitor":"Good"}</span></div>
                 </div>
@@ -2496,7 +2474,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   <FundingRow label="Days remaining" value={`${remainingDays} days`}/>
                   <FundingRow label="Daily profit needed" value={`₹${fmt(Math.max(0,Math.round((selectedAccount.profitTarget/100*selectedAccount.startBalance-totalPnl)/Math.max(1,remainingDays))))}`}/>
                   <FundingRow label="Pass probability" value={`${passProbability}%`}/>
-                  <FundingRow label="Rule compliance" value={`${Math.min(100,80+displayWinRate*0.2).toFixed(0)}%`}/>
+                  <FundingRow label="Rule compliance" value={`${Math.min(100,80+winRateNum*0.2).toFixed(0)}%`}/>
                 </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6">
@@ -3238,88 +3216,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       }
 
       case "kyc": return (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-white text-xl sm:text-2xl font-extrabold">{t("kyc.title")}</h2>
-              <p className="text-white/50 text-sm mt-1">{t("kyc.subtitle")}</p>
-            </div>
-            <span className={`px-3 py-1 rounded-full text-xs font-bold ${kycStatus.kycStatus === "approved" ? "bg-green-500/20 text-green-400" : kycStatus.kycStatus === "submitted" ? "bg-yellow-500/20 text-yellow-400" : kycStatus.kycStatus === "rejected" ? "bg-red-500/20 text-red-400" : "bg-white/10 text-white/50"}`}>
-              {(kycStatus.kycStatus || "pending").charAt(0).toUpperCase() + (kycStatus.kycStatus || "pending").slice(1)}
-            </span>
-          </div>
-
-          {kycStatus.kycStatus === "approved" ? (
-            <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-8 text-center">
-              <CheckCircle size={48} className="text-green-400 mx-auto mb-3" />
-              <h3 className="text-white text-lg font-bold">{t("kyc.approved")}</h3>
-            </div>
-          ) : kycStatus.kycStatus === "submitted" ? (
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-8 text-center">
-              <Clock size={48} className="text-yellow-400 mx-auto mb-3" />
-              <h3 className="text-white text-lg font-bold">{t("kyc.alreadySubmitted")}</h3>
-            </div>
-          ) : (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-white/60 text-xs font-semibold mb-1.5 block">{t("kyc.docType")}</label>
-                  <select value={kycForm.documentType} onChange={e => setKycForm(f => ({ ...f, documentType: e.target.value }))}
-                    className="w-full bg-[#0D001A] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:border-[#4A00E0] outline-none">
-                    <option value="aadhaar">{t("kyc.aadhaar")}</option>
-                    <option value="pan">{t("kyc.pan")}</option>
-                    <option value="passport">{t("kyc.passport")}</option>
-                    <option value="voter_id">{t("kyc.voterID")}</option>
-                    <option value="driving_license">{t("kyc.drivingLicense")}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-white/60 text-xs font-semibold mb-1.5 block">{t("kyc.docNumber")}</label>
-                  <input value={kycForm.documentNumber} onChange={e => setKycForm(f => ({ ...f, documentNumber: e.target.value }))}
-                    className="w-full bg-[#0D001A] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:border-[#4A00E0] outline-none" placeholder="XXXX XXXX XXXX" />
-                </div>
-                <div>
-                  <label className="text-white/60 text-xs font-semibold mb-1.5 block">{t("kyc.fullName")}</label>
-                  <input value={kycForm.fullName} onChange={e => setKycForm(f => ({ ...f, fullName: e.target.value }))}
-                    className="w-full bg-[#0D001A] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:border-[#4A00E0] outline-none" />
-                </div>
-                <div>
-                  <label className="text-white/60 text-xs font-semibold mb-1.5 block">{t("kyc.dob")}</label>
-                  <input type="date" value={kycForm.dateOfBirth} onChange={e => setKycForm(f => ({ ...f, dateOfBirth: e.target.value }))}
-                    className="w-full bg-[#0D001A] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:border-[#4A00E0] outline-none" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="text-white/60 text-xs font-semibold mb-1.5 block">{t("kyc.address")}</label>
-                  <textarea value={kycForm.address} onChange={e => setKycForm(f => ({ ...f, address: e.target.value }))}
-                    className="w-full bg-[#0D001A] border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:border-[#4A00E0] outline-none resize-none" rows={3} />
-                </div>
-              </div>
-              {kycMsg && <div className={`mt-4 text-sm rounded-xl px-4 py-3 ${kycMsg.includes("success") ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}`}>{kycMsg}</div>}
-              <Button onClick={submitKyc} disabled={kycSubmitting}
-                className="mt-5 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold rounded-xl h-11 px-4 md:px-6 lg:px-8 xl:px-10 hover:opacity-90 disabled:opacity-50">
-                {kycSubmitting ? t("kyc.uploading") : t("kyc.submit")}
-              </Button>
-            </div>
-          )}
-
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-            <h3 className="text-white font-bold text-sm mb-3">Why KYC?</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex items-start gap-3">
-                <Shield size={20} className="text-[#4A00E0] flex-shrink-0 mt-0.5" />
-                <div><div className="text-white text-xs font-semibold">Secure Payouts</div><div className="text-white/40 text-[11px]">Required to process withdrawals above ₹5,000</div></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Award size={20} className="text-[#D63384] flex-shrink-0 mt-0.5" />
-                <div><div className="text-white text-xs font-semibold">Higher Limits</div><div className="text-white/40 text-[11px]">Unlock ₹25L & ₹50L account sizes</div></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle size={20} className="text-green-400 flex-shrink-0 mt-0.5" />
-                <div><div className="text-white text-xs font-semibold">Fast Review</div><div className="text-white/40 text-[11px]">Verification completed within 24-48 hours</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <KYCFlow />
       );
 
       default: return null;
