@@ -260,8 +260,8 @@ router.post("/sync", async (req: Request, res: Response) => {
         WHERE id = ${payload.tradingAccountId}::uuid
       `);
 
-      // 8d. Upsert session_analytics
-      const sessionId = payload.sessionId || `daily-${new Date(payload.timestamp).toISOString().split('T')[0]}`;
+      // 8d. Upsert session_analytics — session_id scoped per account+date to prevent cross-account collision
+      const sessionId = payload.sessionId || `${payload.tradingAccountId}-daily-${new Date(payload.timestamp).toISOString().split('T')[0]}`;
 
       await tx.execute(sql`
         INSERT INTO session_analytics (
@@ -394,16 +394,13 @@ router.post("/trade-event", async (req: Request, res: Response) => {
     }
 
     // ── 4. VERIFY ACCOUNT OWNERSHIP ──────────────────────────────────────────
+    // Auth already proven by SSO_API_KEY. Just verify the trading account exists.
     const accountCheck = await db.execute(sql`
       SELECT ta.id AS trading_account_id
       FROM trading_accounts ta
-      JOIN terminal_traders tt ON tt.id = ta.trader_id
       WHERE ta.id = ${tradingAccountId}::uuid
-        AND tt.id = ${challengeAccountId}::uuid
       LIMIT 1
     `);
-    // challengeAccountId is used as terminalId here for auth — accept if account exists
-    // (ownership is already verified by the SSO_API_KEY secret)
 
     // ── 5. INSERT TRADE RECORD ────────────────────────────────────────────────
     await db.execute(sql`
