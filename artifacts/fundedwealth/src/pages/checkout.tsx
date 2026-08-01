@@ -12,6 +12,7 @@ import {
   Lock,
   Eye,
   EyeOff,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -276,6 +277,19 @@ export default function Checkout() {
 
       <div className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-10 max-w-[1600px] py-8">
         <StepIndicator currentStep={step} />
+
+        {/* Compliance Disclosure */}
+        <div className="mb-6 flex items-start gap-3 bg-[#1a1200] border border-yellow-500/30 rounded-xl px-5 py-4 max-w-[1600px]">
+          <FileText size={18} className="text-yellow-400 mt-0.5 shrink-0" />
+          <div className="text-sm leading-relaxed text-white/80">
+            <span className="text-yellow-400 font-semibold block mb-1">Compliance Disclosure</span>
+            All Instant Funding accounts are <span className="font-semibold text-white">simulated funded accounts</span>. No real capital is at risk. Profits are paid from the firm's revenue pool based on your simulated trading performance.{" "}
+            KYC verification and electronic agreement (e-Sign) are mandatory before account activation. By purchasing, you agree to the firm's{" "}
+            <a href="/terms" className="text-yellow-400 underline underline-offset-2 hover:text-yellow-300 transition-colors">Terms of Service</a>{" "}
+            and{" "}
+            <a href="/trading-rules" className="text-yellow-400 underline underline-offset-2 hover:text-yellow-300 transition-colors">Trading Rules</a>.
+          </div>
+        </div>
 
         <AnimatePresence mode="wait">
           {step === 1 && (
