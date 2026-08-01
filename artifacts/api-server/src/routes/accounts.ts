@@ -159,8 +159,7 @@ router.get("/my", async (req: Request, res: Response) => {
     const accounts: any[] = [];
     const accountedOrderIds = new Set<string>();
 
-    // 5a. Batch-fetch session_analytics for ALL live trading accounts in one query.
-    //     This replaces the N+1 per-account subquery that caused timeouts.
+    // 5a. Batch-fetch per-account stats — trade_logs (authoritative) with session_analytics fallback.
     const tradingAccountIds = liveRows
       .map(r => r.trading_account_id)
       .filter(Boolean);
@@ -175,14 +174,31 @@ router.get("/my", async (req: Request, res: Response) => {
         const batchStats = await db.execute(sql`
           SELECT
             ta.id AS trading_account_id,
-            COALESCE(SUM(sa.trades), 0)                          AS total_trades,
-            COALESCE(AVG(sa.win_rate), 0)                        AS avg_win_rate,
-            COUNT(DISTINCT DATE(sa.start_at))                    AS trading_days
+            COALESCE(tl_agg.total_trades, sa_agg.total_trades, 0)  AS total_trades,
+            COALESCE(tl_agg.win_rate,     sa_agg.avg_win_rate, 0)  AS avg_win_rate,
+            COALESCE(tl_agg.trading_days, sa_agg.trading_days, 0)  AS trading_days
           FROM trading_accounts ta
-          LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id
-          LEFT JOIN session_analytics sa ON sa.user_id = tt.external_id
+          LEFT JOIN LATERAL (
+            SELECT
+              COUNT(*)::int                                                     AS total_trades,
+              CASE WHEN COUNT(*) > 0
+                THEN ROUND(COUNT(*) FILTER (WHERE pnl > 0)::numeric / COUNT(*) * 100, 2)
+                ELSE 0
+              END                                                               AS win_rate,
+              COUNT(DISTINCT DATE(exited_at))::int                             AS trading_days
+            FROM trade_logs
+            WHERE trading_account_id = ta.id
+          ) tl_agg ON true
+          LEFT JOIN LATERAL (
+            SELECT
+              COALESCE(SUM(sa.trades), 0)::int       AS total_trades,
+              COALESCE(AVG(sa.win_rate), 0)           AS avg_win_rate,
+              COUNT(DISTINCT DATE(sa.start_at))::int  AS trading_days
+            FROM terminal_traders tt
+            JOIN session_analytics sa ON sa.user_id = tt.external_id
+            WHERE tt.id = ta.trader_id
+          ) sa_agg ON true
           WHERE ta.id IN (${idLiterals})
-          GROUP BY ta.id
         `);
         for (const row of batchStats.rows as any[]) {
           batchStatsMap.set(String(row.trading_account_id), {
@@ -764,8 +780,144 @@ router.get("/:accountId/trades", async (req: Request, res: Response) => {
 
     return res.json({ success: true, trades: tradesResult.rows });
   } catch (err: any) {
-    // trade_logs table may not exist in all environments
     return res.json({ success: true, trades: [] });
+  }
+});
+
+/**
+ * GET /api/accounts/:accountId/analytics
+ * Per-account analytics computed from trade_logs — single source of truth.
+ * Returns: equity curve, daily/weekly/monthly PnL, win rate, profit factor,
+ *          max drawdown, consistency score, avg win/loss.
+ */
+router.get("/:accountId/analytics", async (req: Request, res: Response) => {
+  try {
+    const auth = getAuth(req);
+    if (!auth?.userId) return res.status(401).json({ success: false, message: "Authentication required" });
+    const { accountId } = req.params;
+
+    const [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    const ownerCheck = await db.execute(sql`
+      SELECT ta.id, ca.initial_balance, ca.current_balance, ca.peak_balance,
+             ca.max_drawdown_pct, ca.profit_target_pct
+      FROM trading_accounts ta
+      JOIN terminal_traders tt ON tt.id = ta.trader_id
+      LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+      WHERE (ta.id = ${accountId}::uuid OR ta.challenge_id = ${accountId}::uuid)
+        AND tt.external_id = ${String(user.id)}
+      LIMIT 1
+    `);
+    if (!ownerCheck.rows || ownerCheck.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Account not found" });
+
+    const acct = ownerCheck.rows[0] as any;
+    const tradingAccountId = acct.id;
+    const initialBalance = Number(acct.initial_balance) || 0;
+
+    const tradesRes = await db.execute(sql`
+      SELECT pnl, exited_at, symbol, side
+      FROM trade_logs
+      WHERE trading_account_id = ${tradingAccountId}::uuid AND exited_at IS NOT NULL
+      ORDER BY exited_at ASC
+    `).catch(() => ({ rows: [] }));
+
+    const trades = (tradesRes.rows as any[]).map(t => ({
+      pnl: Number(t.pnl) || 0,
+      exitedAt: String(t.exited_at),
+      symbol: String(t.symbol || ""),
+    }));
+
+    const totalTrades = trades.length;
+    const wins = trades.filter(t => t.pnl > 0);
+    const losses = trades.filter(t => t.pnl < 0);
+    const grossProfit = wins.reduce((s, t) => s + t.pnl, 0);
+    const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0));
+    const netPnl = grossProfit - grossLoss;
+    const winRate = totalTrades > 0 ? (wins.length / totalTrades) * 100 : 0;
+    const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? 999 : 0;
+    const avgWin = wins.length > 0 ? grossProfit / wins.length : 0;
+    const avgLoss = losses.length > 0 ? grossLoss / losses.length : 0;
+
+    // Max drawdown from running equity
+    let runningEq = initialBalance, peak = initialBalance, maxDD = 0;
+    for (const t of trades) {
+      runningEq += t.pnl;
+      peak = Math.max(peak, runningEq);
+      maxDD = Math.max(maxDD, peak - runningEq);
+    }
+    const maxDDPct = initialBalance > 0 ? (maxDD / initialBalance) * 100 : 0;
+
+    // Daily PnL
+    const pnlByDay: Record<string, number> = {};
+    for (const t of trades) {
+      const d = t.exitedAt.slice(0, 10);
+      pnlByDay[d] = (pnlByDay[d] || 0) + t.pnl;
+    }
+    const dailyVals = Object.values(pnlByDay);
+    const meanDay = dailyVals.length ? dailyVals.reduce((s, v) => s + v, 0) / dailyVals.length : 0;
+    const variance = dailyVals.length > 1
+      ? dailyVals.reduce((s, v) => s + Math.pow(v - meanDay, 2), 0) / (dailyVals.length - 1) : 0;
+    const consistencyScore = Math.min(100, Math.max(0,
+      100 - (Math.sqrt(variance) > 0 && Math.abs(meanDay) > 0
+        ? (Math.sqrt(variance) / Math.abs(meanDay)) * 20 : 0)
+    ));
+
+    // Equity curve
+    let eqBal = initialBalance;
+    const sortedDays = Object.keys(pnlByDay).sort();
+    const equityCurve = sortedDays.map(date => {
+      eqBal += pnlByDay[date];
+      return { date, equity: Math.round(eqBal * 100) / 100, pnl: Math.round(pnlByDay[date] * 100) / 100 };
+    });
+
+    // Weekly PnL
+    const pnlByWeek: Record<string, number> = {};
+    for (const t of trades) {
+      const d = new Date(t.exitedAt);
+      const ws = new Date(d); ws.setDate(d.getDate() - d.getDay());
+      const key = ws.toISOString().slice(0, 10);
+      pnlByWeek[key] = (pnlByWeek[key] || 0) + t.pnl;
+    }
+    const weeklyPnl = Object.entries(pnlByWeek).sort(([a], [b]) => a.localeCompare(b))
+      .map(([week, pnl]) => ({ week, pnl: Math.round(pnl * 100) / 100 }));
+
+    // Monthly PnL
+    const pnlByMonth: Record<string, number> = {};
+    for (const t of trades) {
+      const key = t.exitedAt.slice(0, 7);
+      pnlByMonth[key] = (pnlByMonth[key] || 0) + t.pnl;
+    }
+    const monthlyPnl = Object.entries(pnlByMonth).sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, pnl]) => ({ month, pnl: Math.round(pnl * 100) / 100 }));
+
+    return res.json({
+      success: true,
+      accountId: tradingAccountId,
+      initialBalance,
+      currentBalance: Number(acct.current_balance) || initialBalance,
+      peakBalance: Number(acct.peak_balance) || Math.max(initialBalance, initialBalance + netPnl),
+      netPnl: Math.round(netPnl * 100) / 100,
+      totalTrades,
+      winRate: Math.round(winRate * 100) / 100,
+      profitFactor: Math.round(profitFactor * 100) / 100,
+      grossProfit: Math.round(grossProfit * 100) / 100,
+      grossLoss: Math.round(grossLoss * 100) / 100,
+      avgWin: Math.round(avgWin * 100) / 100,
+      avgLoss: Math.round(avgLoss * 100) / 100,
+      maxDrawdown: Math.round(maxDD * 100) / 100,
+      maxDrawdownPct: Math.round(maxDDPct * 100) / 100,
+      consistencyScore: Math.round(consistencyScore * 100) / 100,
+      tradingDays: sortedDays.length,
+      equityCurve,
+      dailyPnl: sortedDays.map(date => ({ date, pnl: Math.round(pnlByDay[date] * 100) / 100 })),
+      weeklyPnl,
+      monthlyPnl,
+    });
+  } catch (err: any) {
+    console.error("[Accounts] /analytics error:", err.message);
+    return res.json({ success: true, equityCurve: [], dailyPnl: [], weeklyPnl: [], monthlyPnl: [] });
   }
 });
 
