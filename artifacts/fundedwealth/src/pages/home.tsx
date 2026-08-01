@@ -4685,6 +4685,77 @@ const AffiliateModal = ({
   );
 };
 
+const AffiliateShareBadge = () => {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const badgeRef = useRef<HTMLDivElement>(null);
+
+  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
+  const shareText = encodeURIComponent("🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
+
+  const shareOptions = [
+    { label: "WhatsApp",     icon: "💬", color: "hover:bg-green-500/20 hover:text-green-400",  href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}` },
+    { label: "Telegram",     icon: "✈️", color: "hover:bg-blue-400/20 hover:text-blue-400",    href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}` },
+    { label: "Twitter / X",  icon: "🐦", color: "hover:bg-sky-400/20 hover:text-sky-400",      href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}` },
+    { label: "Instagram",    icon: "📸", color: "hover:bg-pink-400/20 hover:text-pink-400",    href: "https://www.instagram.com/" },
+  ];
+
+  const handleCopy = async () => {
+    try { await navigator.clipboard.writeText(shareUrl); } catch {}
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (badgeRef.current && !badgeRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="relative inline-block mb-8" ref={badgeRef}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-purple/30 border border-fw-purple/50 text-white text-sm font-bold cursor-pointer hover:bg-fw-purple/50 hover:border-fw-purple transition-all duration-200 group"
+      >
+        <Share2 size={14} className="group-hover:scale-110 transition-transform" />
+        {copied ? <span className="text-green-400">Link Copied!</span> : "Join, Share, Earn!"}
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 z-50 w-52 rounded-2xl border border-white/10 bg-[#14103a] shadow-[0_8px_32px_rgba(74,0,224,0.35)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="px-4 py-2.5 border-b border-white/10">
+            <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Share via</p>
+          </div>
+          {shareOptions.map((opt) => (
+            <a
+              key={opt.label}
+              href={opt.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 text-sm text-white/70 transition-colors ${opt.color}`}
+            >
+              <span className="text-base">{opt.icon}</span>
+              {opt.label}
+            </a>
+          ))}
+          <button
+            onClick={handleCopy}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-purple-500/20 hover:text-purple-400 transition-colors border-t border-white/10"
+          >
+            <Copy size={15} />
+            Copy Link
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AffiliateShareButton = () => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -4876,9 +4947,7 @@ const Affiliate = () => {
 
         {/* ── Hero banner ── */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-purple/30 border border-fw-purple/50 text-white text-sm font-bold mb-8">
-            <MousePointerClick size={15} /> Join, Share, Earn!
-          </div>
+          <AffiliateShareBadge />
           <h2 className="text-3xl sm:text-5xl md:text-7xl font-heading font-extrabold text-white mb-6">
             Make Every{" "}
             <span className="inline-flex items-center gap-3 align-middle">
