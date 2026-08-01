@@ -4686,46 +4686,110 @@ const AffiliateModal = ({
 };
 
 const AffiliateShareButton = () => {
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
-  const shareText = "🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more. Check it out:";
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "FundedWealth Affiliate Program", text: shareText, url: shareUrl });
-      } catch {
-        // user cancelled
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
-      } catch {
-        // fallback
-      }
+  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
+  const shareText = encodeURIComponent("🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
+
+  const shareOptions = [
+    {
+      label: "WhatsApp",
+      icon: "💬",
+      color: "hover:bg-green-500/20 hover:text-green-400",
+      href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}`,
+    },
+    {
+      label: "Telegram",
+      icon: "✈️",
+      color: "hover:bg-blue-400/20 hover:text-blue-400",
+      href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}`,
+    },
+    {
+      label: "Twitter / X",
+      icon: "🐦",
+      color: "hover:bg-sky-400/20 hover:text-sky-400",
+      href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}`,
+    },
+    {
+      label: "Instagram Story",
+      icon: "📸",
+      color: "hover:bg-pink-400/20 hover:text-pink-400",
+      href: `https://www.instagram.com/`,
+    },
+  ];
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // fallback: select text
     }
+    setOpen(false);
   };
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   return (
-    <Button
-      variant="outline"
-      onClick={handleShare}
-      className="h-13 px-8 text-base font-bold border-white/20 text-white hover:bg-white/10 rounded-xl transition-all duration-200"
-    >
-      {copied ? (
-        <>
-          <CheckCheck size={16} className="mr-2 text-green-400" />
-          <span className="text-green-400">Link Copied!</span>
-        </>
-      ) : (
-        <>
-          <Share2 size={16} className="mr-2" />
-          Share
-        </>
+    <div className="relative" ref={dropdownRef}>
+      <Button
+        variant="outline"
+        onClick={() => setOpen((v) => !v)}
+        className="h-13 px-8 text-base font-bold border-white/20 text-white hover:bg-white/10 rounded-xl transition-all duration-200"
+      >
+        {copied ? (
+          <>
+            <CheckCheck size={16} className="mr-2 text-green-400" />
+            <span className="text-green-400">Copied!</span>
+          </>
+        ) : (
+          <>
+            <Share2 size={16} className="mr-2" />
+            Share
+          </>
+        )}
+      </Button>
+
+      {open && (
+        <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 z-50 w-52 rounded-2xl border border-white/10 bg-[#14103a] shadow-[0_8px_32px_rgba(74,0,224,0.35)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="px-4 py-2.5 border-b border-white/10">
+            <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Share via</p>
+          </div>
+          {shareOptions.map((opt) => (
+            <a
+              key={opt.label}
+              href={opt.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 text-sm text-white/70 transition-colors ${opt.color}`}
+            >
+              <span className="text-base">{opt.icon}</span>
+              {opt.label}
+            </a>
+          ))}
+          <button
+            onClick={handleCopy}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-purple-500/20 hover:text-purple-400 transition-colors border-t border-white/10"
+          >
+            <Copy size={15} />
+            Copy Link
+          </button>
+        </div>
       )}
-    </Button>
+    </div>
   );
 };
 
