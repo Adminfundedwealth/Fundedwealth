@@ -72,7 +72,7 @@ lib/db/.env
 /playwright/.cache/
 /playwright/.auth/
 
-# Vercel build output — static folder IS committed (serves production)
-# .vercel/output/
+# Vercel build output — now built from source on Vercel, do NOT commit
+.vercel/output/
 
 
