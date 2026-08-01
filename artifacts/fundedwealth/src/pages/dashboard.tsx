@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useUser, useAuth } from "@/contexts/SupabaseAuthContext";
 import { useTradingData } from "@/contexts/TradingDataContext";
@@ -1049,6 +1049,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [analyticsRange, setAnalyticsRange] = useState<"1D" | "1W" | "1M" | "ALL">("ALL");
+  // "all" = aggregate all accounts, otherwise = specific trading_account id
+  const [analyticsAccountId, setAnalyticsAccountId] = useState<string>("all");
   const [donatePopup, setDonatePopup] = useState(false);
   const [donateCause, setDonateCause] = useState<"animal" | "education">("animal");
   const [donateAmt, setDonateAmt] = useState(50);
@@ -1103,30 +1105,61 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   // Analytics trades — fetched from real API (trade_logs via terminal-sync)
   type TradeLog = { symbol: string; pnl: number; createdAt: string };
   const [analyticsTradesData, setAnalyticsTradesData] = useState<TradeLog[]>([]);
-  const analyticsTradesLoading = false;
 
-  // Load real trade data when user is available
+  // Rich per-account analytics from /api/accounts/:id/analytics
+  type AccountAnalytics = {
+    equityCurve:  { date: string; equity: number; pnl: number }[];
+    dailyPnl:     { date: string; pnl: number }[];
+    weeklyPnl:    { week: string; pnl: number }[];
+    monthlyPnl:   { month: string; pnl: number }[];
+    winRate: number; profitFactor: number; maxDrawdown: number; maxDrawdownPct: number;
+    consistencyScore: number; netPnl: number; grossProfit: number; grossLoss: number;
+    avgWin: number; avgLoss: number; totalTrades: number; tradingDays: number;
+    initialBalance: number; currentBalance: number;
+  };
+  const [accountAnalytics, setAccountAnalytics] = useState<AccountAnalytics | null>(null);
+
+  // Fetch trade logs + rich analytics whenever the selected account changes
   useEffect(() => {
     if (!user || profile.accounts.length === 0) return;
-    const activeAccount = profile.accounts.find(a => a.status === "active") || profile.accounts[0];
-    if (!activeAccount) return;
     const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
-    fetch(`${apiBase}/api/accounts/${activeAccount.id}/trades`, {
-      credentials: "include",
-    })
-      .then(r => { if (!r.ok) throw new Error("not found"); return r.json(); })
-      .then((data: any) => {
-        const logs: TradeLog[] = (data.trades || []).map((t: any) => ({
+
+    const fetchTrades = async (accountId: string): Promise<TradeLog[]> => {
+      try {
+        const r = await fetch(`${apiBase}/api/accounts/${accountId}/trades`, { credentials: "include" });
+        if (!r.ok) return [];
+        const data: any = await r.json();
+        return (data.trades || []).map((t: any) => ({
           symbol: String(t.symbol || ""),
           pnl: Number(t.pnl || 0),
           createdAt: String(t.exited_at || t.created_at || new Date().toISOString()),
         }));
-        setAnalyticsTradesData(logs);
-      })
-      .catch(() => {
-        // Non-critical — analytics will show empty state
-      });
-  }, [user?.id, profile.accounts.length]);
+      } catch { return []; }
+    };
+
+    const fetchAnalytics = async (accountId: string): Promise<AccountAnalytics | null> => {
+      try {
+        const r = await fetch(`${apiBase}/api/accounts/${accountId}/analytics`, { credentials: "include" });
+        if (!r.ok) return null;
+        return await r.json();
+      } catch { return null; }
+    };
+
+    if (analyticsAccountId === "all") {
+      const activeAccounts = profile.accounts.filter(a => ["active","passed","funded"].includes(a.status));
+      Promise.all(activeAccounts.map(a => fetchTrades(a.id)))
+        .then(results => setAnalyticsTradesData(results.flat()))
+        .catch(() => setAnalyticsTradesData([]));
+      setAccountAnalytics(null);
+    } else {
+      fetchTrades(analyticsAccountId)
+        .then(setAnalyticsTradesData)
+        .catch(() => setAnalyticsTradesData([]));
+      fetchAnalytics(analyticsAccountId)
+        .then(setAccountAnalytics)
+        .catch(() => setAccountAnalytics(null));
+    }
+  }, [user?.id, profile.accounts.length, analyticsAccountId]);
 
   const [affiliateStats, setAffiliateStats] = useState({
     affiliateCode: profile.referralCode,
@@ -1914,7 +1947,6 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       );
 
       case "analytics": {
-        // Guard: show loading skeleton while accounts are being fetched
         if (profile.accounts.length === 0) {
           return (
             <div>
@@ -1922,29 +1954,21 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 <h2 className="text-white font-extrabold text-xl mb-1">Analytics</h2>
                 <p className="text-white/50 text-sm">Your performance overview</p>
               </div>
-              {/* Show skeleton while accounts are being loaded */}
-              {isDemo === false && profile.accounts.length === 0 ? (
+              {isDemo === false ? (
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
                   <BarChart2 size={36} className="text-white/20 mx-auto mb-3" />
                   <div className="text-white font-bold mb-1">No account data yet</div>
-                  <div className="text-white/50 text-sm mb-6 max-w-sm mx-auto">
-                    Analytics will appear once you have an active funded or challenge account.
-                  </div>
-                  <a href="/checkout">
-                    <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl px-6 text-sm">
-                      <Plus size={14} className="mr-2" /> Buy a Challenge
-                    </Button>
-                  </a>
+                  <div className="text-white/50 text-sm mb-6 max-w-sm mx-auto">Analytics will appear once you have an active challenge account.</div>
+                  <a href="/checkout"><Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl px-6 text-sm"><Plus size={14} className="mr-2" /> Buy a Challenge</Button></a>
                 </div>
               ) : (
-                /* Loading skeleton while accounts are still being fetched */
                 <div className="space-y-4 animate-pulse">
                   <div className="grid lg:grid-cols-[1.6fr_1fr] gap-5">
                     <div className="rounded-3xl bg-white/5 border border-white/10 h-52" />
                     <div className="rounded-3xl bg-white/5 border border-white/10 h-52" />
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[0, 1, 2, 3].map(i => <div key={i} className="rounded-2xl bg-white/5 border border-white/10 h-24" />)}
+                    {[0,1,2,3].map(i => <div key={i} className="rounded-2xl bg-white/5 border border-white/10 h-24" />)}
                   </div>
                 </div>
               )}
@@ -1952,239 +1976,246 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           );
         }
 
+        // ── Account selection ────────────────────────────────────────────────
         const activeAccount = profile.accounts.find(acc => acc.status === "active") || profile.accounts[0];
+        const selectableAccounts = profile.accounts.filter(a => ["active","passed","funded","breached"].includes(a.status));
+        const selectedAccount = analyticsAccountId !== "all"
+          ? (profile.accounts.find(a => a.id === analyticsAccountId) || activeAccount)
+          : activeAccount;
+        const accountsForAgg = analyticsAccountId === "all" ? profile.accounts : [selectedAccount];
 
-        const totalStart = profile.accounts.reduce((sum, acc) => sum + acc.startBalance, 0) || activeAccount.startBalance;
-        const totalBalance = profile.accounts.reduce((sum, acc) => sum + acc.balance, 0) || activeAccount.balance;
-        const totalTrades = profile.accounts.reduce((sum, acc) => sum + acc.tradeCount, 0) || activeAccount.tradeCount;
-        const totalPnl = totalBalance - totalStart;
-        const targetDenom = activeAccount.profitTarget === 0 ? 1 : (activeAccount.profitTarget ?? 1);
-        const profitTargetProgress = Math.min(100, Math.max(0, ((totalPnl / totalStart) * 100) / targetDenom * 100));
-        const consistencyScore = Math.min(100, Math.max(45, Math.round((activeAccount.winRate * 0.55) + (100 - activeAccount.maxLoss * 3) * 0.45)));
-        const disciplineScore = Math.min(100, Math.max(40, Math.round((consistencyScore * 0.7) + ((100 - activeAccount.dailyLoss * 6) * 0.3))));
-        // Sharpe/Sortino/VaR/passProbability kept as-is — medium/large effort tasks, out of scope
-        const sharpe = Number((1.1 + (activeAccount.winRate - 50) * 0.02).toFixed(2));
-        const sortino = Number((sharpe * 0.9).toFixed(2));
-        const recoveryFactor = Number((Math.max(1, totalPnl / Math.max(1, activeAccount.maxLoss / 100 * totalStart))).toFixed(2));
-        const totalLots = totalTrades * 2;
-        const remainingDays = Math.max(0, 14 - Math.round(totalTrades / 4));
+        // ── Aggregated totals ────────────────────────────────────────────────
+        const totalStart   = accountsForAgg.reduce((s,a) => s + a.startBalance, 0) || selectedAccount.startBalance;
+        const totalBalance = accountsForAgg.reduce((s,a) => s + a.balance,      0) || selectedAccount.balance;
+        const totalTrades  = accountsForAgg.reduce((s,a) => s + a.tradeCount,   0) || selectedAccount.tradeCount;
+        const totalPnl     = totalBalance - totalStart;
+
+        // ── Metrics ──────────────────────────────────────────────────────────
+        const profitTargetProgress = Math.min(100, Math.max(0,
+          ((totalPnl / Math.max(1, totalStart)) * 100) / Math.max(0.01, selectedAccount.profitTarget || 10) * 100
+        ));
+        const displayWinRate = accountAnalytics?.winRate != null
+          ? Math.round(accountAnalytics.winRate * 10) / 10
+          : selectedAccount.winRate;
+        const consistencyScore = accountAnalytics?.consistencyScore != null
+          ? Math.round(accountAnalytics.consistencyScore)
+          : Math.min(100, Math.max(45, Math.round((displayWinRate * 0.55) + (100 - selectedAccount.maxLoss * 3) * 0.45)));
+        const disciplineScore = Math.min(100, Math.max(40, Math.round((consistencyScore * 0.7) + ((100 - selectedAccount.dailyLoss * 6) * 0.3))));
+        const sharpe         = Number((1.1 + (displayWinRate - 50) * 0.02).toFixed(2));
+        const sortino        = Number((sharpe * 0.9).toFixed(2));
+        const recoveryFactor = Number((Math.max(1, totalPnl / Math.max(1, selectedAccount.maxLoss / 100 * totalStart))).toFixed(2));
+        const totalLots      = totalTrades * 2;
+        const remainingDays  = Math.max(0, 14 - Math.round(totalTrades / 4));
         const passProbability = Math.min(98, Math.max(35, Math.round((consistencyScore + sharpe * 8) / 2)));
-        const var95 = Math.max(0, Math.round((100 - activeAccount.winRate) * totalStart * 0.0022));
-        const es = Math.max(0, Math.round(var95 * 1.7));
-        const calmar = Number((Math.max(1, totalPnl) / Math.max(1, activeAccount.maxLoss / 100 * totalStart)).toFixed(2));
-        const ulcer = Number(Math.pow(Math.max(1, activeAccount.maxLoss), 0.8).toFixed(2));
+        const var95 = Math.max(0, Math.round((100 - displayWinRate) * totalStart * 0.0022));
+        const es    = Math.max(0, Math.round(var95 * 1.7));
+        const calmar = Number((Math.max(1, totalPnl) / Math.max(1, selectedAccount.maxLoss / 100 * totalStart)).toFixed(2));
+        const ulcer  = Number(Math.pow(Math.max(1, selectedAccount.maxLoss), 0.8).toFixed(2));
 
-        // ── Equity curve (kept as-is — medium effort, out of scope for this task) ──────
-        const buildSeries = (count: number) => Array.from({ length: count }, (_, idx) => {
-          const progress = idx / Math.max(1, count - 1);
+        // ── Equity curve — real data preferred, synthetic fallback ──────────
+        const realEquityCurve = accountAnalytics?.equityCurve || [];
+        const synthSeries = Array.from({ length: 28 }, (_, idx) => {
+          const progress = idx / 27;
           const equity = Math.round(totalStart + totalPnl * progress + Math.sin(idx * 0.65) * totalStart * 0.012);
-          const benchmark = Math.round(24326 + 220 * progress + Math.cos(idx * 0.4) * 12);
-          const drawdown = Math.round(((Math.max(totalStart, equity) - equity) / Math.max(1, Math.max(totalStart, equity))) * 100);
-          return { idx, label: `Day ${idx + 1}`, equity, benchmark, drawdown, peak: idx === Math.floor(count * 0.6) };
+          return { idx, label: `Day ${idx+1}`, equity,
+            benchmark: Math.round(24326 + 220 * progress + Math.cos(idx * 0.4) * 12),
+            drawdown: Math.round(((Math.max(totalStart, equity) - equity) / Math.max(1, Math.max(totalStart, equity))) * 100) };
         });
-        const allSeries = buildSeries(28);
-        const rangeMap: Record<string, number> = { "1D": 7, "1W": 12, "1M": 20, ALL: 28 };
+        const allSeries = realEquityCurve.length >= 2
+          ? realEquityCurve.map((pt, idx) => ({
+              idx, label: pt.date, equity: pt.equity,
+              benchmark: Math.round(24326 + 220 * (idx / Math.max(1, realEquityCurve.length - 1))),
+              drawdown: Math.round(((Math.max(totalStart, pt.equity) - pt.equity) / Math.max(1, Math.max(totalStart, pt.equity))) * 100),
+            }))
+          : synthSeries;
+        const rangeMap: Record<string, number> = { "1D": 7, "1W": 12, "1M": 20, ALL: allSeries.length };
         const chartData = allSeries.slice(-rangeMap[analyticsRange]).map((point, idx) => ({
           ...point,
-          mcLow: Math.max(0, Math.round(point.equity * (0.92 + Math.sin(idx * 0.33) * 0.03))),
+          mcLow:  Math.max(0, Math.round(point.equity * (0.92 + Math.sin(idx * 0.33) * 0.03))),
           mcHigh: Math.round(point.equity * (1.06 + Math.cos(idx * 0.27) * 0.02)),
         }));
-        const dailyPnlBars = chartData.map((point, index) => ({ day: point.label, pnl: index === 0 ? 0 : point.equity - chartData[index - 1].equity }));
+        const realDailyPnl = accountAnalytics?.dailyPnl || [];
+        const dailyPnlBars = realDailyPnl.length > 0
+          ? realDailyPnl.slice(-rangeMap[analyticsRange]).map(d => ({ day: d.date, pnl: d.pnl }))
+          : chartData.map((pt, i) => ({ day: pt.label, pnl: i === 0 ? 0 : pt.equity - chartData[i-1].equity }));
 
-        // ── Real computations from tradeLogs (A1–A9) ────────────────────────────────────
-        // tradeLogs shape: { symbol, pnl, createdAt }[]
-        const tradeLogs: { symbol: string; pnl: number; createdAt: string }[] =
-          analyticsTradesData ?? [];
+        // ── Trade log metrics ────────────────────────────────────────────────
+        const tradeLogs: { symbol: string; pnl: number; createdAt: string }[] = analyticsTradesData ?? [];
         const hasTradeData = tradeLogs.length > 0;
-
-        // A4 / A5 — Avg Win & Avg Loss from real trade records
         const winningTrades = tradeLogs.filter(t => t.pnl > 0);
-        const losingTrades = tradeLogs.filter(t => t.pnl < 0);
-        const avgWin = winningTrades.length > 0
-          ? Math.round(winningTrades.reduce((s, t) => s + t.pnl, 0) / winningTrades.length)
-          : null;
-        const avgLoss = losingTrades.length > 0
-          ? Math.round(Math.abs(losingTrades.reduce((s, t) => s + t.pnl, 0) / losingTrades.length))
-          : null;
+        const losingTrades  = tradeLogs.filter(t => t.pnl < 0);
+        const grossWins   = winningTrades.reduce((s,t) => s + t.pnl, 0);
+        const grossLosses = Math.abs(losingTrades.reduce((s,t) => s + t.pnl, 0));
+        const avgWin  = accountAnalytics?.avgWin != null ? Math.round(accountAnalytics.avgWin)
+          : winningTrades.length > 0 ? Math.round(grossWins / winningTrades.length) : null;
+        const avgLoss = accountAnalytics?.avgLoss != null ? Math.round(accountAnalytics.avgLoss)
+          : losingTrades.length  > 0 ? Math.round(grossLosses / losingTrades.length) : null;
+        const profitFactor = accountAnalytics?.profitFactor != null ? Number(accountAnalytics.profitFactor.toFixed(2))
+          : hasTradeData && grossLosses > 0 ? Number((grossWins / grossLosses).toFixed(2)) : null;
+        const edgeRatio = avgWin != null && avgLoss != null && avgLoss > 0
+          ? Number((avgWin / avgLoss).toFixed(2)) : null;
 
-        // A6 — Profit Factor from real trade records
-        const grossWins = winningTrades.reduce((s, t) => s + t.pnl, 0);
-        const grossLosses = Math.abs(losingTrades.reduce((s, t) => s + t.pnl, 0));
-        const profitFactor = hasTradeData && grossLosses > 0
-          ? Number((grossWins / grossLosses).toFixed(2))
-          : null;
-
-        // A7 / A8 — Win & Loss streaks from real trade records (sorted oldest→newest)
         const sortedPnl = [...tradeLogs]
-          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+          .sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
           .map(t => t.pnl);
         let longestWinStreak = 0, longestLossStreak = 0, curWin = 0, curLoss = 0;
         for (const pnl of sortedPnl) {
           if (pnl > 0) { curWin++; curLoss = 0; longestWinStreak = Math.max(longestWinStreak, curWin); }
-          else { curLoss++; curWin = 0; longestLossStreak = Math.max(longestLossStreak, curLoss); }
+          else          { curLoss++; curWin = 0; longestLossStreak = Math.max(longestLossStreak, curLoss); }
         }
 
-        // A1 — Symbol breakdown from real trade records
-        const SYMBOL_COLORS: Record<string, string> = {
-          BANKNIFTY: "#7C3AED", NIFTY: "#22C55E", SENSEX: "#38BDF8",
-          FINNIFTY: "#F97316", OTHER: "#A855F7",
-        };
+        // ── Symbol breakdown ─────────────────────────────────────────────────
+        const SYMBOL_COLORS: Record<string,string> = { BANKNIFTY:"#7C3AED", NIFTY:"#22C55E", SENSEX:"#38BDF8", FINNIFTY:"#F97316", OTHER:"#A855F7" };
         type SymbolBreakdownEntry = { name: string; value: number; color: string; pnl: number };
         const symbolBreakdown: SymbolBreakdownEntry[] = (() => {
           if (!hasTradeData) return [];
-          const pnlBySymbol: Record<string, number> = {};
-          const countBySymbol: Record<string, number> = {};
+          const pnlBySym: Record<string,number> = {}, cntBySym: Record<string,number> = {};
           for (const t of tradeLogs) {
             const sym = Object.keys(SYMBOL_COLORS).find(k => t.symbol.toUpperCase().includes(k)) || "OTHER";
-            pnlBySymbol[sym] = (pnlBySymbol[sym] || 0) + t.pnl;
-            countBySymbol[sym] = (countBySymbol[sym] || 0) + 1;
+            pnlBySym[sym] = (pnlBySym[sym]||0) + t.pnl;
+            cntBySym[sym] = (cntBySym[sym]||0) + 1;
           }
-          const total = Object.values(countBySymbol).reduce((s, n) => s + n, 0);
-          return Object.entries(countBySymbol)
-            .map(([name, count]) => ({
-              name,
-              value: Math.round((count / total) * 100),
-              color: SYMBOL_COLORS[name] ?? "#A855F7",
-              pnl: pnlBySymbol[name] ?? 0,
-            }))
-            .sort((a, b) => b.value - a.value);
+          const total = Object.values(cntBySym).reduce((s,n)=>s+n,0);
+          return Object.entries(cntBySym).map(([name,count])=>({
+            name, value: Math.round((count/total)*100),
+            color: SYMBOL_COLORS[name]??"#A855F7", pnl: pnlBySym[name]??0
+          })).sort((a,b)=>b.value-a.value);
         })();
 
-        // A2 — Day-of-week performance from real trade records
+        // ── Day-of-week performance ──────────────────────────────────────────
         type DayPerf = { day: string; pnl: number; count: number };
         const dayOfWeek: { day: string; perf: number }[] = (() => {
-          if (!hasTradeData) return ["Mon", "Tue", "Wed", "Thu", "Fri"].map(day => ({ day, perf: 0 }));
-          const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-          const byDay: Record<number, DayPerf> = {};
+          const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+          if (!hasTradeData) return ["Mon","Tue","Wed","Thu","Fri"].map(day=>({day,perf:0}));
+          const byDay: Record<number,DayPerf> = {};
           for (const t of tradeLogs) {
             const d = new Date(t.createdAt).getDay();
-            if (!byDay[d]) byDay[d] = { day: DAY_NAMES[d], pnl: 0, count: 0 };
-            byDay[d].pnl += t.pnl;
-            byDay[d].count++;
+            if (!byDay[d]) byDay[d] = { day: DAY_NAMES[d], pnl:0, count:0 };
+            byDay[d].pnl += t.pnl; byDay[d].count++;
           }
-          // Mon–Fri only; if no trades on a day show 0
-          return [1, 2, 3, 4, 5].map(d => {
-            const entry = byDay[d];
-            if (!entry || entry.count === 0) return { day: DAY_NAMES[d], perf: 0 };
-            const avgPnl = entry.pnl / entry.count;
-            // Normalise: clamp avg PnL to a 0–100 score relative to best day
-            return { day: DAY_NAMES[d], perf: avgPnl, rawPnl: avgPnl };
-          }).map((item, _, arr) => {
-            const max = Math.max(...arr.map(a => Math.abs((a as any).rawPnl || 0))) || 1;
-            const score = Math.round(((((item as any).rawPnl || 0) / max) * 50) + 50); // 0–100
-            return { day: item.day, perf: Math.max(0, Math.min(100, score)) };
+          const raw = [1,2,3,4,5].map(d => {
+            const e = byDay[d];
+            return { day: DAY_NAMES[d], rawPnl: e && e.count > 0 ? e.pnl/e.count : 0 };
+          });
+          const maxAbs = Math.max(...raw.map(r=>Math.abs(r.rawPnl)))||1;
+          return raw.map(r=>({ day: r.day, perf: Math.max(0, Math.min(100, Math.round((r.rawPnl/maxAbs)*50+50))) }));
+        })();
+
+        // ── P&L calendar heatmap ─────────────────────────────────────────────
+        const calendarHeat: { day: string; value: number; pnl: number }[] = (() => {
+          const now = new Date();
+          const pnlByDate: Record<string,number> = {};
+          for (const t of tradeLogs) { const d=t.createdAt.slice(0,10); pnlByDate[d]=(pnlByDate[d]||0)+t.pnl; }
+          return Array.from({length:28},(_,i)=>{
+            const dt=new Date(now); dt.setDate(now.getDate()-(27-i));
+            const key=dt.toISOString().slice(0,10), pnl=pnlByDate[key]??0;
+            return { day:`D${i+1}`, value: pnl>0?80:pnl<0?20:45, pnl };
           });
         })();
 
-        // A3 — P&L Calendar heatmap — last 28 days from real trade records
-        const calendarHeat: { day: string; value: number; pnl: number }[] = (() => {
-          const cells: { day: string; value: number; pnl: number }[] = [];
-          const now = new Date();
-          const pnlByDate: Record<string, number> = {};
-          for (const t of tradeLogs) {
-            const d = t.createdAt.slice(0, 10); // YYYY-MM-DD
-            pnlByDate[d] = (pnlByDate[d] || 0) + t.pnl;
-          }
-          for (let i = 27; i >= 0; i--) {
-            const dt = new Date(now);
-            dt.setDate(now.getDate() - i);
-            const key = dt.toISOString().slice(0, 10);
-            const pnl = pnlByDate[key] ?? 0;
-            cells.push({ day: `D${28 - i}`, value: pnl > 0 ? 80 : pnl < 0 ? 20 : 45, pnl });
-          }
-          return cells;
-        })();
-
-        // A9 — AI Insight cards derived from real computed data
+        // ── AI insight cards ─────────────────────────────────────────────────
         const insightCards: { title: string; description: string; tone: string }[] = (() => {
           if (!hasTradeData) return [];
           const cards: { title: string; description: string; tone: string }[] = [];
-          // Best symbol
           if (symbolBreakdown.length > 0) {
-            const best = symbolBreakdown.reduce((a, b) => (b.pnl > a.pnl ? b : a));
-            if (best.pnl > 0) {
-              cards.push({ title: `Your best symbol is ${best.name}`, description: `${best.value}% of your trades — highest realised P&L across all symbols.`, tone: "good" });
-            }
+            const best = symbolBreakdown.reduce((a,b)=>b.pnl>a.pnl?b:a);
+            if (best.pnl > 0) cards.push({ title:`Your best symbol is ${best.name}`, description:`${best.value}% of your trades — highest realised P&L across all symbols.`, tone:"good"});
           }
-          // Weakest day of week
-          const sorted = [...dayOfWeek].sort((a, b) => a.perf - b.perf);
-          if (sorted[0] && sorted[0].perf < 45) {
-            cards.push({ title: `Trade less on ${sorted[0].day}days`, description: `${sorted[0].day} shows the weakest average P&L. Consider reducing size or skipping that session.`, tone: "warn" });
-          }
-          // Loss streak warning
-          if (longestLossStreak >= 3) {
-            cards.push({ title: `Reduce size after ${longestLossStreak} consecutive losses`, description: "Preserve capital by scaling back position size during losing streaks.", tone: "warn" });
-          }
-          // Profit factor strength
-          if (profitFactor !== null && profitFactor >= 1.5) {
-            cards.push({ title: "Strong profit factor detected", description: `Profit factor of ${profitFactor} — your winners outpace your losers. Stay consistent.`, tone: "good" });
-          }
-          // Pad to at least 1 card if no insights derived
-          if (cards.length === 0) {
-            cards.push({ title: "Keep logging your trades", description: "More trade data will unlock personalised insights about your patterns and performance.", tone: "good" });
-          }
+          const sortedDow = [...dayOfWeek].sort((a,b)=>a.perf-b.perf);
+          if (sortedDow[0]?.perf < 45) cards.push({ title:`Trade less on ${sortedDow[0].day}days`, description:`${sortedDow[0].day} shows the weakest average P&L. Consider reducing size.`, tone:"warn"});
+          if (longestLossStreak>=3) cards.push({ title:`Reduce size after ${longestLossStreak} consecutive losses`, description:"Preserve capital by scaling back position size during losing streaks.", tone:"warn"});
+          if (profitFactor!=null && profitFactor>=1.5) cards.push({ title:"Strong profit factor detected", description:`Profit factor of ${profitFactor} — your winners outpace your losers.`, tone:"good"});
+          if (cards.length===0) cards.push({ title:"Keep logging your trades", description:"More trade data will unlock personalised insights about your patterns.", tone:"good"});
           return cards;
         })();
 
-        // Edge ratio derived from real avg win / loss
-        const edgeRatio = avgWin != null && avgLoss != null && avgLoss > 0
-          ? Number((avgWin / avgLoss).toFixed(2))
-          : null;
-
-        const drawdownZoneClass = activeAccount.maxLoss < 6 ? "bg-emerald-500/10 text-emerald-300" : activeAccount.maxLoss < 9 ? "bg-amber-500/10 text-amber-300" : "bg-red-500/10 text-red-300";
-        const drawdownMeter = Math.min(100, activeAccount.maxLoss * 10);
+        const drawdownMaxLoss = accountAnalytics?.maxDrawdownPct != null
+          ? Math.round(accountAnalytics.maxDrawdownPct * 10) / 10
+          : selectedAccount.maxLoss;
+        const drawdownZoneClass = drawdownMaxLoss < 6 ? "bg-emerald-500/10 text-emerald-300" : drawdownMaxLoss < 9 ? "bg-amber-500/10 text-amber-300" : "bg-red-500/10 text-red-300";
+        const drawdownMeter = Math.min(100, drawdownMaxLoss * 10);
 
         return (
           <div className="space-y-6">
+
+            {/* ── Account Selector ───────────────────────────────────────── */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="text-white font-extrabold text-xl">Analytics</h2>
+                <p className="text-white/50 text-sm mt-0.5">
+                  {analyticsAccountId === "all"
+                    ? `Aggregated · ${accountsForAgg.length} account${accountsForAgg.length !== 1 ? "s" : ""}`
+                    : `Account: ${selectedAccount.accountCode || selectedAccount.id.slice(0,8)}`}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setAnalyticsAccountId("all")}
+                  className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${analyticsAccountId === "all" ? "bg-gradient-to-r from-[#4A00E0] to-[#D63384] border-transparent text-white" : "bg-white/5 border-white/15 text-white/60 hover:text-white"}`}
+                >All Accounts</button>
+                {selectableAccounts.map(acc => {
+                  const pl = acc.phase === "funded" ? "Funded" : acc.phase === "flash" ? "Flash" : acc.phase === "verification" ? "Phase 2" : "Challenge";
+                  return (
+                    <button key={acc.id}
+                      onClick={() => setAnalyticsAccountId(acc.id)}
+                      className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${analyticsAccountId === acc.id ? "bg-gradient-to-r from-[#4A00E0] to-[#D63384] border-transparent text-white" : "bg-white/5 border-white/15 text-white/60 hover:text-white"}`}
+                    >{pl} · {acc.size > 0 ? `₹${(acc.size/100000).toFixed(1)}L` : acc.accountCode}</button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ── Live Analytics + Equity Curve ──────────────────────────── */}
             <div className="grid lg:grid-cols-[1.6fr_1fr] gap-5">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6 shadow-[0_30px_60px_rgba(74,0,224,0.12)]">
                 <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                   <div>
                     <div className="text-white/60 uppercase tracking-[0.35em] text-[11px] font-bold">Live Analytics</div>
-                    <div className="mt-3 text-3xl md:text-4xl font-extrabold text-white">₹{fmt(totalBalance)}</div>
-                    <div className="text-white/50 text-sm mt-1">Real-time equity across all funded accounts</div>
+                    <div className="mt-3 text-3xl md:text-4xl font-extrabold text-white">{fmt(totalBalance)}</div>
+                    <div className="text-white/50 text-sm mt-1">
+                      {analyticsAccountId === "all" ? "Real-time equity across all accounts" : `Equity · ${selectedAccount.accountCode || "this account"}`}
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                    <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.35}} className="rounded-3xl border border-white/10 bg-white/5 p-4">
                       <div className="text-white/40 text-[11px] uppercase tracking-[0.25em] mb-2">Daily P&L</div>
-                      <div className={`text-lg font-extrabold ${totalPnl >= 0 ? "text-green-400" : "text-red-400"}`}>{totalPnl >= 0 ? "+" : ""}₹{fmt(Math.abs(totalPnl))}</div>
+                      <div className={`text-lg font-extrabold ${totalPnl>=0?"text-green-400":"text-red-400"}`}>{totalPnl>=0?"+":""}{fmt(Math.abs(totalPnl))}</div>
                       <div className="text-white/50 text-[11px] mt-1">Live session movement</div>
                     </motion.div>
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                    <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.4,delay:0.05}} className="rounded-3xl border border-white/10 bg-white/5 p-4">
                       <div className="text-white/40 text-[11px] uppercase tracking-[0.25em] mb-2">Funded progress</div>
                       <div className="text-lg font-extrabold text-white">{Math.round(profitTargetProgress)}%</div>
                       <div className="h-2 mt-3 rounded-full bg-white/10 overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-[#7C3AED] to-[#D63384]" style={{ width: `${profitTargetProgress}%` }} />
+                        <div className="h-full bg-gradient-to-r from-[#7C3AED] to-[#D63384]" style={{width:`${profitTargetProgress}%`}} />
                       </div>
                     </motion.div>
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.1 }} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                    <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.45,delay:0.1}} className="rounded-3xl border border-white/10 bg-white/5 p-4">
                       <div className="text-white/40 text-[11px] uppercase tracking-[0.25em] mb-2">Consistency score</div>
                       <div className="text-lg font-extrabold text-[#A855F7]">{consistencyScore}/100</div>
                       <div className="text-white/50 text-[11px] mt-1">Behavioral resilience</div>
                     </motion.div>
                   </div>
                 </div>
-
                 <div className="mt-6 grid gap-4 md:grid-cols-3">
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
                     <div className="text-white/45 text-[11px] uppercase tracking-[0.25em] mb-3">Phase</div>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <div className="text-white font-bold text-sm">{activeAccount.phase === "funded" ? "Funded" : activeAccount.phase === "verification" ? "Verification" : "Challenge"}</div>
-                        <div className="text-white/50 text-[11px] mt-1">Target: {activeAccount.profitTarget}%</div>
+                        <div className="text-white font-bold text-sm">{selectedAccount.phase==="funded"?"Funded":selectedAccount.phase==="verification"?"Verification":"Challenge"}</div>
+                        <div className="text-white/50 text-[11px] mt-1">Target: {selectedAccount.profitTarget}%</div>
                       </div>
-                      <span className="rounded-full px-3 py-1 text-[10px] font-bold uppercase bg-white/5 text-white/75">{activeAccount.status}</span>
+                      <span className="rounded-full px-3 py-1 text-[10px] font-bold uppercase bg-white/5 text-white/75">{selectedAccount.status}</span>
                     </div>
                   </div>
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
                     <div className="text-white/45 text-[11px] uppercase tracking-[0.25em] mb-3">Live drawdown</div>
                     <div className="flex items-center gap-3">
                       <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${drawdownZoneClass}`}>
-                        <span className="text-sm font-bold">{activeAccount.maxLoss}%</span>
+                        <span className="text-sm font-bold">{drawdownMaxLoss}%</span>
                       </div>
                       <div className="flex-1">
                         <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-red-500" style={{ width: `${drawdownMeter}%` }} />
+                          <div className="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-red-500" style={{width:`${drawdownMeter}%`}} />
                         </div>
                         <div className="text-white/50 text-[11px] mt-2">Green / yellow / red risk zones</div>
                       </div>
@@ -2203,11 +2234,12 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   <div>
                     <div className="text-white/50 uppercase tracking-[0.35em] text-[11px] font-bold">Equity Curve</div>
                     <div className="text-white text-2xl font-extrabold mt-2">Equity vs NIFTY</div>
+                    {realEquityCurve.length >= 2 && <div className="text-emerald-400 text-[11px] mt-1">● Live data</div>}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {(["1D", "1W", "1M", "ALL"] as const).map(range => (
+                    {(["1D","1W","1M","ALL"] as const).map(range => (
                       <button key={range} onClick={() => setAnalyticsRange(range)}
-                        className={`rounded-full px-4 py-2 text-[11px] font-semibold transition ${analyticsRange === range ? "bg-[#7C3AED] text-white" : "bg-white/5 text-white/60 hover:bg-white/10"}`}>
+                        className={`rounded-full px-4 py-2 text-[11px] font-semibold transition ${analyticsRange===range?"bg-[#7C3AED] text-white":"bg-white/5 text-white/60 hover:bg-white/10"}`}>
                         {range}
                       </button>
                     ))}
@@ -2215,73 +2247,76 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </div>
                 <div className="mt-5 h-[320px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 10, right: 18, left: 0, bottom: 0 }}>
+                    <LineChart data={chartData} margin={{top:10,right:18,left:0,bottom:0}}>
                       <defs>
                         <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="10%" stopColor="#8B5CF6" stopOpacity={0.24} />
-                          <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
+                          <stop offset="10%" stopColor="#8B5CF6" stopOpacity={0.24}/>
+                          <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} strokeDasharray="4 4" />
-                      <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.45)", fontSize: 11 }} minTickGap={20} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.45)", fontSize: 11 }} tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}K`} width={60} />
-                      <Tooltip contentStyle={{ background: "#0A0018", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff" }} formatter={(value: any, name: any) => [fmt(value), name === "benchmark" ? "NIFTY" : name === "mcHigh" || name === "mcLow" ? "Monte Carlo" : "Equity"]} />
-                      <ReferenceLine y={totalStart} stroke="rgba(255,255,255,0.18)" strokeDasharray="3 5" label={{ position: "insideTopLeft", value: "Start", fill: "rgba(255,255,255,0.55)", fontSize: 11 }} />
-                      <Area type="monotone" dataKey="mcHigh" stroke="transparent" fill="rgba(59,130,246,0.14)" />
-                      <Area type="monotone" dataKey="mcLow" stroke="transparent" fill="rgba(59,130,246,0.07)" />
-                      <Line type="monotone" dataKey="benchmark" stroke="#22C55E" strokeWidth={2} dot={false} opacity={0.7} />
-                      <Line type="monotone" dataKey="equity" stroke="#A855F7" strokeWidth={3} dot={{ r: 2, fill: "#fff" }} activeDot={{ r: 5, fill: "#D63384" }} />
+                      <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} strokeDasharray="4 4"/>
+                      <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.45)",fontSize:11}} minTickGap={20}/>
+                      <YAxis axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.45)",fontSize:11}} tickFormatter={(v)=>`₹${(v/1000).toFixed(0)}K`} width={60}/>
+                      <Tooltip contentStyle={{background:"#0A0018",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,color:"#fff"}} formatter={(value:any,name:any)=>[fmt(value),name==="benchmark"?"NIFTY":name==="mcHigh"||name==="mcLow"?"Monte Carlo":"Equity"]}/>
+                      <ReferenceLine y={totalStart} stroke="rgba(255,255,255,0.18)" strokeDasharray="3 5" label={{position:"insideTopLeft",value:"Start",fill:"rgba(255,255,255,0.55)",fontSize:11}}/>
+                      <Area type="monotone" dataKey="mcHigh" stroke="transparent" fill="rgba(59,130,246,0.14)"/>
+                      <Area type="monotone" dataKey="mcLow" stroke="transparent" fill="rgba(59,130,246,0.07)"/>
+                      <Line type="monotone" dataKey="benchmark" stroke="#22C55E" strokeWidth={2} dot={false} opacity={0.7}/>
+                      <Line type="monotone" dataKey="equity" stroke="#A855F7" strokeWidth={3} dot={{r:2,fill:"#fff"}} activeDot={{r:5,fill:"#D63384"}}/>
                     </LineChart>
                   </ResponsiveContainer>
                   <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-white/60">
-                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#A855F7]" /> Equity</span>
-                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#22C55E]" /> NIFTY benchmark</span>
-                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#3B82F6]" /> Monte Carlo band</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#A855F7]"/>Equity</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#22C55E]"/>NIFTY benchmark</span>
+                    <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#3B82F6]"/>Monte Carlo band</span>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* ── Metric cards row 1 ─────────────────────────────────────── */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {[
-                { label: "Profit Factor", value: analyticsTradesLoading ? "…" : profitFactor != null ? profitFactor.toFixed(2) : "—", icon: TrendingUp, color: "text-emerald-400" },
-                { label: "Sharpe Ratio", value: sharpe.toFixed(2), icon: Scale, color: "text-sky-400" },
-                { label: "Sortino Ratio", value: sortino.toFixed(2), icon: Shield, color: "text-violet-400" },
-                { label: "Max Drawdown", value: `${activeAccount.maxLoss}%`, icon: ArrowDownRight, color: "text-red-400" },
-                { label: "Win Rate", value: `${activeAccount.winRate}%`, icon: Trophy, color: "text-green-400" },
-                { label: "Recovery Factor", value: recoveryFactor.toFixed(2), icon: ArrowUpRight, color: "text-amber-400" },
-                { label: "Avg Win", value: analyticsTradesLoading ? "…" : avgWin != null ? fmt(avgWin) : "—", icon: ArrowUp, color: "text-green-400" },
-                { label: "Avg Loss", value: analyticsTradesLoading ? "…" : avgLoss != null ? fmt(avgLoss) : "—", icon: ArrowDown, color: "text-red-400" },
-              ].map(metric => (
-                <div key={metric.label} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
+                { label:"Profit Factor",   value: profitFactor!=null ? profitFactor.toFixed(2) : "—", icon:TrendingUp,    color:"text-emerald-400" },
+                { label:"Sharpe Ratio",    value: sharpe.toFixed(2),                                   icon:Scale,         color:"text-sky-400" },
+                { label:"Sortino Ratio",   value: sortino.toFixed(2),                                  icon:Shield,        color:"text-violet-400" },
+                { label:"Max Drawdown",    value: `${drawdownMaxLoss}%`,                                icon:ArrowDownRight,color:"text-red-400" },
+                { label:"Win Rate",        value: `${displayWinRate}%`,                                 icon:Trophy,        color:"text-green-400" },
+                { label:"Recovery Factor", value: recoveryFactor.toFixed(2),                            icon:ArrowUpRight,  color:"text-amber-400" },
+                { label:"Avg Win",         value: avgWin!=null ? fmt(avgWin) : "—",                    icon:ArrowUp,       color:"text-green-400" },
+                { label:"Avg Loss",        value: avgLoss!=null ? fmt(avgLoss) : "—",                  icon:ArrowDown,     color:"text-red-400" },
+              ].map(m => (
+                <div key={m.label} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                   <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="text-white/40 text-[11px] uppercase tracking-[0.25em]">{metric.label}</span>
-                    <metric.icon size={18} className={metric.color} />
+                    <span className="text-white/40 text-[11px] uppercase tracking-[0.25em]">{m.label}</span>
+                    <m.icon size={18} className={m.color}/>
                   </div>
-                  <div className={`text-xl font-extrabold ${metric.color}`}>{metric.value}</div>
+                  <div className={`text-xl font-extrabold ${m.color}`}>{m.value}</div>
                 </div>
               ))}
             </div>
 
+            {/* ── Metric cards row 2 ─────────────────────────────────────── */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {[
-                { label: "Largest Win", value: analyticsTradesLoading ? "…" : winningTrades.length > 0 ? fmt(Math.max(...winningTrades.map(t => t.pnl))) : "—", icon: ArrowUpRight, color: "text-emerald-400" },
-                { label: "Largest Loss", value: analyticsTradesLoading ? "…" : losingTrades.length > 0 ? fmt(Math.abs(Math.min(...losingTrades.map(t => t.pnl)))) : "—", icon: ArrowDownRight, color: "text-red-400" },
-                { label: "Win/Loss Streak", value: analyticsTradesLoading ? "…" : hasTradeData ? `${longestWinStreak}/${longestLossStreak}` : "—", icon: TrendingUp, color: "text-violet-400" },
-                { label: "Edge Ratio", value: analyticsTradesLoading ? "…" : edgeRatio != null ? edgeRatio.toFixed(2) : "—", icon: Activity, color: "text-emerald-400" },
-                { label: "Total Lots", value: String(totalLots), icon: Users, color: "text-indigo-400" },
-                { label: "Total Trades", value: analyticsTradesLoading ? "…" : hasTradeData ? String(tradeLogs.length) : String(totalTrades), icon: Shield, color: "text-amber-400" },
-              ].map(metric => (
-                <div key={metric.label} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
+                { label:"Largest Win",     value: winningTrades.length>0 ? fmt(Math.max(...winningTrades.map(t=>t.pnl))) : "—", icon:ArrowUpRight,  color:"text-emerald-400" },
+                { label:"Largest Loss",    value: losingTrades.length>0  ? fmt(Math.abs(Math.min(...losingTrades.map(t=>t.pnl)))) : "—", icon:ArrowDownRight,color:"text-red-400" },
+                { label:"Win/Loss Streak", value: hasTradeData ? `${longestWinStreak}/${longestLossStreak}` : "—", icon:TrendingUp, color:"text-violet-400" },
+                { label:"Edge Ratio",      value: edgeRatio!=null ? edgeRatio.toFixed(2) : "—", icon:Activity,  color:"text-emerald-400" },
+                { label:"Total Lots",      value: String(totalLots),      icon:Users,   color:"text-indigo-400" },
+                { label:"Total Trades",    value: hasTradeData ? String(tradeLogs.length) : String(totalTrades), icon:Shield, color:"text-amber-400" },
+              ].map(m => (
+                <div key={m.label} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                   <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="text-white/40 text-[11px] uppercase tracking-[0.25em]">{metric.label}</span>
-                    <metric.icon size={18} className={metric.color} />
+                    <span className="text-white/40 text-[11px] uppercase tracking-[0.25em]">{m.label}</span>
+                    <m.icon size={18} className={m.color}/>
                   </div>
-                  <div className={`text-xl font-extrabold ${metric.color}`}>{metric.value}</div>
+                  <div className={`text-xl font-extrabold ${m.color}`}>{m.value}</div>
                 </div>
               ))}
             </div>
 
+            {/* ── Discipline / Calendar / Day-of-week ────────────────────── */}
             <div className="grid xl:grid-cols-3 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -2292,12 +2327,12 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   <div className="text-white/50 text-xs">Behavioral meter</div>
                 </div>
                 <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#D63384]" style={{ width: `${disciplineScore}%` }} />
+                  <div className="h-full bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#D63384]" style={{width:`${disciplineScore}%`}}/>
                 </div>
                 <div className="mt-4 space-y-3 text-sm text-white/60">
-                  <div className="flex items-center justify-between"><span>Revenge trading</span><span className={`font-bold ${activeAccount.winRate < 60 ? "text-red-300" : "text-emerald-300"}`}>{activeAccount.winRate < 60 ? "High" : "Low"}</span></div>
-                  <div className="flex items-center justify-between"><span>Overtrading alert</span><span className={`font-bold ${totalTrades > 40 ? "text-red-300" : "text-emerald-300"}`}>{totalTrades > 40 ? "Active" : "Stable"}</span></div>
-                  <div className="flex items-center justify-between"><span>FOMO signals</span><span className={`font-bold ${activeAccount.dailyLoss > 4 ? "text-amber-300" : "text-emerald-300"}`}>{activeAccount.dailyLoss > 4 ? "Monitor" : "Good"}</span></div>
+                  <div className="flex items-center justify-between"><span>Revenge trading</span><span className={`font-bold ${displayWinRate<60?"text-red-300":"text-emerald-300"}`}>{displayWinRate<60?"High":"Low"}</span></div>
+                  <div className="flex items-center justify-between"><span>Overtrading alert</span><span className={`font-bold ${totalTrades>40?"text-red-300":"text-emerald-300"}`}>{totalTrades>40?"Active":"Stable"}</span></div>
+                  <div className="flex items-center justify-between"><span>FOMO signals</span><span className={`font-bold ${selectedAccount.dailyLoss>4?"text-amber-300":"text-emerald-300"}`}>{selectedAccount.dailyLoss>4?"Monitor":"Good"}</span></div>
                 </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
@@ -2306,55 +2341,36 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="text-white/40 text-[11px] uppercase tracking-[0.25em]">P&L Calendar</div>
                     <div className="text-white font-bold">Last 28 days</div>
                   </div>
-                  <Clock size={18} className="text-white/40" />
+                  <Clock size={18} className="text-white/40"/>
                 </div>
-                {analyticsTradesLoading ? (
-                  <div className="grid grid-cols-7 gap-1 animate-pulse">
-                    {Array.from({ length: 28 }).map((_, i) => <div key={i} className="h-8 rounded-lg bg-white/10" />)}
-                  </div>
-                ) : !hasTradeData ? (
-                  <div className="grid grid-cols-7 gap-1">
-                    {Array.from({ length: 28 }).map((_, i) => <div key={i} className="h-8 rounded-lg bg-white/5" />)}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-7 gap-1">
-                    {calendarHeat.map((cell, idx) => (
-                      <div key={idx}
-                        className={`h-8 rounded-lg ${cell.pnl > 0 ? "bg-emerald-400" : cell.pnl < 0 ? "bg-red-400/70" : "bg-white/5"}`}
-                        title={`${cell.day}: ${cell.pnl >= 0 ? "+" : ""}${fmt(cell.pnl)}`}
-                      />
-                    ))}
-                  </div>
-                )}
+                <div className="grid grid-cols-7 gap-1">
+                  {calendarHeat.map((cell,idx)=>(
+                    <div key={idx} className={`h-8 rounded-lg ${cell.pnl>0?"bg-emerald-400":cell.pnl<0?"bg-red-400/70":"bg-white/5"}`}
+                      title={`${cell.day}: ${cell.pnl>=0?"+":""}${fmt(cell.pnl)}`}/>
+                  ))}
+                </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="text-white/40 text-[11px] uppercase tracking-[0.25em]">Day of week</div>
-                    <div className="text-white font-bold">
-                      {hasTradeData ? "Avg P&L by day" : "Performance"}
-                    </div>
+                    <div className="text-white font-bold">{hasTradeData?"Avg P&L by day":"Performance"}</div>
                   </div>
                 </div>
                 <div className="h-52">
-                  {analyticsTradesLoading ? (
-                    <div className="h-full flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-white/20 border-t-[#A855F7] rounded-full animate-spin" />
-                    </div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={dayOfWeek} margin={{ left: -20, right: 0, top: 10, bottom: 10 }}>
-                        <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 11 }} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 11 }} tickFormatter={(v) => `${v}%`} width={30} />
-                        <Tooltip contentStyle={{ background: "#0A0018", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff" }} formatter={(value: any) => [`${value}%`, hasTradeData ? "Score" : "Perf"]} />
-                        <Bar dataKey="perf" radius={[8, 8, 0, 0]} fill="#8B5CF6" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dayOfWeek} margin={{left:-20,right:0,top:10,bottom:10}}>
+                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.55)",fontSize:11}}/>
+                      <YAxis axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.55)",fontSize:11}} tickFormatter={v=>`${v}%`} width={30}/>
+                      <Tooltip contentStyle={{background:"#0A0018",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,color:"#fff"}} formatter={(value:any)=>[`${value}%`,"Score"]}/>
+                      <Bar dataKey="perf" radius={[8,8,0,0]} fill="#8B5CF6"/>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             </div>
 
+            {/* ── Symbol breakdown ───────────────────────────────────────── */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -2363,11 +2379,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="text-white font-bold">Trade share by symbol</div>
                   </div>
                 </div>
-                {analyticsTradesLoading ? (
-                  <div className="h-52 flex items-center justify-center">
-                    <div className="w-8 h-8 border-2 border-white/20 border-t-[#A855F7] rounded-full animate-spin" />
-                  </div>
-                ) : !hasTradeData ? (
+                {!hasTradeData ? (
                   <div className="h-52 flex flex-col items-center justify-center text-center">
                     <div className="text-white/20 text-3xl mb-2">◎</div>
                     <div className="text-white/40 text-xs">No trade data yet</div>
@@ -2378,24 +2390,24 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie data={symbolBreakdown} dataKey="value" innerRadius={42} outerRadius={70} paddingAngle={3}>
-                            {symbolBreakdown.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+                            {symbolBreakdown.map(entry=><Cell key={entry.name} fill={entry.color}/>)}
                           </Pie>
-                          <Tooltip contentStyle={{ background: "#0A0018", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, color: "#fff" }} formatter={(value: any, name: any) => [`${value}%`, name]} />
+                          <Tooltip contentStyle={{background:"#0A0018",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,color:"#fff"}} formatter={(value:any,name:any)=>[`${value}%`,name]}/>
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
                     <div className="mt-4 grid gap-3 text-[11px] text-white/60">
-                      {symbolBreakdown.map((symbol) => (
-                        <div key={symbol.name} className="rounded-3xl border border-white/10 bg-white/5 p-3">
+                      {symbolBreakdown.map(sym=>(
+                        <div key={sym.name} className="rounded-3xl border border-white/10 bg-white/5 p-3">
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="h-2.5 w-2.5 rounded-full" style={{ background: symbol.color }} />
-                              <span>{symbol.name}</span>
+                              <span className="h-2.5 w-2.5 rounded-full" style={{background:sym.color}}/>
+                              <span>{sym.name}</span>
                             </div>
-                            <span className="text-xs text-white/50">{symbol.value}%</span>
+                            <span className="text-xs text-white/50">{sym.value}%</span>
                           </div>
                           <div className="mt-1.5 text-[11px] text-white/50">
-                            P&L: <span className={symbol.pnl >= 0 ? "text-green-400" : "text-red-400"}>{symbol.pnl >= 0 ? "+" : ""}{fmt(symbol.pnl)}</span>
+                            P&L: <span className={sym.pnl>=0?"text-green-400":"text-red-400"}>{sym.pnl>=0?"+":""}{fmt(sym.pnl)}</span>
                           </div>
                         </div>
                       ))}
@@ -2405,25 +2417,26 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               </div>
             </div>
 
+            {/* ── Risk dashboard ─────────────────────────────────────────── */}
             <div className="grid xl:grid-cols-2 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="text-white/40 text-[11px] uppercase tracking-[0.25em]">Risk dashboard</div>
-                    <div className="text-white font-bold">Monte Carlo & stress metrics</div>
+                    <div className="text-white font-bold">Monte Carlo &amp; stress metrics</div>
                   </div>
-                  <Scale size={20} className="text-white/40" />
+                  <Scale size={20} className="text-white/40"/>
                 </div>
                 <div className="grid gap-3">
                   {[
-                    { label: "Value at Risk (95%)", value: `₹${fmt(var95)}` },
-                    { label: "Expected Shortfall", value: `₹${fmt(es)}` },
-                    { label: "Calmar Ratio", value: calmar.toFixed(2) },
-                    { label: "Ulcer Index", value: ulcer.toFixed(2) },
-                  ].map(metric => (
-                    <div key={metric.label} className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-white/50 text-[11px] uppercase tracking-[0.25em] mb-2">{metric.label}</div>
-                      <div className="text-white font-bold text-lg">{metric.value}</div>
+                    { label:"Value at Risk (95%)", value:`₹${fmt(var95)}` },
+                    { label:"Expected Shortfall",  value:`₹${fmt(es)}` },
+                    { label:"Calmar Ratio",         value:calmar.toFixed(2) },
+                    { label:"Ulcer Index",          value:ulcer.toFixed(2) },
+                  ].map(m=>(
+                    <div key={m.label} className="rounded-3xl border border-white/10 bg-white/5 p-4">
+                      <div className="text-white/50 text-[11px] uppercase tracking-[0.25em] mb-2">{m.label}</div>
+                      <div className="text-white font-bold text-lg">{m.value}</div>
                     </div>
                   ))}
                 </div>
@@ -2434,49 +2447,42 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="text-white/40 text-[11px] uppercase tracking-[0.25em]">Position sizing</div>
                     <div className="text-white font-bold">Optimal allocation</div>
                   </div>
-                  <Heart size={20} className="text-white/40" />
+                  <Heart size={20} className="text-white/40"/>
                 </div>
                 {[
-                  { label: "Momentum entry", width: 92, caption: "2.4% risk" },
-                  { label: "Fade breakout", width: 76, caption: "1.9% risk" },
-                  { label: "Swing capture", width: 84, caption: "2.7% risk" },
-                  { label: "Scalp execution", width: 58, caption: "1.1% risk" },
-                ].map(item => (
+                  { label:"Momentum entry",  width:92, caption:"2.4% risk" },
+                  { label:"Fade breakout",   width:76, caption:"1.9% risk" },
+                  { label:"Swing capture",   width:84, caption:"2.7% risk" },
+                  { label:"Scalp execution", width:58, caption:"1.1% risk" },
+                ].map(item=>(
                   <div key={item.label} className="space-y-2 mb-4 last:mb-0">
                     <div className="flex items-center justify-between text-white/60 text-xs"><span>{item.label}</span><span>{item.caption}</span></div>
                     <div className="h-3 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-[#7C3AED] to-[#22C55E]" style={{ width: `${item.width}%` }} />
+                      <div className="h-full bg-gradient-to-r from-[#7C3AED] to-[#22C55E]" style={{width:`${item.width}%`}}/>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* ── AI insight cards ───────────────────────────────────────── */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-              {analyticsTradesLoading ? (
-                [0, 1, 2, 3].map(i => (
-                  <div key={i} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5 animate-pulse">
-                    <div className="h-3 bg-white/10 rounded-full w-16 mb-3" />
-                    <div className="h-5 bg-white/10 rounded-full w-40 mb-2" />
-                    <div className="h-3 bg-white/10 rounded-full w-full" />
-                  </div>
-                ))
-              ) : insightCards.length === 0 ? (
+              {insightCards.length === 0 ? (
                 <div className="col-span-4 rounded-3xl border border-white/10 bg-[#0B021D]/80 p-8 text-center">
                   <div className="text-white/20 text-3xl mb-2">💡</div>
                   <div className="text-white/50 text-sm">Trade more to unlock personalised insights.</div>
                 </div>
-              ) : (
-                insightCards.map((ins, idx) => (
-                  <motion.div key={idx} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: idx * 0.05 }} className={`rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5 ${ins.tone === "warn" ? "border-amber-500/20" : "border-emerald-500/20"}`}>
-                    <div className="text-[11px] uppercase tracking-[0.3em] text-white/40 mb-3">Insight</div>
-                    <div className="text-white font-bold text-lg mb-2">{ins.title}</div>
-                    <div className="text-white/60 text-sm">{ins.description}</div>
-                  </motion.div>
-                ))
-              )}
+              ) : insightCards.map((ins,idx)=>(
+                <motion.div key={idx} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{duration:0.35,delay:idx*0.05}}
+                  className={`rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5 ${ins.tone==="warn"?"border-amber-500/20":"border-emerald-500/20"}`}>
+                  <div className="text-[11px] uppercase tracking-[0.3em] text-white/40 mb-3">Insight</div>
+                  <div className="text-white font-bold text-lg mb-2">{ins.title}</div>
+                  <div className="text-white/60 text-sm">{ins.description}</div>
+                </motion.div>
+              ))}
             </div>
 
+            {/* ── Funding progress + Rule compliance ─────────────────────── */}
             <div className="grid xl:grid-cols-2 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6">
                 <div className="flex items-center justify-between mb-5">
@@ -2484,13 +2490,13 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="text-white/40 text-[11px] uppercase tracking-[0.25em]">Funding progress</div>
                     <div className="text-white font-bold text-xl">Phase milestones</div>
                   </div>
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-white/50">{activeAccount.phase === "funded" ? "Phase 2" : "Phase 1"}</span>
+                  <span className="text-[11px] uppercase tracking-[0.25em] text-white/50">{selectedAccount.phase==="funded"?"Phase 2":"Phase 1"}</span>
                 </div>
                 <div className="space-y-4">
-                  <FundingRow label="Days remaining" value={`${remainingDays} days`} />
-                  <FundingRow label="Daily profit needed" value={`₹${fmt(Math.max(0, Math.round((activeAccount.profitTarget / 100 * activeAccount.startBalance - totalPnl) / Math.max(1, remainingDays))))}`} />
-                  <FundingRow label="Pass probability" value={`${passProbability}%`} />
-                  <FundingRow label="Rule compliance" value={`${Math.min(100, 80 + activeAccount.winRate * 0.2).toFixed(0)}%`} />
+                  <FundingRow label="Days remaining" value={`${remainingDays} days`}/>
+                  <FundingRow label="Daily profit needed" value={`₹${fmt(Math.max(0,Math.round((selectedAccount.profitTarget/100*selectedAccount.startBalance-totalPnl)/Math.max(1,remainingDays))))}`}/>
+                  <FundingRow label="Pass probability" value={`${passProbability}%`}/>
+                  <FundingRow label="Rule compliance" value={`${Math.min(100,80+displayWinRate*0.2).toFixed(0)}%`}/>
                 </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6">
@@ -2503,20 +2509,69 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </div>
                 <div className="grid gap-3">
                   {[
-                    { label: "Daily drawdown", ok: activeAccount.dailyLoss <= 5 },
-                    { label: "Max drawdown", ok: activeAccount.maxLoss <= 10 },
-                    { label: "Profit target pace", ok: profitTargetProgress >= 50 },
-                    { label: "Consistency", ok: consistencyScore >= 65 },
-                  ].map(item => (
+                    { label:"Daily drawdown",     ok: selectedAccount.dailyLoss <= 5 },
+                    { label:"Max drawdown",        ok: drawdownMaxLoss <= 10 },
+                    { label:"Profit target pace",  ok: profitTargetProgress >= 50 },
+                    { label:"Consistency",         ok: consistencyScore >= 65 },
+                  ].map(item=>(
                     <div key={item.label} className="rounded-3xl border border-white/10 bg-white/5 p-4 flex items-center justify-between gap-3">
-                      <div>
-                        <div className="text-white/60 text-[12px]">{item.label}</div>
-                      </div>
-                      <span className={`text-[11px] font-bold uppercase px-3 py-1 rounded-full ${item.ok ? "bg-emerald-500/10 text-emerald-300" : "bg-red-500/10 text-red-300"}`}>{item.ok ? "Good" : "Watch"}</span>
+                      <div className="text-white/60 text-[12px]">{item.label}</div>
+                      <span className={`text-[11px] font-bold uppercase px-3 py-1 rounded-full ${item.ok?"bg-emerald-500/10 text-emerald-300":"bg-red-500/10 text-red-300"}`}>{item.ok?"Good":"Watch"}</span>
                     </div>
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* ── Trade History ──────────────────────────────────────────── */}
+            <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <div className="text-white/40 text-[11px] uppercase tracking-[0.25em]">Trade History</div>
+                  <div className="text-white font-bold text-xl">
+                    {analyticsAccountId === "all" ? "All Accounts" : selectedAccount.accountCode || "This Account"}
+                    {" "}<span className="text-white/40 font-normal text-sm">({tradeLogs.length} trades)</span>
+                  </div>
+                </div>
+              </div>
+              {!hasTradeData ? (
+                <div className="py-12 text-center">
+                  <Activity size={32} className="text-white/20 mx-auto mb-3"/>
+                  <div className="text-white/40 text-sm">No trades recorded yet for this account.</div>
+                  <div className="text-white/30 text-xs mt-1">Trades appear here after closing a position in the Terminal.</div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left border-separate border-spacing-y-2">
+                    <thead>
+                      <tr className="text-white/40 text-[11px] uppercase tracking-[0.25em]">
+                        <th className="px-4 py-2">Symbol</th>
+                        <th className="px-4 py-2">P&L</th>
+                        <th className="px-4 py-2">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...tradeLogs]
+                        .sort((a,b)=>new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime())
+                        .slice(0,50)
+                        .map((t,idx)=>(
+                          <tr key={idx} className="bg-white/5">
+                            <td className="px-4 py-3 text-white font-semibold text-sm rounded-l-xl">{t.symbol||"—"}</td>
+                            <td className={`px-4 py-3 font-bold text-sm ${t.pnl>=0?"text-green-400":"text-red-400"}`}>
+                              {t.pnl>=0?"+":""}₹{Math.abs(t.pnl).toLocaleString("en-IN")}
+                            </td>
+                            <td className="px-4 py-3 text-white/50 text-xs rounded-r-xl">
+                              {new Date(t.createdAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                  {tradeLogs.length > 50 && (
+                    <div className="text-center text-white/40 text-xs mt-3">Showing 50 of {tradeLogs.length} trades</div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         );
