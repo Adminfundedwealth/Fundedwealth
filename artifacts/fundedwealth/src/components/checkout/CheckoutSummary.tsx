@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import { PlanConfig } from "../../config/checkout";
 
 interface CheckoutSummaryProps {
@@ -94,6 +95,20 @@ export const CheckoutSummary = ({
             <span className="text-white font-bold">{row.value}</span>
           </div>
         ))}
+      </div>
+    </div>
+
+    {/* Compliance Disclosure */}
+    <div className="mt-4 border-t border-yellow-500/20 pt-4 flex items-start gap-2">
+      <FileText size={14} className="text-yellow-400 mt-0.5 shrink-0" />
+      <div className="text-[11px] leading-relaxed text-white/60">
+        <span className="text-yellow-400 font-semibold block mb-1">Compliance Disclosure</span>
+        All Instant Funding accounts are{" "}
+        <span className="font-semibold text-white/80">simulated funded accounts</span>. No real capital is at risk. Profits are paid from the firm's revenue pool based on your simulated trading performance.{" "}
+        KYC verification and e-Sign are mandatory before account activation. By purchasing, you agree to the firm's{" "}
+        <a href="/terms" className="text-yellow-400 underline underline-offset-2 hover:text-yellow-300">Terms of Service</a>{" "}
+        and{" "}
+        <a href="/trading-rules" className="text-yellow-400 underline underline-offset-2 hover:text-yellow-300">Trading Rules</a>.
       </div>
     </div>
   </div>
