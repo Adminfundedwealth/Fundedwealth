@@ -19,11 +19,11 @@ router.get("/me", async (req, res) => {
   // First try by Supabase ID (clerkId column stores the auth provider's user ID)
   let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId));
 
-  // If not found by ID, try linking by email (migration from Clerk → Supabase)
-  if (!user && auth.email) {
+  // Link by email when: not found at all, OR has a stale placeholder clerkId
+  const needsLink = !user || user.clerkId?.startsWith("supabase_pending_") || user.clerkId?.startsWith("guest_");
+  if (needsLink && auth.email) {
     const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email));
     if (byEmail) {
-      // Auto-link: update the old Clerk ID to new Supabase ID
       try {
         const updated = await db
           .update(users)
@@ -51,12 +51,12 @@ router.post("/me", async (req, res) => {
   // Try to find by Supabase ID first
   let [existing] = await db.select().from(users).where(eq(users.clerkId, auth.userId));
 
-  // If not found, try linking by email (Clerk → Supabase migration)
-  if (!existing && (email || auth.email)) {
+  // Link by email when: not found at all, OR has a stale placeholder clerkId
+  const existingNeedsLink = !existing || existing.clerkId?.startsWith("supabase_pending_") || existing.clerkId?.startsWith("guest_");
+  if (existingNeedsLink && (email || auth.email)) {
     const lookupEmail = email || auth.email;
     const [byEmail] = await db.select().from(users).where(eq(users.email, lookupEmail));
     if (byEmail) {
-      // Auto-link existing user to new Supabase ID
       try {
         const updated = await db
           .update(users)

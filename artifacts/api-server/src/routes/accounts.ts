@@ -52,22 +52,25 @@ router.get("/my", async (req: Request, res: Response) => {
       .where(eq(users.clerkId, auth.userId))
       .limit(1);
 
-    // Auto-link by email if not found (handles Clerk → Supabase migration and new browser sessions)
-    if (!user && auth.email) {
+    // Auto-link by email when:
+    //   a) No row found by clerkId at all, OR
+    //   b) Row has a stale placeholder clerkId (supabase_pending_* or guest_*)
+    //      meaning the real Supabase auth UUID was never written back.
+    // This covers 100+ users whose clerk_id was never updated after registration.
+    const needsLink = !user || user.clerkId?.startsWith("supabase_pending_") || user.clerkId?.startsWith("guest_");
+    if (needsLink && auth.email) {
       const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
       if (byEmail) {
-        // Attempt to write the new auth ID. If the row was already updated concurrently
-        // (RETURNING yields 0 rows), fall back to re-reading the row directly so we
-        // always have a valid user object.
+        // Write the real Supabase auth UUID. If RETURNING yields 0 rows (concurrent
+        // update) or throws (unique constraint), fall back to the row we already found.
         try {
           const updated = await db
             .update(users)
             .set({ clerkId: auth.userId, updatedAt: new Date() })
             .where(eq(users.id, byEmail.id))
             .returning();
-          user = updated[0] ?? byEmail; // Use byEmail as fallback if RETURNING is empty
+          user = updated[0] ?? byEmail;
         } catch (linkErr: any) {
-          // Unique constraint violation or other DB error — the row exists, just use it
           console.warn("[Accounts/my] clerkId link failed (non-fatal):", {
             message: linkErr?.message || String(linkErr),
             userId: byEmail.id,
