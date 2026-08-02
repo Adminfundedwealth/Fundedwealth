@@ -52,17 +52,14 @@ router.get("/my", async (req: Request, res: Response) => {
       .where(eq(users.clerkId, auth.userId))
       .limit(1);
 
-    // Auto-link by email when:
-    //   a) No row found by clerkId at all, OR
-    //   b) Row has a stale placeholder clerkId (supabase_pending_* or guest_*)
-    //      meaning the real Supabase auth UUID was never written back.
-    // This covers 100+ users whose clerk_id was never updated after registration.
-    const needsLink = !user || user.clerkId?.startsWith("supabase_pending_") || user.clerkId?.startsWith("guest_");
+    // Auto-link by email when the stored clerkId doesn't match the current Supabase auth UUID.
+    // Covers ALL cases: no row, supabase_pending_*, guest_*, AND old Clerk IDs (user_xxxxx).
+    // A valid Supabase UUID matches: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    const isCurrentSupabaseId = user?.clerkId === auth.userId;
+    const needsLink = !user || !isCurrentSupabaseId;
     if (needsLink && auth.email) {
       const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
       if (byEmail) {
-        // Write the real Supabase auth UUID. If RETURNING yields 0 rows (concurrent
-        // update) or throws (unique constraint), fall back to the row we already found.
         try {
           const updated = await db
             .update(users)

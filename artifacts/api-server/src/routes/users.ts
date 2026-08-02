@@ -19,8 +19,9 @@ router.get("/me", async (req, res) => {
   // First try by Supabase ID (clerkId column stores the auth provider's user ID)
   let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId));
 
-  // Link by email when: not found at all, OR has a stale placeholder clerkId
-  const needsLink = !user || user.clerkId?.startsWith("supabase_pending_") || user.clerkId?.startsWith("guest_");
+  // Link by email when: not found at all, OR has a stale placeholder clerkId,
+  // OR has an old Clerk ID that doesn't match the current Supabase auth userId.
+  const needsLink = !user || user.clerkId !== auth.userId;
   if (needsLink && auth.email) {
     const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email));
     if (byEmail) {
@@ -51,8 +52,8 @@ router.post("/me", async (req, res) => {
   // Try to find by Supabase ID first
   let [existing] = await db.select().from(users).where(eq(users.clerkId, auth.userId));
 
-  // Link by email when: not found at all, OR has a stale placeholder clerkId
-  const existingNeedsLink = !existing || existing.clerkId?.startsWith("supabase_pending_") || existing.clerkId?.startsWith("guest_");
+  // Link by email when: not found at all, OR has any non-matching clerkId
+  const existingNeedsLink = !existing || existing.clerkId !== auth.userId;
   if (existingNeedsLink && (email || auth.email)) {
     const lookupEmail = email || auth.email;
     const [byEmail] = await db.select().from(users).where(eq(users.email, lookupEmail));
