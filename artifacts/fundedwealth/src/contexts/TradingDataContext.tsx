@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { useAuth } from "./SupabaseAuthContext";
 
 /**
@@ -206,6 +206,11 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDemo, setIsDemo] = useState(false);
+  // Keep a stable ref to getToken so it doesn't cause fetchAccounts to re-create
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
+  // Guard against concurrent fetches racing
+  const fetchingRef = useRef(false);
 
   const fetchAccounts = useCallback(async () => {
     if (!isSignedIn) {
@@ -213,12 +218,15 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
+    // Prevent concurrent fetches
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
 
     setLoading(true);
     setError(null);
 
     try {
-      const token = await getToken();
+      const token = await getTokenRef.current();
       const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
       const res = await fetch(`${apiBase}/api/accounts/my`, {
         headers: {
@@ -229,8 +237,8 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
 
       if (!res.ok) {
         if (res.status === 404) {
-          // Only clear accounts if we've never loaded any — don't wipe on transient 404
-          // (the user lookup can transiently fail during auth token refresh)
+          // Only reset to empty if we haven't loaded accounts yet —
+          // never wipe already-loaded accounts on a transient 404
           setProfile(prev => prev.accounts.length > 0 ? prev : defaultProfile);
         } else {
           throw new Error(`Failed to fetch accounts: ${res.status}`);
@@ -240,24 +248,20 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
         const accounts: TradingAccount[] = data.accounts || [];
         const dashAccounts = accounts.map(mapApiAccountToDashboard);
 
-        setProfile({
+        setProfile(prev => ({
+          ...prev,
           accounts: dashAccounts,
-          totalPayout: 0,   // fetched separately from user profile
-          referralCode: "",
-          referralCount: 0,
-          couponCode: "",
-          payouts: [],
-          impact: { mealsSupported: 0, studentsSupported: 0, totalDonated: 0, badge: "none", donations: [] },
-        });
+        }));
       }
     } catch (err: any) {
       console.error("[TradingData] Failed to fetch accounts:", err);
       setError(err.message || "Failed to load trading data");
-      // Don't clear profile on transient errors
+      // Never clear profile on errors
     } finally {
       setLoading(false);
+      fetchingRef.current = false;
     }
-  }, [isSignedIn, getToken]);
+  }, [isSignedIn]);
 
   // Fetch user profile metadata (totalPayout, referralCode)
   useEffect(() => {
