@@ -112,16 +112,31 @@ export async function provisionChallenge(
   } = input;
 
   // ── 1. Insert provisioning_logs row ────────────────────────────────────────
-  // order_id is nullable — emergency provisions have no real order row, so we
-  // pass NULL rather than generating a fake ID that would violate the FK constraint.
-  const provResult = await db.execute(sql`
-    INSERT INTO provisioning_logs
-      (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
-    VALUES
-      (${orderId ?? null}, ${planType}, ${paymentMethod}, ${paymentRef},
-       ${source}, 'processing', now(), now())
-    RETURNING id
-  `);
+  // order_id is nullable — emergency provisions have no real order row.
+  // Must pass explicit SQL NULL (not empty string) to avoid FK constraint violation.
+  const cleanOrderId = (typeof orderId === "string" && orderId.trim().length > 0)
+    ? orderId.trim()
+    : null;
+
+  const provResult = await db.execute(
+    cleanOrderId
+      ? sql`
+          INSERT INTO provisioning_logs
+            (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
+          VALUES
+            (${cleanOrderId}, ${planType}, ${paymentMethod}, ${paymentRef},
+             ${source}, 'processing', now(), now())
+          RETURNING id
+        `
+      : sql`
+          INSERT INTO provisioning_logs
+            (plan, payment_method, payment_ref, source, status, started_at, created_at)
+          VALUES
+            (${planType}, ${paymentMethod}, ${paymentRef},
+             ${source}, 'processing', now(), now())
+          RETURNING id
+        `
+  );
   const provId = (provResult.rows[0] as any).id as string;
 
   // ── 2. Resolve user id + account size ──────────────────────────────────────
