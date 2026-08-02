@@ -1,4 +1,4 @@
-import { randomUUID, createHmac } from "crypto";
+import { createHmac } from "crypto";
 import { db, orders } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import {
@@ -112,12 +112,13 @@ export async function provisionChallenge(
   } = input;
 
   // ── 1. Insert provisioning_logs row ────────────────────────────────────────
-  const logOrderRef = orderId ?? `emergency-${randomUUID()}`;
+  // order_id is nullable — emergency provisions have no real order row, so we
+  // pass NULL rather than generating a fake ID that would violate the FK constraint.
   const provResult = await db.execute(sql`
     INSERT INTO provisioning_logs
       (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
     VALUES
-      (${logOrderRef}, ${planType}, ${paymentMethod}, ${paymentRef},
+      (${orderId ?? null}, ${planType}, ${paymentMethod}, ${paymentRef},
        ${source}, 'processing', now(), now())
     RETURNING id
   `);
@@ -177,9 +178,33 @@ export async function provisionChallenge(
   // activationToken is generated after tradingAccountId is known (step 7)
 
   // ── 6. Get or create terminal_traders ──────────────────────────────────────
-  const existingTrader = await db.execute(sql`
+  // Look up by external_id first, then fall back to email — handles cases where
+  // a prior provision used a different external_id (e.g. old Clerk ID) for this user.
+  let existingTrader = await db.execute(sql`
     SELECT id FROM terminal_traders WHERE external_id = ${String(userId)} LIMIT 1
   `);
+
+  // Fallback: find by email and re-link external_id to the current users.id
+  if (!existingTrader.rows || existingTrader.rows.length === 0) {
+    const traderByEmail = await db.execute(sql`
+      SELECT id, external_id FROM terminal_traders WHERE email = ${user.email} LIMIT 1
+    `);
+    if (traderByEmail.rows && traderByEmail.rows.length > 0) {
+      const row = traderByEmail.rows[0] as any;
+      // Only update if external_id is different — avoids unique constraint violation
+      if (row.external_id !== String(userId)) {
+        await db.execute(sql`
+          UPDATE terminal_traders SET external_id = ${String(userId)}, updated_at = now()
+          WHERE id = ${row.id}::uuid
+        `).catch(() => { /* concurrent update — re-read below */ });
+      }
+      // Re-read after potential update
+      existingTrader = await db.execute(sql`
+        SELECT id FROM terminal_traders WHERE external_id = ${String(userId)} LIMIT 1
+      `);
+    }
+  }
+
   let traderId: string;
   if (existingTrader.rows && existingTrader.rows.length > 0) {
     traderId = (existingTrader.rows[0] as any).id;
@@ -188,6 +213,7 @@ export async function provisionChallenge(
     const traderInsert = await db.execute(sql`
       INSERT INTO terminal_traders (external_id, email, display_name, plan, status, created_at, updated_at)
       VALUES (${String(userId)}, ${user.email}, ${displayName}, ${planType}, 'active', now(), now())
+      ON CONFLICT (external_id) DO UPDATE SET email = EXCLUDED.email, updated_at = now()
       RETURNING id
     `);
     traderId = (traderInsert.rows[0] as any).id;
