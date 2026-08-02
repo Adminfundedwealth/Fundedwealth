@@ -9,17 +9,25 @@ export async function resolveTerminalLaunchUser({
     return null;
   }
 
-  let user = await lookupByClerkId(authUserId);
+  // Wrap every DB call — any transient error must not abort the launch
+  let user = null;
+  try {
+    user = await lookupByClerkId(authUserId);
+  } catch (e) {
+    console.warn("[resolveTerminalLaunchUser] lookupByClerkId failed:", e?.message || String(e));
+  }
 
   if (!user && authEmail) {
-    user = await lookupByEmail(authEmail);
+    try {
+      user = await lookupByEmail(authEmail);
+    } catch (e) {
+      console.warn("[resolveTerminalLaunchUser] lookupByEmail failed:", e?.message || String(e));
+    }
   }
 
   // If the user row exists but isn't linked to this auth ID yet, attempt to
-  // link it. A unique-constraint conflict (another row already holds this
-  // authUserId) or any other transient DB error must NOT abort the launch —
-  // the user is still authenticated and identified, so we continue with the
-  // row we already found.
+  // link it. A unique-constraint conflict or any other DB error must NOT
+  // abort the launch — the user is identified, just continue.
   if (user && authUserId && (!user.clerkId || user.clerkId !== authUserId)) {
     try {
       await linkUserToAuth(user);
@@ -29,7 +37,6 @@ export async function resolveTerminalLaunchUser({
         userId: user.id,
         authUserId,
       });
-      // Continue — user is resolved, link failure is non-fatal
     }
   }
 
