@@ -201,7 +201,7 @@ function mapApiAccountToDashboard(acc: TradingAccount): DashboardAccount {
 }
 
 export function TradingDataProvider({ children }: { children: ReactNode }) {
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn, isLoaded, getToken } = useAuth();
   const [profile, setProfile] = useState<TradingProfile>(defaultProfile);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -211,6 +211,8 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
   getTokenRef.current = getToken;
   // Guard against concurrent fetches racing
   const fetchingRef = useRef(false);
+  // Debounce timer ref
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchAccounts = useCallback(async () => {
     if (!isSignedIn) {
@@ -293,8 +295,18 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
   }, [isSignedIn, getToken]);
 
   useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
+    // Wait until Supabase auth is fully initialized before fetching
+    if (!isLoaded) return;
+    // Debounce: wait 300ms after the last isSignedIn change to avoid firing
+    // during the INITIAL_SESSION → SIGNED_IN auth state sequence
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchAccounts();
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [fetchAccounts, isLoaded]);
 
   // Demo data loader disabled - all accounts must come from real provisioning
   const loadDemoData = useCallback(() => {
