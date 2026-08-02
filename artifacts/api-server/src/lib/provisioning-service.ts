@@ -1,4 +1,4 @@
-import { createHmac } from "crypto";
+import { randomUUID, createHmac } from "crypto";
 import { db, orders } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import {
@@ -112,31 +112,17 @@ export async function provisionChallenge(
   } = input;
 
   // ── 1. Insert provisioning_logs row ────────────────────────────────────────
-  // order_id is nullable — emergency provisions have no real order row.
-  // Must pass explicit SQL NULL (not empty string) to avoid FK constraint violation.
-  const cleanOrderId = (typeof orderId === "string" && orderId.trim().length > 0)
-    ? orderId.trim()
-    : null;
-
-  const provResult = await db.execute(
-    cleanOrderId
-      ? sql`
-          INSERT INTO provisioning_logs
-            (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
-          VALUES
-            (${cleanOrderId}, ${planType}, ${paymentMethod}, ${paymentRef},
-             ${source}, 'processing', now(), now())
-          RETURNING id
-        `
-      : sql`
-          INSERT INTO provisioning_logs
-            (plan, payment_method, payment_ref, source, status, started_at, created_at)
-          VALUES
-            (${planType}, ${paymentMethod}, ${paymentRef},
-             ${source}, 'processing', now(), now())
-          RETURNING id
-        `
-  );
+  // Use a fake reference for emergency provisions (no real order row).
+  // The FK constraint is dropped so any string is accepted.
+  const logOrderRef = orderId ?? `emergency-${randomUUID()}`;
+  const provResult = await db.execute(sql`
+    INSERT INTO provisioning_logs
+      (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
+    VALUES
+      (${logOrderRef}, ${planType}, ${paymentMethod}, ${paymentRef},
+       ${source}, 'processing', now(), now())
+    RETURNING id
+  `);
   const provId = (provResult.rows[0] as any).id as string;
 
   // ── 2. Resolve user id + account size ──────────────────────────────────────
@@ -166,7 +152,7 @@ export async function provisionChallenge(
 
   // ── 3. Load user ────────────────────────────────────────────────────────────
   const userResult = await db.execute(sql`
-    SELECT id, first_name, last_name, email FROM users WHERE id = ${userId} LIMIT 1
+    SELECT id, first_name, last_name, email FROM users WHERE id = ${userId}::uuid LIMIT 1
   `);
   const user = (userResult.rows as any[])[0];
   if (!user) throw new Error(`User ${userId} not found during provisioning`);
