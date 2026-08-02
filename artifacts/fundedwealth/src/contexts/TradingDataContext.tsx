@@ -229,8 +229,9 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
 
       if (!res.ok) {
         if (res.status === 404) {
-          // User exists but has no accounts yet
-          setProfile(defaultProfile);
+          // Only clear accounts if we've never loaded any — don't wipe on transient 404
+          // (the user lookup can transiently fail during auth token refresh)
+          setProfile(prev => prev.accounts.length > 0 ? prev : defaultProfile);
         } else {
           throw new Error(`Failed to fetch accounts: ${res.status}`);
         }

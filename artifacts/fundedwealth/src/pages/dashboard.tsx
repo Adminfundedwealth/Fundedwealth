@@ -1675,10 +1675,10 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           </div>
 
           {/* All provisioned accounts with Launch Terminal */}
-          {profile.accounts.filter(a => !a.status.startsWith("provisioning")).length > 0 ? (
+          {profile.accounts.filter(a => a.status !== "provisioning_pending" && a.status !== "provisioning_failed").length > 0 ? (
             <div className="space-y-4">
               {profile.accounts
-                .filter(a => !a.status.startsWith("provisioning"))
+                .filter(a => a.status !== "provisioning_pending" && a.status !== "provisioning_failed")
                 .map(acc => (
                   <LaunchTerminalCard key={acc.id} acc={acc} />
                 ))}
