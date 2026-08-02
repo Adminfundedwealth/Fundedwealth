@@ -166,7 +166,7 @@ export async function provisionChallenge(
 
   // ── 3. Load user ────────────────────────────────────────────────────────────
   const userResult = await db.execute(sql`
-    SELECT id, first_name, last_name, email FROM users WHERE id = ${userId}::uuid LIMIT 1
+    SELECT id, first_name, last_name, email FROM users WHERE id = ${userId} LIMIT 1
   `);
   const user = (userResult.rows as any[])[0];
   if (!user) throw new Error(`User ${userId} not found during provisioning`);
