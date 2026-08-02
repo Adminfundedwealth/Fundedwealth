@@ -188,24 +188,15 @@ router.get("/my", async (req: Request, res: Response) => {
           tradingAccountIds.map(id => sql`${id}::uuid`),
           sql`, `
         );
+        // NOTE: trade_logs table may not exist in all environments.
+        // Use session_analytics only (always present) to avoid parse-time errors.
         const batchStats = await db.execute(sql`
           SELECT
             ta.id AS trading_account_id,
-            COALESCE(tl_agg.total_trades, sa_agg.total_trades, 0)  AS total_trades,
-            COALESCE(tl_agg.win_rate,     sa_agg.avg_win_rate, 0)  AS avg_win_rate,
-            COALESCE(tl_agg.trading_days, sa_agg.trading_days, 0)  AS trading_days
+            COALESCE(sa_agg.total_trades, 0)   AS total_trades,
+            COALESCE(sa_agg.avg_win_rate, 0)   AS avg_win_rate,
+            COALESCE(sa_agg.trading_days, 0)   AS trading_days
           FROM trading_accounts ta
-          LEFT JOIN LATERAL (
-            SELECT
-              COUNT(*)::int                                                     AS total_trades,
-              CASE WHEN COUNT(*) > 0
-                THEN ROUND(COUNT(*) FILTER (WHERE pnl > 0)::numeric / COUNT(*) * 100, 2)
-                ELSE 0
-              END                                                               AS win_rate,
-              COUNT(DISTINCT DATE(exited_at))::int                             AS trading_days
-            FROM trade_logs
-            WHERE trading_account_id = ta.id
-          ) tl_agg ON true
           LEFT JOIN LATERAL (
             SELECT
               COALESCE(SUM(sa.trades), 0)::int       AS total_trades,
