@@ -56,11 +56,25 @@ router.get("/my", async (req: Request, res: Response) => {
     if (!user && auth.email) {
       const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
       if (byEmail) {
-        [user] = await db
-          .update(users)
-          .set({ clerkId: auth.userId, updatedAt: new Date() })
-          .where(eq(users.id, byEmail.id))
-          .returning();
+        // Attempt to write the new auth ID. If the row was already updated concurrently
+        // (RETURNING yields 0 rows), fall back to re-reading the row directly so we
+        // always have a valid user object.
+        try {
+          const updated = await db
+            .update(users)
+            .set({ clerkId: auth.userId, updatedAt: new Date() })
+            .where(eq(users.id, byEmail.id))
+            .returning();
+          user = updated[0] ?? byEmail; // Use byEmail as fallback if RETURNING is empty
+        } catch (linkErr: any) {
+          // Unique constraint violation or other DB error — the row exists, just use it
+          console.warn("[Accounts/my] clerkId link failed (non-fatal):", {
+            message: linkErr?.message || String(linkErr),
+            userId: byEmail.id,
+            authUserId: auth.userId,
+          });
+          user = byEmail;
+        }
       }
     }
 

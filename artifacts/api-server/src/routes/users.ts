@@ -24,11 +24,16 @@ router.get("/me", async (req, res) => {
     const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email));
     if (byEmail) {
       // Auto-link: update the old Clerk ID to new Supabase ID
-      [user] = await db
-        .update(users)
-        .set({ clerkId: auth.userId, updatedAt: new Date() })
-        .where(eq(users.id, byEmail.id))
-        .returning();
+      try {
+        const updated = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
+        user = updated[0] ?? byEmail;
+      } catch {
+        user = byEmail;
+      }
     }
   }
 
@@ -52,11 +57,16 @@ router.post("/me", async (req, res) => {
     const [byEmail] = await db.select().from(users).where(eq(users.email, lookupEmail));
     if (byEmail) {
       // Auto-link existing user to new Supabase ID
-      [existing] = await db
-        .update(users)
-        .set({ clerkId: auth.userId, updatedAt: new Date() })
-        .where(eq(users.id, byEmail.id))
-        .returning();
+      try {
+        const updated = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
+        existing = updated[0] ?? byEmail;
+      } catch {
+        existing = byEmail;
+      }
     }
   }
 
