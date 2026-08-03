@@ -195,10 +195,13 @@ export async function provisionChallenge(
     const firstName = nameParts[0] || 'Trader';
     const lastName = nameParts[1] || null;
     const affiliateCode = `FW${randomUUID().slice(-6).toUpperCase()}`;
+    // clerk_id is NOT NULL — use a unique placeholder so the insert succeeds.
+    // It will be overwritten with the real Supabase auth ID when the user logs in.
+    const placeholderClerkId = `provisioned_${randomUUID()}`;
     try {
       const created = await db.execute(sql`
-        INSERT INTO users (email, first_name, last_name, affiliate_code, created_at, updated_at)
-        VALUES (${input.email.toLowerCase()}, ${firstName}, ${lastName}, ${affiliateCode}, now(), now())
+        INSERT INTO users (clerk_id, email, first_name, last_name, affiliate_code, created_at, updated_at)
+        VALUES (${placeholderClerkId}, ${input.email.toLowerCase()}, ${firstName}, ${lastName}, ${affiliateCode}, now(), now())
         ON CONFLICT (email) DO UPDATE SET updated_at = now()
         RETURNING id, first_name, last_name, email
       `);
