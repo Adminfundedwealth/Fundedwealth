@@ -79,7 +79,32 @@ router.get("/my", async (req: Request, res: Response) => {
     }
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      // Auto-create user row for users who authenticated via Supabase Auth directly
+      // (admin-provisioned, invited) but whose public.users row was never created.
+      if (auth.email) {
+        try {
+          const affiliateCode = `FW${auth.userId.slice(-6).toUpperCase()}`;
+          const emailParts = auth.email.split('@')[0].split('.');
+          const [inserted] = await db
+            .insert(users)
+            .values({
+              clerkId: auth.userId,
+              email: auth.email,
+              firstName: emailParts[0] || null,
+              lastName: emailParts[1] || null,
+              affiliateCode,
+            })
+            .returning();
+          user = inserted;
+        } catch {
+          // Concurrent insert — re-read
+          const [refetch] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
+          user = refetch;
+        }
+      }
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
     }
 
     // 2. Resolve the user's terminal trader identity.
