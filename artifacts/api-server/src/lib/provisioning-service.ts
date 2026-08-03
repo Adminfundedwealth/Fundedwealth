@@ -22,7 +22,7 @@ export interface ProvisionChallengeInput {
 }
 
 export interface ProvisionChallengeResult {
-  provisioningLogId: string;
+  provisioningLogId: string | null;
   traderId: string;
   challengeAccountId: string;
   tradingAccountId: string;
@@ -112,18 +112,32 @@ export async function provisionChallenge(
   } = input;
 
   // ── 1. Insert provisioning_logs row ────────────────────────────────────────
-  // For emergency provisions without a real order, pass NULL for order_id.
-  // The migration 20260802_provisioning_logs_nullable_order_id.sql makes this column
-  // nullable. If that migration hasn't run yet, the INSERT will fail — run it first.
-  const provResult = await db.execute(sql`
-    INSERT INTO provisioning_logs
-      (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
-    VALUES
-      (${orderId ?? null}, ${planType}, ${paymentMethod}, ${paymentRef},
-       ${source}, 'processing', now(), now())
-    RETURNING id
-  `);
-  const provId = (provResult.rows[0] as any).id as string;
+  // For emergency provisions without a real order, we try to insert a log row
+  // but skip it gracefully if the DB constraint still rejects it.
+  // The Terminal poller only processes 'pending' rows — this is 'processing',
+  // so skipping the log row doesn't affect account creation.
+  let provId: string | null = null;
+  try {
+    const provResult = await db.execute(sql`
+      INSERT INTO provisioning_logs
+        (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
+      VALUES
+        (${orderId ?? null}, ${planType}, ${paymentMethod}, ${paymentRef},
+         ${source}, 'processing', now(), now())
+      RETURNING id
+    `);
+    provId = (provResult.rows[0] as any).id as string;
+  } catch (insertErr: any) {
+    const pgMsg = insertErr?.cause?.message || insertErr?.message || String(insertErr);
+    // For emergency provisions (no real orderId), log the error but continue.
+    // The account will still be created — audit trail is in challenge_accounts/trading_accounts.
+    if (source === 'founder_emergency' || !orderId) {
+      console.warn(`[Provisioning] provisioning_logs INSERT skipped (non-fatal for emergency): ${pgMsg}`);
+      provId = null;
+    } else {
+      throw new Error(`provisioning_logs INSERT failed: ${pgMsg}`);
+    }
+  }
 
   // ── 2. Resolve user id + account size ──────────────────────────────────────
   let userId    = input.userId ?? null;
@@ -265,16 +279,18 @@ export async function provisionChallenge(
   // ── 9. Generate activation token now that we have tradingAccountId ──────────
   const activationToken = generateActivationToken(tradingAccountId, terminalEmail);
 
-  // ── 10. Update provisioning_logs → completed ────────────────────────────────
-  await db.execute(sql`
-    UPDATE provisioning_logs
-    SET status                = 'completed',
-        trader_id             = ${traderId}::uuid,
-        challenge_account_id  = ${challengeAccountId}::uuid,
-        trading_account_id    = ${tradingAccountId}::uuid,
-        completed_at          = now()
-    WHERE id = ${provId}::uuid
-  `);
+  // ── 10. Update provisioning_logs → completed (only if log row was created) ──
+  if (provId) {
+    await db.execute(sql`
+      UPDATE provisioning_logs
+      SET status                = 'completed',
+          trader_id             = ${traderId}::uuid,
+          challenge_account_id  = ${challengeAccountId}::uuid,
+          trading_account_id    = ${tradingAccountId}::uuid,
+          completed_at          = now()
+      WHERE id = ${provId}::uuid
+    `);
+  }
 
   // ── 11. Confirm order + store ALL credentials in metadata ───────────────────
   // loginEmail, accountCode, terminalPassword, activationToken all stored here.
