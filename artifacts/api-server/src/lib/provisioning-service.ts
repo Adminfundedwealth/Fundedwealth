@@ -112,14 +112,14 @@ export async function provisionChallenge(
   } = input;
 
   // ── 1. Insert provisioning_logs row ────────────────────────────────────────
-  // Use a fake reference for emergency provisions (no real order row).
-  // The FK constraint is dropped so any string is accepted.
-  const logOrderRef = orderId ?? `emergency-${randomUUID()}`;
+  // For emergency provisions without a real order, pass NULL for order_id.
+  // The migration 20260802_provisioning_logs_nullable_order_id.sql makes this column
+  // nullable. If that migration hasn't run yet, the INSERT will fail — run it first.
   const provResult = await db.execute(sql`
     INSERT INTO provisioning_logs
       (order_id, plan, payment_method, payment_ref, source, status, started_at, created_at)
     VALUES
-      (${logOrderRef}, ${planType}, ${paymentMethod}, ${paymentRef},
+      (${orderId ?? null}, ${planType}, ${paymentMethod}, ${paymentRef},
        ${source}, 'processing', now(), now())
     RETURNING id
   `);
