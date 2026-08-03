@@ -165,24 +165,33 @@ export async function provisionChallenge(
   if (!userId)      throw new Error("provisionChallenge requires a userId (directly or via orderId)");
   if (!accountSize) accountSize = resolveAccountSize(planType, 0) ?? 50000;
 
-  // ── 3. Load user — try by ID first, fall back to email, then auto-create ────
-  let userResult = await db.execute(sql`
-    SELECT id, first_name, last_name, email FROM users WHERE id = ${userId}::uuid LIMIT 1
-  `);
-  let user = (userResult.rows as any[])[0];
+  // ── 3. Load user — try by ID, email, then auto-create ─────────────────────
+  // Uses direct SQL with a short retry to handle replication lag when the
+  // admin app just created the user row milliseconds ago.
+  let user: any = null;
 
-  // Fallback 1: find by email
-  if (!user && input.email) {
-    const byEmail = await db.execute(sql`
-      SELECT id, first_name, last_name, email FROM users WHERE email = ${input.email.toLowerCase()} LIMIT 1
-    `);
-    user = (byEmail.rows as any[])[0];
-    if (user) userId = user.id;
+  const findUser = async (): Promise<any> => {
+    if (userId) {
+      const r = await db.execute(sql`SELECT id, first_name, last_name, email FROM users WHERE id = ${userId}::uuid LIMIT 1`).catch(() => ({ rows: [] }));
+      if ((r.rows as any[]).length > 0) return (r.rows as any[])[0];
+    }
+    if (input.email) {
+      const r = await db.execute(sql`SELECT id, first_name, last_name, email FROM users WHERE email = ${input.email.toLowerCase()} LIMIT 1`).catch(() => ({ rows: [] }));
+      if ((r.rows as any[]).length > 0) return (r.rows as any[])[0];
+    }
+    return null;
+  };
+
+  // Try immediately, then retry after 2s to handle replication lag
+  user = await findUser();
+  if (!user) {
+    await new Promise(r => setTimeout(r, 2000));
+    user = await findUser();
   }
 
-  // Fallback 2: auto-create the user row (for admin-provisioned users who haven't logged in yet)
+  // Auto-create if still not found (brand new user who hasn't logged in)
   if (!user && input.email) {
-    const nameParts = (input.email.split('@')[0]).split('.');
+    const nameParts = input.email.split('@')[0].split('.');
     const firstName = nameParts[0] || 'Trader';
     const lastName = nameParts[1] || null;
     const affiliateCode = `FW${randomUUID().slice(-6).toUpperCase()}`;
@@ -194,18 +203,13 @@ export async function provisionChallenge(
         RETURNING id, first_name, last_name, email
       `);
       user = (created.rows as any[])[0];
-      if (user) userId = user.id;
-    } catch (createErr: any) {
-      // Re-read in case of race condition
-      const refetch = await db.execute(sql`
-        SELECT id, first_name, last_name, email FROM users WHERE email = ${input.email.toLowerCase()} LIMIT 1
-      `);
-      user = (refetch.rows as any[])[0];
-      if (user) userId = user.id;
+    } catch {
+      user = await findUser();
     }
   }
 
-  if (!user) throw new Error(`User ${userId} not found and could not be created (email=${input.email ?? 'unknown'})`);
+  if (!user) throw new Error(`Cannot provision: user not found and could not be created for email=${input.email ?? userId}`);
+  userId = user.id;
 
   // ── 4. Risk settings directly from product catalog — NO hardcoding ─────────
   // getProvisioningRules reads PRODUCTS[planType].rules exactly as defined.
