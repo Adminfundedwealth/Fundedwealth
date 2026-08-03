@@ -83,13 +83,31 @@ router.get("/my", async (req: Request, res: Response) => {
     }
 
     // 2. Resolve the user's terminal trader identity.
-    //    terminal_traders.external_id = users.id is the AUTHORITATIVE ownership link
-    //    for every provisioned account. It is populated identically by website
-    //    checkout AND Founder/manual emergency provisioning, so anchoring discovery
-    //    here makes both paths produce the EXACT SAME dashboard result.
-    const traderRes = await db.execute(sql`
-      SELECT id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
+    //    PRIMARY: terminal_traders.external_id = users.id (UUID)
+    //    FALLBACK: match by email then repair external_id (handles accounts
+    //    provisioned before the fwUserId was passed, or manual/emergency provisions
+    //    where external_id was set to a generated ext_xxxxxxxx value)
+    let traderRes = await db.execute(sql`
+      SELECT id, external_id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
     `);
+
+    // Email fallback — find by email if UUID match fails
+    if (!traderRes.rows || traderRes.rows.length === 0) {
+      const emailFallback = await db.execute(sql`
+        SELECT id, external_id FROM terminal_traders WHERE email = ${String(user.email)} LIMIT 1
+      `);
+      if (emailFallback.rows && emailFallback.rows.length > 0) {
+        const traderRow = emailFallback.rows[0] as any;
+        // Repair the external_id to the correct users.id UUID so future lookups are fast
+        try {
+          await db.execute(sql`
+            UPDATE terminal_traders SET external_id = ${String(user.id)} WHERE id = ${traderRow.id}::uuid
+          `);
+        } catch { /* non-fatal — repair is best-effort */ }
+        traderRes = emailFallback;
+      }
+    }
+
     const traderId = (traderRes.rows as any[])[0]?.id ?? null;
 
     // 3. Pull every LIVE account for this trader straight from the terminal-owned
