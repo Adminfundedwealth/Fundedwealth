@@ -193,6 +193,7 @@ router.post("/emergency", allowInternalOrAdmin, async (req: Request, res: Respon
       planType: planType as PlanType,
       orderId: typeof orderId === "string" ? orderId : null,
       userId: resolvedUserId,
+      email: typeof email === "string" ? email.trim().toLowerCase() : null,
       sizeIndex,
       paymentMethod: "founder_emergency",
       paymentRef: typeof note === "string" && note.trim() ? note.trim() : "founder_emergency_provision",

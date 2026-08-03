@@ -13,6 +13,7 @@ export interface ProvisionChallengeInput {
   planType: PlanType;
   orderId?: string | null;
   userId?: string | null;
+  email?: string | null;
   sizeIndex?: number | null;
   accountSize?: number | null;
   paymentMethod: string;
@@ -164,12 +165,26 @@ export async function provisionChallenge(
   if (!userId)      throw new Error("provisionChallenge requires a userId (directly or via orderId)");
   if (!accountSize) accountSize = resolveAccountSize(planType, 0) ?? 50000;
 
-  // ── 3. Load user ────────────────────────────────────────────────────────────
-  const userResult = await db.execute(sql`
+  // ── 3. Load user — try by ID first, fall back to email ────────────────────
+  let userResult = await db.execute(sql`
     SELECT id, first_name, last_name, email FROM users WHERE id = ${userId}::uuid LIMIT 1
   `);
-  const user = (userResult.rows as any[])[0];
-  if (!user) throw new Error(`User ${userId} not found during provisioning`);
+  let user = (userResult.rows as any[])[0];
+
+  // Fallback: find by email if the userId row isn't visible yet (race condition
+  // when admin creates user and immediately calls provision)
+  if (!user && input.email) {
+    const byEmail = await db.execute(sql`
+      SELECT id, first_name, last_name, email FROM users WHERE email = ${input.email.toLowerCase()} LIMIT 1
+    `);
+    user = (byEmail.rows as any[])[0];
+    if (user) {
+      // Update userId to the actual DB id
+      userId = user.id;
+    }
+  }
+
+  if (!user) throw new Error(`User ${userId} not found during provisioning (email=${input.email ?? 'unknown'})`);
 
   // ── 4. Risk settings directly from product catalog — NO hardcoding ─────────
   // getProvisioningRules reads PRODUCTS[planType].rules exactly as defined.
