@@ -170,9 +170,20 @@ router.post("/emergency", allowInternalOrAdmin, async (req: Request, res: Respon
       return res.status(400).json({ success: false, error: "Invalid sizeIndex for the selected plan" });
     }
 
-    // Resolve the internal user id (directly, via email, or via the order)
-    let resolvedUserId: string | null = typeof userId === "string" ? userId : null;
+    // Resolve the internal user id — try UUID first, fall back to email
+    // This handles the race condition where admin just created the user row
+    // but the UUID isn't visible yet via the pooled DB connection.
+    let resolvedUserId: string | null = null;
 
+    // Try by userId UUID first (if provided)
+    if (typeof userId === "string" && userId.trim()) {
+      const byId = await db.execute(sql`
+        SELECT id FROM users WHERE id = ${userId.trim()}::uuid LIMIT 1
+      `).catch(() => ({ rows: [] }));
+      resolvedUserId = (byId.rows[0] as any)?.id ?? null;
+    }
+
+    // Fall back to email lookup (handles race condition + newly created users)
     if (!resolvedUserId && typeof email === "string" && email.trim()) {
       const userRows = await db.execute(sql`
         SELECT id FROM users WHERE email = ${email.trim().toLowerCase()} LIMIT 1
