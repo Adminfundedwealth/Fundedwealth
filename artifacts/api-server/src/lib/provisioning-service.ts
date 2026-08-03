@@ -165,26 +165,47 @@ export async function provisionChallenge(
   if (!userId)      throw new Error("provisionChallenge requires a userId (directly or via orderId)");
   if (!accountSize) accountSize = resolveAccountSize(planType, 0) ?? 50000;
 
-  // ── 3. Load user — try by ID first, fall back to email ────────────────────
+  // ── 3. Load user — try by ID first, fall back to email, then auto-create ────
   let userResult = await db.execute(sql`
     SELECT id, first_name, last_name, email FROM users WHERE id = ${userId}::uuid LIMIT 1
   `);
   let user = (userResult.rows as any[])[0];
 
-  // Fallback: find by email if the userId row isn't visible yet (race condition
-  // when admin creates user and immediately calls provision)
+  // Fallback 1: find by email
   if (!user && input.email) {
     const byEmail = await db.execute(sql`
       SELECT id, first_name, last_name, email FROM users WHERE email = ${input.email.toLowerCase()} LIMIT 1
     `);
     user = (byEmail.rows as any[])[0];
-    if (user) {
-      // Update userId to the actual DB id
-      userId = user.id;
+    if (user) userId = user.id;
+  }
+
+  // Fallback 2: auto-create the user row (for admin-provisioned users who haven't logged in yet)
+  if (!user && input.email) {
+    const nameParts = (input.email.split('@')[0]).split('.');
+    const firstName = nameParts[0] || 'Trader';
+    const lastName = nameParts[1] || null;
+    const affiliateCode = `FW${randomUUID().slice(-6).toUpperCase()}`;
+    try {
+      const created = await db.execute(sql`
+        INSERT INTO users (email, first_name, last_name, affiliate_code, created_at, updated_at)
+        VALUES (${input.email.toLowerCase()}, ${firstName}, ${lastName}, ${affiliateCode}, now(), now())
+        ON CONFLICT (email) DO UPDATE SET updated_at = now()
+        RETURNING id, first_name, last_name, email
+      `);
+      user = (created.rows as any[])[0];
+      if (user) userId = user.id;
+    } catch (createErr: any) {
+      // Re-read in case of race condition
+      const refetch = await db.execute(sql`
+        SELECT id, first_name, last_name, email FROM users WHERE email = ${input.email.toLowerCase()} LIMIT 1
+      `);
+      user = (refetch.rows as any[])[0];
+      if (user) userId = user.id;
     }
   }
 
-  if (!user) throw new Error(`User ${userId} not found during provisioning (email=${input.email ?? 'unknown'})`);
+  if (!user) throw new Error(`User ${userId} not found and could not be created (email=${input.email ?? 'unknown'})`);
 
   // ── 4. Risk settings directly from product catalog — NO hardcoding ─────────
   // getProvisioningRules reads PRODUCTS[planType].rules exactly as defined.
