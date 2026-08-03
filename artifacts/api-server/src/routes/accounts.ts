@@ -52,22 +52,22 @@ router.get("/my", async (req: Request, res: Response) => {
       .where(eq(users.clerkId, auth.userId))
       .limit(1);
 
-    // Auto-link by email when the stored clerkId doesn't match the current Supabase auth UUID.
-    // Covers ALL cases: no row, supabase_pending_*, guest_*, AND old Clerk IDs (user_xxxxx).
-    // A valid Supabase UUID matches: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-    const isCurrentSupabaseId = user?.clerkId === auth.userId;
-    const needsLink = !user || !isCurrentSupabaseId;
-    if (needsLink && auth.email) {
+    // Auto-link by email if not found (handles Clerk → Supabase migration and new browser sessions)
+    if (!user && auth.email) {
       const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
       if (byEmail) {
+        // Attempt to write the new auth ID. If the row was already updated concurrently
+        // (RETURNING yields 0 rows), fall back to re-reading the row directly so we
+        // always have a valid user object.
         try {
           const updated = await db
             .update(users)
             .set({ clerkId: auth.userId, updatedAt: new Date() })
             .where(eq(users.id, byEmail.id))
             .returning();
-          user = updated[0] ?? byEmail;
+          user = updated[0] ?? byEmail; // Use byEmail as fallback if RETURNING is empty
         } catch (linkErr: any) {
+          // Unique constraint violation or other DB error — the row exists, just use it
           console.warn("[Accounts/my] clerkId link failed (non-fatal):", {
             message: linkErr?.message || String(linkErr),
             userId: byEmail.id,
@@ -83,31 +83,13 @@ router.get("/my", async (req: Request, res: Response) => {
     }
 
     // 2. Resolve the user's terminal trader identity.
-    //    PRIMARY: terminal_traders.external_id = users.id (UUID)
-    //    FALLBACK: match by email then repair external_id (handles accounts
-    //    provisioned before the fwUserId was passed, or manual/emergency provisions
-    //    where external_id was set to a generated ext_xxxxxxxx value)
-    let traderRes = await db.execute(sql`
-      SELECT id, external_id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
+    //    terminal_traders.external_id = users.id is the AUTHORITATIVE ownership link
+    //    for every provisioned account. It is populated identically by website
+    //    checkout AND Founder/manual emergency provisioning, so anchoring discovery
+    //    here makes both paths produce the EXACT SAME dashboard result.
+    const traderRes = await db.execute(sql`
+      SELECT id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
     `);
-
-    // Email fallback — find by email if UUID match fails
-    if (!traderRes.rows || traderRes.rows.length === 0) {
-      const emailFallback = await db.execute(sql`
-        SELECT id, external_id FROM terminal_traders WHERE email = ${String(user.email)} LIMIT 1
-      `);
-      if (emailFallback.rows && emailFallback.rows.length > 0) {
-        const traderRow = emailFallback.rows[0] as any;
-        // Repair the external_id to the correct users.id UUID so future lookups are fast
-        try {
-          await db.execute(sql`
-            UPDATE terminal_traders SET external_id = ${String(user.id)} WHERE id = ${traderRow.id}::uuid
-          `);
-        } catch { /* non-fatal — repair is best-effort */ }
-        traderRes = emailFallback;
-      }
-    }
-
     const traderId = (traderRes.rows as any[])[0]?.id ?? null;
 
     // 3. Pull every LIVE account for this trader straight from the terminal-owned
@@ -203,15 +185,24 @@ router.get("/my", async (req: Request, res: Response) => {
           tradingAccountIds.map(id => sql`${id}::uuid`),
           sql`, `
         );
-        // NOTE: trade_logs table may not exist in all environments.
-        // Use session_analytics only (always present) to avoid parse-time errors.
         const batchStats = await db.execute(sql`
           SELECT
             ta.id AS trading_account_id,
-            COALESCE(sa_agg.total_trades, 0)   AS total_trades,
-            COALESCE(sa_agg.avg_win_rate, 0)   AS avg_win_rate,
-            COALESCE(sa_agg.trading_days, 0)   AS trading_days
+            COALESCE(tl_agg.total_trades, sa_agg.total_trades, 0)  AS total_trades,
+            COALESCE(tl_agg.win_rate,     sa_agg.avg_win_rate, 0)  AS avg_win_rate,
+            COALESCE(tl_agg.trading_days, sa_agg.trading_days, 0)  AS trading_days
           FROM trading_accounts ta
+          LEFT JOIN LATERAL (
+            SELECT
+              COUNT(*)::int                                                     AS total_trades,
+              CASE WHEN COUNT(*) > 0
+                THEN ROUND(COUNT(*) FILTER (WHERE pnl > 0)::numeric / COUNT(*) * 100, 2)
+                ELSE 0
+              END                                                               AS win_rate,
+              COUNT(DISTINCT DATE(exited_at))::int                             AS trading_days
+            FROM trade_logs
+            WHERE trading_account_id = ta.id
+          ) tl_agg ON true
           LEFT JOIN LATERAL (
             SELECT
               COALESCE(SUM(sa.trades), 0)::int       AS total_trades,
