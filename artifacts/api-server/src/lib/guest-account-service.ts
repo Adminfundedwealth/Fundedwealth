@@ -26,6 +26,7 @@ export interface BillingInfo {
   state?: string;
   zipcode?: string;
   address?: string;
+  country?: string;
 }
 
 export async function normalizeEmail(email: string | undefined): Promise<string | null> {
@@ -46,12 +47,44 @@ export async function getOrCreateUser(authUserId: string | undefined | null, bil
   const normalizedEmail = await normalizeEmail(billing?.email);
   if (authUserId) {
     const existing = await db.select().from(users).where(eq(users.clerkId, authUserId)).limit(1);
-    if (existing[0]) return existing[0];
+    if (existing[0]) {
+      // Update billing fields if provided
+      if (billing) {
+        await db.update(users).set({
+          ...(billing.firstName && { firstName: billing.firstName }),
+          ...(billing.lastName && { lastName: billing.lastName }),
+          ...(billing.phone && { phone: billing.phone }),
+          ...(billing.city && { city: billing.city }),
+          ...(billing.state && { state: billing.state }),
+          ...(billing.address && { addressLine1: billing.address }),
+          ...(billing.zipcode && { postalCode: billing.zipcode }),
+          ...(billing.country && { country: billing.country }),
+          updatedAt: new Date(),
+        }).where(eq(users.clerkId, authUserId));
+      }
+      return existing[0];
+    }
   }
 
   if (normalizedEmail) {
     const existingByEmail = await db.select().from(users).where(eq(users.email, normalizedEmail)).limit(1);
-    if (existingByEmail[0]) return existingByEmail[0];
+    if (existingByEmail[0]) {
+      // Update billing fields on existing user
+      if (billing) {
+        await db.update(users).set({
+          ...(billing.firstName && { firstName: billing.firstName }),
+          ...(billing.lastName && { lastName: billing.lastName }),
+          ...(billing.phone && { phone: billing.phone }),
+          ...(billing.city && { city: billing.city }),
+          ...(billing.state && { state: billing.state }),
+          ...(billing.address && { addressLine1: billing.address }),
+          ...(billing.zipcode && { postalCode: billing.zipcode }),
+          ...(billing.country && { country: billing.country }),
+          updatedAt: new Date(),
+        }).where(eq(users.email, normalizedEmail));
+      }
+      return existingByEmail[0];
+    }
   }
 
   if (!normalizedEmail) return null;
@@ -64,6 +97,9 @@ export async function getOrCreateUser(authUserId: string | undefined | null, bil
     phone: billing?.phone || "",
     city: billing?.city || "",
     state: billing?.state || "",
+    addressLine1: billing?.address || "",
+    postalCode: billing?.zipcode || "",
+    country: billing?.country || "",
     role: "user",
   }).returning();
 
