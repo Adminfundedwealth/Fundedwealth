@@ -386,7 +386,10 @@ export class MonitoringService {
       await db.execute(sql`SELECT 1`);
       return { healthy: true };
     } catch (error) {
-      return { healthy: false, error: error instanceof Error ? error.message : String(error) };
+      const msg = error instanceof Error ? error.message : String(error);
+      // Log full error so it appears in Railway logs for diagnosis
+      console.error("[DB Health] Connection failed:", msg);
+      return { healthy: false, error: msg };
     }
   }
 

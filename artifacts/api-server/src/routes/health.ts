@@ -12,7 +12,14 @@ router.get("/healthz", (_req, res) => {
 router.get("/health", async (_req, res) => {
   try {
     const health = await MonitoringService.getHealthSummary();
-    res.json({ status: "ok", ...health });
+    // Include DB host info (no password) to help diagnose connection issues
+    let dbHost = "unknown";
+    try {
+      const url = process.env.DATABASE_URL || "";
+      const match = url.match(/@([^/]+)/);
+      if (match) dbHost = match[1];
+    } catch {}
+    res.json({ status: "ok", ...health, dbHost });
   } catch (error) {
     res.status(500).json({ status: "failed", error: "Unable to fetch health summary" });
   }
