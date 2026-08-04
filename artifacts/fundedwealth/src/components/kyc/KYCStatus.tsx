@@ -11,12 +11,13 @@ import { useLocation } from "wouter";
 
 interface KYCProfile {
   id: number;
-  status: "NOT_STARTED" | "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED" | "RESUBMISSION_REQUIRED";
+  status: "NOT_STARTED" | "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED" | "RESUBMISSION_REQUIRED" | "ADDITIONAL_DOCS_REQUIRED";
   verificationLevel: number;
   submittedAt?: string;
   approvedAt?: string;
   expiresAt?: string;
   rejectionReason?: string;
+  reviewNotes?: string;
 }
 
 export default function KYCStatus() {
@@ -102,7 +103,12 @@ export default function KYCStatus() {
     RESUBMISSION_REQUIRED: {
       color: "bg-orange-500/20 border-orange-500/30",
       icon: <AlertCircle className="h-5 w-5 text-orange-500" />,
-      message: "Please resubmit your documents with improvements.",
+      message: "Please re-upload your documents as requested by our team.",
+    },
+    ADDITIONAL_DOCS_REQUIRED: {
+      color: "bg-amber-500/20 border-amber-500/30",
+      icon: <AlertCircle className="h-5 w-5 text-amber-500" />,
+      message: "Additional documents are required. Please check the admin notes and resubmit.",
     },
     NOT_STARTED: {
       color: "bg-gray-500/20 border-gray-500/30",
@@ -111,15 +117,16 @@ export default function KYCStatus() {
     },
   };
 
-  const config = statusConfig[profile.status];
-  const progress = {
+  const config = statusConfig[profile.status] ?? statusConfig['NOT_STARTED'];
+  const progress = ({
     NOT_STARTED: 0,
-    PENDING: 75,
-    UNDER_REVIEW: 75,
+    PENDING: 70,
+    UNDER_REVIEW: 80,
     APPROVED: 100,
-    REJECTED: 25,
-    RESUBMISSION_REQUIRED: 50,
-  }[profile.status];
+    REJECTED: 20,
+    RESUBMISSION_REQUIRED: 40,
+    ADDITIONAL_DOCS_REQUIRED: 50,
+  } as Record<string, number>)[profile.status] ?? 0;
 
   return (
     <Card className="border-purple-500/30 bg-purple-950/40">
@@ -161,6 +168,14 @@ export default function KYCStatus() {
           <div className="bg-red-950/30 border border-red-500/30 rounded p-3">
             <p className="text-xs text-red-400">
               <strong>Reason:</strong> {profile.rejectionReason}
+            </p>
+          </div>
+        )}
+
+        {profile.reviewNotes && profile.status === "ADDITIONAL_DOCS_REQUIRED" && (
+          <div className="bg-amber-950/30 border border-amber-500/30 rounded p-3">
+            <p className="text-xs text-amber-400">
+              <strong>Additional docs needed:</strong> {profile.reviewNotes}
             </p>
           </div>
         )}

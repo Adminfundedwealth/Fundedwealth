@@ -33,7 +33,7 @@ export const kycProfiles = pgTable("kyc_profiles", {
   // KYC Status & Verification
   status: text("status")
     .default("NOT_STARTED")
-    .notNull(), // NOT_STARTED, PENDING, UNDER_REVIEW, APPROVED, REJECTED, EXPIRED, RESUBMISSION_REQUIRED
+    .notNull(), // NOT_STARTED | PENDING | UNDER_REVIEW | APPROVED | REJECTED | RESUBMISSION_REQUIRED | ADDITIONAL_DOCS_REQUIRED
   verificationLevel: integer("verification_level").default(0).notNull(), // 0-4
 
   // Risk Assessment
@@ -49,7 +49,7 @@ export const kycProfiles = pgTable("kyc_profiles", {
 
   // Admin Review
   reviewedBy: uuid("reviewed_by").references(() => users.id, { onDelete: "set null" }),
-  reviewNotes: text("review_notes"),
+  reviewNotes: text("review_notes"),       // general notes / additional-docs instructions
   rejectionReason: text("rejection_reason"),
   resubmissionCount: integer("resubmission_count").default(0).notNull(),
 

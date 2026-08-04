@@ -1,197 +1,232 @@
 import React, { useRef, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Spinner } from "@/components/ui/spinner";
-import { AlertCircle, CheckCircle2, Upload, X } from "lucide-react";
+import { CheckCircle2, Upload, X, FileText, AlertCircle } from "lucide-react";
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+export interface UploadedDoc {
+  documentType: string;
+  url: string;
+  fileName: string;
+  fileSize: number;
+}
 
 interface DocumentUploadProps {
   documentType: string;
-  title: string;
+  label: string;
   description: string;
-  acceptedTypes: string[];
+  /** Whether a KYC profile record already exists in the DB */
+  kycProfileReady: boolean;
+  /** Called when the profile doesn't exist yet — should create it and update parent state */
+  onProfileInit: () => Promise<void>;
+  /** Called after a successful upload */
+  onUploadComplete: (doc: UploadedDoc) => void;
 }
 
-interface UploadedDocument {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  url: string;
-  uploadedAt: string;
+// ── Constants ────────────────────────────────────────────────────────────────
+
+const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_MIME = ["image/jpeg", "image/png", "application/pdf"] as const;
+const ALLOWED_EXTS = ".jpg,.jpeg,.png,.pdf";
+const ALLOWED_LABEL = "JPG, PNG or PDF (max 5 MB)";
+
+// ── Helper: format file size ─────────────────────────────────────────────────
+
+function fmtSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+// ── Component ────────────────────────────────────────────────────────────────
 
 export default function DocumentUpload({
   documentType,
-  title,
+  label,
   description,
-  acceptedTypes,
+  kycProfileReady,
+  onProfileInit,
+  onUploadComplete,
 }: DocumentUploadProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<UploadedDocument | null>(null);
+  const [uploaded, setUploaded] = useState<UploadedDoc | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
 
-  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  async function processFile(file: File) {
+    setError(null);
 
+    // Client-side validation
+    if (!ALLOWED_MIME.includes(file.type as typeof ALLOWED_MIME[number])) {
+      setError(`Invalid file type. Allowed: ${ALLOWED_LABEL}`);
+      return;
+    }
+    if (file.size > MAX_SIZE_BYTES) {
+      setError(`File is too large (${fmtSize(file.size)}). Maximum size is 5 MB.`);
+      return;
+    }
+
+    setUploading(true);
     try {
-      setError(null);
-      setSuccess(null);
-      setUploading(true);
-
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        setError("File too large. Maximum size is 10MB.");
-        return;
+      // Ensure KYC profile exists before uploading
+      if (!kycProfileReady) {
+        await onProfileInit();
       }
 
-      // Validate file type
-      const allowedMimeTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
-      if (!allowedMimeTypes.includes(file.type)) {
-        setError("Invalid file type. Only PNG, JPG, WebP, and PDF are allowed.");
-        return;
+      // Read file as Base64
+      const fileBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          resolve(result.split(",")[1]); // strip data URL prefix
+        };
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch("/api/kyc/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documentType,
+          fileBase64,
+          fileName: file.name,
+          mimeType: file.type,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || data.message || "Upload failed");
       }
 
-      // Read file as base64
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const fileBase64 = (e.target?.result as string).split(",")[1];
-
-        try {
-          const response = await fetch("/api/kyc/upload", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              documentType,
-              fileBase64,
-              fileName: file.name,
-              mimeType: file.type,
-            }),
-          });
-
-          if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || "Failed to upload document");
-          }
-
-          const data = await response.json();
-          setUploadedFile({
-            id: data.document.id,
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            url: data.fileUrl,
-            uploadedAt: new Date().toISOString(),
-          });
-          setSuccess("Document uploaded successfully");
-        } catch (err) {
-          setError(err instanceof Error ? err.message : "Error uploading document");
-        } finally {
-          setUploading(false);
-        }
+      const data = await res.json();
+      const doc: UploadedDoc = {
+        documentType,
+        url: data.fileUrl,
+        fileName: file.name,
+        fileSize: file.size,
       };
-
-      reader.onerror = () => {
-        setError("Error reading file");
-        setUploading(false);
-      };
-
-      reader.readAsDataURL(file);
+      setUploaded(doc);
+      onUploadComplete(doc);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error processing file");
+      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
+    } finally {
       setUploading(false);
+      // Reset input so the same file can be re-selected after removal
+      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
-  return (
-    <Card className="border-purple-500/30 bg-purple-950/40">
-      <CardHeader>
-        <CardTitle className="text-white">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Error Message */}
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  }
 
-        {/* Success Message */}
-        {success && (
-          <Alert className="bg-green-950/40 border-green-500/30">
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-            <AlertTitle className="text-green-400">Success</AlertTitle>
-            <AlertDescription className="text-green-300">{success}</AlertDescription>
-          </Alert>
-        )}
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
+  }
 
-        {/* Uploaded File Display */}
-        {uploadedFile && (
-          <div className="bg-green-950/20 border border-green-500/30 rounded-lg p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <div>
-                <p className="text-green-400 font-semibold">{uploadedFile.name}</p>
-                <p className="text-xs text-green-300">{(uploadedFile.size / 1024).toFixed(2)} KB</p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setUploadedFile(null)}
-              className="text-green-400 hover:text-red-400"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+  function removeFile() {
+    setUploaded(null);
+    setError(null);
+  }
+
+  // ── Render: uploaded state ────────────────────────────────────────────────
+
+  if (uploaded) {
+    return (
+      <div className="flex items-center justify-between rounded-lg border border-green-500/30 bg-green-900/20 px-4 py-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <CheckCircle2 className="h-5 w-5 text-green-400 flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-green-300 truncate">{label}</p>
+            <p className="text-xs text-green-400/70 truncate">
+              {uploaded.fileName} · {fmtSize(uploaded.fileSize)}
+            </p>
           </div>
-        )}
-
-        {/* Upload Area */}
-        {!uploadedFile && (
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-purple-500/30 rounded-lg p-8 text-center cursor-pointer hover:border-purple-400/50 transition-colors"
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              hidden
-              onChange={handleFileUpload}
-              accept=".png,.jpg,.jpeg,.webp,.pdf"
-              disabled={uploading}
-            />
-
-            {uploading ? (
-              <>
-                <Spinner className="h-8 w-8 mx-auto mb-3" />
-                <p className="text-purple-200">Uploading...</p>
-              </>
-            ) : (
-              <>
-                <Upload className="h-8 w-8 mx-auto mb-3 text-purple-400" />
-                <p className="text-purple-200 font-semibold">Click to upload or drag and drop</p>
-                <p className="text-xs text-purple-400 mt-1">PNG, JPG, WebP, or PDF (max 10MB)</p>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Document Type Hint */}
-        <div className="bg-purple-900/30 border border-purple-500/20 rounded p-3">
-          <p className="text-xs text-purple-300">
-            <strong>Accepted documents:</strong> {acceptedTypes.join(", ")}
-          </p>
-          <p className="text-xs text-purple-400 mt-1">
-            Ensure the image is clear, well-lit, and all text is readable.
-          </p>
         </div>
-      </CardContent>
-    </Card>
+        <button
+          type="button"
+          onClick={removeFile}
+          aria-label={`Remove ${label}`}
+          className="ml-3 flex-shrink-0 rounded-md p-1 text-green-400 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    );
+  }
+
+  // ── Render: upload area ───────────────────────────────────────────────────
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-white">{label}</p>
+          <p className="text-xs text-purple-400">{description}</p>
+        </div>
+      </div>
+
+      {/* Drop zone */}
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={`Upload ${label}`}
+        onClick={() => !uploading && inputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") inputRef.current?.click(); }}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        className={[
+          "relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-8 text-center cursor-pointer transition-colors",
+          dragging
+            ? "border-purple-400 bg-purple-800/30"
+            : "border-purple-500/30 bg-purple-900/20 hover:border-purple-400/60 hover:bg-purple-900/30",
+          uploading ? "pointer-events-none opacity-60" : "",
+        ].join(" ")}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          className="sr-only"
+          accept={ALLOWED_EXTS}
+          onChange={handleInputChange}
+          disabled={uploading}
+          aria-hidden="true"
+        />
+
+        {uploading ? (
+          <>
+            <Spinner className="h-8 w-8 mb-3 text-purple-400" />
+            <p className="text-sm text-purple-200">Uploading…</p>
+          </>
+        ) : (
+          <>
+            <div className="rounded-full bg-purple-800/50 p-3 mb-3">
+              <Upload className="h-5 w-5 text-purple-300" />
+            </div>
+            <p className="text-sm font-medium text-purple-200">
+              Click to upload or drag &amp; drop
+            </p>
+            <p className="text-xs text-purple-400 mt-1">{ALLOWED_LABEL}</p>
+          </>
+        )}
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="flex items-start gap-2 rounded-md border border-red-500/30 bg-red-900/20 px-3 py-2">
+          <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-red-300">{error}</p>
+        </div>
+      )}
+    </div>
   );
 }

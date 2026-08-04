@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db } from "@workspace/db";
 import { users, kycProfiles, kycDocuments, kycReviews, auditLogs } from "@workspace/db";
-import { eq, desc, and, inArray } from "drizzle-orm";
+import { eq, desc, and, inArray, sql } from "drizzle-orm";
 import { supabaseAdmin } from "../lib/supabase";
 import { logger } from "../lib/logger";
 import { rateLimit } from "../lib/rate-limit";
@@ -13,9 +13,66 @@ import { AdminEventService } from "../lib/admin-event-service";
 const router = Router();
 const kycUploadRateLimit = rateLimit(5, 60); // 5 uploads per minute
 
+// ── Allowed document types for India KYC ──────────────────────────────────────
+const REQUIRED_DOC_TYPES = ["PAN", "AADHAR_FRONT", "AADHAR_BACK"] as const;
+type DocType = typeof REQUIRED_DOC_TYPES[number];
+
+// ── Check if user has at least one active Challenge or Instant Funding account ─
+async function hasActiveAccount(userId: string): Promise<boolean> {
+  try {
+    // Resolve terminal_traders.id for this user
+    const traderRes = await db.execute(sql`
+      SELECT id FROM terminal_traders WHERE external_id = ${userId} LIMIT 1
+    `);
+    const traderId = (traderRes.rows as any[])[0]?.id ?? null;
+    if (!traderId) return false;
+
+    // Check for any non-inactive trading account
+    const accountRes = await db.execute(sql`
+      SELECT 1
+      FROM trading_accounts ta
+      WHERE ta.trader_id = ${traderId}::uuid
+        AND ta.status != 'inactive'
+      LIMIT 1
+    `);
+    return (accountRes.rows as any[]).length > 0;
+  } catch (err) {
+    logger.error({ err }, "hasActiveAccount check failed");
+    return false;
+  }
+}
+
 // ============================================
 // USER KYC ROUTES
 // ============================================
+
+/**
+ * GET /api/kyc/eligibility
+ * Check whether this user may access KYC (has ≥1 active account).
+ */
+router.get("/eligibility", async (req: Request, res: Response) => {
+  try {
+    const auth = getAuth(req);
+    if (!auth?.userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const [user] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.clerkId, auth.userId));
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const eligible = await hasActiveAccount(String(user.id));
+    return res.json({ eligible });
+  } catch (error) {
+    logger.error({ error }, "Error checking KYC eligibility");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 /**
  * POST /api/kyc/start
@@ -35,6 +92,16 @@ router.post("/start", async (req: Request, res: Response) => {
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
+    }
+
+    // Require at least one active account before KYC can be started
+    const eligible = await hasActiveAccount(String(user.id));
+    if (!eligible) {
+      return res.status(403).json({
+        error: "KYC_NO_ACCOUNT",
+        message:
+          "KYC verification becomes available after your first Challenge or Instant Funding account is activated.",
+      });
     }
 
     // Check if profile already exists
@@ -157,8 +224,13 @@ router.patch("/profile", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "KYC profile not found" });
     }
 
-    // Only allow updates if status is NOT_STARTED or RESUBMISSION_REQUIRED
-    if (profile.status !== "NOT_STARTED" && profile.status !== "RESUBMISSION_REQUIRED") {
+    // Only allow updates if status is NOT_STARTED or RESUBMISSION_REQUIRED or ADDITIONAL_DOCS_REQUIRED
+    if (
+      profile.status !== "NOT_STARTED" &&
+      profile.status !== "RESUBMISSION_REQUIRED" &&
+      profile.status !== "ADDITIONAL_DOCS_REQUIRED" &&
+      profile.status !== "REJECTED"
+    ) {
       return res
         .status(400)
         .json({ error: "Cannot update profile in current status", status: profile.status });
@@ -212,6 +284,14 @@ router.post(
         return res.status(400).json({ error: "Missing required fields" });
       }
 
+      // Validate document type
+      const allowedDocTypes = ["PAN", "AADHAR_FRONT", "AADHAR_BACK"];
+      if (!allowedDocTypes.includes(documentType)) {
+        return res.status(400).json({
+          error: `Invalid document type. Allowed: ${allowedDocTypes.join(", ")}`,
+        });
+      }
+
       const [user] = await db
         .select()
         .from(users)
@@ -219,6 +299,16 @@ router.post(
 
       if (!user) {
         return res.status(404).json({ error: "User not found" });
+      }
+
+      // Enforce account eligibility
+      const eligible = await hasActiveAccount(String(user.id));
+      if (!eligible) {
+        return res.status(403).json({
+          error: "KYC_NO_ACCOUNT",
+          message:
+            "KYC verification becomes available after your first Challenge or Instant Funding account is activated.",
+        });
       }
 
       const [profile] = await db
@@ -232,16 +322,16 @@ router.post(
 
       // Validate file
       const buffer = Buffer.from(fileBase64, "base64");
-      const maxFileSize = 10 * 1024 * 1024; // 10MB
+      const maxFileSize = 5 * 1024 * 1024; // 5 MB per requirements
 
       if (buffer.length > maxFileSize) {
-        return res.status(400).json({ error: "File too large (max 10MB)" });
+        return res.status(400).json({ error: "File too large (max 5 MB)" });
       }
 
-      // Validate file type
-      const allowedMimeTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
+      // Validate file type — JPG, PNG, PDF only
+      const allowedMimeTypes = ["image/png", "image/jpeg", "application/pdf"];
       if (mimeType && !allowedMimeTypes.includes(mimeType)) {
-        return res.status(400).json({ error: "Invalid file type" });
+        return res.status(400).json({ error: "Invalid file type. Allowed: JPG, PNG, PDF" });
       }
 
       // ── DUPLICATE DOCUMENT HASH CHECK ──────────────────────────────
@@ -354,6 +444,16 @@ router.patch("/submit", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Enforce account eligibility before submission
+    const eligible = await hasActiveAccount(String(user.id));
+    if (!eligible) {
+      return res.status(403).json({
+        error: "KYC_NO_ACCOUNT",
+        message:
+          "KYC verification becomes available after your first Challenge or Instant Funding account is activated.",
+      });
+    }
+
     const [profile] = await db
       .select()
       .from(kycProfiles)
@@ -363,12 +463,25 @@ router.patch("/submit", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "KYC profile not found" });
     }
 
+    // Block re-submission when already pending/approved
+    const nonResubmittableStatuses = ["PENDING", "UNDER_REVIEW", "APPROVED"];
+    if (nonResubmittableStatuses.includes(profile.status)) {
+      return res.status(400).json({
+        error: "Cannot submit in current status",
+        status: profile.status,
+        message:
+          profile.status === "APPROVED"
+            ? "Your KYC is already approved."
+            : "Your KYC is already under review.",
+      });
+    }
+
     // Validate required fields
     if (!profile.fullName || !profile.dateOfBirth || !profile.country || !profile.address) {
       return res.status(400).json({ error: "Please complete all required fields" });
     }
 
-    // Validate documents uploaded
+    // Validate all three required documents are uploaded
     const documents = await db
       .select()
       .from(kycDocuments)
@@ -379,21 +492,17 @@ router.patch("/submit", async (req: Request, res: Response) => {
         )
       );
 
-    const requiredDocTypes = [
-      "PASSPORT",
-      "PAN",
-      "AADHAR",
-      "DRIVING_LICENSE",
-      "NATIONAL_ID",
-    ];
-    const hasIdentity = requiredDocTypes.some((type) =>
-      documents.some((d) => d.documentType === type)
+    const uploadedTypes = new Set(documents.map((d) => d.documentType));
+    const missingDocs = (["PAN", "AADHAR_FRONT", "AADHAR_BACK"] as const).filter(
+      (t) => !uploadedTypes.has(t)
     );
 
-    if (!hasIdentity) {
-      return res
-        .status(400)
-        .json({ error: "Please upload at least one identity document" });
+    if (missingDocs.length > 0) {
+      return res.status(400).json({
+        error: "Missing required documents",
+        missing: missingDocs,
+        message: `Please upload: ${missingDocs.join(", ")}`,
+      });
     }
 
     // Update profile status

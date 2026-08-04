@@ -30,6 +30,7 @@ import terminalSyncRouter from "./terminal-sync";
 import adminPaymentsRouter from "./admin-payments";
 import adminEventsRouter from "./admin-events";
 import provisioningRouter from "./provisioning";
+import adminWebhookRouter from "./admin-webhook";
 
 const router: IRouter = Router();
 
@@ -70,5 +71,6 @@ router.use("/monitor", requireAdminAuth, adminSecurityMiddleware, monitorRouter)
 router.use("/admin-payments", adminPaymentsRouter);
 router.use("/admin-events", adminEventsRouter);
 router.use("/provisioning", provisioningRouter);
+router.use("/webhooks", adminWebhookRouter);
 
 export default router;

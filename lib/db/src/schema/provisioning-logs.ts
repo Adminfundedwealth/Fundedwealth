@@ -16,7 +16,7 @@ export const provisioningLogs = pgTable(
   "provisioning_logs",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    orderId: text("order_id").notNull(),
+    orderId: text("order_id"),  // nullable — emergency provisions have no real order
     plan: text("plan").notNull(),
     paymentMethod: text("payment_method").notNull(),
     paymentRef: text("payment_ref"),
