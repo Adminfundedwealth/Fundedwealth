@@ -1002,7 +1002,7 @@ const Hero = () => {
 
               {/* 2. WATCH DEMO — Liquid Cosmic Violet Glass */}
               <a
-                href="https://www.youtube.com/@FundedWealth"
+                href="https://youtu.be/w3yyFx_hDcE"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
