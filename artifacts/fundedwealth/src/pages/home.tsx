@@ -622,10 +622,10 @@ const AnnouncementBar = () => {
 
 const DiscountBar = () => {
   const offers = [
-    { code: "Flash", discount: "60% OFF", label: "Flash Funding" },
-    { code: "Instant", discount: "55% OFF", label: "Instant Funding" },
-    { code: "FW", discount: "65% OFF", label: "1-Step Evaluation" },
-    { code: "FW", discount: "70% OFF", label: "2-Step Evaluation" },
+    { code: "INDIA80", discount: "60% OFF", label: "Flash Funding" },
+    { code: "INDIA80", discount: "55% OFF", label: "Instant Funding" },
+    { code: "INDIA80", discount: "65% OFF", label: "1-Step Evaluation" },
+    { code: "INDIA80", discount: "70% OFF", label: "2-Step Evaluation" },
   ];
 
   const content = offers.map((o, i) => (
@@ -2976,7 +2976,7 @@ const Plans = () => {
 
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">Flash</div>
+              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">INDIA80</div>
               <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">60% OFF</span></div>
             </div>
 
@@ -3049,7 +3049,7 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-fw-pink/10 to-fw-orange/10 border border-fw-pink/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">Instant</div>
+              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">INDIA80</div>
               <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">55% OFF</span></div>
             </div>
           </TabsContent>
@@ -3176,7 +3176,7 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500/10 to-fw-pink/10 border border-purple-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">FW</div>
+              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">INDIA80</div>
               <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">65% OFF</span></div>
             </div>
           </TabsContent>
@@ -3310,7 +3310,7 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">FW</div>
+              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">INDIA80</div>
               <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">70% OFF</span></div>
             </div>
           </TabsContent>

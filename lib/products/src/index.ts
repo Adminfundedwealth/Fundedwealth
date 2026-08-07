@@ -92,7 +92,7 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     displayLabel: "Flash",
     serverLabel: "Flash Funding",
     discount: "60%",
-    code: "Flash",
+    code: "INDIA80",
     profitTarget: "—",
     maxLoss: "4%",
     dailyLoss: "2%",
@@ -115,7 +115,7 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     displayLabel: "Instant",
     serverLabel: "Instant Funding",
     discount: "55%",
-    code: "Instant",
+    code: "INDIA80",
     profitTarget: "N/A",
     maxLoss: "5%",
     dailyLoss: "3%",
@@ -156,7 +156,7 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     displayLabel: "1-Step",
     serverLabel: "1-Step Evaluation",
     discount: "65%",
-    code: "FW",
+    code: "INDIA80",
     profitTarget: "10%",
     maxLoss: "6%",
     dailyLoss: "3%",
@@ -178,7 +178,7 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     displayLabel: "2-Step",
     serverLabel: "2-Step Evaluation",
     discount: "70%",
-    code: "FW70",
+    code: "INDIA80",
     profitTarget: "8% + 5%",
     maxLoss: "8%",
     dailyLoss: "3%",
@@ -202,6 +202,7 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
 
 /** Coupon code → percentage discount. Single source for website + server. */
 export const COUPONS: Record<string, number> = {
+  INDIA80: 80,
   FLASH: 60,
   INSTANT: 55,
   FW: 65,
