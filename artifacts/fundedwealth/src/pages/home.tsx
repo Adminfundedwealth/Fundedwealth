@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
+import { useLiveDiscountConfig } from "@/hooks/useDiscountConfig";
 import SEOHead from "@/components/SEOHead";
 import { FAQSchema, ServiceSchema } from "@/components/StructuredData";
 import IndiaTraderNetworkHero from "@/components/IndiaTraderNetworkHero";
@@ -621,17 +622,14 @@ const AnnouncementBar = () => {
 };
 
 const DiscountBar = () => {
-  const offers = [
-    { code: "INDIA80", discount: "60% OFF", label: "Flash Funding" },
-    { code: "INDIA80", discount: "55% OFF", label: "Instant Funding" },
-    { code: "INDIA80", discount: "65% OFF", label: "1-Step Evaluation" },
-    { code: "INDIA80", discount: "70% OFF", label: "2-Step Evaluation" },
-  ];
+  const { entries } = useLiveDiscountConfig();
+  const activeOffers = entries.filter((e) => e.active);
+  const offers = activeOffers.length > 0 ? activeOffers : entries;
 
   const content = offers.map((o, i) => (
     <span key={i} className="inline-flex items-center gap-3 mx-8">
-      <span className="text-white font-extrabold text-sm tracking-tight">{o.discount}</span>
-      <span className="text-white/60 text-xs font-medium">{o.label}</span>
+      <span className="text-white font-extrabold text-sm tracking-tight">{o.discountPct}% OFF</span>
+      <span className="text-white/60 text-xs font-medium">{o.displayLabel}</span>
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 border border-white/15">
         <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Code:</span>
         <span className="text-xs text-fw-orange font-bold tracking-wide">{o.code}</span>
@@ -2797,6 +2795,7 @@ const FlashRulesAccordion = () => (
 const Plans = () => {
   const [activeTab, setActiveTab] = useState("1step");
   const [, navigatePlans] = useLocation();
+  const { config: discountConfig } = useLiveDiscountConfig();
 
   return (
     <section id="plans" className="py-14 relative overflow-hidden">
@@ -2976,8 +2975,8 @@ const Plans = () => {
 
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">INDIA80</div>
-              <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">60% OFF</span></div>
+              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">{discountConfig["flash"]?.code ?? "INDIA80"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">{discountConfig["flash"]?.discountPct ?? 60}% OFF</span></div>
             </div>
 
             <FlashRulesAccordion />
@@ -3049,8 +3048,8 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-fw-pink/10 to-fw-orange/10 border border-fw-pink/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">INDIA80</div>
-              <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">55% OFF</span></div>
+              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">{discountConfig["instant"]?.code ?? "INDIA80"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">{discountConfig["instant"]?.discountPct ?? 55}% OFF</span></div>
             </div>
           </TabsContent>
 
@@ -3176,8 +3175,8 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500/10 to-fw-pink/10 border border-purple-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">INDIA80</div>
-              <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">65% OFF</span></div>
+              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">{discountConfig["1step"]?.code ?? "INDIA80"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">{discountConfig["1step"]?.discountPct ?? 65}% OFF</span></div>
             </div>
           </TabsContent>
 
@@ -3310,8 +3309,8 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">INDIA80</div>
-              <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">70% OFF</span></div>
+              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">{discountConfig["2step"]?.code ?? "INDIA80"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">{discountConfig["2step"]?.discountPct ?? 70}% OFF</span></div>
             </div>
           </TabsContent>
         </Tabs>

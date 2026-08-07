@@ -77,3 +77,6 @@ export * from "./support-tickets";
 // ── Analytics ────────────────────────────────────────────────────────────────
 export * from "./behavior-patterns";
 export * from "./session-analytics";
+
+// ── Dynamic Discount Config ───────────────────────────────────────────────────
+export * from "./discount-config";

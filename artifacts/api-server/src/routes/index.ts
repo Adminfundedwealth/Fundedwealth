@@ -31,6 +31,7 @@ import adminPaymentsRouter from "./admin-payments";
 import adminEventsRouter from "./admin-events";
 import provisioningRouter from "./provisioning";
 import adminWebhookRouter from "./admin-webhook";
+import discountConfigRouter from "./discount-config";
 
 const router: IRouter = Router();
 
@@ -41,6 +42,7 @@ router.use("/blog", blogRouter);
 router.use("/impact", impactRouter);
 router.use("/contact", contactRouter);
 router.use("/captcha", captchaRouter);
+router.use("/discount-config", discountConfigRouter);
 
 // ── Auth routes (mixed public + protected) ──────────────────────────────────
 router.use("/auth", authRouter);
