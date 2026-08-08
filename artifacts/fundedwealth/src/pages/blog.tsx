@@ -34,7 +34,8 @@ export default function Blog() {
   const [posts, setPosts] = useState(FALLBACK_POSTS);
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}api/blog`)
+    const apiBase = (import.meta.env.VITE_API_URL as string) || "https://api.fundedwealth.com";
+    fetch(`${apiBase}/api/blog`)
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
