@@ -4,6 +4,7 @@ import { Eye, EyeOff, User, Mail, Phone, Lock, ShieldCheck } from "lucide-react"
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useCaptcha } from "@/hooks/useCaptcha";
 import { FEATURES } from "@/config/features";
+import SEOHead from "@/components/SEOHead";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -206,6 +207,11 @@ export default function SignUpPage() {
       className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden"
       style={{ background: "radial-gradient(ellipse at 60% 20%,#1a0040 0%,#0D0020 55%,#050010 100%)" }}
     >
+      <SEOHead
+        title="Create Account"
+        description="Create your FundedWealth account to start your prop trading journey."
+        noindex={true}
+      />
       {/* Background blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div style={{

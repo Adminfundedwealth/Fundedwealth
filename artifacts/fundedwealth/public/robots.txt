@@ -1,17 +1,60 @@
 User-agent: *
 Allow: /
+
+# Private / auth pages — no crawl value
 Disallow: /dashboard
-Disallow: /admin
+Disallow: /dashboard/
 Disallow: /sign-in
 Disallow: /sign-up
 Disallow: /login
+Disallow: /register
+Disallow: /checkout
+Disallow: /payment-pending
+Disallow: /purchase-success
+Disallow: /kyc
+Disallow: /auth/
+Disallow: /sso-callback
+Disallow: /reset-password
+Disallow: /ref/
+
+# Legacy admin path (handled separately, but block here too)
+Disallow: /admin
 
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 1
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /login
+Disallow: /register
+Disallow: /checkout
+Disallow: /payment-pending
+Disallow: /purchase-success
+Disallow: /kyc
+Disallow: /auth/
+Disallow: /sso-callback
+Disallow: /reset-password
+Disallow: /ref/
+Disallow: /admin
 
 User-agent: Bingbot
 Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /login
+Disallow: /register
+Disallow: /checkout
+Disallow: /payment-pending
+Disallow: /purchase-success
+Disallow: /kyc
+Disallow: /auth/
+Disallow: /sso-callback
+Disallow: /reset-password
+Disallow: /ref/
+Disallow: /admin
 Crawl-delay: 1
 
 Sitemap: https://fundedwealth.com/sitemap.xml

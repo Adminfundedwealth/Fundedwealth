@@ -1,6 +1,7 @@
-﻿import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useUser, useAuth } from "@/contexts/SupabaseAuthContext";
+import SEOHead from "@/components/SEOHead";
 import { useTradingData } from "@/contexts/TradingDataContext";
 import { motion } from "framer-motion";
 import { useNotifications, DashboardNotification, NotificationPreferences } from "@/hooks/useNotifications";
@@ -972,9 +973,44 @@ function WithdrawalDetailsSection() {
   );
 }
 
-function CouponSection({ profile, validCoupons }: { profile: any; validCoupons: Record<string, string> }) {
+interface LiveDiscountEntry {
+  planType: string;
+  displayLabel: string;
+  code: string;
+  discountPct: number;
+  active: boolean;
+}
+
+function CouponSection({ profile }: { profile: any }) {
   const [couponInput, setCouponInput] = useState(profile.couponCode || "");
   const [couponStatus, setCouponStatus] = useState<"idle" | "valid" | "invalid">(profile.couponCode ? "valid" : "idle");
+  const [liveDiscounts, setLiveDiscounts] = useState<LiveDiscountEntry[]>([]);
+  const [discountsLoading, setDiscountsLoading] = useState(true);
+
+  // Build a lookup map from the live discount data: code (uppercase) → description
+  const validCoupons = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const entry of liveDiscounts) {
+      if (entry.active) {
+        map[entry.code.toUpperCase()] = `${entry.discountPct}% off ${entry.displayLabel}`;
+      }
+    }
+    return map;
+  }, [liveDiscounts]);
+
+  // Fetch live discount config from the API on mount
+  useEffect(() => {
+    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    fetch(`${apiBase}/api/discount-config`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((data) => {
+        if (Array.isArray(data?.data)) setLiveDiscounts(data.data);
+      })
+      .catch(() => {
+        // silently fall back to empty — user can still type a code manually
+      })
+      .finally(() => setDiscountsLoading(false));
+  }, []);
 
   const handleApply = () => {
     const code = couponInput.trim().toUpperCase();
@@ -984,6 +1020,27 @@ function CouponSection({ profile, validCoupons }: { profile: any; validCoupons: 
       setCouponStatus("invalid");
     }
   };
+
+  // Deduplicate badges: some plans share the same code — show each unique code once
+  const uniqueBadges = useMemo(() => {
+    const seen = new Set<string>();
+    const badges: { code: string; desc: string }[] = [];
+    for (const entry of liveDiscounts) {
+      if (!entry.active) continue;
+      const key = entry.code.toUpperCase();
+      if (seen.has(key)) {
+        // Append plan label to existing entry's description
+        const existing = badges.find((b) => b.code === key);
+        if (existing && !existing.desc.includes(entry.displayLabel)) {
+          existing.desc = `${entry.discountPct}% off any plan`;
+        }
+      } else {
+        seen.add(key);
+        badges.push({ code: key, desc: `${entry.discountPct}% off ${entry.displayLabel}` });
+      }
+    }
+    return badges;
+  }, [liveDiscounts]);
 
   return (
     <div className="space-y-6">
@@ -1023,17 +1080,23 @@ function CouponSection({ profile, validCoupons }: { profile: any; validCoupons: 
         )}
         <div className="mt-5">
           <div className="text-white/40 text-xs mb-2 font-semibold uppercase tracking-wide">Available codes</div>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(validCoupons).map(([code, desc]) => (
-              <button
-                key={code}
-                onClick={() => { setCouponInput(code); setCouponStatus("idle"); }}
-                className="text-xs bg-white/5 border border-white/10 hover:border-[#4A00E0]/40 text-white/60 hover:text-white rounded-lg px-3 py-1.5 transition-all"
-              >
-                {code} — {desc}
-              </button>
-            ))}
-          </div>
+          {discountsLoading ? (
+            <div className="text-white/30 text-xs">Loading codes…</div>
+          ) : uniqueBadges.length === 0 ? (
+            <div className="text-white/30 text-xs">No active codes at the moment.</div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {uniqueBadges.map(({ code, desc }) => (
+                <button
+                  key={code}
+                  onClick={() => { setCouponInput(code); setCouponStatus("idle"); }}
+                  className="text-xs bg-white/5 border border-white/10 hover:border-[#4A00E0]/40 text-white/60 hover:text-white rounded-lg px-3 py-1.5 transition-all"
+                >
+                  {code} — {desc}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -2866,14 +2929,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       );
 
       case "coupon": {
-        const VALID_COUPONS: Record<string, string> = {
-          FLASH: "60% off Flash Challenge",
-          INSTANT: "55% off Instant Funding",
-          FW: "65% off any plan",
-          FW70: "70% off any plan",
-          WELCOME: "10% off any plan",
-        };
-        return <CouponSection profile={profile} validCoupons={VALID_COUPONS} />;
+        return <CouponSection profile={profile} />;
       }
 
       case "giveaway": return (
@@ -3329,6 +3385,11 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
   return (
     <>
+      <SEOHead
+        title="Dashboard"
+        description="Manage your FundedWealth funded trading accounts, payouts, and analytics."
+        noindex={true}
+      />
       {donatePopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setDonatePopup(false)} />

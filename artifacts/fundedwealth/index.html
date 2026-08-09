@@ -2,15 +2,17 @@
 <html lang="en-IN">
 
 <head>
-  <!-- Google Tag Manager -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Tag Manager — placed after charset/viewport per GTM best-practice -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
   j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-NC2QNN5P');</script>
   <!-- End Google Tag Manager -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>FundedWealth — India's #1 Prop Trading Firm | Best Prop Firm in India | Get Funded Up to ₹50 Lakhs</title>
   <meta name="description"
     content="FundedWealth is India's best prop trading firm. Get funded trading accounts up to ₹50 Lakhs. Trade NSE, BSE, MCX, Forex & Crypto with zero risk. Keep 70-90% profits. 12-hour guaranteed payouts. Join 15,000+ funded traders. Lowest evaluation fees starting ₹999." />
@@ -21,15 +23,16 @@
   <meta name="theme-color" content="#1A0030" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="google-site-verification" content="" />
+
+  <!-- Search Console / Webmaster verification — fill token before deploying -->
+  <meta name="google-site-verification" content="REPLACE_WITH_GOOGLE_SEARCH_CONSOLE_TOKEN" />
+  <meta name="msvalidate.01" content="REPLACE_WITH_BING_WEBMASTER_TOKEN" />
+
   <meta name="geo.region" content="IN" />
   <meta name="geo.placename" content="India" />
   <meta name="language" content="English" />
-  <meta name="revisit-after" content="1 days" />
-  <meta name="rating" content="general" />
-  <meta name="distribution" content="global" />
-  <meta name="target" content="all" />
 
+  <!-- Open Graph — static fallback for root URL; per-page tags injected by SEOHead -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="FundedWealth — India's #1 Best Prop Trading Firm | Funded Accounts Up to ₹50L" />
   <meta property="og:description"
@@ -37,11 +40,12 @@
   <meta property="og:image" content="https://fundedwealth.com/opengraph.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="FundedWealth — India's #1 Prop Trading Firm" />
   <meta property="og:url" content="https://fundedwealth.com" />
   <meta property="og:site_name" content="FundedWealth" />
   <meta property="og:locale" content="en_IN" />
-  <meta property="og:locale:alternate" content="hi_IN" />
 
+  <!-- Twitter Card — static fallback; per-page tags injected by SEOHead -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@fundedwealth" />
   <meta name="twitter:creator" content="@fundedwealth" />
@@ -49,27 +53,41 @@
   <meta name="twitter:description"
     content="Get funded up to ₹50 Lakhs. Trade NSE, BSE, MCX, Forex & Crypto. Keep 70-90% profits. Instant payouts." />
   <meta name="twitter:image" content="https://fundedwealth.com/opengraph.jpg" />
+  <meta name="twitter:image:alt" content="FundedWealth — India's #1 Prop Trading Firm" />
 
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/favicon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
+
+  <!-- Root canonical — per-page canonicals injected by SEOHead at runtime -->
   <link rel="canonical" href="https://fundedwealth.com" />
+
+  <!-- hreflang — only en-IN and x-default; hi-IN removed (no distinct URL served) -->
   <link rel="alternate" hreflang="en-IN" href="https://fundedwealth.com" />
-  <link rel="alternate" hreflang="hi-IN" href="https://fundedwealth.com?lang=hi" />
   <link rel="alternate" hreflang="x-default" href="https://fundedwealth.com" />
+
+  <!-- Resource hints -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://nysrxvpjdlvzvcawysvh.supabase.co" crossorigin>
   <link rel="preconnect" href="https://api.fundedwealth.com" crossorigin>
   <link rel="dns-prefetch" href="https://checkout.razorpay.com">
-  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
+  <!-- Razorpay — deferred so it doesn't block parse -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+
+  <!-- Fonts — non-render-blocking via media=print trick -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+
+  <!-- Urgency system CSS — non-render-blocking -->
   <link rel="stylesheet" href="/urgency-system.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="/urgency-system.css"></noscript>
+
+  <!-- Inline loading screen — visible instantly, hidden once React mounts -->
   <style>
     #fw-init-loader {
       position: fixed; inset: 0;
@@ -95,11 +113,12 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NC2QNN5P"
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
-  <!-- Inline loading screen — visible instantly, hidden once React mounts -->
+
   <div id="fw-init-loader">
     <div class="fw-spinner"></div>
   </div>
   <div id="root"></div>
+
   <script>
     // Hide loader once React has rendered
     var _fwObs = new MutationObserver(function() {
@@ -112,7 +131,9 @@
     });
     _fwObs.observe(document.getElementById('root'), { childList: true });
   </script>
+
   <script type="module" src="/src/main.tsx"></script>
+
   <script>
     // Defer urgency system until after main content is interactive
     window.addEventListener('load', function() {
@@ -121,20 +142,12 @@
       document.body.appendChild(s);
     });
   </script>
-  <!-- Google Analytics — deferred to not block rendering -->
-  <script>
-    window.addEventListener('load', function() {
-      var s = document.createElement('script');
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-2JC3K2H68Y';
-      s.async = true;
-      document.head.appendChild(s);
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', 'G-2JC3K2H68Y');
-    });
-  </script>
+
+  <!--
+    Google Analytics (GA4) — G-2JC3K2H68Y is fired via GTM (GTM-NC2QNN5P).
+    The standalone gtag snippet below is intentionally REMOVED to prevent
+    double-counting. Configure GA4 as a tag inside GTM instead.
+  -->
 </body>
 
 </html>

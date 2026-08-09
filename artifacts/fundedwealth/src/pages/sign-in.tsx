@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Smartphone, Download } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 
 // Force fresh deployment
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -291,6 +292,11 @@ export default function SignInPage() {
       className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden"
       style={{ background: "radial-gradient(ellipse at 60% 20%, #1a0040 0%, #0D0020 55%, #050010 100%)" }}
     >
+      <SEOHead
+        title="Sign In"
+        description="Sign in to your FundedWealth account to access your funded trading dashboard."
+        noindex={true}
+      />
       {/* ── Animated background blobs ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div style={{ position: "absolute", top: "-120px", left: "-100px", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, rgba(74,0,224,0.45) 0%, transparent 70%)", animation: "fw-float 7s ease-in-out infinite" }} />

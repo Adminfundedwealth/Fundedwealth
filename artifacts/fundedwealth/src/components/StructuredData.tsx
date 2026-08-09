@@ -45,13 +45,6 @@ const organizationSchema = {
     "@type": "PostalAddress",
     addressCountry: "IN"
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    ratingCount: "2450",
-    bestRating: "5",
-    worstRating: "1"
-  },
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "Prop Trading Plans",

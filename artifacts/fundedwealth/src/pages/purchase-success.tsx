@@ -242,6 +242,7 @@ export default function PurchaseSuccess() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0D0020] text-white flex items-center justify-center">
+        <SEOHead title="Loading" noindex={true} />
         <div className="text-center">
           <Loader2 size={48} className="text-fw-pink animate-spin mx-auto mb-4" />
           <div className="text-white/60">Loading your account details...</div>
@@ -253,6 +254,7 @@ export default function PurchaseSuccess() {
   if (error || !accountData) {
     return (
       <div className="min-h-screen bg-[#0D0020] text-white flex items-center justify-center px-4">
+        <SEOHead title="Error" noindex={true} />
         <div className="max-w-md w-full text-center">
           <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
             <div className="text-red-400 text-lg font-bold mb-2">Could not load account</div>

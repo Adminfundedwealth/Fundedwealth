@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import "./i18n";
 import "./index.css";
 import { lazy, Suspense, Component, type ReactNode } from "react";
@@ -45,10 +46,12 @@ const Loading = () => (
 );
 
 createRoot(document.getElementById("root")!).render(
-  <ErrorBoundary>
-    <Suspense fallback={<Loading />}>
-      <App />
-    </Suspense>
-    {/* Agentation removed — dev-only tool, not for production */}
-  </ErrorBoundary>
+  <HelmetProvider>
+    <ErrorBoundary>
+      <Suspense fallback={<Loading />}>
+        <App />
+      </Suspense>
+      {/* Agentation removed — dev-only tool, not for production */}
+    </ErrorBoundary>
+  </HelmetProvider>
 );

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import SEOHead from "@/components/SEOHead";
 
 interface EconomicEvent {
   id: number;
@@ -125,6 +126,12 @@ export default function EconomicCalendarPage() {
 
   return (
     <div className="min-h-screen bg-[#0D0020] text-white px-4 md:px-6 lg:px-8 xl:px-10">
+      <SEOHead
+        title="India Economic Calendar 2026 — RBI & Global Macro Events"
+        description="Free India-first economic calendar for traders. Track RBI announcements, FOMC, CPI, GDP and all high-impact macro events for NSE, BSE & MCX trading in real time."
+        keywords="India economic calendar, RBI calendar 2026, NSE economic events, trading calendar India, macro events India, FOMC calendar, CPI calendar India, economic events for traders, high impact news India"
+        canonical="/economic-calendar"
+      />
       <div className="max-w-[1600px] mx-auto space-y-6">
         <div className="rounded-3xl border border-white/10 bg-[#11001f] p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">

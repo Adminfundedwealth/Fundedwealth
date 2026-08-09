@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
+import SEOHead from "@/components/SEOHead";
 
 export default function ReferralLandingPage() {
   const [match, params] = useRoute("/ref/:code");
@@ -48,6 +49,11 @@ export default function ReferralLandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0D0020] text-white px-4 py-12 sm:px-6 lg:px-8">
+      <SEOHead
+        title="Referral"
+        description="You have been referred to FundedWealth — India's best prop trading firm."
+        noindex={true}
+      />
       <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-purple-900/10 backdrop-blur-sm">
         <div className="mb-8">
           <p className="mb-4 text-sm uppercase tracking-[0.4em] text-[#A085FF]">Referral landing page</p>
