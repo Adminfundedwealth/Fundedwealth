@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import {
   BookOpen, Plus, Sparkles, Eye, EyeOff, Pencil, Trash2,
-  Search, RefreshCw, Star, StarOff, ExternalLink,
+  Search, RefreshCw, Star, StarOff, Upload, X, ImageIcon,
 } from 'lucide-react';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -46,6 +46,7 @@ interface PostForm {
   meta_title: string;
   meta_description: string;
   keywords: string;
+  cover_image: string;
 }
 
 const EMPTY_FORM: PostForm = {
@@ -53,6 +54,7 @@ const EMPTY_FORM: PostForm = {
   author: 'FundedWealth Team', read_time: '5 min read',
   is_featured: false, is_published: false,
   meta_title: '', meta_description: '', keywords: '',
+  cover_image: '',
 };
 
 const CATEGORIES = [
@@ -96,6 +98,10 @@ export default function BlogManagementPage() {
 
   const [previewPost, setPreviewPost] = useState<BlogPost | null>(null);
 
+  // ── Image upload state ────────────────────────────────────────────────────
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState('');
+
   // ── Fetch ────────────────────────────────────────────────────────────────────
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -134,6 +140,7 @@ export default function BlogManagementPage() {
           is_featured: p.is_featured, is_published: p.is_published,
           meta_title: p.meta_title || '', meta_description: p.meta_description || '',
           keywords: p.keywords || '',
+          cover_image: p.cover_image || '',
         });
         setEditingId(post.id);
       } catch {
@@ -145,6 +152,31 @@ export default function BlogManagementPage() {
       setEditingId(null);
     }
     setEditorOpen(true);
+  }
+
+  // ── Upload cover image ────────────────────────────────────────────────────
+  async function handleImageUpload(file: File) {
+    setImageUploading(true);
+    setImageError('');
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await apiFetch('/api/blog/upload-image', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.setup_required) {
+          setImageError('Storage not set up yet. Create a "blog-images" bucket in Supabase Storage with public access, then try again.');
+        } else {
+          setImageError(json.error || 'Upload failed');
+        }
+        return;
+      }
+      setForm(f => ({ ...f, cover_image: json.url }));
+    } catch (err: any) {
+      setImageError(err.message);
+    } finally {
+      setImageUploading(false);
+    }
   }
 
   // ── Save (create or update) ────────────────────────────────────────────────
@@ -423,9 +455,67 @@ export default function BlogManagementPage() {
               <p className="text-[11px] text-muted-foreground mt-1">URL: /blog/{form.slug}</p>
             </div>
 
+            {/* Cover Image */}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Cover Image <span className="normal-case text-muted-foreground/50">(optional, max 5MB — JPEG/PNG/WebP)</span>
+              </label>
+              <div className="mt-1 space-y-2">
+                {form.cover_image ? (
+                  <div className="relative group w-full">
+                    <img
+                      src={form.cover_image}
+                      alt="Cover preview"
+                      className="w-full h-40 object-cover rounded-lg border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, cover_image: '' }))}
+                      className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remove image"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/30 transition-colors ${imageUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                      {imageUploading ? (
+                        <div className="h-5 w-5 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <ImageIcon className="h-6 w-6" />
+                      )}
+                      <span className="text-xs">{imageUploading ? 'Uploading…' : 'Click to upload cover image'}</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      className="hidden"
+                      disabled={imageUploading}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                )}
+                {/* Or paste URL directly */}
+                <div className="flex gap-2 items-center">
+                  <span className="text-[11px] text-muted-foreground shrink-0">Or URL:</span>
+                  <Input
+                    value={form.cover_image}
+                    onChange={e => setForm(f => ({ ...f, cover_image: e.target.value }))}
+                    placeholder="https://…"
+                    className="h-7 text-xs"
+                  />
+                </div>
+                {imageError && <p className="text-xs text-destructive">{imageError}</p>}
+              </div>
+            </div>
+
             {/* Category + Author row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-2 gap-4">              <div>
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Category *</label>
                 <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="mt-1 w-full h-9 rounded-md border bg-background px-3 text-sm">
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
