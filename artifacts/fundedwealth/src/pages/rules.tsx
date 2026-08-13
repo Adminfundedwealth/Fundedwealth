@@ -1552,7 +1552,6 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
     { param: "Payout threshold",    spec: "3% net profit" },
     { param: "Profit target",       spec: "None — instant funded" },
     { param: "Consistency rule",    spec: "15% best-trade rule" },
-    { param: "Daily profit cap",    spec: "4% — triggers kill-switch for the day" },
     { param: "Scaling",             spec: "Not available" },
   ];
 
@@ -1598,9 +1597,7 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
         <div className="mt-5 p-4 rounded-xl bg-amber-500/5 border border-amber-500/25">
           <p className="text-white/75 text-sm leading-relaxed">
             <strong className="text-amber-300">Important:</strong> Breaking a <strong className="text-red-400">Critical</strong> rule
-            (Daily Drawdown, Max Drawdown) disqualifies your account immediately. Hitting the{" "}
-            <strong className="text-amber-200">4% Daily Profit Cap</strong> triggers a{" "}
-            <strong className="text-amber-200">kill-switch</strong> — no new trades for the rest of that day.
+            (Daily Drawdown, Max Drawdown) disqualifies your account immediately.
           </p>
         </div>
       </div>
@@ -1620,7 +1617,7 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
               <div key={i} className="grid grid-cols-2 px-5 py-3.5 hover:bg-white/[0.02] transition-colors">
                 <span className="text-white/70 text-sm font-medium">{row.param}</span>
                 <span className={`text-sm font-semibold ${
-                  row.param.includes("profit cap") || row.param.includes("consistency") ? "text-amber-200" : "text-white"
+                  row.param.includes("consistency") ? "text-amber-200" : "text-white"
                 }`}>{row.spec}</span>
               </div>
             ))}
@@ -1818,7 +1815,6 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
                   "Consistency rule (15%)",
                   "Daily drawdown (2%)",
                   "Max drawdown (4%)",
-                  "Daily profit cap / kill-switch (4%)",
                   "Scaling: not available",
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2">
