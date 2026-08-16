@@ -40,6 +40,7 @@ const CreatePassword = lazy(() => import("@/pages/create-password"));
 const ResetPassword = lazy(() => import("@/pages/reset-password"));
 const ChatWidget = lazy(() => import("@/components/ChatWidget"));
 const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
+const SocialMediaRail = lazy(() => import("@/components/SocialMediaRail"));
 import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
 import MobileShell from "@/components/MobileShell";
 
@@ -155,6 +156,7 @@ function App() {
                                         <AppRouter />
                                         <ChatWidget />
                                         <WhatsAppButton />
+                                        <SocialMediaRail />
                                     </MobileShell>
                                 </Suspense>
                                 <Toaster />
