@@ -103,7 +103,7 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-xl font-bold text-white mb-3">9. Third-Party Services</h2>
-            <p>Our platform integrates with third-party services including Clerk (authentication), payment processors, and analytics tools. Each of these services has its own privacy policy governing the use of your information.</p>
+            <p>Our platform integrates with third-party services including Supabase (authentication and session management), payment processors, and analytics tools. Each of these services has its own privacy policy governing the use of your information.</p>
           </section>
 
           <section>
