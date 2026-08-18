@@ -62,6 +62,7 @@ export default function Privacy() {
               <li>Analyze usage patterns to improve user experience</li>
               <li>Send marketing communications (with your consent)</li>
             </ul>
+            <p className="mt-3"><strong className="text-white/80">Automated Security and Risk Assessment:</strong> FundedWealth uses automated security and risk-assessment systems to help detect and prevent fraud, multi-account abuse, account sharing, challenge farming, referral abuse, and other suspicious activity. These systems may use information such as device, IP, and account activity data to assess security risk and may result in temporary restrictions on certain account functions, including payment or payout activity. Accounts flagged by these systems may also be reviewed by our security or compliance team. We maintain security and risk-related records as necessary to protect the integrity of the platform.</p>
           </section>
 
           <section>
