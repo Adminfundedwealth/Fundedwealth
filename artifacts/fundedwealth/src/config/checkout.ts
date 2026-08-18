@@ -11,7 +11,7 @@ export type { PlanType };
 
 export interface PlanConfig {
   label: string;
-  sizes: { size: string; origFee: string; discFee: string; popular?: boolean }[];
+  sizes: { size: string; fee: number; origFee: string; discFee: string; popular?: boolean }[];
   discount: string;
   code: string;
   profitTarget: string;
@@ -39,6 +39,7 @@ export const PLANS: Record<PlanType, PlanConfig> = PLAN_TYPES.reduce((acc, key) 
     duration: p.duration,
     sizes: p.sizes.map((s) => ({
       size: s.sizeLabel,
+      fee: s.fee,
       origFee: s.origFeeLabel,
       discFee: s.discFeeLabel,
       ...(s.popular ? { popular: true } : {}),

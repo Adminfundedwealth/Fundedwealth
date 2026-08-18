@@ -5,10 +5,14 @@ import { PlanConfig } from "../../config/checkout";
 
 interface CheckoutSummaryProps {
   productName: string;
-  size: { origFee: string; discFee: string; popular?: boolean };
+  size: { origFee: string; fee: number; discFee: string; popular?: boolean };
   plan: PlanConfig;
   selectedAddonData: { label: string; price: string } | null;
   finalTotal: number;
+  /** Live discount percentage from Admin config */
+  discountPct: number;
+  /** Live discounted price (pre-computed from base fee × discount) */
+  discountedPriceLabel: string;
   onNext: () => void;
 }
 
@@ -18,6 +22,8 @@ export const CheckoutSummary = ({
   plan,
   selectedAddonData,
   finalTotal,
+  discountPct,
+  discountedPriceLabel,
   onNext,
 }: CheckoutSummaryProps) => (
   <div className="bg-[#1A0030] border border-white/10 rounded-2xl p-6 sticky top-24">
@@ -27,12 +33,12 @@ export const CheckoutSummary = ({
     <div className="flex items-center justify-center gap-3 mb-4">
       <span className="text-white/30 line-through text-lg">{size.origFee}</span>
       <span className="text-3xl font-heading font-extrabold text-white">
-        {size.discFee}
+        {discountedPriceLabel}
       </span>
     </div>
     <div className="flex items-center justify-center gap-2 mb-6">
       <span className="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">
-        {plan.discount} OFF
+        {discountPct}% OFF
       </span>
     </div>
 
@@ -60,7 +66,7 @@ export const CheckoutSummary = ({
       </div>
       <div className="flex justify-between text-sm mb-2">
         <span className="text-white/80">{productName}</span>
-        <span className="text-white font-bold">{size.discFee}</span>
+        <span className="text-white font-bold">{discountedPriceLabel}</span>
       </div>
       {selectedAddonData && (
         <div className="flex justify-between text-sm mb-2">

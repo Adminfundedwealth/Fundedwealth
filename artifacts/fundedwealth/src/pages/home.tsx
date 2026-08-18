@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { useLiveDiscountConfig } from "@/hooks/useDiscountConfig";
+import { useLiveDiscountConfig, computeDiscountedPrice, formatINR } from "@/hooks/useDiscountConfig";
 import SEOHead from "@/components/SEOHead";
 import { FAQSchema, ServiceSchema } from "@/components/StructuredData";
 import IndiaTraderNetworkHero from "@/components/IndiaTraderNetworkHero";
@@ -2911,12 +2911,15 @@ const Plans = () => {
           <TabsContent value="flash" className="mt-0">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
               {[
-                { size: "₹50,000", origFee: "₹1,999", discFee: "₹799" },
-                { size: "₹1,00,000", origFee: "₹3,499", discFee: "₹1,399" },
-                { size: "₹2,50,000", origFee: "₹7,499", discFee: "₹2,999", popular: true },
-                { size: "₹5,00,000", origFee: "₹11,499", discFee: "₹4,599" },
-                { size: "₹10,00,000", origFee: "₹19,499", discFee: "₹7,799" },
-              ].map((plan, i) => (
+                { size: "₹50,000", baseFee: 1999, origFee: "₹1,999" },
+                { size: "₹1,00,000", baseFee: 3499, origFee: "₹3,499" },
+                { size: "₹2,50,000", baseFee: 7499, origFee: "₹7,499", popular: true },
+                { size: "₹5,00,000", baseFee: 11499, origFee: "₹11,499" },
+                { size: "₹10,00,000", baseFee: 19499, origFee: "₹19,499" },
+              ].map((plan, i) => {
+                const flashPct = discountConfig["flash"]?.discountPct ?? 60;
+                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, flashPct));
+                return (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-yellow-500/60 shadow-[0_0_25px_rgba(234,179,8,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-to-r from-yellow-500 to-orange-500 text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white">
@@ -2929,9 +2932,9 @@ const Plans = () => {
                       <div className="text-lg sm:text-xl font-heading font-extrabold text-white mb-2">{plan.size}</div>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">60% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{flashPct}% OFF</span>
                       </div>
-                      <div className="text-yellow-400 font-extrabold text-xl mt-1">{plan.discFee}</div>
+                      <div className="text-yellow-400 font-extrabold text-xl mt-1">{discFee}</div>
                     </div>
 
                     <div className="space-y-2.5 mb-5">
@@ -2970,7 +2973,8 @@ const Plans = () => {
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
+              );
+              })}
             </div>
 
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl px-6 py-4">
@@ -2985,11 +2989,14 @@ const Plans = () => {
           <TabsContent value="instant" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
               {[
-                { size: "₹1,00,000", origFee: "₹4,999", discFee: "₹2,749" },
-                { size: "₹5,00,000", origFee: "₹10,999", discFee: "₹6,049", popular: true },
-                { size: "₹10,00,000", origFee: "₹17,999", discFee: "₹9,899" },
-                { size: "₹20,00,000", origFee: "₹29,999", discFee: "₹16,499" },
-              ].map((plan, i) => (
+                { size: "₹1,00,000", baseFee: 4999, origFee: "₹4,999" },
+                { size: "₹5,00,000", baseFee: 10999, origFee: "₹10,999", popular: true },
+                { size: "₹10,00,000", baseFee: 17999, origFee: "₹17,999" },
+                { size: "₹20,00,000", baseFee: 29999, origFee: "₹29,999" },
+              ].map((plan, i) => {
+                const instantPct = discountConfig["instant"]?.discountPct ?? 55;
+                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, instantPct));
+                return (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-fw text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white">
@@ -3002,9 +3009,9 @@ const Plans = () => {
                       <div className="text-lg sm:text-xl font-heading font-extrabold text-white mb-2">{plan.size}</div>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">55% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{instantPct}% OFF</span>
                       </div>
-                      <div className="text-fw-orange font-extrabold text-xl mt-1">{plan.discFee}</div>
+                      <div className="text-fw-orange font-extrabold text-xl mt-1">{discFee}</div>
                       <div className="text-white/40 text-[10px] mt-0.5">refundable fee</div>
                     </div>
 
@@ -3044,7 +3051,8 @@ const Plans = () => {
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
+              );
+              })}
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-fw-pink/10 to-fw-orange/10 border border-fw-pink/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
@@ -3056,11 +3064,14 @@ const Plans = () => {
           <TabsContent value="1step" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto">
               {[
-                { size: "₹1,00,000", origFee: "₹2,999", discFee: "₹1,049", evalSplit: "–", fundedBonuses: "From ₹499" },
-                { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹4,199", evalSplit: "–", fundedBonuses: "From ₹1,500", popular: true },
-                { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹7,699", evalSplit: "–", fundedBonuses: "From ₹2,500" },
-                { size: "₹25,00,000", origFee: "₹48,499", discFee: "₹16,974", evalSplit: "–", fundedBonuses: "From ₹5,250" },
-              ].map((plan, idx) => (
+                { size: "₹1,00,000", baseFee: 2999, origFee: "₹2,999", evalSplit: "–", fundedBonuses: "From ₹499" },
+                { size: "₹5,00,000", baseFee: 11999, origFee: "₹11,999", evalSplit: "–", fundedBonuses: "From ₹1,500", popular: true },
+                { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", evalSplit: "–", fundedBonuses: "From ₹2,500" },
+                { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", evalSplit: "–", fundedBonuses: "From ₹5,250" },
+              ].map((plan, idx) => {
+                const oneStepPct = discountConfig["1step"]?.discountPct ?? 65;
+                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, oneStepPct));
+                return (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-fw text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white z-10">
@@ -3074,9 +3085,9 @@ const Plans = () => {
                       <p className="text-white/50 text-xs mb-3">One evaluation. Prove it once, get funded.</p>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">65% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{oneStepPct}% OFF</span>
                       </div>
-                      <div className="text-fw-orange font-extrabold text-xl mt-1">{plan.discFee}</div>
+                      <div className="text-fw-orange font-extrabold text-xl mt-1">{discFee}</div>
                       <div className="text-white/40 text-[10px] mt-0.5">one-time fee</div>
                     </div>
 
@@ -3171,7 +3182,8 @@ const Plans = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              );
+              })}
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500/10 to-fw-pink/10 border border-purple-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
@@ -3183,10 +3195,13 @@ const Plans = () => {
           <TabsContent value="2step" className="mt-0">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
               {[
-                { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹3,599", discount: "70%", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹999" },
-                { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹6,599", discount: "70%", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹1,999", popular: true },
-                { size: "₹25,00,000", origFee: "₹48,999", discFee: "₹14,549", discount: "70%", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹4,999" },
-              ].map((plan, idx) => (
+                { size: "₹5,00,000", baseFee: 11999, origFee: "₹11,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹999" },
+                { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹1,999", popular: true },
+                { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹4,999" },
+              ].map((plan, idx) => {
+                const twoStepPct = discountConfig["2step"]?.discountPct ?? 70;
+                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, twoStepPct));
+                return (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-fw text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white z-10">
@@ -3200,9 +3215,9 @@ const Plans = () => {
                       <p className="text-white/50 text-xs mb-3">One evaluation. Prove it once, get funded.</p>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{plan.discount} OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{twoStepPct}% OFF</span>
                       </div>
-                      <div className="text-fw-orange font-extrabold text-xl mt-1">{plan.discFee}</div>
+                      <div className="text-fw-orange font-extrabold text-xl mt-1">{discFee}</div>
                       <div className="text-white/40 text-[10px] mt-0.5">one-time fee</div>
                     </div>
 
@@ -3305,7 +3320,8 @@ const Plans = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              );
+              })}
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>

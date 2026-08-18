@@ -20,6 +20,7 @@ import {
   getProduct,
   type PlanType,
 } from "@workspace/products";
+import { resolveDiscountPct } from "../lib/discount-resolver";
 import { provisionChallenge } from "../lib/provisioning-service";
 import {
   getOrCreateUser,
@@ -279,7 +280,9 @@ router.post("/create-crypto-payment", paymentLimiter, async (req: Request, res: 
       return;
     }
 
-    const pricing = computeServerTotal(planType as PlanType, sizeIndex, couponCode);
+    // Resolve the live admin-configured discount for this plan
+    const liveDiscountPct = await resolveDiscountPct(planType as PlanType, couponCode);
+    const pricing = computeServerTotal(planType as PlanType, sizeIndex, couponCode, liveDiscountPct);
     if (!pricing) {
       res.status(400).json({ error: "Invalid plan or size selection" });
       return;
@@ -898,7 +901,8 @@ router.post("/verify-utr", paymentLimiter, async (req: Request, res: Response) =
     }
 
     // SECURITY: Server-side price validation — prevent underpayment attacks
-    const expectedPricing = computeServerTotal(planType as PlanType, typeof sizeIndex === "number" ? sizeIndex : 0, couponCode);
+    const utrLiveDiscountPct = await resolveDiscountPct(planType as PlanType, couponCode);
+    const expectedPricing = computeServerTotal(planType as PlanType, typeof sizeIndex === "number" ? sizeIndex : 0, couponCode, utrLiveDiscountPct);
     if (!expectedPricing) {
       return res.status(400).json({ success: false, message: "Invalid plan/size combination." });
     }

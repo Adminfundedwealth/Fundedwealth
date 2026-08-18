@@ -95,16 +95,21 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: { code: 'DB_ERROR', message: error.message } }, { status: 500 });
     }
 
-    await auditLogger.log({
-      actorId: actor.id,
-      actorRole: 'Founder',
-      action: 'discount_config.update',
-      targetEntityType: 'discount_config',
-      targetEntityId: 'all',
-      newState: { updates: parsed.data.updates } as any,
-      ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1',
-      deviceInfo: { userAgent: request.headers.get('user-agent') || '' } as any,
-    });
+    // Audit log — non-fatal: don't let a logging failure kill a successful save
+    try {
+      await auditLogger.log({
+        actorId: actor.id,
+        actorRole: 'Founder',
+        action: 'discount_config.update',
+        targetEntityType: 'discount_config',
+        targetEntityId: 'all',
+        newState: { updates: parsed.data.updates } as any,
+        ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1',
+        deviceInfo: { userAgent: request.headers.get('user-agent') || '' } as any,
+      });
+    } catch (auditErr) {
+      console.error('discount-config audit log failed (non-fatal):', auditErr);
+    }
 
     return NextResponse.json({ success: true, updated: upsertRows.length });
   } catch (err) {

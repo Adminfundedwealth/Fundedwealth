@@ -255,19 +255,40 @@ export function getCouponDiscount(couponCode?: string | null): number {
 /**
  * Server-authoritative pricing for a plan + size + optional coupon.
  * Returns null if the plan/size selection is invalid.
+ *
+ * @param discountOverride — If provided, uses this discount percentage directly
+ *   instead of resolving the coupon code from the static COUPONS map.
+ *   This allows the API server to pass the live DB discount value.
  */
 export function computeTotal(
   planType: PlanType,
   sizeIndex: number,
   couponCode?: string | null,
+  discountOverride?: number | null,
 ): { baseFee: number; total: number; finalTotal: number; discount: number } | null {
   const size = getProductSize(planType, sizeIndex);
   if (!size) return null;
 
   const baseFee = size.fee;
   const total = baseFee;
-  const discount = getCouponDiscount(couponCode);
+  const discount = discountOverride != null ? discountOverride : getCouponDiscount(couponCode);
   const finalTotal = discount > 0 ? Math.round(total * (1 - discount / 100)) : total;
 
   return { baseFee, total, finalTotal, discount };
+}
+
+/**
+ * Format a number as INR price string using Indian numbering (lakh/crore).
+ * E.g., 1999 → "₹1,999", 16974 → "₹16,974", 100000 → "₹1,00,000"
+ */
+export function formatINR(amount: number): string {
+  return "₹" + amount.toLocaleString("en-IN");
+}
+
+/**
+ * Compute the discounted fee for a given base fee and discount percentage.
+ * Returns the rounded integer amount.
+ */
+export function computeDiscountedFee(baseFee: number, discountPct: number): number {
+  return Math.round(baseFee * (1 - discountPct / 100));
 }

@@ -37,6 +37,22 @@ let _cacheTime = 0;
 const CACHE_TTL_MS = 60_000; // 60 seconds
 
 /**
+ * Compute the discounted price from a base fee and discount percentage.
+ * Uses Math.round for consistency with the server-side calculation.
+ */
+export function computeDiscountedPrice(baseFee: number, discountPct: number): number {
+  return Math.round(baseFee * (1 - discountPct / 100));
+}
+
+/**
+ * Format a number as INR price string using Indian numbering (lakh/crore).
+ * E.g., 1999 → "₹1,999", 16974 → "₹16,974", 100000 → "₹1,00,000"
+ */
+export function formatINR(amount: number): string {
+  return "₹" + amount.toLocaleString("en-IN");
+}
+
+/**
  * useLiveDiscountConfig
  *
  * Fetches the active discount codes from the API and returns them as a map.

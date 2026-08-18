@@ -114,11 +114,12 @@ export default function Checkout() {
 
   const plan = PLANS[selectedPlan];
   const size = plan.sizes[selectedSizeIdx];
-  const priceNum = parseInt(size.discFee.replace(/[₹,]/g, ""));
+  // Compute discounted price dynamically from base fee + live admin discount
+  const origNum = size.fee;
+  const priceNum = couponDiscount > 0 ? Math.round(origNum * (1 - couponDiscount / 100)) : origNum;
   const selectedAddonData = ADDONS.find((a) => a.id === selectedAddon) ?? null;
   const addonPrice = selectedAddonData ? parseInt(selectedAddonData.price.replace(/[₹,/a-zA-Z]/g, "")) : 0;
   const finalTotal = priceNum + addonPrice;
-  const origNum = parseInt(size.origFee.replace(/[₹,]/g, ""));
   const productName = `${size.size} ${plan.label} (FundedWealth IND)`;
 
   const FW_UPI_ID = "s8257683769651514@slc";
@@ -326,6 +327,8 @@ export default function Checkout() {
                 plan={plan}
                 selectedAddonData={selectedAddonData}
                 finalTotal={finalTotal}
+                discountPct={couponDiscount}
+                discountedPriceLabel={`₹${priceNum.toLocaleString("en-IN")}`}
                 onNext={() => setStep(2)}
               />
             </motion.div>
