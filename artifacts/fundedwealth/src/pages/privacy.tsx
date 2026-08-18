@@ -45,6 +45,7 @@ export default function Privacy() {
               <li>IP address and approximate location</li>
               <li>Usage data (pages visited, time spent, click patterns)</li>
               <li>Cookies and similar tracking technologies</li>
+              <li><strong className="text-white/80">Device Fingerprint:</strong> We use the open-source FingerprintJS library to generate a device identifier based on your browser and device characteristics (such as screen resolution, timezone, language, and hardware configuration). This identifier is generated locally in your browser and sent to FundedWealth's servers — it is not transmitted to any external FingerprintJS service. We use this information to detect suspicious activity, prevent fraud, protect accounts, and identify potentially unauthorized access.</li>
             </ul>
           </section>
 
