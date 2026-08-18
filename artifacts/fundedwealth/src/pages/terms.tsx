@@ -55,8 +55,8 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-bold text-white mb-3">5. Privacy & Data</h2>
-            <p>FundedWealth collects and processes user information as described in our <Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link>. By using the Service, you acknowledge that you have reviewed the Privacy Policy and consent to the collection, use, and processing of your information as described therein.</p>
-            <p className="mt-3">Your use of the Service is subject to our Privacy Policy, which describes how we collect, use, share, retain, and secure your information. You have the privacy and data rights described in the Privacy Policy, including the right to access, correct, and request deletion of your personal data.</p>
+            <p>FundedWealth collects and handles personal information as described in our <Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link>. The processing of personal information in connection with the Service is governed by applicable privacy and data protection laws.</p>
+            <p className="mt-3">Please review the Privacy Policy for details regarding the collection, use, sharing, retention, and security of your information, as well as your data rights (including access, correction, and deletion). The Privacy Policy forms part of your relationship with FundedWealth.</p>
             <p className="mt-3">Where applicable, you may be required to provide identity verification (KYC) information for account verification and payout processing. You agree to provide accurate and truthful information when completing any verification process.</p>
           </section>
 
@@ -136,7 +136,7 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-bold text-white mb-3">14. Limitation of Liability</h2>
-            <p>To the maximum extent permitted by law, FundedWealth shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or other intangible losses resulting from your use of the Service. FundedWealth's total liability for any claim arising out of or relating to these Terms or the Service shall not exceed the amount you paid to FundedWealth in the twelve (12) months preceding the claim.</p>
+            <p>To the maximum extent permitted by law, FundedWealth shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or other intangible losses resulting from your use of the Service.</p>
           </section>
 
           <section>
