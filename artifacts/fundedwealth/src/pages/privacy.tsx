@@ -106,6 +106,7 @@ export default function Privacy() {
             <h2 className="text-xl font-bold text-white mb-3">9. Third-Party Services</h2>
             <p>Our platform integrates with third-party services including Supabase (authentication and session management), payment processors, and analytics tools. Each of these services has its own privacy policy governing the use of your information.</p>
             <p className="mt-3">We use ProxyCheck.io, a third-party IP intelligence service, for security and fraud prevention purposes. Your IP address may be checked against ProxyCheck.io to identify connections from VPNs, proxies, TOR networks, or datacenter/hosting infrastructure. The result of this check is stored on FundedWealth's servers and may contribute to our security and fraud-detection systems, which help protect accounts and the integrity of the platform.</p>
+            <p className="mt-3">For cryptocurrency payments, we use OxaPay as a third-party payment processor. When you choose to pay with cryptocurrency, payment-related information such as the transaction amount, currency, and an order identifier is shared with OxaPay to create and process the payment. OxaPay processes this information in accordance with its own privacy practices. FundedWealth does not send your name, email, KYC documents, or other personal account information to OxaPay.</p>
           </section>
 
           <section>
