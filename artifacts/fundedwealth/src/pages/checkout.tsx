@@ -122,7 +122,7 @@ export default function Checkout() {
   const finalTotal = priceNum + addonPrice;
   const productName = `${size.size} ${plan.label} (FundedWealth IND)`;
 
-  const FW_UPI_ID = "s8257683769651514@slc";
+  const FW_UPI_ID = "BHARATPE09S9C1V8L1Z53809@yesbankltd";
   const FW_MERCHANT_NAME = "AMAN KUMAR SINGH";
 
   useEffect(() => {
