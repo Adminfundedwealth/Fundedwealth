@@ -79,6 +79,52 @@ import("./lib/redis-client").then(({ getRedisClient }) => {
   getRedisClient().catch(() => {});
 });
 
+// ── P0 Fix: Seed correct plan sale discounts into discount_config ─────────────
+// Runs non-blocking at startup. Ensures the DB has the canonical values:
+//   Flash=50%, Instant=45%, 1-Step=55%, 2-Step=60%
+// Safe to run every startup — uses upsert so it is idempotent.
+(async () => {
+  try {
+    const { invalidateDiscountCache } = await import("./lib/discount-resolver");
+    const { db, discountConfig } = await import("@workspace/db");
+    const { PRODUCTS, PLAN_TYPES } = await import("@workspace/products");
+
+    const correctRows = PLAN_TYPES.map((planType) => {
+      const p = PRODUCTS[planType];
+      return {
+        planType,
+        code: p.code,
+        discountPct: p.discountPct,
+        active: true,
+      };
+    });
+
+    // Upsert canonical values — idempotent, only writes if different
+    for (const row of correctRows) {
+      await db
+        .insert(discountConfig)
+        .values(row)
+        .onConflictDoUpdate({
+          target: discountConfig.planType,
+          set: {
+            code: row.code,
+            discountPct: row.discountPct,
+            active: row.active,
+          },
+        })
+        .catch((seedErr: Error) => {
+          // Non-fatal: the static fallback in discount-resolver.ts is correct
+          logger.warn({ planType: row.planType, seedErr: seedErr.message }, "discount_config startup seed failed for plan (non-fatal)");
+        });
+    }
+
+    invalidateDiscountCache();
+    logger.info("discount_config seeded/verified: Flash=50%, Instant=45%, 1-Step=55%, 2-Step=60%");
+  } catch (err) {
+    logger.warn({ err }, "discount_config startup seed skipped (non-fatal)");
+  }
+})();
+
 server.listen(port, (err?: any) => {
   if (err) {
     logger.error({ err }, "Error listening on port");
