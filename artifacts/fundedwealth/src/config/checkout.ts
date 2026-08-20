@@ -5,6 +5,11 @@
 // of truth: @workspace/products. This file only adapts that canonical data
 // into the display shape the checkout UI already expects, plus website-only
 // presentation config (add-ons, payment methods).
+//
+// CANONICAL PLAN SALE DISCOUNTS (from @workspace/products):
+//   Flash   = 50%  |  Instant = 45%  |  1-Step = 55%  |  2-Step = 60%
+//
+// These are BASE PLAN DISCOUNTS — do NOT confuse with coupon codes.
 import { PRODUCTS, COUPONS, PLAN_TYPES, type PlanType } from "@workspace/products";
 
 export type { PlanType };
@@ -12,7 +17,11 @@ export type { PlanType };
 export interface PlanConfig {
   label: string;
   sizes: { size: string; fee: number; origFee: string; discFee: string; popular?: boolean }[];
+  /** Plan sale discount as string e.g. "50%" */
   discount: string;
+  /** Plan sale discount as number e.g. 50 — use this for calculations */
+  discountPct: number;
+  /** Promotional code shown in "Use code" banner — display only, NOT a price driver */
   code: string;
   profitTarget: string;
   maxLoss: string;
@@ -29,6 +38,7 @@ export const PLANS: Record<PlanType, PlanConfig> = PLAN_TYPES.reduce((acc, key) 
   acc[key] = {
     label: p.displayLabel,
     discount: p.discount,
+    discountPct: p.discountPct,
     code: p.code,
     profitTarget: p.profitTarget,
     maxLoss: p.maxLoss,

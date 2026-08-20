@@ -2917,7 +2917,7 @@ const Plans = () => {
                 { size: "₹5,00,000", baseFee: 11499, origFee: "₹11,499" },
                 { size: "₹10,00,000", baseFee: 19499, origFee: "₹19,499" },
               ].map((plan, i) => {
-                const flashPct = discountConfig["flash"]?.discountPct ?? 60;
+                const flashPct = discountConfig["flash"]?.discountPct ?? 50;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, flashPct));
                 return (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-yellow-500/60 shadow-[0_0_25px_rgba(234,179,8,0.15)]' : ''}`}>
@@ -2979,8 +2979,8 @@ const Plans = () => {
 
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">{discountConfig["flash"]?.code ?? "INDIA80"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">{discountConfig["flash"]?.discountPct ?? 60}% OFF</span></div>
+              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">{discountConfig["flash"]?.code ?? "FLASH50"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">{discountConfig["flash"]?.discountPct ?? 50}% OFF</span></div>
             </div>
 
             <FlashRulesAccordion />
@@ -2994,7 +2994,7 @@ const Plans = () => {
                 { size: "₹10,00,000", baseFee: 17999, origFee: "₹17,999" },
                 { size: "₹20,00,000", baseFee: 29999, origFee: "₹29,999" },
               ].map((plan, i) => {
-                const instantPct = discountConfig["instant"]?.discountPct ?? 55;
+                const instantPct = discountConfig["instant"]?.discountPct ?? 45;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, instantPct));
                 return (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
@@ -3056,8 +3056,8 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-fw-pink/10 to-fw-orange/10 border border-fw-pink/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">{discountConfig["instant"]?.code ?? "INDIA80"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">{discountConfig["instant"]?.discountPct ?? 55}% OFF</span></div>
+              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">{discountConfig["instant"]?.code ?? "INSTANT45"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">{discountConfig["instant"]?.discountPct ?? 45}% OFF</span></div>
             </div>
           </TabsContent>
 
@@ -3069,7 +3069,7 @@ const Plans = () => {
                 { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", evalSplit: "–", fundedBonuses: "From ₹2,500" },
                 { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", evalSplit: "–", fundedBonuses: "From ₹5,250" },
               ].map((plan, idx) => {
-                const oneStepPct = discountConfig["1step"]?.discountPct ?? 65;
+                const oneStepPct = discountConfig["1step"]?.discountPct ?? 55;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, oneStepPct));
                 return (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
@@ -3187,8 +3187,8 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500/10 to-fw-pink/10 border border-purple-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">{discountConfig["1step"]?.code ?? "INDIA80"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">{discountConfig["1step"]?.discountPct ?? 65}% OFF</span></div>
+              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">{discountConfig["1step"]?.code ?? "ONESTEP55"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">{discountConfig["1step"]?.discountPct ?? 55}% OFF</span></div>
             </div>
           </TabsContent>
 
@@ -3199,7 +3199,7 @@ const Plans = () => {
                 { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹1,999", popular: true },
                 { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹4,999" },
               ].map((plan, idx) => {
-                const twoStepPct = discountConfig["2step"]?.discountPct ?? 70;
+                const twoStepPct = discountConfig["2step"]?.discountPct ?? 60;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, twoStepPct));
                 return (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
@@ -3325,8 +3325,8 @@ const Plans = () => {
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">{discountConfig["2step"]?.code ?? "INDIA80"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">{discountConfig["2step"]?.discountPct ?? 70}% OFF</span></div>
+              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">{discountConfig["2step"]?.code ?? "TWOSTEP60"}</div>
+              <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">{discountConfig["2step"]?.discountPct ?? 60}% OFF</span></div>
             </div>
           </TabsContent>
         </Tabs>

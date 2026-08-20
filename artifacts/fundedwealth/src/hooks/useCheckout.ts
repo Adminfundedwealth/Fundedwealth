@@ -2,15 +2,69 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, PlanType, COUPON_CODES } from "../config/checkout";
 
+/** Shape returned by GET /api/discount-config */
+interface LiveDiscountEntry {
+  planType: string;
+  code: string;
+  discountPct: number;
+  active: boolean;
+}
+
 export const useCheckout = () => {
   const { isLoaded, getToken, isSignedIn } = useAuth();
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("1step");
   const [selectedSizeIdx, setSelectedSizeIdx] = useState(0);
   const [selectedAddon, setSelectedAddon] = useState<string | null>(null);
-  // Use each plan's own coupon code so server validation matches displayed price
-  const appliedCoupon = PLANS[selectedPlan].code;
-  const couponDiscount = COUPON_CODES[appliedCoupon] ?? 0;
+
+  // Live discount config fetched from the API (admin-controlled).
+  // Falls back to the static @workspace/products values if the fetch fails.
+  const [liveDiscounts, setLiveDiscounts] = useState<LiveDiscountEntry[]>([]);
+
+  useEffect(() => {
+    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    fetch(`${apiBase}/api/discount-config`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((data) => { if (Array.isArray(data?.data)) setLiveDiscounts(data.data); })
+      .catch(() => { /* silently use static fallback */ });
+  }, []);
+
+  // ─── Resolve plan sale discount (Tier 1) ────────────────────────────────────
+  // The liveEntry.discountPct IS the plan sale discount percentage (50/45/55/60).
+  // It is NOT a coupon. We use it directly as the base discount applied to the fee.
+  //
+  // FALLBACK hierarchy (most specific first):
+  //   1. API live discount for this plan  (liveEntry.discountPct)
+  //   2. Static PLANS[plan].discount string parsed as number
+  //
+  // NOTE: We intentionally do NOT fall back to COUPON_CODES[liveEntry.code] here.
+  // That was the P0 bug — the plan code was "INDIA80" and COUPON_CODES["INDIA80"]=80,
+  // which made every plan show 80% off regardless of the plan sale discount.
+  const liveEntry = liveDiscounts.find((e) => e.planType === selectedPlan && e.active);
+
+  // planSaleDiscount = the canonical plan discount (50 for Flash, 45 for Instant, etc.)
+  const planSaleDiscount: number = liveEntry?.discountPct
+    ?? parseInt(PLANS[selectedPlan].discount, 10)  // "50%" → 50
+    ?? 0;
+
+  // appliedCoupon = the PROMOTIONAL code shown in the "Use code" banner (display only).
+  // This does NOT change the planSaleDiscount.
+  const appliedCoupon = liveEntry?.code ?? PLANS[selectedPlan].code;
+
+  // ─── Coupon discount (Tier 2) ────────────────────────────────────────────────
+  // A promo coupon entered by the user provides an ADDITIONAL discount on top of
+  // the plan sale price. The user has NOT entered a coupon code yet at this point
+  // (that feature is applied at checkout step 3). For now, couponDiscount = 0.
+  //
+  // If a separate coupon-input field is added to checkout, look it up via:
+  //   COUPON_CODES[enteredCode] → additional %
+  // and stack it on top of planSaleDiscount.
+  //
+  // For backwards compatibility with components that receive `couponDiscount` to
+  // compute the final price, we expose planSaleDiscount as couponDiscount so no
+  // other component needs to change.
+  const couponDiscount = planSaleDiscount;
+
   const [termsOpen, setTermsOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -104,6 +158,7 @@ export const useCheckout = () => {
     setSelectedAddon,
     appliedCoupon,
     couponDiscount,
+    planSaleDiscount,
     termsOpen,
     setTermsOpen,
     selectedPayment,

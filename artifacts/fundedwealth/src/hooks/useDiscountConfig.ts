@@ -18,12 +18,23 @@ const API_PREFIX = import.meta.env.VITE_API_URL
     ? `${import.meta.env.VITE_API_BASE_URL}/api`
     : `${RAILWAY_API}/api`;
 
-/** Static fallback used before the API responds or on error. */
+/**
+ * Static fallback used before the API responds or on error.
+ *
+ * CANONICAL PLAN SALE DISCOUNTS — keep in sync with @workspace/products PRODUCTS:
+ *   Flash   = 50%  (code FLASH50)
+ *   Instant = 45%  (code INSTANT45)
+ *   1-Step  = 55%  (code ONESTEP55)
+ *   2-Step  = 60%  (code TWOSTEP60)
+ *
+ * These are BASE PLAN DISCOUNTS, not coupons.
+ * DO NOT set discountPct to 80 here — that was the P0 bug root cause.
+ */
 const FALLBACK: DiscountConfigEntry[] = [
-  { planType: "flash",   displayLabel: "Flash Funding",     code: "INDIA80", discountPct: 60, active: true },
-  { planType: "instant", displayLabel: "Instant Funding",   code: "INDIA80", discountPct: 55, active: true },
-  { planType: "1step",   displayLabel: "1-Step Evaluation", code: "INDIA80", discountPct: 65, active: true },
-  { planType: "2step",   displayLabel: "2-Step Evaluation", code: "INDIA80", discountPct: 70, active: true },
+  { planType: "flash",   displayLabel: "Flash Funding",     code: "FLASH50",    discountPct: 50, active: true },
+  { planType: "instant", displayLabel: "Instant Funding",   code: "INSTANT45",  discountPct: 45, active: true },
+  { planType: "1step",   displayLabel: "1-Step Evaluation", code: "ONESTEP55",  discountPct: 55, active: true },
+  { planType: "2step",   displayLabel: "2-Step Evaluation", code: "TWOSTEP60",  discountPct: 60, active: true },
 ];
 
 function toMap(entries: DiscountConfigEntry[]): DiscountConfigMap {
