@@ -671,6 +671,25 @@ const Navbar = () => {
             <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
               <span></span>FundedWealth <span className="opacity-90">IND</span>
             </button>
+            {/* FundedWealth Forex — 3D glassy tab */}
+            <a
+              href="https://forex.fundedwealth.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-all duration-200 hover:scale-105 select-none"
+              style={{
+                background: "linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(0,255,180,0.10) 50%, rgba(0,120,255,0.18) 100%)",
+                border: "1px solid rgba(0,220,255,0.35)",
+                boxShadow: "0 2px 16px 0 rgba(0,212,255,0.18), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.10)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                color: "rgba(180,255,255,0.95)",
+                textShadow: "0 0 8px rgba(0,212,255,0.6)",
+              }}
+            >
+              <span style={{ filter: "drop-shadow(0 0 4px rgba(0,212,255,0.8))" }}></span>
+              FundedWealth <span style={{ opacity: 0.9 }}>Forex</span>
+            </a>
           </div>
         </div>
       </div>
