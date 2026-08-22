@@ -671,22 +671,6 @@ const Navbar = () => {
             <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
               <span></span>FundedWealth <span className="opacity-90">IND</span>
             </button>
-            {[
-              { label: "Forex", icon: "" },
-              { label: "Crypto", icon: "₿" },
-              { label: "Futures", icon: "" },
-            ].map((t) => (
-              <button
-                key={t.label}
-                disabled
-                title="Coming Soon"
-                className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-medium text-white/50 hover:text-white/70 transition-colors flex items-center gap-1.5 cursor-not-allowed"
-              >
-                <span>{t.icon}</span>
-                FundedWealth <span className="opacity-90">{t.label}</span>
-                <span className="ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">Soon</span>
-              </button>
-            ))}
           </div>
         </div>
       </div>
