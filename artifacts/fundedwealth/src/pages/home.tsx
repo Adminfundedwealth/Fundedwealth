@@ -4391,7 +4391,7 @@ const ContactUs = () => {
                 <Mail className="text-fw-orange w-5 h-5 shrink-0" />
                 <div>
                   <div className="text-white/40 text-xs mb-0.5">Email:</div>
-                  <div className="text-white font-semibold text-sm">support@fundedwealth.in</div>
+                  <div className="text-white font-semibold text-sm">support@fundedwealth.com</div>
                 </div>
               </div>
             </div>
@@ -5337,10 +5337,8 @@ const TrustAndSecurity = () => {
   ];
 
   const companyCredentials = [
-    { label: "Registered Company", value: "FundedWealth India Pvt. Ltd." },
-    { label: "CIN", value: "U74999MH2024PTC000000" },
-    { label: "GSTIN", value: "27AABCF0000A1Z5" },
-    { label: "Registered Office", value: "Mumbai, Maharashtra, India" },
+    { label: "Brand", value: "FundedWealth" },
+    { label: "Location", value: "Mumbai, Maharashtra, India" },
     { label: "Support Email", value: "support@fundedwealth.com" },
     { label: "Operating Since", value: "2024" },
   ];
@@ -5400,7 +5398,7 @@ const TrustAndSecurity = () => {
             <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
               <h3 className="text-white font-heading font-bold text-lg flex items-center gap-2">
                 <Building2 size={20} className="text-green-400" />
-                Company Registration Details
+                About FundedWealth
               </h3>
             </div>
             <div className="p-6 space-y-4">
@@ -5576,11 +5574,10 @@ const Footer = () => {
               India's #1 Fastest Growing Prop Trading Firm Dedicated to Indian Traders
             </p>
             <div className="space-y-2 mb-6 text-sm text-white/40">
-              <p className="flex items-center gap-2"><Building2 size={14} className="text-white/30 shrink-0" /> FundedWealth India Pvt. Ltd.</p>
+              <p className="flex items-center gap-2"><Building2 size={14} className="text-white/30 shrink-0" /> FundedWealth</p>
+              <p className="flex items-center gap-2"><Globe size={14} className="text-white/30 shrink-0" /> Simulated Trading &amp; Evaluation Platform</p>
               <p className="flex items-center gap-2"><MapPin size={14} className="text-white/30 shrink-0" /> Mumbai, Maharashtra, India</p>
               <p className="flex items-center gap-2"><Mail size={14} className="text-white/30 shrink-0" /> support@fundedwealth.com</p>
-              <p className="flex items-center gap-2"><FileText size={14} className="text-white/30 shrink-0" /> CIN: U74999MH2024PTC000000</p>
-              <p className="flex items-center gap-2"><FileText size={14} className="text-white/30 shrink-0" /> GSTIN: 27AABCF0000A1Z5</p>
             </div>
             <div className="flex gap-4">
               <a href="https://www.instagram.com/fundedwealthind" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-fw-pink hover:text-white transition-colors">
@@ -5645,7 +5642,7 @@ const Footer = () => {
           </div>
           <div className="border border-white/10 rounded-xl bg-white/3 px-6 py-4">
             <p className="text-xs text-white/60 leading-relaxed">
-              <span className="text-fw-orange font-bold">Important Notice:</span> FundedWealth India is not a SEBI-registered entity and does not provide regulated financial services, investment advice, or brokerage services. All activities on the platform are for educational and skill assessment purposes.
+              <span className="text-fw-orange font-bold">Important Notice:</span> FundedWealth is not a SEBI-registered entity and does not provide regulated financial services, investment advice, or brokerage services. FundedWealth provides simulated trading and evaluation services. Trading activity is conducted in a simulated environment and does not represent live securities transactions unless expressly stated otherwise. All activities on the platform are for educational and skill assessment purposes.
             </p>
           </div>
         </div>
