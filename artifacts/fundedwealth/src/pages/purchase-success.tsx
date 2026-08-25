@@ -198,7 +198,7 @@ export default function PurchaseSuccess() {
     // Add footer
     doc.setFontSize(8);
     doc.setTextColor(128);
-    doc.text("FundedWealth.com | support@fundedwealth.in", 20, 280);
+    doc.text("FundedWealth.com | support@fundedwealth.com", 20, 280);
     
     // Save the PDF
     doc.save(`FundedWealth_Credentials_${accountData.accountCode}.pdf`);

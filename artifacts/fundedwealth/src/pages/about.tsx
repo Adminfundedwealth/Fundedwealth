@@ -346,7 +346,7 @@ const AboutPage = () => {
             {[
               { label: "Terms of Service", href: "/terms" },
               { label: "Privacy Policy", href: "/privacy" },
-              { label: "Risk Disclosure", href: "/refund" },
+              { label: "Refund Policy", href: "/refund" },
               { label: "FAQ", href: "/#faq" },
             ].map((p) => (
               <Link key={p.label} href={p.href}>
