@@ -483,8 +483,8 @@ export default function PaymentPending() {
                 {flow === "upi" && (
                   <p className="text-center text-white/50 text-xs">
                     Your payment is safe. Contact{" "}
-                    <a href="mailto:support@fundedwealth.in" className="text-white/70 underline">
-                      support@fundedwealth.in
+                    <a href="mailto:support@fundedwealth.com" className="text-white/70 underline">
+                      support@fundedwealth.com
                     </a>{" "}
                     if you need help.
                   </p>
@@ -516,10 +516,10 @@ export default function PaymentPending() {
           <p className="text-center text-white/30 text-xs mt-6">
             Questions?{" "}
             <a
-              href="mailto:support@fundedwealth.in"
+              href="mailto:support@fundedwealth.com"
               className="text-white/50 hover:text-white underline"
             >
-              support@fundedwealth.in
+              support@fundedwealth.com
             </a>
             {referenceId && (
               <span className="block mt-1">Quote {flow === "upi" ? "Order" : "Track"} ID: {referenceId}</span>

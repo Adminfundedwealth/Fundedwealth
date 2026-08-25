@@ -370,7 +370,7 @@ const FAQS: Faq[] = [
   {
     cat: "Billing",
     q: "Can I cancel my assessment?",
-    a: "Yes — within 7 days of purchase and only if no trade has been placed. Refunds are credited to the original payment method within 5–7 business days. Full terms are on our Refund Policy page.",
+    a: "Yes — within 48 hours of purchase and only if no trade has been placed on the challenge account. Refunds are processed to the original payment method within 5–7 business days of approval. Full terms are on our Refund Policy page.",
   },
   {
     cat: "Billing",

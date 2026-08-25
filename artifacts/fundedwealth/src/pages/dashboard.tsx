@@ -384,7 +384,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         <XCircle size={32} className="text-red-400" />
         <div className="text-white font-bold">Provisioning Failed</div>
         <div className="text-white/50 text-sm">{(acc as any).provisioningError || "Something went wrong. Please contact support."}</div>
-        <a href="mailto:support@fundedwealth.in" className="text-red-400 text-xs underline hover:text-red-300">Contact Support</a>
+        <a href="mailto:support@fundedwealth.com" className="text-red-400 text-xs underline hover:text-red-300">Contact Support</a>
       </div>
     );
   }
@@ -1098,6 +1098,133 @@ function CouponSection({ profile }: { profile: any }) {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Data & Privacy section — self-contained component ────────────────────────
+// Renders privacy info cards, "Download My Data" button, and
+// the existing "Request Data Deletion" button.
+function PrivacySection() {
+  const { getToken } = useAuth();
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportDone, setExportDone] = useState(false);
+
+  const handleDownload = async () => {
+    if (exporting) return; // prevent duplicate requests
+    setExporting(true);
+    setExportError(null);
+    setExportDone(false);
+
+    try {
+      const token = await getToken();
+      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const res = await fetch(`${apiBase}/api/users/me/export`, {
+        method: "GET",
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (res.status === 429) {
+        const body = await res.json().catch(() => ({}));
+        const hours = (body as any).retryAfterHours ?? 24;
+        setExportError(`You've already downloaded your data recently. Please try again in ${hours} hour${hours !== 1 ? "s" : ""}.`);
+        return;
+      }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setExportError((body as any).error ?? "Export failed. Please try again.");
+        return;
+      }
+
+      // Derive filename from Content-Disposition header or use a default
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const match = disposition.match(/filename="([^"]+)"/);
+      const filename = match?.[1] ?? `fundedwealth-data-export-${new Date().toISOString().slice(0, 10)}.json`;
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setExportDone(true);
+    } catch {
+      setExportError("Network error. Please check your connection and try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-white font-extrabold text-xl">Data & Privacy</h2>
+
+      {/* Privacy information cards */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+        {[
+          { label: "Data Processing", desc: "We process your data in compliance with Indian data protection laws." },
+          { label: "Data Storage", desc: "Your account and trading data is stored securely with AES-256 encryption." },
+          { label: "Third-Party Sharing", desc: "We do not sell or share your personal data with third parties." },
+          { label: "Data Deletion", desc: "You can request data deletion at any time by contacting support." },
+        ].map(item => (
+          <div key={item.label} className="border-b border-white/8 pb-4 last:border-0 last:pb-0">
+            <div className="text-white font-semibold text-sm mb-1">{item.label}</div>
+            <div className="text-white/55 text-sm">{item.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Access your data */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
+        <h3 className="text-white font-bold text-sm">Your Data Rights</h3>
+        <p className="text-white/55 text-sm leading-relaxed">
+          Under applicable Indian privacy laws you have the right to access and receive a copy of
+          your personal data held by FundedWealth. Click below to download a complete export of
+          your account, trading, KYC, payout, and activity data as a JSON file.
+        </p>
+
+        {exportError && (
+          <div className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
+            {exportError}
+          </div>
+        )}
+        {exportDone && !exportError && (
+          <div className="text-green-400 text-xs bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2.5">
+            Your data export has been downloaded.
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-3 pt-1">
+          <Button
+            onClick={handleDownload}
+            disabled={exporting}
+            className="flex items-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl px-5 py-2.5 text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Download size={14} />
+            {exporting ? "Preparing export…" : "Download My Data"}
+          </Button>
+
+          {/* Keep the existing deletion button — backend not yet implemented */}
+          <Button
+            variant="outline"
+            onClick={() => {
+              window.location.href = "mailto:privacy@fundedwealth.com?subject=Data%20Deletion%20Request&body=Please%20delete%20my%20personal%20data%20from%20FundedWealth.";
+            }}
+            className="border-red-500/30 text-red-400 bg-red-500/5 hover:bg-red-500/10 rounded-xl"
+          >
+            Request Data Deletion
+          </Button>
+        </div>
+        <p className="text-white/30 text-xs">
+          Exports are limited to once every 24 hours. The file may take a moment to generate.
+        </p>
       </div>
     </div>
   );
@@ -3012,25 +3139,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       );
 
       case "privacy": return (
-        <div className="space-y-6">
-          <h2 className="text-white font-extrabold text-xl">Data & Privacy</h2>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
-            {[
-              { label: "Data Processing", desc: "We process your data in compliance with Indian data protection laws." },
-              { label: "Data Storage", desc: "Your account and trading data is stored securely with AES-256 encryption." },
-              { label: "Third-Party Sharing", desc: "We do not sell or share your personal data with third parties." },
-              { label: "Data Deletion", desc: "You can request data deletion at any time by contacting support." },
-            ].map(item => (
-              <div key={item.label} className="border-b border-white/8 pb-4 last:border-0 last:pb-0">
-                <div className="text-white font-semibold text-sm mb-1">{item.label}</div>
-                <div className="text-white/55 text-sm">{item.desc}</div>
-              </div>
-            ))}
-            <Button variant="outline" className="border-red-500/30 text-red-400 bg-red-500/5 hover:bg-red-500/10 rounded-xl mt-2">
-              Request Data Deletion
-            </Button>
-          </div>
-        </div>
+        <PrivacySection />
       );
 
       case "withdrawal-details":

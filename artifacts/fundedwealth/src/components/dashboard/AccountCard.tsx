@@ -121,7 +121,7 @@ export function AccountCard({ acc }: { acc: TradingAccount }) {
         <XCircle size={32} className="text-red-400" />
         <div className="text-white font-bold">Provisioning Failed</div>
         <div className="text-white/50 text-sm">{(acc as any).provisioningError || "Something went wrong. Please contact support."}</div>
-        <a href="mailto:support@fundedwealth.in" className="text-red-400 text-xs underline hover:text-red-300">Contact Support</a>
+        <a href="mailto:support@fundedwealth.com" className="text-red-400 text-xs underline hover:text-red-300">Contact Support</a>
       </div>
     );
   }
