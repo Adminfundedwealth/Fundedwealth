@@ -74,6 +74,9 @@ export * from "./admin-events";
 // ── Support ──────────────────────────────────────────────────────────────────
 export * from "./support-tickets";
 
+// ── Refunds ───────────────────────────────────────────────────────────────────
+export * from "./refund-requests";
+
 // ── Analytics ────────────────────────────────────────────────────────────────
 export * from "./behavior-patterns";
 export * from "./session-analytics";

@@ -32,6 +32,7 @@ import adminEventsRouter from "./admin-events";
 import provisioningRouter from "./provisioning";
 import adminWebhookRouter from "./admin-webhook";
 import discountConfigRouter from "./discount-config";
+import refundsRouter from "./refunds";
 
 const router: IRouter = Router();
 
@@ -74,5 +75,6 @@ router.use("/admin-payments", adminPaymentsRouter);
 router.use("/admin-events", adminEventsRouter);
 router.use("/provisioning", provisioningRouter);
 router.use("/webhooks", adminWebhookRouter);
+router.use("/refunds", refundsRouter);
 
 export default router;
