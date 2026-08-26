@@ -64,6 +64,14 @@ export const ADDONS = [
   { id: "weekly", label: "Weekly Payout", price: "₹799" },
 ];
 
+// ---------------------------------------------------------------------------
+// Payment provider availability flags
+// Set to false to temporarily disable a provider at the checkout UI level.
+// The underlying integration code is preserved and can be re-enabled by
+// setting the flag back to true.
+// ---------------------------------------------------------------------------
+export const RAZORPAY_PAYMENT_ENABLED = false;
+
 export const PAYMENT_METHODS = [
   { id: "razorpay-card", label: "Debit / Credit Card", icon: "CreditCard", desc: "Visa, Mastercard, RuPay — via Razorpay", group: "fiat" },
   { id: "razorpay-netbanking", label: "Net Banking", icon: "Building2", desc: "All major Indian banks — via Razorpay", group: "fiat" },

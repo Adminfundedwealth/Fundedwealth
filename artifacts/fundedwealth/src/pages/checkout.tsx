@@ -29,7 +29,7 @@ import { PaymentUPI } from "@/components/checkout/PaymentUPI";
 import { useCheckout } from "@/hooks/useCheckout";
 import { usePayment } from "@/hooks/usePayment";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { PLANS, ADDONS, PAYMENT_METHODS, PlanType } from "@/config/checkout";
+import { PLANS, ADDONS, PAYMENT_METHODS, PlanType, RAZORPAY_PAYMENT_ENABLED } from "@/config/checkout";
 
 const RazorpayLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
   const h = size === "sm" ? 16 : size === "lg" ? 36 : 22;
@@ -449,23 +449,30 @@ export default function Checkout() {
 
                   {!payCategory ? (
                     <div className="grid sm:grid-cols-2 gap-4">
+                      {/* UPI / QR Code — PRIMARY / RECOMMENDED */}
                       <button onClick={() => { setPayCategory("upi"); setSelectedPayment("upi-qr"); }} className="group relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] hover:from-[#4A00E0]/15 hover:to-[#8E2DE2]/10 border border-white/10 hover:border-[#8E2DE2]/40 rounded-2xl p-5 text-left transition-all">
                         <div className="flex items-start justify-between mb-4">
                           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A00E0] to-[#8E2DE2] flex items-center justify-center"><QrCode size={22} className="text-white" /></div>
+                          <span className="bg-emerald-500/15 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-500/30">RECOMMENDED</span>
                         </div>
                         <div className="text-white font-extrabold text-base mb-1">UPI / QR Code</div>
                         <div className="text-[#c79bff] font-bold text-lg">₹{finalTotal.toLocaleString("en-IN")}</div>
                       </button>
 
-                      <button onClick={() => { setPayCategory("card"); setSelectedPayment("razorpay-card"); }} className="group relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] hover:from-blue-600/15 hover:to-indigo-600/10 border border-white/10 hover:border-blue-500/40 rounded-2xl p-5 text-left transition-all">
+                      {/* Razorpay — TEMPORARILY PAUSED */}
+                      <div
+                        aria-disabled="true"
+                        className="group relative bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/5 rounded-2xl p-5 text-left opacity-50 cursor-not-allowed select-none"
+                      >
                         <div className="flex items-start justify-between mb-4">
                           <RazorpayLogo size="lg" />
-                          <span className="bg-emerald-500/15 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-500/30">RECOMMENDED</span>
+                          <span className="bg-orange-500/15 text-orange-400 text-[10px] font-bold px-2 py-1 rounded-full border border-orange-500/30">TEMPORARILY PAUSED</span>
                         </div>
-                        <div className="text-white font-extrabold text-sm mb-1">Card &amp; Netbanking</div>
-                        <div className="text-white font-extrabold text-sm mb-2">UPI / QR Code</div>
-                        <div className="text-blue-300 font-bold text-lg">₹{finalTotal.toLocaleString("en-IN")}</div>
-                      </button>
+                        <div className="text-white/50 font-extrabold text-sm mb-1">Card &amp; Netbanking</div>
+                        <div className="text-white/50 font-extrabold text-sm mb-2">UPI / QR Code</div>
+                        <div className="text-white/30 font-bold text-lg">₹{finalTotal.toLocaleString("en-IN")}</div>
+                        <p className="text-white/35 text-[11px] mt-2 leading-snug">Razorpay payments are temporarily paused. Please use UPI / QR Code.</p>
+                      </div>
 
                       <button onClick={() => setPayCategory("crypto")} className="group relative sm:col-span-2 bg-gradient-to-br from-white/[0.06] to-white/[0.02] hover:from-emerald-600/15 hover:to-teal-600/10 border border-white/10 hover:border-emerald-500/40 rounded-2xl p-5 text-left transition-all">
                         <div className="flex items-start justify-between mb-4">
