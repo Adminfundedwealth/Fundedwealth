@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import { ArrowLeft } from "lucide-react";
+import LegalCTA from "@/components/LegalCTA";
 
 export default function AmlKyc() {
   return (
@@ -326,6 +327,8 @@ export default function AmlKyc() {
 
         </div>
       </div>
+
+      <LegalCTA />
     </div>
   );
 }

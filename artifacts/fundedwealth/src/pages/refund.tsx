@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import { ArrowLeft } from "lucide-react";
+import LegalCTA from "@/components/LegalCTA";
 
 export default function Refund() {
   return (
@@ -559,6 +560,8 @@ export default function Refund() {
 
         </div>
       </div>
+
+      <LegalCTA />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import { ArrowLeft } from "lucide-react";
+import LegalCTA from "@/components/LegalCTA";
 
 export default function Privacy() {
   return (
@@ -373,6 +374,8 @@ export default function Privacy() {
 
         </div>
       </div>
+
+      <LegalCTA />
     </div>
   );
 }

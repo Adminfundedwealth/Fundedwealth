@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import { ArrowLeft } from "lucide-react";
+import LegalCTA from "@/components/LegalCTA";
 
 export default function CookiePolicy() {
   return (
@@ -103,6 +104,8 @@ export default function CookiePolicy() {
 
         </div>
       </div>
+
+      <LegalCTA />
     </div>
   );
 }

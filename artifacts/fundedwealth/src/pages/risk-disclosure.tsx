@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import { ArrowLeft } from "lucide-react";
+import LegalCTA from "@/components/LegalCTA";
 
 export default function RiskDisclosure() {
   return (
@@ -286,6 +287,8 @@ export default function RiskDisclosure() {
 
         </div>
       </div>
+
+      <LegalCTA />
     </div>
   );
 }

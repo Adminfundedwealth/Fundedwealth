@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import { ArrowLeft } from "lucide-react";
+import LegalCTA from "@/components/LegalCTA";
 
 export default function AffiliateTerms() {
   return (
@@ -123,6 +124,8 @@ export default function AffiliateTerms() {
 
         </div>
       </div>
+
+      <LegalCTA />
     </div>
   );
 }
