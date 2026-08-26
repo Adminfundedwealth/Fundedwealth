@@ -44,8 +44,7 @@ export default function Terms() {
               <li><Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link></li>
               <li><Link href="/rules" className="text-fw-orange hover:underline">Trading Rules</Link></li>
               <li><Link href="/refund" className="text-fw-orange hover:underline">Refund Policy</Link></li>
-              <li>Risk Disclosure</li>
-              <li>Any other policies expressly referenced or incorporated within the Service</li>
+              <li>Any risk disclosures or other policies expressly made available by FundedWealth and incorporated by reference into the Service</li>
             </ul>
             <p className="mt-3">In the event of a conflict between these Terms and a specific policy listed above, the more specific policy shall govern with respect to its subject matter.</p>
           </section>
@@ -102,7 +101,7 @@ export default function Terms() {
           {/* ─── 5. Privacy, Data & KYC ────────────────────────────────────── */}
           <section>
             <h2 className="text-xl font-bold text-white mb-3">5. Privacy, Data & KYC</h2>
-            <p>FundedWealth collects, processes, and stores personal information in accordance with the <Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link>. By using the Service, you consent to such collection and processing.</p>
+            <p>FundedWealth collects, processes, and stores personal information in accordance with the <Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link> and applicable law. The Privacy Policy explains the purposes and applicable legal basis for different types of processing.</p>
             <p className="mt-3">FundedWealth may collect and process information necessary for:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-white/60">
               <li>Account creation and ongoing account operation</li>
@@ -122,7 +121,7 @@ export default function Terms() {
             <p>FundedWealth offers structured evaluation programs ("Challenges") designed to assess a user's trading competence. Available Challenge types include:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-white/60">
               <li><strong className="text-white/80">Flash</strong> — a time-limited evaluation account</li>
-              <li><strong className="text-white/80">Instant</strong> — immediate funded access with ongoing compliance requirements</li>
+              <li><strong className="text-white/80">Instant</strong> — immediate access to the applicable simulated funded program</li>
               <li><strong className="text-white/80">1-Step</strong> — a single-phase evaluation before funded status</li>
               <li><strong className="text-white/80">2-Step</strong> — a two-phase evaluation before funded status</li>
             </ul>
