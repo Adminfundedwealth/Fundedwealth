@@ -42,7 +42,11 @@ import {
   Banknote,
   Share2,
   Copy,
-  CheckCheck
+  CheckCheck,
+  AlertTriangle,
+  Cookie,
+  UserCheck,
+  Scale
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -5626,6 +5630,11 @@ const Footer = () => {
               <li><Link href="/privacy" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Lock size={14} className="text-white/30" /> Privacy Policy</Link></li>
               <li><Link href="/refund" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Banknote size={14} className="text-white/30" /> Refund Policy</Link></li>
               <li><Link href="/rules" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><ShieldCheck size={14} className="text-white/30" /> Trading Rules</Link></li>
+              <li><Link href="/aml-kyc" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><UserCheck size={14} className="text-white/30" /> AML & KYC Policy</Link></li>
+              <li><Link href="/risk-disclosure" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><AlertTriangle size={14} className="text-white/30" /> Risk Disclosure</Link></li>
+              <li><Link href="/acceptable-use" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Scale size={14} className="text-white/30" /> Acceptable Use Policy</Link></li>
+              <li><Link href="/cookie-policy" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Cookie size={14} className="text-white/30" /> Cookie Policy</Link></li>
+              <li><Link href="/affiliate-terms" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Users size={14} className="text-white/30" /> Affiliate Terms</Link></li>
               <li><a href="/faq" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Globe size={14} className="text-white/30" /> FAQ</a></li>
             </ul>
           </div>
@@ -5659,6 +5668,7 @@ const Footer = () => {
             <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy Policy</Link>
             <Link href="/refund" className="hover:text-white/60 transition-colors">Refund Policy</Link>
             <Link href="/rules" className="hover:text-white/60 transition-colors">Trading Rules</Link>
+            <Link href="/risk-disclosure" className="hover:text-white/60 transition-colors">Risk Disclosure</Link>
           </div>
         </div>
       </div>

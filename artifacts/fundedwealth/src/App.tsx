@@ -29,6 +29,11 @@ const Community = lazy(() => import("@/pages/community"));
 const Terms = lazy(() => import("@/pages/terms"));
 const Privacy = lazy(() => import("@/pages/privacy"));
 const Refund = lazy(() => import("@/pages/refund"));
+const AmlKyc = lazy(() => import("@/pages/aml-kyc"));
+const RiskDisclosure = lazy(() => import("@/pages/risk-disclosure"));
+const AcceptableUse = lazy(() => import("@/pages/acceptable-use"));
+const CookiePolicy = lazy(() => import("@/pages/cookie-policy"));
+const AffiliateTerms = lazy(() => import("@/pages/affiliate-terms"));
 const Checkout = lazy(() => import("@/pages/checkout"));
 const ReferralLandingPage = lazy(() => import("@/pages/referral"));
 const PaymentPending = lazy(() => import("@/pages/payment-pending"));
@@ -101,6 +106,11 @@ function AppRouter() {
             <Route path="/terms" component={Terms} />
             <Route path="/privacy" component={Privacy} />
             <Route path="/refund" component={Refund} />
+            <Route path="/aml-kyc" component={AmlKyc} />
+            <Route path="/risk-disclosure" component={RiskDisclosure} />
+            <Route path="/acceptable-use" component={AcceptableUse} />
+            <Route path="/cookie-policy" component={CookiePolicy} />
+            <Route path="/affiliate-terms" component={AffiliateTerms} />
             <Route path="/ref/:code" component={ReferralLandingPage} />
             <Route path="/checkout" component={Checkout} />
             <Route path="/payment-pending" component={PaymentPending} />
