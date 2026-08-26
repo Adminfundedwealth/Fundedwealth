@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import LegalCTA from "@/components/LegalCTA";
 import {
   ArrowLeft,
   Instagram,
@@ -22,7 +23,7 @@ import {
 
 export default function AcceptableUse() {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-800">
+    <div className="min-h-screen flex flex-col bg-[#0D0020] text-white">
       <SEOHead
         title="Prohibited Activities & Acceptable Use Policy — FundedWealth"
         description="Read FundedWealth's Prohibited Activities & Acceptable Use Policy. Understand what conduct is permitted and prohibited on our platform."
@@ -30,24 +31,24 @@ export default function AcceptableUse() {
       />
 
       {/* ─── Top Navigation Bar ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 py-4">
+      <header className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
         <div className="container mx-auto px-4 flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+          <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
             <ArrowLeft size={20} />
             <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
-            <span className="font-heading font-bold text-gray-900">FundedWealth</span>
+            <span className="font-heading font-bold">FundedWealth</span>
           </Link>
         </div>
       </header>
 
       {/* ─── Main Content ───────────────────────────────────────────────── */}
       <main className="flex-1 container mx-auto px-4 py-14 max-w-4xl">
-        <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-gray-900 mb-2">
+        <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-2">
           Prohibited Activities &amp; Acceptable Use Policy
         </h1>
-        <p className="text-gray-400 text-sm mb-12">Last updated: August 26, 2026</p>
+        <p className="text-white/40 text-sm mb-12">Last updated: August 26, 2026</p>
 
-        <div className="space-y-10 text-gray-600 leading-relaxed text-[15px]">
+        <div className="space-y-10 text-white/70 leading-relaxed text-[15px]">
 
           {/* Intro */}
           <p>
@@ -55,16 +56,16 @@ export default function AcceptableUse() {
           </p>
           <p>
             This Policy should be read together with the FundedWealth{" "}
-            <Link href="/terms" className="text-indigo-600 hover:underline">Terms of Service</Link>,{" "}
-            <Link href="/rules" className="text-indigo-600 hover:underline">Trading Rules</Link>,{" "}
-            <Link href="/risk-disclosure" className="text-indigo-600 hover:underline">Risk Disclosure</Link>,{" "}
-            <Link href="/privacy" className="text-indigo-600 hover:underline">Privacy Policy</Link>, and{" "}
-            <Link href="/refund" className="text-indigo-600 hover:underline">Refund Policy</Link>.
+            <Link href="/terms" className="text-fw-orange hover:underline">Terms of Service</Link>,{" "}
+            <Link href="/rules" className="text-fw-orange hover:underline">Trading Rules</Link>,{" "}
+            <Link href="/risk-disclosure" className="text-fw-orange hover:underline">Risk Disclosure</Link>,{" "}
+            <Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link>, and{" "}
+            <Link href="/refund" className="text-fw-orange hover:underline">Refund Policy</Link>.
           </p>
 
           {/* ─── 1. Platform Integrity ──────────────────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">1. Platform Integrity</h2>
+            <h2 className="text-xl font-bold text-white mb-3">1. Platform Integrity</h2>
             <p>
               FundedWealth is a simulated trading and evaluation platform. Users must use the platform in good faith and must not attempt to obtain an unfair evaluation advantage through technical exploitation, identity abuse, coordinated activity, unauthorized automation, or other prohibited conduct.
             </p>
@@ -72,15 +73,15 @@ export default function AcceptableUse() {
 
           {/* ─── 2. Prohibited Activities ───────────────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">2. Prohibited Activities</h2>
+            <h2 className="text-xl font-bold text-white mb-3">2. Prohibited Activities</h2>
             <p>
               The following activities are prohibited where they are intended to circumvent the program rules, manipulate evaluation results, interfere with platform systems, or obtain an unfair advantage.
             </p>
 
             {/* 2.1 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.1 Market-Data or Technology Exploitation</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.1 Market-Data or Technology Exploitation</h3>
             <p className="mb-2">Examples may include:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Deliberately exploiting stale or incorrect displayed data</li>
               <li>Exploiting known latency or synchronization problems</li>
               <li>Manipulating race conditions</li>
@@ -91,9 +92,9 @@ export default function AcceptableUse() {
             <p className="mt-3">Users must report material platform vulnerabilities rather than attempting to exploit them.</p>
 
             {/* 2.2 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.2 Account Sharing and Coordinated Account Abuse</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.2 Account Sharing and Coordinated Account Abuse</h3>
             <p className="mb-2">Users must not:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Allow another person to operate their account</li>
               <li>Trade on behalf of another participant</li>
               <li>Share account credentials</li>
@@ -103,9 +104,9 @@ export default function AcceptableUse() {
             </ul>
 
             {/* 2.3 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.3 Identity and KYC Abuse</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.3 Identity and KYC Abuse</h3>
             <p className="mb-2">The following are prohibited:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Providing false identity information</li>
               <li>Using another person's identity</li>
               <li>Creating accounts under multiple identities</li>
@@ -115,9 +116,9 @@ export default function AcceptableUse() {
             </ul>
 
             {/* 2.4 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.4 Unauthorized Automation</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.4 Unauthorized Automation</h3>
             <p className="mb-2">Users must comply with the automation requirements applicable to their program. Unless expressly permitted, users must not use:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Unauthorized trading bots</li>
               <li>Automated order-entry systems</li>
               <li>Scripts designed to bypass platform controls</li>
@@ -127,9 +128,9 @@ export default function AcceptableUse() {
             <p className="mt-3">Where a program permits automation subject to restrictions, the user remains responsible for ensuring that the automation complies with the applicable Trading Rules.</p>
 
             {/* 2.5 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.5 Copy Trading and Signal-Based Abuse</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.5 Copy Trading and Signal-Based Abuse</h3>
             <p className="mb-2">Users must not use external services or coordinated activity to artificially reproduce another participant's trading activity for the purpose of passing an evaluation or circumventing program restrictions. This may include:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Unauthorized copy-trading systems</li>
               <li>Synchronized trading between participants</li>
               <li>Coordinated signal execution intended to manipulate evaluation outcomes</li>
@@ -138,9 +139,9 @@ export default function AcceptableUse() {
             <p className="mt-3">Normal independent trading based on publicly available market information is not prohibited merely because another trader may make a similar decision.</p>
 
             {/* 2.6 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.6 Rule-Circumvention</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.6 Rule-Circumvention</h3>
             <p className="mb-2">Users must not intentionally structure trades or account activity to evade the intent of FundedWealth's Trading Rules. Examples may include:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Repeatedly opening and closing positions solely to manipulate an evaluation metric</li>
               <li>Exploiting rule calculations rather than demonstrating genuine trading behaviour</li>
               <li>Deliberately using multiple accounts to offset or neutralize evaluation outcomes</li>
@@ -149,9 +150,9 @@ export default function AcceptableUse() {
             </ul>
 
             {/* 2.7 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.7 Manipulative or Disruptive Behaviour</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.7 Manipulative or Disruptive Behaviour</h3>
             <p className="mb-2">Users must not engage in activity designed to misrepresent genuine trading performance or interfere with platform operations. Examples may include:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Artificial order-generation patterns</li>
               <li>Spoofing-like or layering-like behaviour where prohibited by the applicable program</li>
               <li>Wash-style activity</li>
@@ -160,9 +161,9 @@ export default function AcceptableUse() {
             </ul>
 
             {/* 2.8 */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">2.8 Payment and Refund Abuse</h3>
+            <h3 className="text-lg font-semibold text-white/90 mt-6 mb-2">2.8 Payment and Refund Abuse</h3>
             <p className="mb-2">Users must not:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Submit fraudulent payment information</li>
               <li>Intentionally create duplicate transactions and misrepresent them as accidental</li>
               <li>Abuse refunds or retries</li>
@@ -174,9 +175,9 @@ export default function AcceptableUse() {
 
           {/* ─── 3. Acceptable Use ──────────────────────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">3. Acceptable Use</h2>
+            <h2 className="text-xl font-bold text-white mb-3">3. Acceptable Use</h2>
             <p className="mb-2">Users may use FundedWealth for legitimate activities consistent with the selected program, including:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Independent trading within the applicable Trading Rules</li>
               <li>Reasonable use of the platform's tools and features</li>
               <li>Use of permitted automation where expressly allowed</li>
@@ -188,9 +189,9 @@ export default function AcceptableUse() {
 
           {/* ─── 4. Security and Surveillance ───────────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">4. Security and Surveillance</h2>
+            <h2 className="text-xl font-bold text-white mb-3">4. Security and Surveillance</h2>
             <p className="mb-2">FundedWealth may monitor platform activity for security, fraud prevention, account integrity, and evaluation fairness. Monitoring may involve information such as:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Trading activity</li>
               <li>Order activity</li>
               <li>Account relationships</li>
@@ -202,14 +203,14 @@ export default function AcceptableUse() {
               <li>Other relevant security signals</li>
             </ul>
             <p className="mt-3">FundedWealth may use automated systems and human review to identify potentially suspicious or prohibited activity. Automated detection does not necessarily constitute a final determination. Activity may be reviewed by authorized personnel.</p>
-            <p className="mt-3">The handling of personal information is governed by the <Link href="/privacy" className="text-indigo-600 hover:underline">Privacy Policy</Link>.</p>
+            <p className="mt-3">The handling of personal information is governed by the <Link href="/privacy" className="text-fw-orange hover:underline">Privacy Policy</Link>.</p>
           </section>
 
           {/* ─── 5. Investigation and Verification ──────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">5. Investigation and Verification</h2>
+            <h2 className="text-xl font-bold text-white mb-3">5. Investigation and Verification</h2>
             <p className="mb-2">Where potentially prohibited activity is identified, FundedWealth may request additional information or conduct a review. A review may include:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Account history</li>
               <li>Trading/order records</li>
               <li>Device or IP relationships</li>
@@ -224,9 +225,9 @@ export default function AcceptableUse() {
 
           {/* ─── 6. Consequences of Prohibited Activity ─────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">6. Consequences of Prohibited Activity</h2>
+            <h2 className="text-xl font-bold text-white mb-3">6. Consequences of Prohibited Activity</h2>
             <p className="mb-2">Depending on the nature and seriousness of the activity, FundedWealth may take one or more of the following actions, subject to the Terms, Trading Rules, applicable program conditions, and applicable law:</p>
-            <ol className="list-decimal list-inside space-y-1 text-gray-500">
+            <ol className="list-decimal list-inside space-y-1 text-white/60">
               <li>Request additional information or verification</li>
               <li>Temporarily restrict certain account functionality</li>
               <li>Place a payout or payment under review</li>
@@ -242,19 +243,19 @@ export default function AcceptableUse() {
 
           {/* ─── 7. Technical Failure vs Prohibited Activity ─────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">7. Technical Failure vs Prohibited Activity</h2>
+            <h2 className="text-xl font-bold text-white mb-3">7. Technical Failure vs Prohibited Activity</h2>
             <p className="mb-2">A technical problem and a rule violation are not the same thing.</p>
 
-            <p className="font-semibold text-gray-800 mt-4 mb-2">Examples of a potential technical issue:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <p className="font-semibold text-white/90 mt-4 mb-2">Examples of a potential technical issue:</p>
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Verified platform-side provisioning failure</li>
               <li>Confirmed system malfunction</li>
               <li>Confirmed data synchronization problem</li>
               <li>Payment successfully completed but the purchased service was not properly provisioned</li>
             </ul>
 
-            <p className="font-semibold text-gray-800 mt-4 mb-2">Examples of prohibited activity:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
+            <p className="font-semibold text-white/90 mt-4 mb-2">Examples of prohibited activity:</p>
+            <ul className="list-disc list-inside space-y-1 text-white/60">
               <li>Deliberately exploiting a platform error</li>
               <li>Manipulating account state</li>
               <li>Circumventing risk controls</li>
@@ -262,31 +263,31 @@ export default function AcceptableUse() {
               <li>Sharing or misrepresenting account identity</li>
             </ul>
 
-            <p className="mt-3">Technical issues are handled under the applicable support and <Link href="/refund" className="text-indigo-600 hover:underline">Refund Policy</Link> processes.</p>
+            <p className="mt-3">Technical issues are handled under the applicable support and <Link href="/refund" className="text-fw-orange hover:underline">Refund Policy</Link> processes.</p>
           </section>
 
           {/* ─── 8. Reporting Security or Platform Vulnerabilities ────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">8. Reporting Security or Platform Vulnerabilities</h2>
+            <h2 className="text-xl font-bold text-white mb-3">8. Reporting Security or Platform Vulnerabilities</h2>
             <p>Users who discover a genuine security or technical vulnerability should report it to FundedWealth rather than exploit it.</p>
-            <p className="mt-3">Reports may be sent to: <span className="text-gray-900 font-medium">support@fundedwealth.com</span></p>
+            <p className="mt-3">Reports may be sent to: <span className="text-white font-medium">support@fundedwealth.com</span></p>
             <p className="mt-3">Users should provide enough information for FundedWealth to investigate the issue.</p>
           </section>
 
           {/* ─── 9. Third-Party Tools and Services ──────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">9. Third-Party Tools and Services</h2>
+            <h2 className="text-xl font-bold text-white mb-3">9. Third-Party Tools and Services</h2>
             <p>Users remain responsible for ensuring that third-party tools, automation services, signal providers, or integrations used with FundedWealth comply with the applicable program rules.</p>
             <p className="mt-3">The use of a third-party tool does not transfer responsibility for prohibited activity away from the account holder.</p>
           </section>
 
           {/* ─── 10. Policy Interpretation ──────────────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">10. Policy Interpretation</h2>
+            <h2 className="text-xl font-bold text-white mb-3">10. Policy Interpretation</h2>
             <p>FundedWealth may evaluate conduct based on the substance and purpose of the activity rather than relying only on the technical form of a trade or action.</p>
             <p className="mt-3">The examples in this Policy are illustrative and are not an exhaustive list of every prohibited activity.</p>
             <p className="mt-3">A particular activity may be restricted where it materially undermines:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500 mt-2">
+            <ul className="list-disc list-inside space-y-1 text-white/60 mt-2">
               <li>Platform security</li>
               <li>Evaluation fairness</li>
               <li>Account integrity</li>
@@ -297,14 +298,16 @@ export default function AcceptableUse() {
 
           {/* ─── 11. Contact ────────────────────────────────────────────────── */}
           <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-3">11. Contact</h2>
+            <h2 className="text-xl font-bold text-white mb-3">11. Contact</h2>
             <p>For questions about this Policy:</p>
-            <p className="mt-2 text-gray-900 font-medium">support@fundedwealth.com</p>
-            <p className="mt-2">Website: <a href="https://fundedwealth.com" className="text-indigo-600 hover:underline">fundedwealth.com</a></p>
+            <p className="mt-2 text-white font-medium">support@fundedwealth.com</p>
+            <p className="mt-2">Website: <a href="https://fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a></p>
           </section>
 
         </div>
       </main>
+
+      <LegalCTA />
 
       {/* ─── Footer (dark, matching home page) ──────────────────────────── */}
       <footer className="bg-[#0a0015] pt-20 pb-10 border-t border-white/10">
