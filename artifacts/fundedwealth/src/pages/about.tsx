@@ -34,7 +34,7 @@ const AboutPage = () => {
       <SEOHead
         title="About FundedWealth — India's First AI-Native Prop Firm"
         description="FundedWealth is India's first AI-native proprietary trading evaluation platform built for trust, discipline, and long-term performance. Learn how we align with serious Indian traders."
-        keywords="about FundedWealth, AI prop firm India, FundedWealth founder, prop trading India, A-book prop firm, SEBI compliant prop firm"
+        keywords="about FundedWealth, AI prop firm India, FundedWealth founder, prop trading India, A-book prop firm"
         canonical="/about"
       />
 
@@ -181,7 +181,7 @@ const AboutPage = () => {
               <p className="text-white/60 leading-relaxed text-sm">
                 A clean evaluation framework, dashboards that highlight repeatable behaviour over one-off luck, and a support
                 team that treats you like the operator you are. Clear our published criteria and you unlock access to
-                company-funded capital plus performance-linked rewards — every step laid out in writing.
+                simulated evaluation accounts plus performance-based rewards — every step laid out in writing.
               </p>
             </div>
           </div>

@@ -8,7 +8,7 @@ const organizationSchema = {
   url: "https://fundedwealth.com",
   logo: "https://fundedwealth.com/logo.png",
   image: "https://fundedwealth.com/opengraph.jpg",
-  description: "FundedWealth is India's #1 best prop trading firm. Get funded trading accounts up to ₹50 Lakhs. Trade NSE, BSE, MCX, Forex & Crypto. Keep 70-90% profits with 12-hour guaranteed payouts.",
+  description: "FundedWealth is India's #1 best prop trading firm. Get funded trading accounts up to ₹50 Lakhs. Trade NSE, BSE, MCX, Forex & Crypto. Keep 70-90% profits. Performance-based rewards typically processed within 12 hours for eligible approved requests.",
   foundingDate: "2023",
   slogan: "India's #1 Prop Trading Firm — Trade Smarter, Get Funded",
   priceRange: "₹999 - ₹49,999",
@@ -103,7 +103,7 @@ const faqSchema = {
       name: "What is FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth is India's #1 best prop trading firm that provides funded trading accounts up to ₹50 Lakhs. Traders keep 70-90% of their profits with 12-hour guaranteed payouts. We support NSE, BSE, MCX, Forex, and Crypto trading."
+        text: "FundedWealth is India's #1 best prop trading firm that provides funded trading accounts up to ₹50 Lakhs. Traders keep 70-90% of their profits with performance-based rewards typically processed within 12 hours for eligible approved requests. We support NSE, BSE, MCX, Forex, and Crypto trading."
       }
     },
     {
@@ -111,7 +111,7 @@ const faqSchema = {
       name: "Is FundedWealth the best prop firm in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, FundedWealth is recognized as India's #1 prop trading firm with 15,000+ funded traders, ₹45 Lakhs+ in monthly payouts, 12-hour guaranteed payout delivery, up to 90% profit split, and the lowest evaluation fees starting at just ₹999. We are 100% dedicated to Indian traders."
+        text: "Yes, FundedWealth is recognized as India's #1 prop trading firm with 15,000+ funded traders, ₹45 Lakhs+ in monthly payouts, performance-based rewards typically processed within 12 hours, up to 90% profit split, and the lowest evaluation fees starting at just ₹999. We are 100% dedicated to Indian traders."
       }
     },
     {
@@ -119,7 +119,7 @@ const faqSchema = {
       name: "How does prop trading work at FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Choose a plan (Flash, Instant, 1-Step, or 2-Step), pass the evaluation by meeting profit targets while staying within drawdown limits, and get funded with real capital. Trade NSE, BSE, MCX, Forex & Crypto with zero risk to your own money."
+        text: "Choose a plan (Flash, Instant, 1-Step, or 2-Step), pass the evaluation by meeting profit targets while staying within drawdown limits, and receive a simulated funded account. Trade NSE, BSE, MCX, Forex & Crypto with zero risk to your own money."
       }
     },
     {
@@ -143,7 +143,7 @@ const faqSchema = {
       name: "How fast are payouts at FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth guarantees payouts within 12 hours — the fastest payout guarantee among Indian prop trading firms. We support bank transfer, UPI, and crypto payouts."
+        text: "Eligible performance-based rewards are typically processed within 12 hours under the applicable program terms. We support bank transfer, UPI, and crypto payouts."
       }
     },
     {

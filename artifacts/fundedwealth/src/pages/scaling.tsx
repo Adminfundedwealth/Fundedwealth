@@ -97,7 +97,7 @@ export default function Scaling() {
                       )}
                       {lvl.final && (
                         <div className="flex items-center gap-2 text-yellow-400 text-xs font-semibold">
-                          <Crown size={14} /> Maximum account size — trade with ₹50 Lakhs of our capital
+                          <Crown size={14} /> Maximum account size — trade with a ₹50 Lakh simulated account
                         </div>
                       )}
                     </CardContent>

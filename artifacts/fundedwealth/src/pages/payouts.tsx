@@ -111,8 +111,8 @@ export default function Payouts() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Prop Trading Payout Proofs India — ₹45L+ Paid | 12-Hour Guaranteed"
-        description="Real, verified payout proofs from FundedWealth — India's best prop firm. Over ₹45 Lakhs paid monthly with 12-hour guaranteed processing. See what India's top funded traders are earning."
+        title="Prop Trading Payout Proofs India — ₹45L+ Paid in Performance-Based Rewards"
+        description="Performance-based rewards for eligible participants under the applicable program terms. Over ₹45 Lakhs paid to FundedWealth evaluation participants. See verified payout proofs from India's top funded traders."
         keywords="prop trading payouts India, funded trader payouts India, payout proof prop firm, verified payouts prop trading, fastest prop firm payouts India, 12 hour payout prop firm, prop firm payout proof, real prop trading profits India"
         canonical="/payouts"
       />

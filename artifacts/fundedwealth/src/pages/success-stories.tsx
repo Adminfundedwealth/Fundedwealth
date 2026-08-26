@@ -111,7 +111,7 @@ export default function SuccessStories() {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-extrabold mb-4">
             Real Traders, <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">Real Results</span>
           </h2>
-          <p className="text-white/60 text-lg max-w-2xl mx-auto">Stories from funded traders who turned their skills into real income with FundedWealth.</p>
+          <p className="text-white/60 text-lg max-w-2xl mx-auto">Stories from evaluation participants who received performance-based rewards through FundedWealth.</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12 max-w-3xl mx-auto">
@@ -177,7 +177,7 @@ export default function SuccessStories() {
             <CardContent className="p-8">
               <Users className="text-fw-pink mx-auto mb-4" size={32} />
               <h3 className="text-2xl font-heading font-bold text-white mb-3">Your Story Could Be Next</h3>
-              <p className="text-white/60 mb-6">Join thousands of Indian traders building real income through funded trading.</p>
+              <p className="text-white/60 mb-6">Join thousands of Indian traders participating in FundedWealth's performance-based evaluation programs.</p>
               <Link href="/sign-up">
                 <Button className="bg-gradient-fw text-white border-0 rounded-full px-4 md:px-6 lg:px-8 xl:px-10 py-3 font-bold">
                   Start Your Journey →

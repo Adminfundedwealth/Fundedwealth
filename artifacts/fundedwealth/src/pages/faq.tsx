@@ -188,7 +188,7 @@ const FAQS: Faq[] = [
   {
     cat: "Funded Account",
     q: "How do trading cycles work on funded accounts?",
-    a: "Each payout cycle is 14 days by default. At the end of a cycle, eligible profits are paid out and the cycle resets. You can also request an early withdrawal once per cycle if you have crossed the minimum payout amount.",
+    a: "Each payout cycle is 7 days. At the end of a cycle, eligible profits are paid out under the applicable program terms and the cycle resets. You can submit a reward request from your dashboard once per cycle if you have crossed the minimum payout amount.",
   },
 
   // ---------------- Payouts ----------------
@@ -200,12 +200,12 @@ const FAQS: Faq[] = [
   {
     cat: "Payouts",
     q: "When can I request my first payout?",
-    a: "After 14 calendar days from your funded account activation, provided you have at least one profitable trade and have completed 5 trading days inside that cycle.",
+    a: "After 7 calendar days from your funded account activation, provided you have at least one profitable trade and have completed the required minimum trading days inside that cycle.",
   },
   {
     cat: "Payouts",
     q: "How often can I withdraw profits?",
-    a: "Once every 14 days as standard. Consistent traders unlock weekly payouts after 3 successful cycles.",
+    a: "Eligible rewards can be requested every 7 days under the applicable program terms, provided you have met the minimum payout threshold and completed the required trading days within that cycle.",
   },
   {
     cat: "Payouts",
@@ -225,7 +225,7 @@ const FAQS: Faq[] = [
   {
     cat: "Payouts",
     q: "Are payouts guaranteed?",
-    a: "Eligible payouts are guaranteed inside the 12-hour SLA. If we ever miss the SLA, your next payout is bumped by an additional 5% as a make-good — that is our 12-hour guarantee.",
+    a: "Eligible approved rewards are typically processed within 12 hours, subject to verification and applicable program requirements. FundedWealth aims for fast processing but payout timing depends on compliance review and payment provider availability.",
   },
 
   // ---------------- Platform ----------------
@@ -402,7 +402,7 @@ const FAQS: Faq[] = [
   {
     cat: "Tax & Compliance",
     q: "Is FundedWealth SEBI registered?",
-    a: "FundedWealth operates a simulated proprietary trading programme — it is not a stockbroker, investment advisor or portfolio manager and does not require SEBI registration in those categories. We do, however, follow SEBI's broader market integrity guidelines and partner with SEBI-registered brokers for our underlying market data and execution rails.",
+    a: "FundedWealth operates a simulated proprietary trading evaluation programme — it is not a stockbroker, investment advisor or portfolio manager and does not require SEBI registration in those categories. Market data and related services may be sourced through regulated third-party providers where applicable.",
   },
   {
     cat: "Tax & Compliance",

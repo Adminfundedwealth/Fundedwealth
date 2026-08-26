@@ -1193,7 +1193,7 @@ function TwoStepRulesDetail({ onBack }: { onBack: () => void }) {
           </CardContent></Card>
           <Card className="glass-card border-red-500/20"><CardContent className="p-6">
             <div className="flex items-center gap-2 mb-3"><span className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-red-500/15 border border-red-500/30 text-red-300 uppercase">Critical</span><h4 className="text-white font-extrabold text-base">Max Drawdown — 8% eval · 6% funded</h4></div>
-            <p className="text-white/65 text-sm mb-3">During both evaluation phases: <strong className="text-white">8%</strong> of starting balance. Once funded: drops to <strong className="text-white">6%</strong> — tighter protection once you're trading real capital.</p>
+            <p className="text-white/65 text-sm mb-3">During both evaluation phases: <strong className="text-white">8%</strong> of starting balance. Once funded: drops to <strong className="text-white">6%</strong> — tighter protection once you're trading on a simulated funded account.</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5 text-sm text-white/55"><strong className="text-white/80">Phase 1/2:</strong> ₹10,00,000 → floor <strong className="text-red-300">₹9,20,000</strong></div>
               <div className="px-4 py-3 rounded-lg bg-white/[0.03] border border-white/5 text-sm text-white/55"><strong className="text-white/80">Funded:</strong> ₹10,00,000 → floor <strong className="text-emerald-300">₹9,40,000</strong></div>

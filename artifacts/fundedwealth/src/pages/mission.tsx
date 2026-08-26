@@ -44,7 +44,7 @@ const MissionPage = () => {
             </span>
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto">
-            FundedWealth exists for one reason: to remove capital as the barrier between a talented trader and a life-changing income.
+            FundedWealth exists for one reason: to remove capital as the barrier between a talented trader and the opportunity to earn performance-based rewards.
           </p>
         </div>
       </section>

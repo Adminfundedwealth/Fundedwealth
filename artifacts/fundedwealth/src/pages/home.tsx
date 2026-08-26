@@ -1242,9 +1242,9 @@ const IndianInstruments = () => {
 
 const FWIndEdge = () => {
   const edges = [
-    { icon: <Building2 className="w-6 h-6" />, title: "SEBI-Aligned Data Infrastructure", desc: "Our real-time price feeds are sourced from SEBI-licensed Indian brokerages — simulated account prices mirror live market conditions accurately.", color: "from-blue-500 to-cyan-500" },
+    { icon: <Building2 className="w-6 h-6" />, title: "Market Data from Regulated Sources", desc: "Our real-time price feeds are sourced from SEBI-licensed Indian brokerages — simulated account prices mirror live market conditions accurately.", color: "from-blue-500 to-cyan-500" },
     { icon: <BarChart3 className="w-6 h-6" />, title: "Real-Time NSE/BSE Price Data", desc: "Simulated accounts use live NSE & BSE tick data — exactly the same prices a retail trader sees on their broker terminal.", color: "from-emerald-500 to-teal-500" },
-    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Pay in ₹, receive performance-based rewards in ₹. Processed via UPI / IMPS / NEFT direct to your bank — no FX, no intermediary, no delay.", color: "from-orange-500 to-amber-500" },
+    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Pay in ₹, receive performance-based rewards in ₹. Processed via UPI / IMPS / NEFT direct to your bank — no FX, no intermediary, streamlined reward processing.", color: "from-orange-500 to-amber-500" },
     { icon: <Zap className="w-6 h-6" />, title: "Real-Time Market Data", desc: "Simulated accounts use live NSE & BSE tick data — the same prices a retail trader sees on their broker terminal.", color: "from-purple-500 to-pink-500" },
     { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in discipline scoring monitors your every simulated trade — overleveraging, revenge trading, and drawdown breaches flagged in real time.", color: "from-rose-500 to-red-500" },
     { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "Structured simulated evaluation environment using real market data. Every rule, fee, and reward condition published upfront. No surprises.", color: "from-indigo-500 to-violet-500" },
@@ -1513,7 +1513,7 @@ const PayoutsMadeSimple = () => {
             </p>
             <Link href="/checkout">
               <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl h-12 px-7 font-bold shadow-lg hover:shadow-purple-500/30">
-                Start Earning Today <ArrowRight size={16} className="ml-2" />
+                Start Your Evaluation <ArrowRight size={16} className="ml-2" />
               </Button>
             </Link>
           </div>
@@ -3490,7 +3490,7 @@ const SmartScalingPlan = () => {
 const SEBIBrokers = () => {
   const cards = [
     {
-      title: "SEBI-Aligned Data",
+      title: "Market Data from Regulated Sources",
       desc: "Our real-time price feeds come from SEBI-registered broker infrastructure, ensuring simulated account prices accurately mirror the live Indian market.",
       icon: <ShieldCheck className="w-6 h-6" />,
       iconBg: "bg-emerald-500/15",
@@ -3827,7 +3827,7 @@ const Calculator = () => {
                   </div>
 
                   <Button className="w-full h-14 mt-4 bg-white text-black hover:bg-gray-200 text-lg font-bold">
-                    Start Earning Now
+                    Get Started Now
                   </Button>
 
                   <p className="text-xs text-white/40 text-center mt-4">
@@ -4905,7 +4905,7 @@ const Affiliate = () => {
       commission: "30%",
       referrals: "1 – 20 sales",
       bonus: "₹5,000 at 30 sales",
-      desc: "Start earning from day one! Get 30% commission on every paid referral. Only completed purchases count — no signup commissions, just real earnings.",
+      desc: "Start receiving affiliate commissions from day one — transparent commission terms, clear tracking. Only completed purchases count — no signup commissions.",
       color: "from-blue-500/20 to-blue-600/10",
       border: "border-blue-500/30",
       badge: "text-blue-400",
