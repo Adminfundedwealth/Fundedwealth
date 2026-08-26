@@ -46,6 +46,12 @@ RewriteRule . /index.html [L]
         Header set Cache-Control "no-cache, no-store, must-revalidate"
     </FilesMatch>
 
+    # Service Worker — must never be cached to ensure updates propagate
+    <FilesMatch "service-worker\.js$">
+        ExpiresDefault "access plus 0 seconds"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+
     # Versioned JS/CSS assets — cache 1 year (Vite adds content hashes)
     <FilesMatch "\.(js|css|woff2?|ttf|eot)$">
         ExpiresDefault "access plus 1 year"

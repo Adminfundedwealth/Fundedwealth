@@ -134,6 +134,18 @@
 
   <script type="module" src="/src/main.tsx"></script>
 
+  <!-- Service Worker registration — must stay in HTML to ensure old SWs update -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js').then(function(reg) {
+          // Force update check on every page load to pick up new SW after deploy
+          reg.update();
+        }).catch(function() { /* SW registration failed — non-critical */ });
+      });
+    }
+  </script>
+
   <script>
     // Defer urgency system until after main content is interactive
     window.addEventListener('load', function() {
