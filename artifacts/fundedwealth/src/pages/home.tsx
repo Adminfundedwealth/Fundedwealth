@@ -1131,34 +1131,6 @@ const Hero = () => {
   );
 };
 
-const Stats = () => {
-  return (
-    <section className="py-12 border-y border-white/10 bg-black/20 backdrop-blur-sm relative z-20">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink mb-2">₹45 Lakhs+</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">In Performance-Based Rewards Paid</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-pink to-fw-purple mb-2">15,000+</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Evaluation Participants</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-white mb-2">12 HRS</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Reward Processing Time</div>
-            <div className="text-xs text-white/40 mt-1">For eligible approved requests</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-white mb-2">70%-90%</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Max Performance Share</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 const IndianInstruments = () => {
   const indexFO = [
     { name: "NIFTY", desc: "Nifty 50 Options & Futures", color: "from-orange-500 to-red-500" },
@@ -5688,7 +5660,6 @@ export default function Home() {
 
       <main>
         <Hero />
-        <Stats />
         <IndianInstruments />
         <FWIndEdge />
         <Plans />
