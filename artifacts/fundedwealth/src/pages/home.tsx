@@ -4024,14 +4024,13 @@ const ImpactInitiative = () => (
       <div className="text-center mb-16 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 rounded-full px-4 py-1.5 mb-6">
           <Heart size={14} className="text-pink-400 fill-pink-400" />
-          <span className="text-pink-400 text-sm font-bold">Powered by Real Impact ❤∩╕Å</span>
+          <span className="text-pink-400 text-sm font-bold">Powered by Real Impact in India</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
-          Trade for Change — <span className="text-gradient">Profit with Purpose</span>
+          Trade with Purpose — <span className="text-gradient">Create Real Impact</span>
         </h2>
         <p className="text-xl text-white/70">
-          Every trade you take creates real impact.<br />
-          FundedWealth contributes from its profits — and you can choose to give back too.
+          Your participation can support meaningful social initiatives. FundedWealth contributes through its impact program, and eligible participants may choose to contribute as well.
         </p>
       </div>
 
@@ -4040,7 +4039,7 @@ const ImpactInitiative = () => (
           <div className="absolute top-3 right-3 bg-blue-500/15 border border-blue-500/25 rounded-full px-2.5 py-0.5 text-blue-400 text-[10px] font-bold">AUTOMATIC</div>
           <div className="text-3xl mb-3"></div>
           <h3 className="text-white font-extrabold text-xl mb-2">FundedWealth Contribution</h3>
-          <p className="text-white/50 text-sm mb-4">We allocate a portion of our profits to support real causes across India.</p>
+          <p className="text-white/50 text-sm mb-4">FundedWealth supports selected social initiatives across India through its impact program.</p>
           <div className="space-y-2">
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">₹12L+</span></div>
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">8,200+</span></div>
@@ -4051,7 +4050,7 @@ const ImpactInitiative = () => (
           <div className="absolute top-3 right-3 bg-green-500/15 border border-green-500/25 rounded-full px-2.5 py-0.5 text-green-400 text-[10px] font-bold">OPTIONAL</div>
           <div className="text-3xl mb-3"></div>
           <h3 className="text-white font-extrabold text-xl mb-2">Trader Contribution</h3>
-          <p className="text-white/50 text-sm mb-4">You can optionally contribute during withdrawals and increase your impact.</p>
+          <p className="text-white/50 text-sm mb-4">Eligible participants can optionally contribute when requesting a reward payout.</p>
           <div className="space-y-2">
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">₹6.5L+</span></div>
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">4,300+</span></div>
@@ -5655,7 +5654,6 @@ export default function Home() {
         <Guarantee />
         <ImpactInitiative />
         <PayoutsMadeSimple />
-        <LivePayouts />
         <TerminalMockup />
         <Advantages />
         <WhyChoose />
