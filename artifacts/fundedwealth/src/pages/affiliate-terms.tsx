@@ -23,7 +23,6 @@ export default function AffiliateTerms() {
 
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-4xl font-heading font-extrabold mb-2">Affiliate Terms</h1>
-        <p className="text-white/40 text-sm mb-10">Last updated: August 26, 2026</p>
 
         <div className="space-y-8 text-white/70 leading-relaxed">
 

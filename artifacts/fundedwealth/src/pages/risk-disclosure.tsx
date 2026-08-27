@@ -23,7 +23,6 @@ export default function RiskDisclosure() {
 
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <h1 className="text-4xl font-heading font-extrabold mb-2">Risk Disclosure</h1>
-        <p className="text-white/40 text-sm mb-10">Last updated: August 26, 2026</p>
 
         <p className="text-white/70 leading-relaxed mb-8">
           READ CAREFULLY BEFORE USING FUNDEDWEALTH. This Risk Disclosure explains the principal risks associated with using the FundedWealth platform, purchasing an evaluation program, operating a simulated trading account, and becoming eligible for performance-based rewards.

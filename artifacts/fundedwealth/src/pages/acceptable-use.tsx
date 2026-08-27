@@ -46,7 +46,6 @@ export default function AcceptableUse() {
         <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-2">
           Prohibited Activities &amp; Acceptable Use Policy
         </h1>
-        <p className="text-white/40 text-sm mb-12">Last updated: August 26, 2026</p>
 
         <div className="space-y-10 text-white/70 leading-relaxed text-[15px]">
 
