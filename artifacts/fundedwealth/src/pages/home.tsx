@@ -1734,17 +1734,17 @@ const TechAndBenefits = () => {
       ),
     },
     {
-      title: "Competitive Brokerage & Leverage",
-      desc: "Trade Indian stocks with zero brokerage rates and competitive leverage matching the best Indian brokers.",
+      title: "No Per-Trade Costs in Simulation",
+      desc: "Trade Indian instruments in the simulated environment with no per-trade charges, so your evaluation reflects your strategy, not fees.",
       iconBg: "bg-pink-500",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="5" x2="5" y2="19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" /></svg>
       ),
       visual: (
         <div className="bg-white/5 border border-white/10 rounded-xl p-5 mt-4 flex flex-col items-center">
-          <div className="text-rose-400 font-extrabold text-3xl">0%</div>
-          <div className="text-white font-bold text-xs mt-1">Brokerage</div>
-          <div className="text-white/40 text-[10px] mt-0.5">Competitive leverage</div>
+          <div className="text-rose-400 font-extrabold text-3xl">Rs 0</div>
+          <div className="text-white font-bold text-xs mt-1">Simulated Trade Costs</div>
+          <div className="text-white/40 text-[10px] mt-0.5">Focus on performance</div>
         </div>
       ),
     },
