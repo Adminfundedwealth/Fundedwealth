@@ -26,7 +26,7 @@ export default {
     desc: "Join our simulated trading programs – choose between industry leading instant model or evaluation model with",
     guarantee: "performance-based rewards typically processed within 12 hours for eligible approved requests",
     desc2: "& rewards protection.",
-    subdesc: "Access simulated account sizes up to ₹50L. Trade NIFTY, BANKNIFTY, SENSEX, FINNIFTY & NIFTY 500 stocks — 100% Indian markets, zero risk to your own money.",
+    subdesc: "Access simulated account sizes up to ₹50L. Trade NIFTY, BANKNIFTY, SENSEX, FINNIFTY & NIFTY 500 stocks — 100% Indian markets. All trading is simulated — no real capital is at risk.",
     cta: "Get Funded Now",
     viewPlans: "View Plans",
   },

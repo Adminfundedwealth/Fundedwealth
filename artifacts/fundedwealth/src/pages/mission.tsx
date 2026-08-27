@@ -40,7 +40,7 @@ const MissionPage = () => {
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-heading font-extrabold text-white mb-6 leading-tight">
             Turning Indian Skill Into<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-fw-orange via-fw-pink to-fw-purple">
-              Real Trading Wealth
+              Performance-Based Rewards
             </span>
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto">
@@ -66,7 +66,7 @@ const MissionPage = () => {
               Giving India's Best Traders the Capital They Deserve
             </h2>
             <p className="text-white/80 text-lg leading-relaxed mb-4">
-              FundedWealth is India's fastest-growing performance-based proprietary trading firm — built to bridge the gap between raw trading talent and real financial opportunity. We give disciplined traders access to capital up to ₹50 Lakhs without asking them to risk a single rupee of their own savings.
+              FundedWealth is India's fastest-growing performance-based proprietary trading evaluation platform — built to bridge the gap between raw trading talent and the opportunity to earn performance-based rewards. We give disciplined traders access to simulated evaluation accounts with balances up to ₹50 Lakhs, with no real capital of your own at risk (all trading is simulated).
             </p>
             <p className="text-white/55 leading-relaxed mb-4">
               Born from the belief that skill — not savings — should determine who gets funded, we've grown into a platform trusted by 15,000+ traders across every corner of India. From tier-1 cities to small towns, if you can trade, we'll back you.
@@ -87,20 +87,20 @@ const MissionPage = () => {
             <div className="space-y-5">
               {[
                 {
-                  title: "We Back Traders with Capital:",
-                  body: "Clear the evaluation challenge and you receive a fully-funded live account — up to ₹50L — to trade the Indian markets exactly the way you trade now.",
+                  title: "We Back Traders with Simulated Accounts:",
+                  body: "Clear the evaluation and you receive a simulated evaluation account — up to ₹50L simulated balance — to demonstrate your strategy on Indian market data. No real capital is at risk.",
                 },
                 {
                   title: "We Keep the Rules Honest:",
                   body: "No hidden tripwires, no arbitrary denials. Our rules are published, simple, and designed to reward good risk management — not punish traders on technicalities.",
                 },
                 {
-                  title: "We Share Profits Generously:",
-                  body: "Earn 70%–90% of every rupee of profit you generate. We only win when you win — so we're fully invested in your success.",
+                  title: "We Share Rewards Generously:",
+                  body: "Eligible participants earn 70%–90% performance-based rewards on qualifying simulated profit, under program terms. We only win when you win — so we're fully invested in your success.",
                 },
                 {
-                  title: "We Pay Fast, Every Week:",
-                  body: "No 30-day cycles. Verified payouts go straight to your UPI or bank account in 12 hours. We average 5–7 hours. Because your money is your money.",
+                  title: "We Process Rewards Fast:",
+                  body: "No 30-day cycles. Approved rewards are typically processed within 12 hours to your UPI or bank account, subject to verification and program terms.",
                 },
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 p-6 bg-white/3 border border-white/8 rounded-2xl hover:border-fw-orange/20 transition-colors">
@@ -185,11 +185,11 @@ const MissionPage = () => {
           {/* Closing tagline */}
           <div className="text-center py-10 border-t border-white/10">
             <p className="text-2xl font-heading font-bold text-white/80 mb-8">
-              Your Skills. <span className="text-fw-orange">Our Capital.</span> <span className="text-fw-pink">Unlimited Potential.</span>
+              Your Skills. <span className="text-fw-orange">Our Simulated Accounts.</span> <span className="text-fw-pink">Your Potential.</span>
             </p>
             <Link href="/">
               <Button className="h-14 px-10 text-lg font-bold bg-gradient-to-r from-fw-orange to-fw-pink text-white rounded-xl shadow-lg shadow-fw-orange/30 hover:opacity-90 transition-opacity">
-                Get Funded Today <ArrowRight size={20} />
+                Start Your Evaluation <ArrowRight size={20} />
               </Button>
             </Link>
           </div>

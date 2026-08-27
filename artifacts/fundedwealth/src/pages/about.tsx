@@ -91,7 +91,7 @@ const AboutPage = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 mt-7">
-                <Pill icon={<ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />}>SEBI-Aligned Brokers</Pill>
+                <Pill icon={<ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />}>SEBI-Aligned Data Sources</Pill>
                 <Pill icon={<Sparkles className="w-3.5 h-3.5 text-violet-400" />}>AI-Native</Pill>
                 <Pill icon={<Scale className="w-3.5 h-3.5 text-blue-400" />}>A-Book Aligned</Pill>
               </div>

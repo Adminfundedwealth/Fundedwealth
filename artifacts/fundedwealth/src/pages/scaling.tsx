@@ -25,8 +25,8 @@ export default function Scaling() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Scaling Plan — Grow from ₹1L to ₹50L Funded Capital | Best Prop Firm India"
-        description="Scale your funded trading account from ₹1 Lakh to ₹50 Lakhs in 6 levels at India's best prop firm. FundedWealth's scaling program rewards consistent traders with more capital and higher profit splits."
+        title="Scaling Plan — Grow your simulated evaluation account from ₹1L to ₹50L | FundedWealth India"
+        description="Scale your simulated evaluation account size from ₹1 Lakh to ₹50 Lakhs across 6 levels as you demonstrate consistency. FundedWealth's scaling program rewards consistent performance with larger simulated accounts and higher reward splits."
         keywords="prop trading scaling plan India, funded account scaling, grow trading capital India, ₹50 lakh funded account, scaling program prop firm, best prop firm India scaling, increase funded account size, prop firm capital growth India"
         canonical="/scaling"
       />

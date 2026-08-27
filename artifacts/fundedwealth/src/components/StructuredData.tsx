@@ -2,13 +2,13 @@ import { Helmet } from "react-helmet-async";
 
 const organizationSchema = {
   "@context": "https://schema.org",
-  "@type": "FinancialService",
+  "@type": "Organization",
   name: "FundedWealth",
   alternateName: ["FundedWealth India", "FW", "Funded Wealth"],
   url: "https://fundedwealth.com",
   logo: "https://fundedwealth.com/logo.png",
   image: "https://fundedwealth.com/opengraph.jpg",
-  description: "FundedWealth is India's #1 best prop trading firm. Get funded trading accounts up to ₹50 Lakhs. Trade NSE, BSE, MCX, Forex & Crypto. Keep 70-90% profits. Performance-based rewards typically processed within 12 hours for eligible approved requests.",
+  description: "FundedWealth is a simulated trading evaluation platform focused on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). Eligible participants can earn performance-based rewards, typically processed within 12 hours for approved requests, under program terms.",
   foundingDate: "2023",
   slogan: "India's #1 Prop Trading Firm — Trade Smarter, Get Funded",
   priceRange: "₹999 - ₹49,999",
@@ -119,7 +119,7 @@ const faqSchema = {
       name: "How does prop trading work at FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Choose a plan (Flash, Instant, 1-Step, or 2-Step), pass the evaluation by meeting profit targets while staying within drawdown limits, and receive a simulated funded account. Trade NSE, BSE, MCX, Forex & Crypto with zero risk to your own money."
+        text: "Choose a plan (Flash, Instant, 1-Step, or 2-Step), pass the evaluation by meeting profit targets while staying within drawdown limits, and receive a simulated evaluation account. All trading is simulated, so no real capital is at risk. The platform currently focuses on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500)."
       }
     },
     {
@@ -135,7 +135,7 @@ const faqSchema = {
       name: "What markets can I trade with FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth supports trading on NSE (National Stock Exchange), BSE (Bombay Stock Exchange), MCX (Multi Commodity Exchange), international Forex pairs, and Cryptocurrency markets — giving Indian traders access to all major instruments."
+        text: "FundedWealth offers simulated trading on NSE, BSE and MCX instruments (index F&O and equities). Forex, crypto and global futures are planned for future FundedWealth verticals."
       }
     },
     {
@@ -164,10 +164,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Is there a money-back guarantee?",
+      name: "Is the evaluation fee refundable?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, FundedWealth offers a 100% money-back guarantee. Your evaluation fee is fully refundable once you become a funded trader."
+        text: "Evaluation fees are non-refundable on failure. On passing, the original evaluation fee is refunded with your first reward payout, subject to the Refund Policy."
       }
     },
     {
@@ -214,7 +214,7 @@ const serviceSchema = {
     "@type": "Organization",
     name: "FundedWealth"
   },
-  description: "India's best prop trading evaluation and funded trading account service. Get funded up to ₹50 Lakhs to trade NSE, BSE, MCX, Forex & Crypto.",
+  description: "Simulated trading evaluation service for Indian markets. Eligible participants can earn performance-based rewards under program terms. All trading is simulated.",
   areaServed: { "@type": "Country", name: "India" },
   hasOfferCatalog: {
     "@type": "OfferCatalog",

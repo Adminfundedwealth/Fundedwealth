@@ -142,7 +142,7 @@ export default function Payouts() {
             Verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Payout Proofs</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            Every payout is real, verified, and delivered within 12 hours. See the proof for yourself.
+            Eligible rewards are verified and typically processed within 12 hours of approval. See the proof for yourself.
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export default function Payouts() {
             <CardContent className="p-5 text-center">
               <Shield className="text-purple-400 mx-auto mb-2" size={24} />
               <div className="text-2xl font-heading font-extrabold text-white">100%</div>
-              <div className="text-white/50 text-xs">Payout Success</div>
+              <div className="text-white/50 text-xs">Approved Payouts Verified</div>
             </CardContent>
           </Card>
         </div>

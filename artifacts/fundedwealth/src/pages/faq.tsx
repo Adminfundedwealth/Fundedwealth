@@ -52,7 +52,7 @@ const FAQS: Faq[] = [
   {
     cat: "About",
     q: "Why choose FundedWealth over other prop firms?",
-    a: "Three reasons: we operate entirely on Indian instruments (rupee P&L, IST sessions, NSE/BSE feeds), we settle payouts inside 12 hours to your Indian bank account, and our rulebook is short, plain-English and published in full on our Rules page — no hidden disqualifications.",
+    a: "Three reasons: we operate entirely on Indian instruments (rupee P&L, IST sessions, NSE/BSE feeds), eligible rewards are typically processed within 12 hours of approval to your Indian bank account (subject to verification and payment-provider timelines), and our rulebook is short, plain-English and published in full on our Rules page — no hidden disqualifications.",
   },
   {
     cat: "About",
@@ -215,7 +215,7 @@ const FAQS: Faq[] = [
   {
     cat: "Payouts",
     q: "How long do payouts take to process?",
-    a: "Once approved, funds hit your verified Indian bank account within 12 hours — usually faster. We publish the exact timestamps on our public Payouts page.",
+    a: "Once approved, eligible rewards are typically processed to your verified Indian bank account within 12 hours, subject to verification and payment-provider timelines. We publish exact timestamps on our public Payouts page.",
   },
   {
     cat: "Payouts",
