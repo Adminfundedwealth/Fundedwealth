@@ -2342,307 +2342,6 @@ const TerminalMockup = () => {
   );
 };
 
-const LivePayouts = () => {
-  const payouts = [
-    { name: "Rohan S.", amount: "₹58,200", time: "2 mins ago", initial: "RS", color: "from-orange-500 to-pink-500", state: "Maharashtra" },
-    { name: "Vikram N.", amount: "₹1,55,000", time: "15 mins ago", initial: "VN", color: "from-violet-500 to-purple-700", state: "Delhi" },
-    { name: "Aman J.", amount: "₹21,000", time: "1 hr ago", initial: "AJ", color: "from-cyan-500 to-blue-600", state: "Punjab" },
-    { name: "Sandeep P.", amount: "₹65,000", time: "2 hrs ago", initial: "SP", color: "from-green-500 to-teal-600", state: "Karnataka" },
-    { name: "Neha G.", amount: "₹62,000", time: "3 hrs ago", initial: "NG", color: "from-pink-500 to-rose-600", state: "Gujarat" },
-    { name: "Priya M.", amount: "₹88,500", time: "5 hrs ago", initial: "PM", color: "from-amber-500 to-orange-600", state: "Tamil Nadu" },
-    { name: "Karan T.", amount: "₹1,20,000", time: "7 hrs ago", initial: "KT", color: "from-blue-500 to-indigo-600", state: "Rajasthan" },
-    { name: "Divya R.", amount: "₹10,000", time: "8 hrs ago", initial: "DR", color: "from-fuchsia-500 to-pink-600", state: "Uttar Pradesh" },
-    { name: "Suresh K.", amount: "₹5,000", time: "9 hrs ago", initial: "SK", color: "from-lime-500 to-green-600", state: "West Bengal" },
-    { name: "Meera P.", amount: "₹25,000", time: "10 hrs ago", initial: "MP", color: "from-yellow-500 to-amber-600", state: "Madhya Pradesh" },
-    { name: "Aditya V.", amount: "₹40,000", time: "11 hrs ago", initial: "AV", color: "from-red-500 to-orange-600", state: "Telangana" },
-    { name: "Tanya S.", amount: "₹75,000", time: "12 hrs ago", initial: "TS", color: "from-sky-500 to-cyan-600", state: "Kerala" },
-    { name: "Rahul B.", amount: "₹90,000", time: "13 hrs ago", initial: "RB", color: "from-purple-500 to-violet-600", state: "Bihar" },
-    { name: "Anjali D.", amount: "₹15,500", time: "14 hrs ago", initial: "AD", color: "from-rose-500 to-pink-600", state: "Haryana" },
-    { name: "Nikhil M.", amount: "₹32,000", time: "16 hrs ago", initial: "NM", color: "from-teal-500 to-green-600", state: "Odisha" },
-    { name: "Pooja L.", amount: "₹48,000", time: "17 hrs ago", initial: "PL", color: "from-indigo-500 to-blue-600", state: "Jharkhand" },
-    { name: "Arjun D.", amount: "₹1,10,000", time: "18 hrs ago", initial: "AD", color: "from-emerald-500 to-teal-600", state: "Andhra Pradesh" },
-    { name: "Sneha R.", amount: "₹27,500", time: "19 hrs ago", initial: "SR", color: "from-pink-400 to-fuchsia-600", state: "Chhattisgarh" },
-    { name: "Manish K.", amount: "₹95,000", time: "20 hrs ago", initial: "MK", color: "from-orange-400 to-red-600", state: "Uttarakhand" },
-    { name: "Ritu S.", amount: "₹18,000", time: "22 hrs ago", initial: "RS", color: "from-cyan-400 to-teal-500", state: "Assam" },
-    { name: "Deepak V.", amount: "₹72,000", time: "1 day ago", initial: "DV", color: "from-violet-400 to-purple-600", state: "Goa" },
-    { name: "Kavita N.", amount: "₹35,000", time: "1 day ago", initial: "KN", color: "from-amber-400 to-yellow-600", state: "Himachal Pradesh" },
-    { name: "Sanjay B.", amount: "₹53,000", time: "1 day ago", initial: "SB", color: "from-blue-400 to-cyan-600", state: "Jammu & Kashmir" },
-    { name: "Anita P.", amount: "₹1,45,000", time: "1 day ago", initial: "AP", color: "from-red-400 to-rose-600", state: "Sikkim" },
-    { name: "Vijay G.", amount: "₹8,500", time: "2 days ago", initial: "VG", color: "from-green-400 to-emerald-600", state: "Meghalaya" },
-  ];
-
-  return (
-    <section id="live-payouts" className="py-12 bg-[#1A0030]">
-      <div className="container mx-auto px-4 mb-10 text-center">
-        <h2 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-3">
-          Recent Performance Rewards <span className="text-fw-orange">(LIVE)</span>
-        </h2>
-        <p className="text-white/60 text-lg max-w-2xl mx-auto">
-          Verified performance-based rewards paid to evaluation participants across India. All activity on FundedWealth is simulated for evaluation purposes.
-        </p>
-      </div>
-
-      <div className="relative w-full overflow-hidden mb-10">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#1A0030] to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#1A0030] to-transparent z-10 pointer-events-none"></div>
-
-        <div className="flex gap-4 animate-marquee-slow" style={{ width: "max-content" }}>
-          {[...payouts, ...payouts].map((payout, i) => (
-            <Card key={i} className="min-w-[260px] glass-card border-white/10 shrink-0">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${payout.color} flex items-center justify-center text-white font-bold text-sm border border-white/20 shrink-0`}>
-                  {payout.initial}
-                </div>
-                <div>
-                  <div className="text-white/80 font-medium text-sm">{payout.name}</div>
-                  <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">
-                    {payout.amount}
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white/50 text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{payout.state}</span>
-                    <span className="text-white/40 text-xs flex items-center gap-1">
-                      <Clock size={10} /> {payout.time}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      <LivePayoutTable />
-
-    </section>
-  );
-};
-
-const PAYOUT_NAMES = [
-  "Rahul S.", "Priya M.", "Amit K.", "Sneha R.", "Vikram P.", "Ananya D.", "Rohan T.", "Meera J.",
-  "Karan B.", "Divya N.", "Arjun G.", "Pooja L.", "Nikhil W.", "Swati C.", "Manish V.", "Ritu A.",
-  "Saurabh H.", "Neha F.", "Deepak Y.", "Kavita E.", "Tanya S.", "Aditya V.", "Anjali D.", "Vijay G.",
-  "Suresh K.", "Sandeep P.", "Aman J.", "Sanjay B.", "Anita P.", "Nisha T.", "Rajesh M.", "Simran K.",
-  "Harish D.", "Lakshmi R.", "Gaurav S.", "Bhavna P.", "Mohit L.", "Jyoti A.", "Sachin V.", "Rekha B.",
-  "Pankaj N.", "Shweta G.", "Vivek C.", "Pallavi H.", "Ashish J.", "Komal F.", "Tushar W.", "Sonali E.",
-  "Ramesh Y.", "Geeta D.",
-];
-
-function generateHash(): string {
-  const chars = "0123456789abcdef";
-  let h = "";
-  for (let i = 0; i < 40; i++) h += chars[Math.floor(Math.random() * 16)];
-  return h.slice(0, 8) + "..." + h.slice(-6);
-}
-
-function generatePayoutRows(count: number) {
-  const now = new Date();
-  const rows: { date: string; hash: string; amount: string; amountNum: number }[] = [];
-  for (let i = 0; i < count; i++) {
-    const d = new Date(now.getTime() - i * (12 + Math.random() * 30) * 60 * 1000);
-    const dateStr = d.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" }) + ", " +
-      d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-    const r = Math.random();
-    let amt: number;
-    if (r < 0.15) amt = [2500, 3000, 3500, 4000, 4500, 5000][Math.floor(Math.random() * 6)];
-    else if (r < 0.35) amt = [7500, 8000, 10000, 12000, 15000][Math.floor(Math.random() * 5)];
-    else if (r < 0.55) amt = [18000, 21000, 25000, 28000, 32000, 35000][Math.floor(Math.random() * 6)];
-    else if (r < 0.75) amt = [38000, 42000, 45000, 48000, 52000, 55000, 58000][Math.floor(Math.random() * 7)];
-    else if (r < 0.9) amt = [62000, 68000, 74000, 78000, 85000, 92000, 95000][Math.floor(Math.random() * 7)];
-    else amt = [110000, 125000, 150000, 175000, 210000, 250000, 320000, 350000][Math.floor(Math.random() * 8)];
-    rows.push({
-      date: dateStr,
-      hash: generateHash(),
-      amount: "₹" + amt.toLocaleString("en-IN"),
-      amountNum: amt,
-    });
-  }
-  return rows;
-}
-
-const LivePayoutChart = ({ data }: { data: { amountNum: number }[] }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ctx = c.getContext("2d")!;
-    const W = c.width = c.offsetWidth * 2;
-    const H = c.height = c.offsetHeight * 2;
-    ctx.scale(2, 2);
-    const w = W / 2, h = H / 2;
-
-    const amounts = data.slice(0, 30).map(d => d.amountNum).reverse();
-    const max = Math.max(...amounts) * 1.1;
-    const min = Math.min(...amounts) * 0.9;
-    const range = max - min || 1;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, "rgba(255,138,61,0.25)");
-    grad.addColorStop(1, "rgba(255,138,61,0)");
-
-    const points: { x: number; y: number }[] = [];
-    const padX = 10, padY = 15;
-    for (let i = 0; i < amounts.length; i++) {
-      const x = padX + (i / (amounts.length - 1)) * (w - padX * 2);
-      const y = padY + (1 - (amounts[i] - min) / range) * (h - padY * 2);
-      points.push({ x, y });
-    }
-
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const cpx = (prev.x + curr.x) / 2;
-      ctx.bezierCurveTo(cpx, prev.y, cpx, curr.y, curr.x, curr.y);
-    }
-    ctx.strokeStyle = "#FF8A3D";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.lineTo(points[points.length - 1].x, h);
-    ctx.lineTo(points[0].x, h);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    const last = points[points.length - 1];
-    ctx.beginPath();
-    ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = "#FF8A3D";
-    ctx.shadowColor = "#FF8A3D";
-    ctx.shadowBlur = 10;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  }, [data]);
-
-  return <canvas ref={canvasRef} className="w-full" style={{ height: 120 }} />;
-};
-
-const LivePayoutTable = () => {
-  const [rows, setRows] = useState(() => generatePayoutRows(100));
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRows(prev => {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" }) + ", " +
-          now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-        const r = Math.random();
-        let amt: number;
-        if (r < 0.15) amt = [2500, 3000, 3500, 4000, 4500, 5000][Math.floor(Math.random() * 6)];
-        else if (r < 0.35) amt = [7500, 8000, 10000, 12000, 15000][Math.floor(Math.random() * 5)];
-        else if (r < 0.55) amt = [18000, 21000, 25000, 28000, 32000, 35000][Math.floor(Math.random() * 6)];
-        else if (r < 0.75) amt = [38000, 42000, 45000, 48000, 52000, 55000, 58000][Math.floor(Math.random() * 7)];
-        else if (r < 0.9) amt = [62000, 68000, 74000, 78000, 85000, 92000, 95000][Math.floor(Math.random() * 7)];
-        else amt = [110000, 125000, 150000, 175000, 210000, 250000, 320000, 350000][Math.floor(Math.random() * 8)];
-        const newRow = {
-          date: dateStr,
-          hash: generateHash(),
-          amount: "₹" + amt.toLocaleString("en-IN"),
-          amountNum: amt,
-        };
-        return [newRow, ...prev.slice(0, 99)];
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="container mx-auto px-4">
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-card rounded-2xl border border-white/10 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-white font-bold text-sm">Real-Time Payout Transactions</span>
-            </div>
-            <span className="text-white/40 text-xs">Auto-updates every 5s</span>
-          </div>
-          <div className="overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/10 bg-white/5">
-                  <th className="text-left px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Date</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Transaction Hash</th>
-                  <th className="text-right px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Payout</th>
-                </tr>
-              </thead>
-            </table>
-            <div className="overflow-y-auto max-h-[420px] no-scrollbar">
-              <table className="w-full">
-                <tbody>
-                  {rows.map((row, i) => (
-                    <tr key={i} className={`border-b border-white/5 transition-colors hover:bg-white/5 ${i === 0 ? "animate-in fade-in slide-in-from-top-2 duration-500 bg-fw-orange/5" : ""}`}>
-                      <td className="px-6 py-3 text-sm text-white/70 whitespace-nowrap">{row.date}</td>
-                      <td className="px-6 py-3">
-                        <span className="text-fw-orange text-sm font-mono cursor-pointer hover:underline">{row.hash}</span>
-                      </td>
-                      <td className="px-6 py-3 text-right">
-                        <span className="text-green-400 font-bold text-sm">{row.amount}</span>
-                        <span className="text-white/30 text-xs ml-1">INR</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="flex items-center justify-between px-6 py-3 border-t border-white/10 bg-white/5">
-            <span className="text-fw-orange text-xs font-semibold flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-fw-orange animate-pulse" />
-              Real-Time Payout Transactions
-            </span>
-            <span className="text-white/30 text-xs flex items-center gap-1.5">
-              <img src="/logo.png" alt="" className="w-4 h-4 rounded" />
-              FundedWealth
-            </span>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <div className="glass-card rounded-2xl border border-white/10 p-6">
-            <div className="text-white/50 text-xs uppercase tracking-wider mb-1">Total Paid Out (Last 30 Days)</div>
-            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">
-              ₹{(rows.reduce((a, r) => a + r.amountNum, 0) / 100000).toFixed(1)}L+
-            </div>
-            <div className="text-white/40 text-xs mt-1">Across {rows.length} verified transactions</div>
-          </div>
-
-          <div className="glass-card rounded-2xl border border-white/10 p-6">
-            <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Payout Trend (Last 30 Transactions)</div>
-            <LivePayoutChart data={rows} />
-          </div>
-
-          <div className="glass-card rounded-2xl border border-white/10 p-5">
-            <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Payout Stats</div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-fw-orange font-extrabold text-lg">₹{Math.max(...rows.map(r => r.amountNum)).toLocaleString("en-IN")}</div>
-                <div className="text-white/40 text-[10px] uppercase">Highest Payout</div>
-              </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-green-400 font-extrabold text-lg">₹{Math.round(rows.reduce((a, r) => a + r.amountNum, 0) / rows.length).toLocaleString("en-IN")}</div>
-                <div className="text-white/40 text-[10px] uppercase">Avg Payout</div>
-              </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-white font-extrabold text-lg">{rows.length}</div>
-                <div className="text-white/40 text-[10px] uppercase">Total Payouts</div>
-              </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-fw-pink font-extrabold text-lg">12hr</div>
-                <div className="text-white/40 text-[10px] uppercase">Avg Speed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Advantages = () => {
   const features = [
     { title: "Clear, Published Rules", desc: "No hidden rules designed to make you fail. Every risk parameter and evaluation condition is published upfront." },
@@ -3531,90 +3230,90 @@ const WhatPeopleSay = () => {
     {
       name: "Disha Kakkar",
       handle: "@disha_kakkar",
-      quote: "Every metric I actually care about — daily limit, profit target, payout window — is right there on one screen. My day starts calmer and my routine just runs.",
+      quote: "Every metric I actually care about — daily limits, performance targets, and account rules — is available in one place. It makes my evaluation routine easier to follow.",
       ago: "5 days ago",
-      amount: "₹1,18,900",
+      amount: "Evaluation Participant",
       gradient: "from-pink-400 to-rose-500",
       initials: "DK",
     },
     {
       name: "Hrdaya Grover",
       handle: "@hrdaya_grover",
-      quote: "Watching my P&L update tick-by-tick in the FundedWealth Terminal removed the mental noise. I stopped refreshing five tabs and just focused on hitting my 8% target.",
+      quote: "Seeing my simulated P&L update in the FundedWealth Terminal reduced the need to switch between multiple screens. I can focus more clearly on my evaluation rules and trading discipline.",
       ago: "3 days ago",
-      amount: "₹67,200",
+      amount: "Evaluation Participant",
       gradient: "from-violet-500 to-blue-500",
       initials: "HG",
     },
     {
       name: "Sanyam Maheswari",
       handle: "@sanyam_maheswari",
-      quote: "Fills are quick, the layout is uncluttered, and the live risk meter keeps me honest. It pushes me to trade my plan instead of my mood.",
+      quote: "The interface is responsive, the layout is uncluttered, and the live risk tools help me stay aware of my evaluation limits. It encourages me to follow my trading plan.",
       ago: "2 days ago",
-      amount: "₹1,80,000",
+      amount: "Evaluation Participant",
       gradient: "from-amber-400 to-orange-500",
       initials: "SM",
     },
     {
       name: "Rohan Mehta",
       handle: "@rohan_mehta",
-      quote: "Cleared the 2-Step in 19 days. The drawdown tracker literally saved me from a revenge trade on a Friday close — that one nudge paid for the entire challenge fee.",
+      quote: "Cleared the 2-Step evaluation in 19 days. The drawdown tracker helped me avoid an impulsive trade near a Friday close — that single prompt reinforced the value of following my risk rules.",
       ago: "1 week ago",
-      amount: "₹2,45,000",
+      amount: "Evaluation Participant",
       gradient: "from-cyan-400 to-blue-600",
       initials: "RM",
     },
     {
       name: "Priya Iyer",
       handle: "@priya_trades",
-      quote: "Payout hit my HDFC account in under 24 hours, no follow-ups, no awkward ticket replies. After two offshore prop horror stories, this felt unreal.",
+      quote: "The reward request process was clear and the support team kept me updated throughout the verification process. After difficult experiences elsewhere, the process here felt much more straightforward.",
       ago: "4 days ago",
-      amount: "₹98,400",
+      amount: "Verified Participant",
       gradient: "from-emerald-400 to-teal-600",
       initials: "PI",
     },
     {
       name: "Aakash Sharma",
       handle: "@aakash_fno",
-      quote: "Trading BankNifty with 25L funded capital while my own savings stayed untouched — that mental shift alone improved my execution. Sizing finally feels rational.",
+      quote: "Practising within a structured simulated account environment helped me focus on position sizing and risk discipline without treating the evaluation as an investment product.",
       ago: "6 days ago",
-      amount: "₹3,12,750",
+      amount: "Evaluation Participant",
       gradient: "from-indigo-500 to-purple-600",
       initials: "AS",
     },
     {
       name: "Neha Singh",
       handle: "@neha_sgh",
-      quote: "Hindi support over WhatsApp, clear KYC steps, and zero hidden fees. As a part-time trader from Lucknow, this is the first platform that actually felt built for us.",
+      quote: "Hindi support, clear verification steps, and transparent program information made the onboarding process easier to understand. As a part-time trader, the platform feels accessible and straightforward.",
       ago: "2 weeks ago",
-      amount: "₹54,600",
+      amount: "Community Member",
       gradient: "from-rose-500 to-pink-600",
       initials: "NS",
     },
     {
       name: "Vikram Reddy",
       handle: "@vik_trades",
-      quote: "The discipline score is brutal but fair. Watching it drop after a single rule break taught me more about risk than three years of YouTube content ever did.",
+      quote: "The discipline score is strict but fair. Watching it drop after a single rule break taught me more about risk management than three years of online content ever did.",
       ago: "9 days ago",
-      amount: "₹1,76,200",
+      amount: "Evaluation Participant",
       gradient: "from-amber-500 to-red-500",
       initials: "VR",
     },
     {
       name: "Ananya Bose",
       handle: "@ananya.b",
-      quote: "I scaled from ₹5L to ₹20L in five months without ever touching my own capital. The milestone framework keeps the goals concrete instead of abstract.",
+      quote: "The structured evaluation milestones gave me clear goals to work toward. Having defined rules and measurable targets helped me stay focused and consistent.",
       ago: "3 weeks ago",
-      amount: "₹4,28,000",
+      amount: "Evaluation Participant",
       gradient: "from-fuchsia-500 to-violet-700",
       initials: "AB",
     },
     {
       name: "Karan Malhotra",
       handle: "@karan.mal",
-      quote: "What I love is the absence of gimmicks — no flashy WhatsApp groups, no signal calls. Just a clean evaluation, real rules, and a payout when you earn it.",
+      quote: "What I like is the straightforward approach — no flashy signal groups or unnecessary distractions. Just a structured simulated evaluation with clearly defined rules and performance criteria.",
       ago: "1 day ago",
-      amount: "₹89,500",
+      amount: "Community Member",
       gradient: "from-sky-500 to-cyan-600",
       initials: "KM",
     },
@@ -3637,7 +3336,7 @@ const WhatPeopleSay = () => {
       <p className="text-white/65 text-sm italic leading-relaxed mb-5 flex-1">&ldquo;{t.quote}&rdquo;</p>
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
         <span className="text-white/40 text-xs">{t.ago}</span>
-        <span className="text-emerald-400 font-extrabold text-sm">{t.amount}</span>
+        <span className="text-white/50 font-semibold text-xs">{t.amount}</span>
       </div>
     </div>
   );
@@ -3668,7 +3367,7 @@ const WhatPeopleSay = () => {
           What People <span className="text-gradient">Say About Us</span>
         </h2>
         <p className="text-center text-white/55 text-sm md:text-base max-w-2xl mx-auto">
-          Honest words from evaluation participants across India — auto-pulled from our community feed.
+          Feedback from members of the FundedWealth evaluation community.
         </p>
       </div>
 
