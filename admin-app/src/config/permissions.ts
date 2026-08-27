@@ -24,6 +24,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Exclude<SystemRole, 'founder' | 'c
   finance_manager: [
     'users.view',
     'payouts.view', 'payouts.approve', 'payouts.reject',
+    'payments.view', 'payments.manage',  // refund operations
     'risk.view',
     'settings.view',
     'challenges.view',
@@ -42,6 +43,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Exclude<SystemRole, 'founder' | 'c
     'users.view',
     'challenges.view',
     'support.view', 'support.manage',
+    'payments.view',  // needed to access Refund Operations and create cases
   ],
   marketing_manager: [
     'marketing.view', 'marketing.manage',
@@ -73,6 +75,7 @@ export const ROUTE_PERMISSIONS: Record<string, Permission> = {
   '/challenges': 'challenges.view',
   '/funded': 'challenges.view',
   '/payouts': 'payouts.view',
+  '/finance/refunds': 'payments.view',
   '/kyc': 'kyc.view',
   '/risk': 'risk.view',
   '/trades': 'trades.view',

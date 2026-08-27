@@ -123,6 +123,13 @@ export const sidebarNavigation: NavigationSection[] = [
         badge: { query: 'payouts_pending' },
       },
       {
+        label: 'Refund Operations',
+        icon: 'RefreshCw',
+        href: '/finance/refunds',
+        permission: 'payments.view',
+        badge: { query: 'refunds_pending' },
+      },
+      {
         label: 'Revenue Intelligence',
         icon: 'BarChart3',
         href: '/revenue',
