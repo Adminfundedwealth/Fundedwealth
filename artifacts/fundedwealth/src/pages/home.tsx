@@ -1154,7 +1154,7 @@ const IndianInstruments = () => {
             What You Can <span className="text-gradient">Trade</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            FundedWealth IND is a structured simulated trading and evaluation platform built exclusively for Indian markets. Simulated accounts use real-time NSE/BSE market price data, priced and settled in INR.
+            FundedWealth India is a structured simulated trading and evaluation platform built exclusively for Indian markets. Simulated accounts use real-time NSE and BSE market data for evaluation purposes. Program fees and applicable rewards are denominated in INR.
           </p>
         </div>
 
@@ -1193,20 +1193,6 @@ const IndianInstruments = () => {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-amber-500/5 via-orange-500/5 to-amber-500/5 border border-amber-500/20 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="text-3xl"></div>
-          <div className="flex-1">
-            <div className="text-amber-300 text-xs font-bold uppercase tracking-wider mb-1">Coming Soon — Same Brand, Separate Verticals</div>
-            <p className="text-white/70 text-sm">
-              <strong className="text-white">FundedWealth Forex</strong>, <strong className="text-white">FundedWealth Crypto</strong> and <strong className="text-white">FundedWealth Futures</strong> launching as dedicated platforms. Same trust, global markets.
-            </p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold"> Forex</span>
-            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold">₿ Crypto</span>
-            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold"> Futures</span>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -1214,12 +1200,12 @@ const IndianInstruments = () => {
 
 const FWIndEdge = () => {
   const edges = [
-    { icon: <Building2 className="w-6 h-6" />, title: "Market Data from Regulated Sources", desc: "Our real-time price feeds are sourced from SEBI-licensed Indian brokerages — simulated account prices mirror live market conditions accurately.", color: "from-blue-500 to-cyan-500" },
-    { icon: <BarChart3 className="w-6 h-6" />, title: "Real-Time NSE/BSE Price Data", desc: "Simulated accounts use live NSE & BSE tick data — exactly the same prices a retail trader sees on their broker terminal.", color: "from-emerald-500 to-teal-500" },
-    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Pay in ₹, receive performance-based rewards in ₹. Processed via UPI / IMPS / NEFT direct to your bank — no FX, no intermediary, streamlined reward processing.", color: "from-orange-500 to-amber-500" },
-    { icon: <Zap className="w-6 h-6" />, title: "Real-Time Market Data", desc: "Simulated accounts use live NSE & BSE tick data — the same prices a retail trader sees on their broker terminal.", color: "from-purple-500 to-pink-500" },
-    { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in discipline scoring monitors your every simulated trade — overleveraging, revenge trading, and drawdown breaches flagged in real time.", color: "from-rose-500 to-red-500" },
-    { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "Structured simulated evaluation environment using real market data. Every rule, fee, and reward condition published upfront. No surprises.", color: "from-indigo-500 to-violet-500" },
+    { icon: <Building2 className="w-6 h-6" />, title: "Market Data for Simulation", desc: "Simulated account pricing is based on available Indian market data and is designed to reflect prevailing market conditions for evaluation purposes.", color: "from-blue-500 to-cyan-500" },
+    { icon: <BarChart3 className="w-6 h-6" />, title: "Indian Market Price Data", desc: "Simulated trading uses market price data designed to reflect current Indian market conditions for evaluation purposes.", color: "from-emerald-500 to-teal-500" },
+    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Program fees and eligible performance rewards are denominated in INR. Reward processing is subject to verification, applicable terms, and available payout methods.", color: "from-orange-500 to-amber-500" },
+    { icon: <Zap className="w-6 h-6" />, title: "Market-Based Simulation", desc: "The simulated environment uses market price data to provide a realistic evaluation experience based on Indian market conditions.", color: "from-purple-500 to-pink-500" },
+    { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in risk analytics monitor simulated trading activity and identify patterns such as overleveraging, revenge trading, and rule breaches.", color: "from-rose-500 to-red-500" },
+    { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "A structured simulated evaluation environment with clear rules, fees, and reward conditions published upfront.", color: "from-indigo-500 to-violet-500" },
   ];
   return (
     <section id="ind-edge" className="py-14 relative overflow-hidden">
@@ -1233,7 +1219,7 @@ const FWIndEdge = () => {
             Designed For <span className="text-gradient">Indian Traders</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Every feature purpose-built for Indian markets — real-time NSE/BSE data feeds, INR pricing, and a fully structured simulated evaluation environment.
+            Every feature is purpose-built for Indian markets — using market-based pricing and a structured simulated evaluation environment.
           </p>
         </div>
 
