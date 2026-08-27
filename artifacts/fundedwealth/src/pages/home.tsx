@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useLiveDiscountConfig, computeDiscountedPrice, formatINR } from "@/hooks/useDiscountConfig";
@@ -61,7 +61,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
 
-// ─── Bulge / Magnetic text effect ───────────────────────────────────────────
+// --- Bulge / Magnetic text effect -------------------------------------------
 function BulgeText({
   text,
   className = "",
@@ -136,7 +136,7 @@ function BulgeText({
     </span>
   );
 }
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const WORLD_CONTINENTS: [number, number][][] = [
   [[71, 25], [60, 30], [55, 42], [45, 40], [40, 28], [36, 36], [30, 48], [25, 56], [20, 63], [15, 75], [10, 77], [8, 77], [10, 80], [15, 80], [20, 87], [22, 89], [25, 88], [28, 97], [35, 76], [37, 68], [42, 45], [48, 40], [55, 28], [60, 20], [65, 15], [70, 20], [71, 25]],
@@ -211,26 +211,26 @@ const MAP_CONNS: [number, number][] = [
 ];
 
 const TRADER_PAYOUTS = [
-  { name: "Rahul S.", city: 1, amount: "₹1,25,000", time: "2 min ago" },
-  { name: "Priya M.", city: 4, amount: "₹87,500", time: "5 min ago" },
-  { name: "Amit K.", city: 10, amount: "₹2,50,000", time: "8 min ago" },
-  { name: "Sneha R.", city: 8, amount: "₹65,000", time: "12 min ago" },
-  { name: "Vikram P.", city: 7, amount: "₹1,50,000", time: "15 min ago" },
-  { name: "Ananya D.", city: 9, amount: "₹92,000", time: "18 min ago" },
-  { name: "Rohan T.", city: 2, amount: "₹45,000", time: "22 min ago" },
-  { name: "Meera J.", city: 5, amount: "₹1,10,000", time: "25 min ago" },
-  { name: "Karan B.", city: 12, amount: "₹3,20,000", time: "30 min ago" },
-  { name: "Divya N.", city: 14, amount: "₹78,000", time: "35 min ago" },
-  { name: "Arjun G.", city: 0, amount: "₹55,000", time: "40 min ago" },
-  { name: "Pooja L.", city: 13, amount: "₹1,80,000", time: "45 min ago" },
-  { name: "Nikhil W.", city: 25, amount: "₹2,10,000", time: "48 min ago" },
-  { name: "Swati C.", city: 16, amount: "₹68,000", time: "52 min ago" },
-  { name: "Manish V.", city: 3, amount: "₹95,000", time: "55 min ago" },
-  { name: "Ritu A.", city: 15, amount: "₹1,35,000", time: "1 hr ago" },
-  { name: "Saurabh H.", city: 17, amount: "₹42,000", time: "1 hr ago" },
-  { name: "Neha F.", city: 6, amount: "₹1,75,000", time: "1 hr ago" },
-  { name: "Deepak Y.", city: 18, amount: "₹88,000", time: "2 hrs ago" },
-  { name: "Kavita E.", city: 11, amount: "₹3,50,000", time: "2 hrs ago" },
+  { name: "Rahul S.", city: 1, amount: "?1,25,000", time: "2 min ago" },
+  { name: "Priya M.", city: 4, amount: "?87,500", time: "5 min ago" },
+  { name: "Amit K.", city: 10, amount: "?2,50,000", time: "8 min ago" },
+  { name: "Sneha R.", city: 8, amount: "?65,000", time: "12 min ago" },
+  { name: "Vikram P.", city: 7, amount: "?1,50,000", time: "15 min ago" },
+  { name: "Ananya D.", city: 9, amount: "?92,000", time: "18 min ago" },
+  { name: "Rohan T.", city: 2, amount: "?45,000", time: "22 min ago" },
+  { name: "Meera J.", city: 5, amount: "?1,10,000", time: "25 min ago" },
+  { name: "Karan B.", city: 12, amount: "?3,20,000", time: "30 min ago" },
+  { name: "Divya N.", city: 14, amount: "?78,000", time: "35 min ago" },
+  { name: "Arjun G.", city: 0, amount: "?55,000", time: "40 min ago" },
+  { name: "Pooja L.", city: 13, amount: "?1,80,000", time: "45 min ago" },
+  { name: "Nikhil W.", city: 25, amount: "?2,10,000", time: "48 min ago" },
+  { name: "Swati C.", city: 16, amount: "?68,000", time: "52 min ago" },
+  { name: "Manish V.", city: 3, amount: "?95,000", time: "55 min ago" },
+  { name: "Ritu A.", city: 15, amount: "?1,35,000", time: "1 hr ago" },
+  { name: "Saurabh H.", city: 17, amount: "?42,000", time: "1 hr ago" },
+  { name: "Neha F.", city: 6, amount: "?1,75,000", time: "1 hr ago" },
+  { name: "Deepak Y.", city: 18, amount: "?88,000", time: "2 hrs ago" },
+  { name: "Kavita E.", city: 11, amount: "?3,50,000", time: "2 hrs ago" },
 ];
 
 const HeroIndiaMap = () => {
@@ -552,7 +552,7 @@ const MiniTrophy = () => (
       }}
     />
 
-    {/* Trophy Image — requires transparent PNG */}
+    {/* Trophy Image � requires transparent PNG */}
     <img
       src="/fw-trophy.png"
       alt="FundedWealth Championship Trophy"
@@ -610,7 +610,7 @@ const AnnouncementBar = () => {
       <span className="text-white/90 font-semibold text-xs">{idx.name}</span>
       <span className="text-white font-bold text-xs">{idx.price}</span>
       <span className={`text-xs font-bold ${idx.up ? "text-emerald-400" : "text-red-400"}`}>
-        {idx.up ? "▲" : "▼"} {idx.change}
+        {idx.up ? "?" : "?"} {idx.change}
       </span>
     </span>
   ));
@@ -675,7 +675,7 @@ const Navbar = () => {
             <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
               <span></span>FundedWealth <span className="opacity-90">IND</span>
             </button>
-            {/* FundedWealth Forex — 3D glassy tab */}
+            {/* FundedWealth Forex � 3D glassy tab */}
             <a
               href="https://forex.fundedwealth.com"
               target="_blank"
@@ -788,10 +788,10 @@ const Navbar = () => {
 
 const HeroChampionshipPopup = () => {
   const leaders = [
-    { rank: 1, name: "Aarav K.", profit: "+₹4.82L", city: "Mumbai", medal: "from-yellow-300 to-amber-500" },
-    { rank: 2, name: "Ishita R.", profit: "+₹3.65L", city: "Delhi", medal: "from-slate-200 to-slate-400" },
-    { rank: 3, name: "Vikram S.", profit: "+₹3.11L", city: "Bengaluru", medal: "from-amber-600 to-orange-700" },
-    { rank: 4, name: "Meera J.", profit: "+₹2.74L", city: "Pune", medal: "from-fw-pink to-fw-purple" },
+    { rank: 1, name: "Aarav K.", profit: "+?4.82L", city: "Mumbai", medal: "from-yellow-300 to-amber-500" },
+    { rank: 2, name: "Ishita R.", profit: "+?3.65L", city: "Delhi", medal: "from-slate-200 to-slate-400" },
+    { rank: 3, name: "Vikram S.", profit: "+?3.11L", city: "Bengaluru", medal: "from-amber-600 to-orange-700" },
+    { rank: 4, name: "Meera J.", profit: "+?2.74L", city: "Pune", medal: "from-fw-pink to-fw-purple" },
   ];
   const [idx, setIdx] = useState(0);
   const [opacity, setOpacity] = useState(1);
@@ -845,7 +845,7 @@ const HeroChampionshipPopup = () => {
         </div>
         <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between">
           <span className="text-white/50 text-[9px]">Prize pool</span>
-          <span className="text-fw-orange font-extrabold text-[10px]">₹25,00,000</span>
+          <span className="text-fw-orange font-extrabold text-[10px]">?25,00,000</span>
         </div>
       </Link>
     </motion.div>
@@ -860,7 +860,7 @@ const Hero = () => {
 
       {/* Extra shooting stars & sparkle particles */}
       <div className="absolute inset-0 pointer-events-none z-[3] overflow-hidden">
-        {/* Diagonal shooting stars — like meteors from top-right to bottom-left */}
+        {/* Diagonal shooting stars � like meteors from top-right to bottom-left */}
         {Array.from({ length: 12 }).map((_, i) => {
           const angles = [-25, -35, -20, -30, -40, -22, -28, -33, -18, -38, -27, -32];
           const tops = [5, 12, 20, 8, 35, 15, 45, 25, 55, 10, 40, 30];
@@ -928,7 +928,7 @@ const Hero = () => {
 
             {/* Top badge */}
             <div className="mb-3 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
-              <span className="text-lg">🇮🇳</span>
+              <span className="text-lg">????</span>
               <span><BulgeText text="INDIA'S SIMULATED TRADING " /><BulgeText text="& EVALUATION PLATFORM" className="text-fw-orange" /></span>
             </div>
 
@@ -961,17 +961,17 @@ const Hero = () => {
               <p>
                 Trade Indian market instruments including NIFTY, BANKNIFTY, SENSEX and selected equities &amp; futures:<br />
                 <span className="text-white font-bold tracking-wide">
-                  <BulgeText text="NIFTY • BANKNIFTY • SENSEX • FINNIFTY" radius={120} strength={0.45} />
+                  <BulgeText text="NIFTY � BANKNIFTY � SENSEX � FINNIFTY" radius={120} strength={0.45} />
                 </span>
               </p>
               <p>
                 Equities :<br />
                 <span className="text-white font-bold tracking-wide">
-                  <BulgeText text="NIFTY 500 • Stock Futures." radius={120} strength={0.45} />
+                  <BulgeText text="NIFTY 500 � Stock Futures." radius={120} strength={0.45} />
                 </span>
               </p>
               <p className="pt-4 text-white font-bold text-base md:text-lg">
-                Access simulated account sizes of up to <span className="text-fw-orange font-extrabold">₹50 Lakhs</span> and trade under clearly defined risk parameters.<br />
+                Access simulated account sizes of up to <span className="text-fw-orange font-extrabold">?50 Lakhs</span> and trade under clearly defined risk parameters.<br />
                 Demonstrate consistent performance and become eligible for <span className="text-blue-400 font-extrabold not-italic">performance-based rewards</span> under the applicable program terms.
               </p>
               <p className="text-white/50 text-sm font-normal">
@@ -979,10 +979,10 @@ const Hero = () => {
               </p>
             </div>
 
-            {/* CTA Buttons — Liquid Glass */}
+            {/* CTA Buttons � Liquid Glass */}
             <div className="mt-10 flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
 
-              {/* 1. GET FUNDED NOW — Liquid Sunset Glass */}
+              {/* 1. GET FUNDED NOW � Liquid Sunset Glass */}
               <button
                 onClick={() => navigate("/checkout")}
                 className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
@@ -1007,7 +1007,7 @@ const Hero = () => {
                 </span>
               </button>
 
-              {/* 2. WATCH DEMO — Liquid Cosmic Violet Glass */}
+              {/* 2. WATCH DEMO � Liquid Cosmic Violet Glass */}
               <a
                 href="https://youtu.be/w3yyFx_hDcE"
                 target="_blank"
@@ -1033,7 +1033,7 @@ const Hero = () => {
                 </span>
               </a>
 
-              {/* 3. TRADING RULES — Liquid Neon Blue Glass */}
+              {/* 3. TRADING RULES � Liquid Neon Blue Glass */}
               <Link href="/rules">
                 <button
                   className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
@@ -1059,7 +1059,7 @@ const Hero = () => {
                 </button>
               </Link>
 
-              {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
+              {/* 4. FREE TRIAL ACCOUNT � Liquid Emerald Glass */}
               <button
                 onClick={() => navigate("/sign-up?trial=true")}
                 className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
@@ -1104,7 +1104,7 @@ const Hero = () => {
           60%  { opacity: 0.8; }
           100% { transform: translateX(180%); opacity: 0; }
         }
-        /* Glass tab — inner overlay + gloss shown when active */        [data-state=active] .glass-tab-overlay { opacity: 1 !important; }
+        /* Glass tab � inner overlay + gloss shown when active */        [data-state=active] .glass-tab-overlay { opacity: 1 !important; }
         [data-state=active] .glass-tab-gloss   { opacity: 1 !important; }
         /* Remove Radix default active bg */
         [role=tablist] [data-state=active] { background: transparent !important; box-shadow: none !important; }
@@ -1202,9 +1202,9 @@ const FWIndEdge = () => {
   const edges = [
     { icon: <Building2 className="w-6 h-6" />, title: "Market Data for Simulation", desc: "Simulated account pricing is based on available Indian market data and is designed to reflect prevailing market conditions for evaluation purposes.", color: "from-blue-500 to-cyan-500" },
     { icon: <BarChart3 className="w-6 h-6" />, title: "Indian Market Price Data", desc: "Simulated trading uses market price data designed to reflect current Indian market conditions for evaluation purposes.", color: "from-emerald-500 to-teal-500" },
-    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Program fees and eligible performance rewards are denominated in INR. Reward processing is subject to verification, applicable terms, and available payout methods.", color: "from-orange-500 to-amber-500" },
+    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing � INR Rewards", desc: "Program fees and eligible performance rewards are denominated in INR. Reward processing is subject to verification, applicable terms, and available payout methods.", color: "from-orange-500 to-amber-500" },
     { icon: <Zap className="w-6 h-6" />, title: "Market-Based Simulation", desc: "The simulated environment uses market price data to provide a realistic evaluation experience based on Indian market conditions.", color: "from-purple-500 to-pink-500" },
-    { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in risk analytics monitor simulated trading activity and identify patterns such as overleveraging, revenge trading, and rule breaches.", color: "from-rose-500 to-red-500" },
+    { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach�", desc: "Built-in risk analytics monitor simulated trading activity and identify patterns such as overleveraging, revenge trading, and rule breaches.", color: "from-rose-500 to-red-500" },
     { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "A structured simulated evaluation environment with clear rules, fees, and reward conditions published upfront.", color: "from-indigo-500 to-violet-500" },
   ];
   return (
@@ -1219,7 +1219,7 @@ const FWIndEdge = () => {
             Designed For <span className="text-gradient">Indian Traders</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Every feature is purpose-built for Indian markets — using market-based pricing and a structured simulated evaluation environment.
+            Every feature is purpose-built for Indian markets � using market-based pricing and a structured simulated evaluation environment.
           </p>
         </div>
 
@@ -1249,8 +1249,8 @@ const AIRiskCoach = () => {
   ];
   const alerts = [
     { type: "info", icon: "", text: "Average win/loss ratio improved 18% this week" },
-    { type: "warning", icon: "⚠∩╕Å", text: "Consecutive losses detected — pause suggested" },
-    { type: "success", icon: "✅", text: "Daily loss limit respected for 7 days straight" },
+    { type: "warning", icon: "?n+�", text: "Consecutive losses detected � pause suggested" },
+    { type: "success", icon: "?", text: "Daily loss limit respected for 7 days straight" },
   ];
   return (
     <section id="ai-risk" className="py-14 relative overflow-hidden">
@@ -1259,20 +1259,20 @@ const AIRiskCoach = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <span className="inline-block px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold uppercase tracking-wider mb-4">
-              AI Risk Coach™
+              AI Risk Coach�
             </span>
             <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
               Your Personal <span className="text-gradient">Trading Discipline</span> Engine
             </h2>
             <p className="text-white/60 mb-6 leading-relaxed">
-              Most traders fail not from bad strategy, but from broken discipline. Our AI Risk Coach watches every trade in real time — flagging overleveraging, revenge trading, drawdown breaches, and emotional patterns before they cost you the account.
+              Most traders fail not from bad strategy, but from broken discipline. Our AI Risk Coach watches every trade in real time � flagging overleveraging, revenge trading, drawdown breaches, and emotional patterns before they cost you the account.
             </p>
             <ul className="space-y-3 mb-6">
               {[
                 "Real-time discipline score based on your behaviour",
                 "Pre-trade warnings when risk thresholds are about to break",
-                "Daily/weekly behavioural reports — improve over time",
-                "Free for all funded traders — no add-on fee",
+                "Daily/weekly behavioural reports � improve over time",
+                "Free for all funded traders � no add-on fee",
               ].map((p) => (
                 <li key={p} className="flex items-start gap-3 text-white/80 text-sm">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
@@ -1292,7 +1292,7 @@ const AIRiskCoach = () => {
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold">AI</div>
                 <div>
                   <div className="text-white font-bold text-sm">Risk Coach Dashboard</div>
-                  <div className="text-white/40 text-[10px]">Live · Last updated 2s ago</div>
+                  <div className="text-white/40 text-[10px]">Live � Last updated 2s ago</div>
                 </div>
               </div>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
@@ -1342,7 +1342,7 @@ const HowItWorksIND = () => {
           <div className="h-2.5 rounded-full bg-white/10 mb-2.5 w-3/4" />
           <div className="h-2.5 rounded-full bg-white/10 mb-3 w-1/2" />
           <div className="bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white text-[11px] font-bold rounded-lg py-2 text-center">
-            Begin Assessment →
+            Begin Assessment ?
           </div>
         </div>
       ),
@@ -1394,7 +1394,7 @@ const HowItWorksIND = () => {
       desc: "Demonstrate consistent performance and become eligible for performance-based rewards under the applicable program terms. Request rewards via UPI / IMPS / NEFT every 7 days.",
       visual: (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-3 mt-4 space-y-1.5">
-          {["+₹25,000", "+₹50,000", "+₹75,000"].map((v) => (
+          {["+?25,000", "+?50,000", "+?75,000"].map((v) => (
             <div key={v} className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2.5 py-1.5">
               <TrendingUp className="w-3 h-3 text-emerald-400 shrink-0" />
               <div className="h-1 flex-1 rounded-full bg-emerald-500/30" />
@@ -1418,7 +1418,7 @@ const HowItWorksIND = () => {
             How It <span className="text-gradient">Works</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Choose an evaluation plan that matches your trading style and experience. From sign-up to performance rewards — the process is straightforward and transparent.
+            Choose an evaluation plan that matches your trading style and experience. From sign-up to performance rewards � the process is straightforward and transparent.
           </p>
         </div>
 
@@ -1455,7 +1455,7 @@ const PayoutsMadeSimple = () => {
     { num: "01", icon: <CheckCircle2 className="w-5 h-5" />, iconBg: "from-blue-500 to-indigo-600", title: "Pass Evaluation", desc: "Complete your evaluation phase(s) and meet all defined objectives.", time: "30-45 days" },
     { num: "02", icon: <TrendingUp className="w-5 h-5" />, iconBg: "from-slate-600 to-slate-800", title: "Receive Simulated Account", desc: "Receive access to your simulated evaluation account within 24 hours of passing.", time: "< 24 hours" },
     { num: "03", icon: <Banknote className="w-5 h-5" />, iconBg: "from-emerald-500 to-green-600", title: "Trade & Perform", desc: "Trade within risk parameters on your simulated account and generate measurable performance.", time: "Weekly cycle" },
-    { num: "04", icon: <CreditCard className="w-5 h-5" />, iconBg: "from-blue-500 to-cyan-600", title: "Request Reward", desc: "Submit reward requests via your dashboard under the applicable program terms — UPI / IMPS / NEFT.", time: "Every 7 days" },
+    { num: "04", icon: <CreditCard className="w-5 h-5" />, iconBg: "from-blue-500 to-cyan-600", title: "Request Reward", desc: "Submit reward requests via your dashboard under the applicable program terms � UPI / IMPS / NEFT.", time: "Every 7 days" },
   ];
   return (
     <section id="payouts-simple" className="py-14 relative overflow-hidden">
@@ -1492,7 +1492,7 @@ const PayoutsMadeSimple = () => {
               <pre className="px-5 py-4 text-[12px] leading-relaxed font-mono text-emerald-300/90 overflow-x-auto">
                 {`{
   "status": "success",
-  "amount": "₹8,50,000",
+  "amount": "?8,50,000",
   "trader": "Arjun K.",
   "payout_id": "po_1N3k8sL",
   "timestamp": "2026-04-15T10:30:00Z",
@@ -1540,9 +1540,9 @@ const PayoutsMadeSimple = () => {
 
 const WhyTradersLoveUs = () => {
   const cards = [
-    { icon: <Clock className="w-7 h-7" />, iconBg: "bg-blue-500/10", iconColor: "text-blue-400", title: "Rewards Every 7 Days", desc: "Eligible performance-based rewards processed every 7 days — UPI/IMPS direct to your bank under the applicable program terms.", badge: "WEEKLY CYCLE", badgeColor: "text-blue-400" },
+    { icon: <Clock className="w-7 h-7" />, iconBg: "bg-blue-500/10", iconColor: "text-blue-400", title: "Rewards Every 7 Days", desc: "Eligible performance-based rewards processed every 7 days � UPI/IMPS direct to your bank under the applicable program terms.", badge: "WEEKLY CYCLE", badgeColor: "text-blue-400" },
     { icon: <CreditCard className="w-7 h-7" />, iconBg: "bg-slate-500/10", iconColor: "text-slate-300", title: "Streamlined Process", desc: "Request and track your performance-based rewards directly from your dashboard.", badge: "SIMPLE & TRANSPARENT", badgeColor: "text-slate-300" },
-    { icon: <BarChart3 className="w-7 h-7" />, iconBg: "bg-emerald-500/10", iconColor: "text-emerald-400", title: "90% Performance Share", desc: "Keep up to 90% of your simulated performance results as a reward — among the highest shares available.", badge: "INDUSTRY LEADING", badgeColor: "text-emerald-400" },
+    { icon: <BarChart3 className="w-7 h-7" />, iconBg: "bg-emerald-500/10", iconColor: "text-emerald-400", title: "90% Performance Share", desc: "Keep up to 90% of your simulated performance results as a reward � among the highest shares available.", badge: "INDUSTRY LEADING", badgeColor: "text-emerald-400" },
   ];
   return (
     <section id="why-love-us" className="py-14 relative overflow-hidden">
@@ -1572,14 +1572,14 @@ const WhyTradersLoveUs = () => {
 
 const PayoutCertificates = () => {
   const certs = [
-    { name: "ROHIT CHAWLA", amount: "₹1,56,000", date: "14-01-2026" },
-    { name: "KUNAL SINGAL", amount: "₹1,12,000", date: "30-01-2026" },
-    { name: "PRIYA SHARMA", amount: "₹2,80,000", date: "14-01-2026" },
-    { name: "MEERA JOSHI", amount: "₹3,10,000", date: "26-12-2025" },
-    { name: "RAJESH PATEL", amount: "₹1,95,000", date: "17-12-2025" },
-    { name: "ISHANT GUPTA", amount: "₹89,500", date: "08-12-2025" },
-    { name: "AARTI VERMA", amount: "₹2,15,000", date: "02-12-2025" },
-    { name: "VIKRAM SINGH", amount: "₹1,38,500", date: "25-11-2025" },
+    { name: "ROHIT CHAWLA", amount: "?1,56,000", date: "14-01-2026" },
+    { name: "KUNAL SINGAL", amount: "?1,12,000", date: "30-01-2026" },
+    { name: "PRIYA SHARMA", amount: "?2,80,000", date: "14-01-2026" },
+    { name: "MEERA JOSHI", amount: "?3,10,000", date: "26-12-2025" },
+    { name: "RAJESH PATEL", amount: "?1,95,000", date: "17-12-2025" },
+    { name: "ISHANT GUPTA", amount: "?89,500", date: "08-12-2025" },
+    { name: "AARTI VERMA", amount: "?2,15,000", date: "02-12-2025" },
+    { name: "VIKRAM SINGH", amount: "?1,38,500", date: "25-11-2025" },
   ];
 
   const Certificate = ({ name, amount, date }: { name: string; amount: string; date: string }) => (
@@ -1670,8 +1670,8 @@ const TechAndBenefits = () => {
       ),
     },
     {
-      title: "AI Risk Guard™",
-      desc: "Real-time risk monitoring algorithms and trackers that predict drawdown risk before it happens — protecting your capital allocation.",
+      title: "AI Risk Guard�",
+      desc: "Real-time risk monitoring algorithms and trackers that predict drawdown risk before it happens � protecting your capital allocation.",
       iconBg: "bg-blue-500",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
@@ -1692,7 +1692,7 @@ const TechAndBenefits = () => {
             <path d="M0,40 L20,35 L40,38 L60,30 L80,32 L100,25 L120,28 L140,20 L160,23 L180,15 L200,18 L200,60 L0,60 Z" fill="url(#riskGrad)" />
             <path d="M0,40 L20,35 L40,38 L60,30 L80,32 L100,25 L120,28 L140,20 L160,23 L180,15 L200,18" stroke="#3B82F6" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <div className="text-center text-white/40 text-[10px] mt-1">AI Risk Guard™</div>
+          <div className="text-center text-white/40 text-[10px] mt-1">AI Risk Guard�</div>
         </div>
       ),
     },
@@ -1750,7 +1750,7 @@ const TechAndBenefits = () => {
     },
     {
       title: "Performance-Based Rewards",
-      desc: "Earn up to 90% profit share through FundedWealth's simulated evaluation account — based purely on your skill.",
+      desc: "Earn up to 90% profit share through FundedWealth's simulated evaluation account � based purely on your skill.",
       iconBg: "bg-amber-500",
       icon: <Trophy className="w-5 h-5 text-white" strokeWidth={2.5} />,
       visual: (
@@ -1836,7 +1836,7 @@ const Championship = () => {
             </h2>
 
             <p className="text-lg text-white/70 mb-8 leading-relaxed">
-              Join FundedWealth's monthly simulated trading competition. Demonstrate your skills against participants across India and win performance prizes. Trade in a structured simulated environment — pure skill decides the winners.
+              Join FundedWealth's monthly simulated trading competition. Demonstrate your skills against participants across India and win performance prizes. Trade in a structured simulated environment � pure skill decides the winners.
             </p>
 
             <div className="space-y-6 mb-10">
@@ -1845,8 +1845,8 @@ const Championship = () => {
                   <span className="text-2xl"></span>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-white mb-1">1st Place — ₹10 Lakh Account</h4>
-                  <p className="text-white/60">Win a ₹10L 1-Step simulated evaluation plan + Apple MacBook + ₹30,000 cash + Certificate.</p>
+                  <h4 className="text-xl font-bold text-white mb-1">1st Place � ?10 Lakh Account</h4>
+                  <p className="text-white/60">Win a ?10L 1-Step simulated evaluation plan + Apple MacBook + ?30,000 cash + Certificate.</p>
                 </div>
               </div>
 
@@ -1855,8 +1855,8 @@ const Championship = () => {
                   <span className="text-2xl"></span>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-white mb-1">2nd Place — ₹5 Lakh Account</h4>
-                  <p className="text-white/60">Win a ₹5L 1-Step simulated evaluation plan + ₹20,000 cash + Certificate.</p>
+                  <h4 className="text-xl font-bold text-white mb-1">2nd Place � ?5 Lakh Account</h4>
+                  <p className="text-white/60">Win a ?5L 1-Step simulated evaluation plan + ?20,000 cash + Certificate.</p>
                 </div>
               </div>
 
@@ -1865,8 +1865,8 @@ const Championship = () => {
                   <span className="text-2xl"></span>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-white mb-1">3rd Place — ₹2 Lakh Account</h4>
-                  <p className="text-white/60">Win a ₹2L 1-Step simulated evaluation plan + ₹9,000 cash + Certificate.</p>
+                  <h4 className="text-xl font-bold text-white mb-1">3rd Place � ?2 Lakh Account</h4>
+                  <p className="text-white/60">Win a ?2L 1-Step simulated evaluation plan + ?9,000 cash + Certificate.</p>
                 </div>
               </div>
             </div>
@@ -1886,7 +1886,7 @@ const Championship = () => {
                   {[
                     "Instant Login After Purchase",
                     "Mega Rewards Every Month",
-                    "No Hidden Rules — Pure Skill",
+                    "No Hidden Rules � Pure Skill",
                     "iPhone 16 Winners Announced Weekly",
                     "Live Leaderboard Tracking"
                   ].map((feature, i) => (
@@ -1903,7 +1903,7 @@ const Championship = () => {
                   </Button>
                 </Link>
                 <div className="text-center mt-4 text-sm text-red-400 font-semibold animate-pulse">
-                  Limited slots remaining — register now
+                  Limited slots remaining � register now
                 </div>
               </CardContent>
             </Card>
@@ -1927,10 +1927,10 @@ const Guarantee = () => {
               Eligible Rewards Processed Within 12 Hours.
             </h3>
             <p className="text-white/70 text-lg mb-8">
-              Eligible performance-based rewards for approved participants are processed quickly. Rewards are paid under the applicable program terms — no unnecessary delays.
+              Eligible performance-based rewards for approved participants are processed quickly. Rewards are paid under the applicable program terms � no unnecessary delays.
             </p>
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-bold">
-              <Clock size={20} /> AVG. DISBURSEMENT TIME — 5-7 HOURS
+              <Clock size={20} /> AVG. DISBURSEMENT TIME � 5-7 HOURS
             </div>
           </div>
 
@@ -1954,7 +1954,7 @@ const Guarantee = () => {
                 </div>
                 <div>
                   <h4 className="text-lg font-bold text-white mb-2">Direct to UPI/Bank</h4>
-                  <p className="text-white/60 text-sm">Eligible rewards transferred to any Indian bank account or via UPI — no hidden conversion fees.</p>
+                  <p className="text-white/60 text-sm">Eligible rewards transferred to any Indian bank account or via UPI � no hidden conversion fees.</p>
                 </div>
               </CardContent>
             </Card>
@@ -2342,313 +2342,12 @@ const TerminalMockup = () => {
   );
 };
 
-const LivePayouts = () => {
-  const payouts = [
-    { name: "Rohan S.", amount: "₹58,200", time: "2 mins ago", initial: "RS", color: "from-orange-500 to-pink-500", state: "Maharashtra" },
-    { name: "Vikram N.", amount: "₹1,55,000", time: "15 mins ago", initial: "VN", color: "from-violet-500 to-purple-700", state: "Delhi" },
-    { name: "Aman J.", amount: "₹21,000", time: "1 hr ago", initial: "AJ", color: "from-cyan-500 to-blue-600", state: "Punjab" },
-    { name: "Sandeep P.", amount: "₹65,000", time: "2 hrs ago", initial: "SP", color: "from-green-500 to-teal-600", state: "Karnataka" },
-    { name: "Neha G.", amount: "₹62,000", time: "3 hrs ago", initial: "NG", color: "from-pink-500 to-rose-600", state: "Gujarat" },
-    { name: "Priya M.", amount: "₹88,500", time: "5 hrs ago", initial: "PM", color: "from-amber-500 to-orange-600", state: "Tamil Nadu" },
-    { name: "Karan T.", amount: "₹1,20,000", time: "7 hrs ago", initial: "KT", color: "from-blue-500 to-indigo-600", state: "Rajasthan" },
-    { name: "Divya R.", amount: "₹10,000", time: "8 hrs ago", initial: "DR", color: "from-fuchsia-500 to-pink-600", state: "Uttar Pradesh" },
-    { name: "Suresh K.", amount: "₹5,000", time: "9 hrs ago", initial: "SK", color: "from-lime-500 to-green-600", state: "West Bengal" },
-    { name: "Meera P.", amount: "₹25,000", time: "10 hrs ago", initial: "MP", color: "from-yellow-500 to-amber-600", state: "Madhya Pradesh" },
-    { name: "Aditya V.", amount: "₹40,000", time: "11 hrs ago", initial: "AV", color: "from-red-500 to-orange-600", state: "Telangana" },
-    { name: "Tanya S.", amount: "₹75,000", time: "12 hrs ago", initial: "TS", color: "from-sky-500 to-cyan-600", state: "Kerala" },
-    { name: "Rahul B.", amount: "₹90,000", time: "13 hrs ago", initial: "RB", color: "from-purple-500 to-violet-600", state: "Bihar" },
-    { name: "Anjali D.", amount: "₹15,500", time: "14 hrs ago", initial: "AD", color: "from-rose-500 to-pink-600", state: "Haryana" },
-    { name: "Nikhil M.", amount: "₹32,000", time: "16 hrs ago", initial: "NM", color: "from-teal-500 to-green-600", state: "Odisha" },
-    { name: "Pooja L.", amount: "₹48,000", time: "17 hrs ago", initial: "PL", color: "from-indigo-500 to-blue-600", state: "Jharkhand" },
-    { name: "Arjun D.", amount: "₹1,10,000", time: "18 hrs ago", initial: "AD", color: "from-emerald-500 to-teal-600", state: "Andhra Pradesh" },
-    { name: "Sneha R.", amount: "₹27,500", time: "19 hrs ago", initial: "SR", color: "from-pink-400 to-fuchsia-600", state: "Chhattisgarh" },
-    { name: "Manish K.", amount: "₹95,000", time: "20 hrs ago", initial: "MK", color: "from-orange-400 to-red-600", state: "Uttarakhand" },
-    { name: "Ritu S.", amount: "₹18,000", time: "22 hrs ago", initial: "RS", color: "from-cyan-400 to-teal-500", state: "Assam" },
-    { name: "Deepak V.", amount: "₹72,000", time: "1 day ago", initial: "DV", color: "from-violet-400 to-purple-600", state: "Goa" },
-    { name: "Kavita N.", amount: "₹35,000", time: "1 day ago", initial: "KN", color: "from-amber-400 to-yellow-600", state: "Himachal Pradesh" },
-    { name: "Sanjay B.", amount: "₹53,000", time: "1 day ago", initial: "SB", color: "from-blue-400 to-cyan-600", state: "Jammu & Kashmir" },
-    { name: "Anita P.", amount: "₹1,45,000", time: "1 day ago", initial: "AP", color: "from-red-400 to-rose-600", state: "Sikkim" },
-    { name: "Vijay G.", amount: "₹8,500", time: "2 days ago", initial: "VG", color: "from-green-400 to-emerald-600", state: "Meghalaya" },
-  ];
-
-  return (
-    <section id="live-payouts" className="py-12 bg-[#1A0030]">
-      <div className="container mx-auto px-4 mb-10 text-center">
-        <h2 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-3">
-          Recent Performance Rewards <span className="text-fw-orange">(LIVE)</span>
-        </h2>
-        <p className="text-white/60 text-lg max-w-2xl mx-auto">
-          Verified performance-based rewards paid to evaluation participants across India. All activity on FundedWealth is simulated for evaluation purposes.
-        </p>
-      </div>
-
-      <div className="relative w-full overflow-hidden mb-10">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#1A0030] to-transparent z-10 pointer-events-none"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#1A0030] to-transparent z-10 pointer-events-none"></div>
-
-        <div className="flex gap-4 animate-marquee-slow" style={{ width: "max-content" }}>
-          {[...payouts, ...payouts].map((payout, i) => (
-            <Card key={i} className="min-w-[260px] glass-card border-white/10 shrink-0">
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${payout.color} flex items-center justify-center text-white font-bold text-sm border border-white/20 shrink-0`}>
-                  {payout.initial}
-                </div>
-                <div>
-                  <div className="text-white/80 font-medium text-sm">{payout.name}</div>
-                  <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">
-                    {payout.amount}
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-white/50 text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{payout.state}</span>
-                    <span className="text-white/40 text-xs flex items-center gap-1">
-                      <Clock size={10} /> {payout.time}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      <LivePayoutTable />
-
-    </section>
-  );
-};
-
-const PAYOUT_NAMES = [
-  "Rahul S.", "Priya M.", "Amit K.", "Sneha R.", "Vikram P.", "Ananya D.", "Rohan T.", "Meera J.",
-  "Karan B.", "Divya N.", "Arjun G.", "Pooja L.", "Nikhil W.", "Swati C.", "Manish V.", "Ritu A.",
-  "Saurabh H.", "Neha F.", "Deepak Y.", "Kavita E.", "Tanya S.", "Aditya V.", "Anjali D.", "Vijay G.",
-  "Suresh K.", "Sandeep P.", "Aman J.", "Sanjay B.", "Anita P.", "Nisha T.", "Rajesh M.", "Simran K.",
-  "Harish D.", "Lakshmi R.", "Gaurav S.", "Bhavna P.", "Mohit L.", "Jyoti A.", "Sachin V.", "Rekha B.",
-  "Pankaj N.", "Shweta G.", "Vivek C.", "Pallavi H.", "Ashish J.", "Komal F.", "Tushar W.", "Sonali E.",
-  "Ramesh Y.", "Geeta D.",
-];
-
-function generateHash(): string {
-  const chars = "0123456789abcdef";
-  let h = "";
-  for (let i = 0; i < 40; i++) h += chars[Math.floor(Math.random() * 16)];
-  return h.slice(0, 8) + "..." + h.slice(-6);
-}
-
-function generatePayoutRows(count: number) {
-  const now = new Date();
-  const rows: { date: string; hash: string; amount: string; amountNum: number }[] = [];
-  for (let i = 0; i < count; i++) {
-    const d = new Date(now.getTime() - i * (12 + Math.random() * 30) * 60 * 1000);
-    const dateStr = d.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" }) + ", " +
-      d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-    const r = Math.random();
-    let amt: number;
-    if (r < 0.15) amt = [2500, 3000, 3500, 4000, 4500, 5000][Math.floor(Math.random() * 6)];
-    else if (r < 0.35) amt = [7500, 8000, 10000, 12000, 15000][Math.floor(Math.random() * 5)];
-    else if (r < 0.55) amt = [18000, 21000, 25000, 28000, 32000, 35000][Math.floor(Math.random() * 6)];
-    else if (r < 0.75) amt = [38000, 42000, 45000, 48000, 52000, 55000, 58000][Math.floor(Math.random() * 7)];
-    else if (r < 0.9) amt = [62000, 68000, 74000, 78000, 85000, 92000, 95000][Math.floor(Math.random() * 7)];
-    else amt = [110000, 125000, 150000, 175000, 210000, 250000, 320000, 350000][Math.floor(Math.random() * 8)];
-    rows.push({
-      date: dateStr,
-      hash: generateHash(),
-      amount: "₹" + amt.toLocaleString("en-IN"),
-      amountNum: amt,
-    });
-  }
-  return rows;
-}
-
-const LivePayoutChart = ({ data }: { data: { amountNum: number }[] }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const ctx = c.getContext("2d")!;
-    const W = c.width = c.offsetWidth * 2;
-    const H = c.height = c.offsetHeight * 2;
-    ctx.scale(2, 2);
-    const w = W / 2, h = H / 2;
-
-    const amounts = data.slice(0, 30).map(d => d.amountNum).reverse();
-    const max = Math.max(...amounts) * 1.1;
-    const min = Math.min(...amounts) * 0.9;
-    const range = max - min || 1;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, "rgba(255,138,61,0.25)");
-    grad.addColorStop(1, "rgba(255,138,61,0)");
-
-    const points: { x: number; y: number }[] = [];
-    const padX = 10, padY = 15;
-    for (let i = 0; i < amounts.length; i++) {
-      const x = padX + (i / (amounts.length - 1)) * (w - padX * 2);
-      const y = padY + (1 - (amounts[i] - min) / range) * (h - padY * 2);
-      points.push({ x, y });
-    }
-
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      const prev = points[i - 1];
-      const curr = points[i];
-      const cpx = (prev.x + curr.x) / 2;
-      ctx.bezierCurveTo(cpx, prev.y, cpx, curr.y, curr.x, curr.y);
-    }
-    ctx.strokeStyle = "#FF8A3D";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.lineTo(points[points.length - 1].x, h);
-    ctx.lineTo(points[0].x, h);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    const last = points[points.length - 1];
-    ctx.beginPath();
-    ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
-    ctx.fillStyle = "#FF8A3D";
-    ctx.shadowColor = "#FF8A3D";
-    ctx.shadowBlur = 10;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  }, [data]);
-
-  return <canvas ref={canvasRef} className="w-full" style={{ height: 120 }} />;
-};
-
-const LivePayoutTable = () => {
-  const [rows, setRows] = useState(() => generatePayoutRows(100));
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRows(prev => {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" }) + ", " +
-          now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-        const r = Math.random();
-        let amt: number;
-        if (r < 0.15) amt = [2500, 3000, 3500, 4000, 4500, 5000][Math.floor(Math.random() * 6)];
-        else if (r < 0.35) amt = [7500, 8000, 10000, 12000, 15000][Math.floor(Math.random() * 5)];
-        else if (r < 0.55) amt = [18000, 21000, 25000, 28000, 32000, 35000][Math.floor(Math.random() * 6)];
-        else if (r < 0.75) amt = [38000, 42000, 45000, 48000, 52000, 55000, 58000][Math.floor(Math.random() * 7)];
-        else if (r < 0.9) amt = [62000, 68000, 74000, 78000, 85000, 92000, 95000][Math.floor(Math.random() * 7)];
-        else amt = [110000, 125000, 150000, 175000, 210000, 250000, 320000, 350000][Math.floor(Math.random() * 8)];
-        const newRow = {
-          date: dateStr,
-          hash: generateHash(),
-          amount: "₹" + amt.toLocaleString("en-IN"),
-          amountNum: amt,
-        };
-        return [newRow, ...prev.slice(0, 99)];
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="container mx-auto px-4">
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-card rounded-2xl border border-white/10 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-white font-bold text-sm">Real-Time Payout Transactions</span>
-            </div>
-            <span className="text-white/40 text-xs">Auto-updates every 5s</span>
-          </div>
-          <div className="overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/10 bg-white/5">
-                  <th className="text-left px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Date</th>
-                  <th className="text-left px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Transaction Hash</th>
-                  <th className="text-right px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Payout</th>
-                </tr>
-              </thead>
-            </table>
-            <div className="overflow-y-auto max-h-[420px] no-scrollbar">
-              <table className="w-full">
-                <tbody>
-                  {rows.map((row, i) => (
-                    <tr key={i} className={`border-b border-white/5 transition-colors hover:bg-white/5 ${i === 0 ? "animate-in fade-in slide-in-from-top-2 duration-500 bg-fw-orange/5" : ""}`}>
-                      <td className="px-6 py-3 text-sm text-white/70 whitespace-nowrap">{row.date}</td>
-                      <td className="px-6 py-3">
-                        <span className="text-fw-orange text-sm font-mono cursor-pointer hover:underline">{row.hash}</span>
-                      </td>
-                      <td className="px-6 py-3 text-right">
-                        <span className="text-green-400 font-bold text-sm">{row.amount}</span>
-                        <span className="text-white/30 text-xs ml-1">INR</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="flex items-center justify-between px-6 py-3 border-t border-white/10 bg-white/5">
-            <span className="text-fw-orange text-xs font-semibold flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-fw-orange animate-pulse" />
-              Real-Time Payout Transactions
-            </span>
-            <span className="text-white/30 text-xs flex items-center gap-1.5">
-              <img src="/logo.png" alt="" className="w-4 h-4 rounded" />
-              FundedWealth
-            </span>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <div className="glass-card rounded-2xl border border-white/10 p-6">
-            <div className="text-white/50 text-xs uppercase tracking-wider mb-1">Total Paid Out (Last 30 Days)</div>
-            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">
-              ₹{(rows.reduce((a, r) => a + r.amountNum, 0) / 100000).toFixed(1)}L+
-            </div>
-            <div className="text-white/40 text-xs mt-1">Across {rows.length} verified transactions</div>
-          </div>
-
-          <div className="glass-card rounded-2xl border border-white/10 p-6">
-            <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Payout Trend (Last 30 Transactions)</div>
-            <LivePayoutChart data={rows} />
-          </div>
-
-          <div className="glass-card rounded-2xl border border-white/10 p-5">
-            <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Payout Stats</div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-fw-orange font-extrabold text-lg">₹{Math.max(...rows.map(r => r.amountNum)).toLocaleString("en-IN")}</div>
-                <div className="text-white/40 text-[10px] uppercase">Highest Payout</div>
-              </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-green-400 font-extrabold text-lg">₹{Math.round(rows.reduce((a, r) => a + r.amountNum, 0) / rows.length).toLocaleString("en-IN")}</div>
-                <div className="text-white/40 text-[10px] uppercase">Avg Payout</div>
-              </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-white font-extrabold text-lg">{rows.length}</div>
-                <div className="text-white/40 text-[10px] uppercase">Total Payouts</div>
-              </div>
-              <div className="bg-white/5 rounded-xl p-3 text-center">
-                <div className="text-fw-pink font-extrabold text-lg">12hr</div>
-                <div className="text-white/40 text-[10px] uppercase">Avg Speed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Advantages = () => {
   const features = [
     { title: "Clear, Published Rules", desc: "No hidden rules designed to make you fail. Every risk parameter and evaluation condition is published upfront." },
     { title: "Rewards Every 7 Days", desc: "Eligible performance-based rewards processed every 7 days, directly to your UPI or bank account under the applicable program terms." },
     { title: "Performance Share Up to 90%", desc: "Demonstrate consistent performance and keep up to 90% of your simulated trading results as a performance-based reward." },
-    { title: "Scaling Up to ₹50 Lakhs", desc: "Prove consistent execution within risk parameters and your simulated account size grows through our structured scaling plan." },
+    { title: "Scaling Up to ?50 Lakhs", desc: "Prove consistent execution within risk parameters and your simulated account size grows through our structured scaling plan." },
     { title: "Affiliate Program up to 15%", desc: "Earn referral rewards by introducing other traders to our simulated evaluation platform." },
     { title: "Competitive Simulation Conditions", desc: "Simulated accounts use real-time NSE/BSE data with competitive spreads and leverage matching institutional-grade conditions." },
   ];
@@ -2661,7 +2360,7 @@ const Advantages = () => {
             The <span className="text-gradient">FundedWealth</span> Edge
           </h2>
           <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            A structured simulated trading and evaluation platform built for transparency, speed, and measurable performance — fully aligned with trader success.
+            A structured simulated trading and evaluation platform built for transparency, speed, and measurable performance � fully aligned with trader success.
           </p>
         </div>
 
@@ -2685,10 +2384,10 @@ const Advantages = () => {
 
 const WhyChoose = () => {
   const points = [
-    { num: "All", title: "NIFTY · BANKNIFTY · SENSEX · FINNIFTY · NIFTY 500", icon: <TrendingUp /> },
+    { num: "All", title: "NIFTY � BANKNIFTY � SENSEX � FINNIFTY � NIFTY 500", icon: <TrendingUp /> },
     { num: "7", title: "Day Payout Cycle", icon: <Clock /> },
     { num: "15%", title: "Industry-Leading Affiliate Program", icon: <Users /> },
-    { num: "∞", title: "Unlimited Trading Period", icon: <Clock /> },
+    { num: "8", title: "Unlimited Trading Period", icon: <Clock /> },
     { num: "Direct", title: "Payout In UPI/Bank", icon: <CreditCard /> },
     { num: "0", title: "Instant Funding Available", icon: <Zap /> },
   ];
@@ -2715,16 +2414,16 @@ const WhyChoose = () => {
 
 const FLASH_RULES = [
   { title: "Payouts", value: "After 24-hour window closes", desc: "Flash accounts are live for 24 hours from your first trade. You can request one payout after the 24-hour account period ends if your best trade does not exceed 15% of your total profit and your net profit is at least 3% of your starting balance." },
-  { title: "Consistency Rule", value: "15% Best Trade Rule", desc: "Your single best trade cannot exceed 15% of your total profit. This ensures consistent trading rather than relying on one lucky trade. Example: if your total profit is ₹10,000, no single trade should account for more than ₹1,500 of that profit." },
-  { title: "Profit Threshold for Payout", value: "3%", desc: "You must generate at least 3% net profit on your starting balance to be eligible for a payout. Example: on a ₹1,00,000 account, you need at least ₹3,000 in net profit. On a ₹5,00,000 account, you need at least ₹15,000." },
-  { title: "Daily Drawdown", value: "2%", desc: "How much you can lose in a single trading day: Don't let your losses exceed 2% of your balance to avoid losing your account. Example: with a ₹1,00,000 account, keep daily losses under ₹2,000." },
-  { title: "Max Drawdown", value: "4%", desc: "How much you can lose in total: Keep your losses under 4% of your starting balance. Example: with ₹1,00,000 starting balance, your account can't drop below ₹96,000." },
-  { title: "Profit Split", value: "80%", desc: "How much of your trading profits you keep: You get 80% of all profits. Example: when you make ₹1,00,000 profit — you can withdraw ₹80,000." },
-  { title: "Scaling", value: "–", desc: "Flash accounts close 24 hours after the first trade and don't scale." },
-  { title: "Minimum Trading Days", value: "–", desc: "No minimum trading day rule applies — your account automatically closes 24 hours after the first trade." },
+  { title: "Consistency Rule", value: "15% Best Trade Rule", desc: "Your single best trade cannot exceed 15% of your total profit. This ensures consistent trading rather than relying on one lucky trade. Example: if your total profit is ?10,000, no single trade should account for more than ?1,500 of that profit." },
+  { title: "Profit Threshold for Payout", value: "3%", desc: "You must generate at least 3% net profit on your starting balance to be eligible for a payout. Example: on a ?1,00,000 account, you need at least ?3,000 in net profit. On a ?5,00,000 account, you need at least ?15,000." },
+  { title: "Daily Drawdown", value: "2%", desc: "How much you can lose in a single trading day: Don't let your losses exceed 2% of your balance to avoid losing your account. Example: with a ?1,00,000 account, keep daily losses under ?2,000." },
+  { title: "Max Drawdown", value: "4%", desc: "How much you can lose in total: Keep your losses under 4% of your starting balance. Example: with ?1,00,000 starting balance, your account can't drop below ?96,000." },
+  { title: "Profit Split", value: "80%", desc: "How much of your trading profits you keep: You get 80% of all profits. Example: when you make ?1,00,000 profit � you can withdraw ?80,000." },
+  { title: "Scaling", value: "�", desc: "Flash accounts close 24 hours after the first trade and don't scale." },
+  { title: "Minimum Trading Days", value: "�", desc: "No minimum trading day rule applies � your account automatically closes 24 hours after the first trade." },
   { title: "Holding Overnight", value: "Available", desc: "You can hold positions overnight as long as your 24-hour period hasn't expired." },
   { title: "Holding Over Weekends", value: "Available", desc: "Weekend holding is allowed, but positions may close automatically if the market shuts before your 24-hour account period ends. Crypto positions can remain open." },
-  { title: "Leverage", value: "Varies by asset", desc: "Currencies – 1:100 · Commodities – 1:20 · Indices – 1:20 · Crypto – 1:2\n\nExample: with 1:100 leverage on currencies, you can trade positions worth ₹1,00,00,000 using ₹1,00,000 of your balance.\n\nNote: Due to increased market volatility, leverage on Metals, Oil, and Indices is temporarily set to 1:5 on funded accounts only." },
+  { title: "Leverage", value: "Varies by asset", desc: "Currencies � 1:100 � Commodities � 1:20 � Indices � 1:20 � Crypto � 1:2\n\nExample: with 1:100 leverage on currencies, you can trade positions worth ?1,00,00,000 using ?1,00,000 of your balance.\n\nNote: Due to increased market volatility, leverage on Metals, Oil, and Indices is temporarily set to 1:5 on funded accounts only." },
 ];
 
 const FlashRuleRow = ({ rule }: { rule: typeof FLASH_RULES[0] }) => {
@@ -2749,7 +2448,7 @@ const FlashRulesAccordion = () => (
   <div className="max-w-3xl mx-auto glass-card rounded-2xl border border-white/10 overflow-hidden">
     <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
       <h3 className="text-white font-heading font-bold text-lg flex items-center gap-2">
-        ⚡ Flash Funding Rules & Details
+        ? Flash Funding Rules & Details
       </h3>
     </div>
     <div className="divide-y divide-white/5">
@@ -2794,7 +2493,7 @@ const Plans = () => {
               {/* Top gloss on container */}
               <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl sm:rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
 
-              {/* Flash ⚡ — yellow/orange active */}
+              {/* Flash ? � yellow/orange active */}
               <TabsTrigger
                 value="flash"
                 className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
@@ -2811,10 +2510,10 @@ const Plans = () => {
                   }}
                 />
                 <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
-                <span className="relative z-10">Flash ⚡</span>
+                <span className="relative z-10">Flash ?</span>
               </TabsTrigger>
 
-              {/* Instant — pink/violet active */}
+              {/* Instant � pink/violet active */}
               <TabsTrigger
                 value="instant"
                 className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
@@ -2834,7 +2533,7 @@ const Plans = () => {
                 <span className="relative z-10">Instant</span>
               </TabsTrigger>
 
-              {/* 1-Step — cyan/violet active */}
+              {/* 1-Step � cyan/violet active */}
               <TabsTrigger
                 value="1step"
                 className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
@@ -2854,7 +2553,7 @@ const Plans = () => {
                 <span className="relative z-10">1-Step</span>
               </TabsTrigger>
 
-              {/* 2-Step — violet/pink active */}
+              {/* 2-Step � violet/pink active */}
               <TabsTrigger
                 value="2step"
                 className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
@@ -2879,11 +2578,11 @@ const Plans = () => {
           <TabsContent value="flash" className="mt-0">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
               {[
-                { size: "₹50,000", baseFee: 1999, origFee: "₹1,999" },
-                { size: "₹1,00,000", baseFee: 3499, origFee: "₹3,499" },
-                { size: "₹2,50,000", baseFee: 7499, origFee: "₹7,499", popular: true },
-                { size: "₹5,00,000", baseFee: 11499, origFee: "₹11,499" },
-                { size: "₹10,00,000", baseFee: 19499, origFee: "₹19,499" },
+                { size: "?50,000", baseFee: 1999, origFee: "?1,999" },
+                { size: "?1,00,000", baseFee: 3499, origFee: "?3,499" },
+                { size: "?2,50,000", baseFee: 7499, origFee: "?7,499", popular: true },
+                { size: "?5,00,000", baseFee: 11499, origFee: "?11,499" },
+                { size: "?10,00,000", baseFee: 19499, origFee: "?19,499" },
               ].map((plan, i) => {
                 const flashPct = discountConfig["flash"]?.discountPct ?? 50;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, flashPct));
@@ -2924,7 +2623,7 @@ const Plans = () => {
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-white/60">Profit Target</span>
-                        <span className="text-white font-bold">–</span>
+                        <span className="text-white font-bold">�</span>
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-white/60">Consistency Rule</span>
@@ -2957,10 +2656,10 @@ const Plans = () => {
           <TabsContent value="instant" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
               {[
-                { size: "₹1,00,000", baseFee: 4999, origFee: "₹4,999" },
-                { size: "₹5,00,000", baseFee: 10999, origFee: "₹10,999", popular: true },
-                { size: "₹10,00,000", baseFee: 17999, origFee: "₹17,999" },
-                { size: "₹20,00,000", baseFee: 29999, origFee: "₹29,999" },
+                { size: "?1,00,000", baseFee: 4999, origFee: "?4,999" },
+                { size: "?5,00,000", baseFee: 10999, origFee: "?10,999", popular: true },
+                { size: "?10,00,000", baseFee: 17999, origFee: "?17,999" },
+                { size: "?20,00,000", baseFee: 29999, origFee: "?29,999" },
               ].map((plan, i) => {
                 const instantPct = discountConfig["instant"]?.discountPct ?? 45;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, instantPct));
@@ -3032,10 +2731,10 @@ const Plans = () => {
           <TabsContent value="1step" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto">
               {[
-                { size: "₹1,00,000", baseFee: 2999, origFee: "₹2,999", evalSplit: "–", fundedBonuses: "From ₹499" },
-                { size: "₹5,00,000", baseFee: 11999, origFee: "₹11,999", evalSplit: "–", fundedBonuses: "From ₹1,500", popular: true },
-                { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", evalSplit: "–", fundedBonuses: "From ₹2,500" },
-                { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", evalSplit: "–", fundedBonuses: "From ₹5,250" },
+                { size: "?1,00,000", baseFee: 2999, origFee: "?2,999", evalSplit: "�", fundedBonuses: "From ?499" },
+                { size: "?5,00,000", baseFee: 11999, origFee: "?11,999", evalSplit: "�", fundedBonuses: "From ?1,500", popular: true },
+                { size: "?10,00,000", baseFee: 21999, origFee: "?21,999", evalSplit: "�", fundedBonuses: "From ?2,500" },
+                { size: "?25,00,000", baseFee: 48499, origFee: "?48,499", evalSplit: "�", fundedBonuses: "From ?5,250" },
               ].map((plan, idx) => {
                 const oneStepPct = discountConfig["1step"]?.discountPct ?? 55;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, oneStepPct));
@@ -3103,7 +2802,7 @@ const Plans = () => {
 
                       <div className="p-4">
                         <div className="flex items-center gap-1.5 mb-4">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white text-[10px] font-bold">✓</div>
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white text-[10px] font-bold">?</div>
                           <h3 className="text-sm font-heading font-bold text-white">Funded Trader</h3>
                         </div>
                         <div className="space-y-2.5">
@@ -3117,7 +2816,7 @@ const Plans = () => {
                           </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-white/60">Profit Target</span>
-                            <span className="text-white font-bold">–</span>
+                            <span className="text-white font-bold">�</span>
                           </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-white/60">Max Risk/Trade</span>
@@ -3145,7 +2844,7 @@ const Plans = () => {
 
                     <div className="p-4 border-t border-white/10">
                       <Button onClick={() => navigatePlans("/checkout")} className={`w-full h-10 text-sm font-bold rounded-xl transition-all ${plan.popular ? 'bg-gradient-fw text-white border-0 hover:shadow-lg hover:shadow-fw-pink/30' : 'bg-white text-black hover:bg-gray-200'}`}>
-                        Get Funded →
+                        Get Funded ?
                       </Button>
                     </div>
                   </CardContent>
@@ -3163,9 +2862,9 @@ const Plans = () => {
           <TabsContent value="2step" className="mt-0">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
               {[
-                { size: "₹5,00,000", baseFee: 11999, origFee: "₹11,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹999" },
-                { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹1,999", popular: true },
-                { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹4,999" },
+                { size: "?5,00,000", baseFee: 11999, origFee: "?11,999", profitTarget: "8% / 5%", evalSplit: "�", fundedBonuses: "From ?999" },
+                { size: "?10,00,000", baseFee: 21999, origFee: "?21,999", profitTarget: "8% / 5%", evalSplit: "�", fundedBonuses: "From ?1,999", popular: true },
+                { size: "?25,00,000", baseFee: 48499, origFee: "?48,499", profitTarget: "8% / 5%", evalSplit: "�", fundedBonuses: "From ?4,999" },
               ].map((plan, idx) => {
                 const twoStepPct = discountConfig["2step"]?.discountPct ?? 60;
                 const discFee = formatINR(computeDiscountedPrice(plan.baseFee, twoStepPct));
@@ -3237,7 +2936,7 @@ const Plans = () => {
 
                       <div className="p-4">
                         <div className="flex items-center gap-1.5 mb-4">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white text-[10px] font-bold">✓</div>
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white text-[10px] font-bold">?</div>
                           <h3 className="text-sm font-heading font-bold text-white">Funded Trader</h3>
                         </div>
                         <div className="space-y-2.5">
@@ -3251,7 +2950,7 @@ const Plans = () => {
                           </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-white/60">Profit Target</span>
-                            <span className="text-white font-bold">–</span>
+                            <span className="text-white font-bold">�</span>
                           </div>
                           <div className="flex justify-between text-xs">
                             <span className="text-white/60">Consistency</span>
@@ -3283,7 +2982,7 @@ const Plans = () => {
 
                     <div className="p-4 border-t border-white/10">
                       <Button onClick={() => navigatePlans("/checkout")} className="w-full h-10 text-sm font-bold bg-gradient-fw text-white border-0 rounded-xl hover:shadow-lg hover:shadow-fw-pink/30 transition-all">
-                        Get Funded →
+                        Get Funded ?
                       </Button>
                     </div>
                   </CardContent>
@@ -3300,7 +2999,7 @@ const Plans = () => {
         </Tabs>
 
         <div className="mt-12 text-center">
-          <p className="text-white/50 text-sm">Simulated account sizes up to ₹50 Lakhs available through the scaling plan. All trading activity is simulated for evaluation purposes. Performance-based rewards subject to applicable program terms.</p>
+          <p className="text-white/50 text-sm">Simulated account sizes up to ?50 Lakhs available through the scaling plan. All trading activity is simulated for evaluation purposes. Performance-based rewards subject to applicable program terms.</p>
         </div>
         <div className="mt-16 flex flex-wrap items-center justify-center gap-3 md:gap-5">
           <span className="text-white/50 text-sm font-semibold tracking-wide mr-2">Payment Options:</span>
@@ -3342,7 +3041,7 @@ const Plans = () => {
 
 const ChoosePathPills = () => {
   const pills = [
-    "AI Risk Guard™ Technology",
+    "AI Risk Guard� Technology",
     "Real-Time Behavioral Analytics",
     "Discipline Score Tracking",
     "Real-Time Market Price Data",
@@ -3370,12 +3069,12 @@ const ChoosePathPills = () => {
 
 const SmartScalingPlan = () => {
   const milestones = [
-    { month: "0M", label: "Starting", amount: "₹5L", height: 12 },
-    { month: "3M", label: "First Scale", amount: "₹10L", height: 18 },
-    { month: "6M", label: "Second Scale", amount: "₹20L", height: 28 },
-    { month: "9M", label: "Third Scale", amount: "₹40L", height: 42 },
-    { month: "12M", label: "Fourth Scale", amount: "₹80L", height: 65 },
-    { month: "15M", label: "Fifth Scale", amount: "₹160L", height: 95 },
+    { month: "0M", label: "Starting", amount: "?5L", height: 12 },
+    { month: "3M", label: "First Scale", amount: "?10L", height: 18 },
+    { month: "6M", label: "Second Scale", amount: "?20L", height: 28 },
+    { month: "9M", label: "Third Scale", amount: "?40L", height: 42 },
+    { month: "12M", label: "Fourth Scale", amount: "?80L", height: 65 },
+    { month: "15M", label: "Fifth Scale", amount: "?160L", height: 95 },
   ];
   return (
     <section id="smart-scaling" className="py-14 relative overflow-hidden">
@@ -3389,7 +3088,7 @@ const SmartScalingPlan = () => {
               Plan
             </h2>
             <p className="text-white/60 mb-7 leading-relaxed max-w-md">
-              Grow your simulated evaluation account size by demonstrating steady, rule-respecting performance. Hit a combined 5% return across any three consecutive months and your simulated account size doubles — a clear, milestone-driven path designed for long-term Indian traders.
+              Grow your simulated evaluation account size by demonstrating steady, rule-respecting performance. Hit a combined 5% return across any three consecutive months and your simulated account size doubles � a clear, milestone-driven path designed for long-term Indian traders.
             </p>
             <Link href="/scaling">
               <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-full h-12 px-7 font-bold shadow-lg hover:shadow-purple-500/30">
@@ -3450,90 +3149,90 @@ const WhatPeopleSay = () => {
     {
       name: "Disha Kakkar",
       handle: "@disha_kakkar",
-      quote: "Every metric I actually care about — daily limit, profit target, payout window — is right there on one screen. My day starts calmer and my routine just runs.",
+      quote: "Every metric I actually care about � daily limits, performance targets, and account rules � is available in one place. It makes my evaluation routine easier to follow.",
       ago: "5 days ago",
-      amount: "₹1,18,900",
+      amount: "Evaluation Participant",
       gradient: "from-pink-400 to-rose-500",
       initials: "DK",
     },
     {
       name: "Hrdaya Grover",
       handle: "@hrdaya_grover",
-      quote: "Watching my P&L update tick-by-tick in the FundedWealth Terminal removed the mental noise. I stopped refreshing five tabs and just focused on hitting my 8% target.",
+      quote: "Seeing my simulated P&L update in the FundedWealth Terminal reduced the need to switch between multiple screens. I can focus more clearly on my evaluation rules and trading discipline.",
       ago: "3 days ago",
-      amount: "₹67,200",
+      amount: "Evaluation Participant",
       gradient: "from-violet-500 to-blue-500",
       initials: "HG",
     },
     {
       name: "Sanyam Maheswari",
       handle: "@sanyam_maheswari",
-      quote: "Fills are quick, the layout is uncluttered, and the live risk meter keeps me honest. It pushes me to trade my plan instead of my mood.",
+      quote: "The interface is responsive, the layout is uncluttered, and the live risk tools help me stay aware of my evaluation limits. It encourages me to follow my trading plan.",
       ago: "2 days ago",
-      amount: "₹1,80,000",
+      amount: "Evaluation Participant",
       gradient: "from-amber-400 to-orange-500",
       initials: "SM",
     },
     {
       name: "Rohan Mehta",
       handle: "@rohan_mehta",
-      quote: "Cleared the 2-Step in 19 days. The drawdown tracker literally saved me from a revenge trade on a Friday close — that one nudge paid for the entire challenge fee.",
+      quote: "Cleared the 2-Step evaluation in 19 days. The drawdown tracker helped me avoid an impulsive trade near a Friday close � that single prompt reinforced the value of following my risk rules.",
       ago: "1 week ago",
-      amount: "₹2,45,000",
+      amount: "Evaluation Participant",
       gradient: "from-cyan-400 to-blue-600",
       initials: "RM",
     },
     {
       name: "Priya Iyer",
       handle: "@priya_trades",
-      quote: "Payout hit my HDFC account in under 24 hours, no follow-ups, no awkward ticket replies. After two offshore prop horror stories, this felt unreal.",
+      quote: "The reward request process was clear and the support team kept me updated throughout the verification process. After difficult experiences elsewhere, the process here felt much more straightforward.",
       ago: "4 days ago",
-      amount: "₹98,400",
+      amount: "Verified Participant",
       gradient: "from-emerald-400 to-teal-600",
       initials: "PI",
     },
     {
       name: "Aakash Sharma",
       handle: "@aakash_fno",
-      quote: "Trading BankNifty with 25L funded capital while my own savings stayed untouched — that mental shift alone improved my execution. Sizing finally feels rational.",
+      quote: "Practising within a structured simulated account environment helped me focus on position sizing and risk discipline without treating the evaluation as an investment product.",
       ago: "6 days ago",
-      amount: "₹3,12,750",
+      amount: "Evaluation Participant",
       gradient: "from-indigo-500 to-purple-600",
       initials: "AS",
     },
     {
       name: "Neha Singh",
       handle: "@neha_sgh",
-      quote: "Hindi support over WhatsApp, clear KYC steps, and zero hidden fees. As a part-time trader from Lucknow, this is the first platform that actually felt built for us.",
+      quote: "Hindi support, clear verification steps, and transparent program information made the onboarding process easier to understand. As a part-time trader, the platform feels accessible and straightforward.",
       ago: "2 weeks ago",
-      amount: "₹54,600",
+      amount: "Community Member",
       gradient: "from-rose-500 to-pink-600",
       initials: "NS",
     },
     {
       name: "Vikram Reddy",
       handle: "@vik_trades",
-      quote: "The discipline score is brutal but fair. Watching it drop after a single rule break taught me more about risk than three years of YouTube content ever did.",
+      quote: "The discipline score is strict but fair. Watching it drop after a single rule break taught me more about risk management than three years of online content ever did.",
       ago: "9 days ago",
-      amount: "₹1,76,200",
+      amount: "Evaluation Participant",
       gradient: "from-amber-500 to-red-500",
       initials: "VR",
     },
     {
       name: "Ananya Bose",
       handle: "@ananya.b",
-      quote: "I scaled from ₹5L to ₹20L in five months without ever touching my own capital. The milestone framework keeps the goals concrete instead of abstract.",
+      quote: "The structured evaluation milestones gave me clear goals to work toward. Having defined rules and measurable targets helped me stay focused and consistent.",
       ago: "3 weeks ago",
-      amount: "₹4,28,000",
+      amount: "Evaluation Participant",
       gradient: "from-fuchsia-500 to-violet-700",
       initials: "AB",
     },
     {
       name: "Karan Malhotra",
       handle: "@karan.mal",
-      quote: "What I love is the absence of gimmicks — no flashy WhatsApp groups, no signal calls. Just a clean evaluation, real rules, and a payout when you earn it.",
+      quote: "What I love is the absence of gimmicks � no flashy WhatsApp groups, no signal calls. Just a clean evaluation, real rules, and a payout when you earn it.",
       ago: "1 day ago",
-      amount: "₹89,500",
+      amount: "?89,500",
       gradient: "from-sky-500 to-cyan-600",
       initials: "KM",
     },
@@ -3587,7 +3286,7 @@ const WhatPeopleSay = () => {
           What People <span className="text-gradient">Say About Us</span>
         </h2>
         <p className="text-center text-white/55 text-sm md:text-base max-w-2xl mx-auto">
-          Honest words from evaluation participants across India — auto-pulled from our community feed.
+          Honest words from evaluation participants across India � auto-pulled from our community feed.
         </p>
       </div>
 
@@ -3648,14 +3347,14 @@ const Calculator = () => {
               Calculate Your <span className="text-gradient">Potential</span>
             </h2>
             <p className="text-xl text-white/70 mb-10">
-              See how your simulated performance translates into potential performance-based rewards. Figures shown are illustrative only — actual rewards are subject to applicable program terms.
+              See how your simulated performance translates into potential performance-based rewards. Figures shown are illustrative only � actual rewards are subject to applicable program terms.
             </p>
 
             <div className="space-y-10">
               <div>
                 <div className="flex justify-between mb-4">
                   <label className="text-white font-semibold">Account Balance</label>
-                  <span className="text-fw-orange font-bold text-xl">₹{(balance[0]).toLocaleString('en-IN')}</span>
+                  <span className="text-fw-orange font-bold text-xl">?{(balance[0]).toLocaleString('en-IN')}</span>
                 </div>
                 <Slider
                   value={balance}
@@ -3691,7 +3390,7 @@ const Calculator = () => {
                 <div className="space-y-8">
                   <div>
                     <p className="text-white/60 font-semibold mb-2 uppercase tracking-wide">Simulated Monthly Performance</p>
-                    <p className="text-4xl font-heading font-bold text-white">₹{(profit).toLocaleString('en-IN')}</p>
+                    <p className="text-4xl font-heading font-bold text-white">?{(profit).toLocaleString('en-IN')}</p>
                   </div>
 
                   <div className="h-px w-full bg-white/10"></div>
@@ -3699,7 +3398,7 @@ const Calculator = () => {
                   <div>
                     <p className="text-white/60 font-semibold mb-2 uppercase tracking-wide">Potential Reward (80% Share)</p>
                     <p className="text-3xl sm:text-5xl md:text-6xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink">
-                      ₹{(payout).toLocaleString('en-IN')}
+                      ?{(payout).toLocaleString('en-IN')}
                     </p>
                   </div>
 
@@ -3727,23 +3426,23 @@ const articles = {
     sections: [
       {
         heading: "The Concept",
-        body: "A simulated evaluation account is straightforward: FundedWealth provides you with a structured simulated trading environment — with simulated account sizes of up to ₹50 Lakhs — and you trade under our defined risk framework. Participants who demonstrate consistent performance become eligible for performance-based rewards under the applicable program terms. All account balances shown on the platform are simulated balances and do not represent customer-owned funds."
+        body: "A simulated evaluation account is straightforward: FundedWealth provides you with a structured simulated trading environment � with simulated account sizes of up to ?50 Lakhs � and you trade under our defined risk framework. Participants who demonstrate consistent performance become eligible for performance-based rewards under the applicable program terms. All account balances shown on the platform are simulated balances and do not represent customer-owned funds."
       },
       {
-        heading: "How It Works — Step by Step",
-        body: "1. Choose an evaluation plan (₹1L, ₹2L, ₹5L, ₹10L, ₹25L, or ₹50L).\n2. Complete the evaluation by hitting the defined profit target while staying within the max drawdown limit.\n3. Receive your simulated evaluation account — activated within 12 hours of passing.\n4. Trade within the defined risk parameters. Every 7 days, eligible participants may request performance-based rewards, processed to your UPI or bank account under the applicable program terms."
+        heading: "How It Works � Step by Step",
+        body: "1. Choose an evaluation plan (?1L, ?2L, ?5L, ?10L, ?25L, or ?50L).\n2. Complete the evaluation by hitting the defined profit target while staying within the max drawdown limit.\n3. Receive your simulated evaluation account � activated within 12 hours of passing.\n4. Trade within the defined risk parameters. Every 7 days, eligible participants may request performance-based rewards, processed to your UPI or bank account under the applicable program terms."
       },
       {
         heading: "The Performance Share",
-        body: "FundedWealth offers a 70%–90% performance share in your favour, depending on your plan tier. There are no hidden deductions, no platform fees on reward requests, and no lock-in periods. What you earn under the program terms is what you receive."
+        body: "FundedWealth offers a 70%�90% performance share in your favour, depending on your plan tier. There are no hidden deductions, no platform fees on reward requests, and no lock-in periods. What you earn under the program terms is what you receive."
       },
       {
-        heading: "Risk Parameters — Kept Simple",
+        heading: "Risk Parameters � Kept Simple",
         body: "We believe in fair, published rules. The defined limits are: a Daily Drawdown of up to 5% and a Max Drawdown of up to 10% depending on plan. No news-trading restrictions. No time limits on the evaluation. Minimum trading days apply only to demonstrate consistency, not to restrict you."
       },
       {
         heading: "Who Is This For?",
-        body: "Any trader — beginner to advanced — who wants to demonstrate their strategy in a structured simulated environment. Whether you trade equities, indices, or commodities, if you can demonstrate disciplined risk management and consistent execution, you may become eligible for performance-based rewards."
+        body: "Any trader � beginner to advanced � who wants to demonstrate their strategy in a structured simulated environment. Whether you trade equities, indices, or commodities, if you can demonstrate disciplined risk management and consistent execution, you may become eligible for performance-based rewards."
       }
     ]
   },
@@ -3753,23 +3452,23 @@ const articles = {
     sections: [
       {
         heading: "The Math That Changes the Picture",
-        body: "A 10% return on a personal ₹50,000 account produces ₹5,000 in profit. The same 10% simulated performance on a FundedWealth ₹50 Lakh simulated evaluation account generates a ₹4,00,000 performance reward at the 80% share rate. Same skill. Same strategy. The evaluation framework scales the outcome."
+        body: "A 10% return on a personal ?50,000 account produces ?5,000 in profit. The same 10% simulated performance on a FundedWealth ?50 Lakh simulated evaluation account generates a ?4,00,000 performance reward at the 80% share rate. Same skill. Same strategy. The evaluation framework scales the outcome."
       },
       {
-        heading: "Personal Capital — The Hidden Costs",
+        heading: "Personal Capital � The Hidden Costs",
         body: "Trading your own savings means every loss has a direct personal financial impact. You carry 100% of the downside. Scaling to meaningful capital requires years of compounding. Emotionally, execution is harder when personal savings are at stake."
       },
       {
-        heading: "Simulated Evaluation — The Asymmetric Structure",
-        body: "With FundedWealth, your downside is limited to the evaluation fee. If the simulated account breaches defined risk limits, the evaluation ends — not your personal savings. You can attempt again, improve your consistency, and reapply. The risk-reward structure is fundamentally different from personal capital trading."
+        heading: "Simulated Evaluation � The Asymmetric Structure",
+        body: "With FundedWealth, your downside is limited to the evaluation fee. If the simulated account breaches defined risk limits, the evaluation ends � not your personal savings. You can attempt again, improve your consistency, and reapply. The risk-reward structure is fundamentally different from personal capital trading."
       },
       {
         heading: "Side-by-Side Comparison",
-        body: "Personal ₹50k account → 10% gain = ₹5,000 result, any loss is personal.\nFundedWealth ₹50L simulated account → 10% simulated performance = ₹4,00,000 reward at 80% share, no personal capital at risk.\nPersonal account → requires years of saving and compounding to grow.\nSimulated evaluation account → defined scaling path from ₹1L to ₹50L based on demonstrated performance."
+        body: "Personal ?50k account ? 10% gain = ?5,000 result, any loss is personal.\nFundedWealth ?50L simulated account ? 10% simulated performance = ?4,00,000 reward at 80% share, no personal capital at risk.\nPersonal account ? requires years of saving and compounding to grow.\nSimulated evaluation account ? defined scaling path from ?1L to ?50L based on demonstrated performance."
       },
       {
         heading: "The Bottom Line",
-        body: "Consistent, disciplined execution is the scarce resource — not capital. FundedWealth's structured evaluation environment lets you demonstrate your edge without risking personal savings."
+        body: "Consistent, disciplined execution is the scarce resource � not capital. FundedWealth's structured evaluation environment lets you demonstrate your edge without risking personal savings."
       }
     ]
   },
@@ -3895,7 +3594,7 @@ const Education = () => {
           >
             <CardContent className="p-8">
               <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-pink transition-colors">Simulated vs Personal Capital Trading</h4>
-              <p className="text-white/60 mb-6">Trading a personal ₹50k account with 10% simulated gains generates ₹5k in performance results. Trading on a ₹50L simulated evaluation account with the same performance generates ₹4L at 80% reward share. The evaluation framework scales your demonstrated skill.</p>
+              <p className="text-white/60 mb-6">Trading a personal ?50k account with 10% simulated gains generates ?5k in performance results. Trading on a ?50L simulated evaluation account with the same performance generates ?4L at 80% reward share. The evaluation framework scales your demonstrated skill.</p>
               <div className="text-fw-pink font-semibold flex items-center gap-2">Compare <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></div>
             </CardContent>
           </Card>
@@ -3906,7 +3605,7 @@ const Education = () => {
           >
             <CardContent className="p-8">
               <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-purple transition-colors">How Evaluation Platforms Work in India</h4>
-              <p className="text-white/60 mb-6">Understand the legal and operational framework. FundedWealth provides a structured simulated trading environment tied to real market data. The platform is not a broker, investment advisor, or SEBI-registered entity — it is a performance evaluation service.</p>
+              <p className="text-white/60 mb-6">Understand the legal and operational framework. FundedWealth provides a structured simulated trading environment tied to real market data. The platform is not a broker, investment advisor, or SEBI-registered entity � it is a performance evaluation service.</p>
               <div className="text-fw-purple font-semibold flex items-center gap-2">Learn Truth <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></div>
             </CardContent>
           </Card>
@@ -3925,7 +3624,7 @@ const Education = () => {
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle2 className="text-fw-purple shrink-0" size={20} />
-                  <span className="text-white/90 font-medium">Clear, published rules — no hidden conditions</span>
+                  <span className="text-white/90 font-medium">Clear, published rules � no hidden conditions</span>
                 </li>
               </ul>
             </CardContent>
@@ -3946,7 +3645,7 @@ const ImpactInitiative = () => (
           <span className="text-pink-400 text-sm font-bold">Powered by Real Impact in India</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
-          Trade with Purpose — <span className="text-gradient">Create Real Impact</span>
+          Trade with Purpose � <span className="text-gradient">Create Real Impact</span>
         </h2>
         <p className="text-xl text-white/70">
           Your participation can support meaningful social initiatives. FundedWealth contributes through its impact program, and eligible participants may choose to contribute as well.
@@ -3960,7 +3659,7 @@ const ImpactInitiative = () => (
           <h3 className="text-white font-extrabold text-xl mb-2">FundedWealth Contribution</h3>
           <p className="text-white/50 text-sm mb-4">FundedWealth supports selected social initiatives across India through its impact program.</p>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">₹12L+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">?12L+</span></div>
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">8,200+</span></div>
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">520+</span></div>
           </div>
@@ -3971,7 +3670,7 @@ const ImpactInitiative = () => (
           <h3 className="text-white font-extrabold text-xl mb-2">Trader Contribution</h3>
           <p className="text-white/50 text-sm mb-4">Eligible participants can optionally contribute when requesting a reward payout.</p>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">₹6.5L+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">?6.5L+</span></div>
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">4,300+</span></div>
             <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">330+</span></div>
           </div>
@@ -3980,7 +3679,7 @@ const ImpactInitiative = () => (
 
       <div className="bg-gradient-to-r from-pink-500/15 via-purple-500/10 to-pink-500/15 border border-pink-500/20 rounded-2xl p-4 text-center mb-12">
         <span className="text-white font-extrabold">Together, we create DOUBLE IMPACT</span>
-        <span className="text-white/40 text-sm ml-2">— ₹18.5L+ combined across 12 cities</span>
+        <span className="text-white/40 text-sm ml-2">� ?18.5L+ combined across 12 cities</span>
       </div>
 
       <div className="glass-card rounded-2xl border border-white/10 p-8 mb-10">
@@ -3989,8 +3688,8 @@ const ImpactInitiative = () => (
             <h3 className="text-white font-extrabold text-2xl mb-3">How It Works</h3>
             <div className="space-y-4">
               {[
-                { step: "1", title: "You Trade & Profit", desc: "Focus on your trading — we handle the rest.", tag: "" },
-                { step: "2", title: "We Contribute Automatically", desc: "FundedWealth donates from its profits — no action needed.", tag: "AUTO" },
+                { step: "1", title: "You Trade & Profit", desc: "Focus on your trading � we handle the rest.", tag: "" },
+                { step: "2", title: "We Contribute Automatically", desc: "FundedWealth donates from its profits � no action needed.", tag: "AUTO" },
                 { step: "3", title: "You Can Give Back (Optional)", desc: "During withdrawal, optionally donate to a cause you care about.", tag: "OPTIONAL" },
                 { step: "4", title: "Track & Share Your Impact", desc: "See your meals, students & badge level in your dashboard.", tag: "" },
               ].map(s => (
@@ -4010,9 +3709,9 @@ const ImpactInitiative = () => (
               <div className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-3">Badge System</div>
               <div className="space-y-3">
                 {[
-                  { badge: " Supporter", range: "₹1 – ₹100", color: "text-blue-400" },
-                  { badge: "⭐ Contributor", range: "₹100 – ₹1,000", color: "text-purple-400" },
-                  { badge: " Impact Leader", range: "₹1,000+", color: "text-amber-400" },
+                  { badge: " Supporter", range: "?1 � ?100", color: "text-blue-400" },
+                  { badge: "? Contributor", range: "?100 � ?1,000", color: "text-purple-400" },
+                  { badge: " Impact Leader", range: "?1,000+", color: "text-amber-400" },
                 ].map(b => (
                   <div key={b.badge} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
                     <span className={`font-bold text-sm ${b.color}`}>{b.badge}</span>
@@ -4089,31 +3788,31 @@ const FAQ = () => {
             },
             {
               q: "What simulated account sizes are available?",
-              a: "We offer simulated account sizes across all plan types:\n\n• Flash ⚡ — ₹1,00,000 | ₹2,50,000 | ₹5,00,000 | ₹10,00,000\n• Instant — ₹1,00,000 | ₹5,00,000 | ₹10,00,000\n• 1-Step Evaluation — ₹1,00,000 | ₹5,00,000 | ₹10,00,000 | ₹25,00,000\n• 2-Step Evaluation — ₹5,00,000 | ₹10,00,000 | ₹25,00,000\n\nThrough our scaling plan, participants can scale their simulated account up to ₹50,00,000 (₹50L) in 6 levels. All account balances are simulated balances."
+              a: "We offer simulated account sizes across all plan types:\n\n� Flash ? � ?1,00,000 | ?2,50,000 | ?5,00,000 | ?10,00,000\n� Instant � ?1,00,000 | ?5,00,000 | ?10,00,000\n� 1-Step Evaluation � ?1,00,000 | ?5,00,000 | ?10,00,000 | ?25,00,000\n� 2-Step Evaluation � ?5,00,000 | ?10,00,000 | ?25,00,000\n\nThrough our scaling plan, participants can scale their simulated account up to ?50,00,000 (?50L) in 6 levels. All account balances are simulated balances."
             },
             {
               q: "What is the difference between Flash, Instant, 1-Step, and 2-Step plans?",
-              a: "Flash ⚡ gives you immediate access to a simulated evaluation account — start trading right away. Instant also provides immediate access with slightly different pricing and parameters. 1-Step requires completing a single evaluation phase by hitting the profit target. 2-Step has two phases with separate profit targets of 8% and 5%. The 2-Step plan offers the lowest entry fees and suits traders who prefer a more gradual evaluation process."
+              a: "Flash ? gives you immediate access to a simulated evaluation account � start trading right away. Instant also provides immediate access with slightly different pricing and parameters. 1-Step requires completing a single evaluation phase by hitting the profit target. 2-Step has two phases with separate profit targets of 8% and 5%. The 2-Step plan offers the lowest entry fees and suits traders who prefer a more gradual evaluation process."
             },
             {
               q: "What are the fees for each account size?",
-              a: "Fees vary by plan type and simulated account size. Here are the discounted prices:\n\n• Flash ⚡ — ₹1L: ₹1,399 | ₹2.5L: ₹2,999 | ₹5L: ₹4,599 | ₹10L: ₹7,799\n• Instant — ₹1L: ₹2,749 | ₹5L: ₹6,049 | ₹10L: ₹9,899\n• 1-Step — ₹1L: ₹1,049 | ₹5L: ₹4,199 | ₹10L: ₹7,699 | ₹25L: ₹16,974\n• 2-Step — ₹5L: ₹3,599 | ₹10L: ₹6,599 | ₹25L: ₹14,549\n\nAll prices include GST. Check the Plans section for current discount offers."
+              a: "Fees vary by plan type and simulated account size. Here are the discounted prices:\n\n� Flash ? � ?1L: ?1,399 | ?2.5L: ?2,999 | ?5L: ?4,599 | ?10L: ?7,799\n� Instant � ?1L: ?2,749 | ?5L: ?6,049 | ?10L: ?9,899\n� 1-Step � ?1L: ?1,049 | ?5L: ?4,199 | ?10L: ?7,699 | ?25L: ?16,974\n� 2-Step � ?5L: ?3,599 | ?10L: ?6,599 | ?25L: ?14,549\n\nAll prices include GST. Check the Plans section for current discount offers."
             },
             {
               q: "What is the profit target for each plan?",
-              a: "Profit targets depend on the plan type:\n\n• Flash ⚡ — No profit target (immediate access)\n• Instant — No profit target (immediate access)\n• 1-Step — 10% simulated profit target in a single phase\n• 2-Step — 8% in Phase 1 + 5% in Phase 2\n\nOnce you hit the target while staying within risk parameters, your simulated evaluation account is activated within 12 hours."
+              a: "Profit targets depend on the plan type:\n\n� Flash ? � No profit target (immediate access)\n� Instant � No profit target (immediate access)\n� 1-Step � 10% simulated profit target in a single phase\n� 2-Step � 8% in Phase 1 + 5% in Phase 2\n\nOnce you hit the target while staying within risk parameters, your simulated evaluation account is activated within 12 hours."
             },
             {
               q: "What are the drawdown rules for each account size?",
-              a: "Drawdown rules are the same across all simulated account sizes:\n\n• Daily Drawdown: 2% of your balance (e.g., ₹2,000 on a ₹1L account, ₹50,000 on a ₹25L account)\n• Max Drawdown: 4% of your starting balance (e.g., ₹4,000 on a ₹1L account, ₹1,00,000 on a ₹25L account)\n\nThese are the defined risk parameters. If either limit is breached on the simulated account, the evaluation ends."
+              a: "Drawdown rules are the same across all simulated account sizes:\n\n� Daily Drawdown: 2% of your balance (e.g., ?2,000 on a ?1L account, ?50,000 on a ?25L account)\n� Max Drawdown: 4% of your starting balance (e.g., ?4,000 on a ?1L account, ?1,00,000 on a ?25L account)\n\nThese are the defined risk parameters. If either limit is breached on the simulated account, the evaluation ends."
             },
             {
               q: "How does the scaling plan work?",
-              a: "Our scaling plan lets participants grow their simulated account size in 6 levels:\n\n₹1,00,000 → ₹2,50,000 → ₹5,00,000 → ₹10,00,000 → ₹25,00,000 → ₹50,00,000\n\nTo qualify for scaling, you need to consistently meet defined performance targets while staying within risk parameters. Each level increases your simulated account size — all the way up to ₹50L."
+              a: "Our scaling plan lets participants grow their simulated account size in 6 levels:\n\n?1,00,000 ? ?2,50,000 ? ?5,00,000 ? ?10,00,000 ? ?25,00,000 ? ?50,00,000\n\nTo qualify for scaling, you need to consistently meet defined performance targets while staying within risk parameters. Each level increases your simulated account size � all the way up to ?50L."
             },
             {
               q: "Which account size should I start with?",
-              a: "It depends on your experience and budget:\n\n• Beginners — Start with ₹1L (Flash or 1-Step) to learn the rules with minimal investment\n• Intermediate — ₹5L gives a good balance of simulated account size and affordability\n• Experienced — ₹10L or ₹25L for traders who want higher performance reward potential from day one\n\nYou can always progress through our scaling plan as your simulated performance demonstrates consistency."
+              a: "It depends on your experience and budget:\n\n� Beginners � Start with ?1L (Flash or 1-Step) to learn the rules with minimal investment\n� Intermediate � ?5L gives a good balance of simulated account size and affordability\n� Experienced � ?10L or ?25L for traders who want higher performance reward potential from day one\n\nYou can always progress through our scaling plan as your simulated performance demonstrates consistency."
             }
           ].map((faq, i) => (
             <AccordionItem key={i} value={`item-${i}`} className="bg-white/5 border border-white/10 rounded-xl px-6 data-[state=open]:bg-white/10 transition-colors">
@@ -4181,7 +3880,7 @@ const ContactUs = () => {
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
 
-        {/* ── Header ── */}
+        {/* -- Header -- */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-purple/30 border border-fw-purple/50 text-white text-sm font-bold mb-6">
             Contact Us
@@ -4192,7 +3891,7 @@ const ContactUs = () => {
           <p className="text-white/50 text-lg">We are here to answer any question you may have.</p>
         </div>
 
-        {/* ── Cards ── */}
+        {/* -- Cards -- */}
         <div className="grid sm:grid-cols-3 gap-6 mb-12">
           {/* WhatsApp */}
           <div className="glass-card rounded-2xl p-7 border border-white/10 flex flex-col gap-5">
@@ -4249,7 +3948,7 @@ const ContactUs = () => {
           </div>
         </div>
 
-        {/* ── Fill Out The Form ── */}
+        {/* -- Fill Out The Form -- */}
         <div className="grid lg:grid-cols-2 gap-16 items-start">
 
           {/* Left info */}
@@ -4406,7 +4105,7 @@ const AffiliateModal = ({
       <DialogContent className="max-w-4xl w-full p-0 bg-transparent border-0 shadow-none overflow-hidden rounded-2xl">
         <div className="flex flex-col md:flex-row min-h-[580px]">
 
-          {/* ── Left panel ── */}
+          {/* -- Left panel -- */}
           <div className="hidden md:flex flex-col justify-between w-[42%] shrink-0 bg-[#0f0020] p-10 rounded-l-2xl border-r border-white/10">
             <div>
               <div className="flex items-center gap-3 mb-8">
@@ -4433,10 +4132,10 @@ const AffiliateModal = ({
                 ))}
               </div>
             </div>
-            <div className="text-white/20 text-xs mt-8">© 2025 FundedWealth. All rights reserved.</div>
+            <div className="text-white/20 text-xs mt-8">� 2025 FundedWealth. All rights reserved.</div>
           </div>
 
-          {/* ── Right panel ── */}
+          {/* -- Right panel -- */}
           <div className="flex-1 bg-[#160028] rounded-r-2xl md:rounded-l-none rounded-2xl p-8 md:p-10 overflow-y-auto">
             {mode === "register" ? (
               <>
@@ -4592,13 +4291,13 @@ const AffiliateShareBadge = () => {
   const badgeRef = useRef<HTMLDivElement>(null);
 
   const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
-  const shareText = encodeURIComponent("🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
+  const shareText = encodeURIComponent("?? Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
 
   const shareOptions = [
-    { label: "WhatsApp",     icon: "💬", color: "hover:bg-green-500/20 hover:text-green-400",  href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}` },
-    { label: "Telegram",     icon: "✈️", color: "hover:bg-blue-400/20 hover:text-blue-400",    href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}` },
-    { label: "Twitter / X",  icon: "🐦", color: "hover:bg-sky-400/20 hover:text-sky-400",      href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}` },
-    { label: "Instagram",    icon: "📸", color: "hover:bg-pink-400/20 hover:text-pink-400",    href: "https://www.instagram.com/" },
+    { label: "WhatsApp",     icon: "??", color: "hover:bg-green-500/20 hover:text-green-400",  href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}` },
+    { label: "Telegram",     icon: "??", color: "hover:bg-blue-400/20 hover:text-blue-400",    href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}` },
+    { label: "Twitter / X",  icon: "??", color: "hover:bg-sky-400/20 hover:text-sky-400",      href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}` },
+    { label: "Instagram",    icon: "??", color: "hover:bg-pink-400/20 hover:text-pink-400",    href: "https://www.instagram.com/" },
   ];
 
   const handleCopy = async () => {
@@ -4663,30 +4362,30 @@ const AffiliateShareButton = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
-  const shareText = encodeURIComponent("🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
+  const shareText = encodeURIComponent("?? Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
 
   const shareOptions = [
     {
       label: "WhatsApp",
-      icon: "💬",
+      icon: "??",
       color: "hover:bg-green-500/20 hover:text-green-400",
       href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}`,
     },
     {
       label: "Telegram",
-      icon: "✈️",
+      icon: "??",
       color: "hover:bg-blue-400/20 hover:text-blue-400",
       href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}`,
     },
     {
       label: "Twitter / X",
-      icon: "🐦",
+      icon: "??",
       color: "hover:bg-sky-400/20 hover:text-sky-400",
       href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}`,
     },
     {
       label: "Instagram Story",
-      icon: "📸",
+      icon: "??",
       color: "hover:bg-pink-400/20 hover:text-pink-400",
       href: `https://www.instagram.com/`,
     },
@@ -4779,20 +4478,20 @@ const Affiliate = () => {
       name: "Starter",
       icon: "",
       commission: "30%",
-      referrals: "1 – 20 sales",
-      bonus: "₹5,000 at 30 sales",
-      desc: "Start receiving affiliate commissions from day one — transparent commission terms, clear tracking. Only completed purchases count — no signup commissions.",
+      referrals: "1 � 20 sales",
+      bonus: "?5,000 at 30 sales",
+      desc: "Start receiving affiliate commissions from day one � transparent commission terms, clear tracking. Only completed purchases count � no signup commissions.",
       color: "from-blue-500/20 to-blue-600/10",
       border: "border-blue-500/30",
       badge: "text-blue-400",
     },
     {
       name: "Pro",
-      icon: "⚡",
+      icon: "?",
       commission: "35%",
-      referrals: "21 – 100 sales",
-      bonus: "₹15,000 at 75 sales",
-      desc: "After 20 sales, your commission jumps to 35% on every transaction. Hit 75 sales and unlock a ₹15,000 cash bonus as a reward.",
+      referrals: "21 � 100 sales",
+      bonus: "?15,000 at 75 sales",
+      desc: "After 20 sales, your commission jumps to 35% on every transaction. Hit 75 sales and unlock a ?15,000 cash bonus as a reward.",
       color: "from-fw-orange/20 to-fw-orange/5",
       border: "border-fw-orange/40",
       badge: "text-fw-orange",
@@ -4801,7 +4500,7 @@ const Affiliate = () => {
       name: "Elite",
       icon: "",
       commission: "40%",
-      referrals: "101 – 300 sales",
+      referrals: "101 � 300 sales",
       bonus: "iPhone at 150 sales",
       desc: "From your 101st sale you earn 40% commission on every transaction. Reach 150 sales and win a brand new iPhone as your milestone reward!",
       color: "from-fw-pink/20 to-fw-pink/5",
@@ -4830,11 +4529,11 @@ const Affiliate = () => {
   ];
 
   const bonuses = [
-    { milestone: "30 Sales", title: "₹5,000 Cash", sub: "Instant bonus credited to your account", img: null },
-    { milestone: "75 Sales", title: "₹15,000 Cash", sub: "+ Priority affiliate support", img: null },
+    { milestone: "30 Sales", title: "?5,000 Cash", sub: "Instant bonus credited to your account", img: null },
+    { milestone: "75 Sales", title: "?15,000 Cash", sub: "+ Priority affiliate support", img: null },
     { milestone: "150 Sales", title: "iPhone 16", sub: "Brand new iPhone delivered to you!", img: "/reward-iphone.png" },
     { milestone: "400 Sales", title: "MacBook", sub: "MacBook Pro as your reward", img: "/reward-macbook.png" },
-    { milestone: "800+ Sales", title: "Bike", sub: "Your dream bike — fully sponsored!", img: "/reward-bike.png" },
+    { milestone: "800+ Sales", title: "Bike", sub: "Your dream bike � fully sponsored!", img: "/reward-bike.png" },
   ];
 
   return (
@@ -4846,7 +4545,7 @@ const Affiliate = () => {
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
 
-        {/* ── Hero banner ── */}
+        {/* -- Hero banner -- */}
         <div className="text-center mb-12">
           <AffiliateShareBadge />
           <h2 className="text-3xl sm:text-5xl md:text-7xl font-heading font-extrabold text-white mb-6">
@@ -4879,7 +4578,7 @@ const Affiliate = () => {
           </div>
         </div>
 
-        {/* ── Tier cards ── */}
+        {/* -- Tier cards -- */}
         <div className="mb-14">
           <div className="text-center mb-12">
             <h3 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-3">
@@ -4908,7 +4607,7 @@ const Affiliate = () => {
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-white/50">Bonus</span>
-                    <span className={`font-bold ${t.bonus === "—" ? "text-white/30" : "text-fw-orange"}`}>{t.bonus}</span>
+                    <span className={`font-bold ${t.bonus === "�" ? "text-white/30" : "text-fw-orange"}`}>{t.bonus}</span>
                   </div>
                 </div>
                 <p className="text-white/50 text-xs leading-relaxed mt-2">{t.desc}</p>
@@ -4917,7 +4616,7 @@ const Affiliate = () => {
           </div>
         </div>
 
-        {/* ── How it works ── */}
+        {/* -- How it works -- */}
         <div className="mb-14">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm font-bold mb-6">
@@ -4946,7 +4645,7 @@ const Affiliate = () => {
           </div>
         </div>
 
-        {/* ── Bonus milestones ── */}
+        {/* -- Bonus milestones -- */}
         <div>
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-orange/20 border border-fw-orange/30 text-fw-orange text-sm font-bold mb-6">
@@ -4956,7 +4655,7 @@ const Affiliate = () => {
               FundedWealth <span className="text-gradient">Affiliate Bonuses</span>
             </h3>
             <p className="text-white/50 max-w-2xl mx-auto">
-              Hit key referral milestones to unlock exclusive cash rewards — our way of thanking top performing affiliates.
+              Hit key referral milestones to unlock exclusive cash rewards � our way of thanking top performing affiliates.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
@@ -4979,7 +4678,7 @@ const Affiliate = () => {
           </div>
         </div>
 
-        {/* ── Free Account Rewards ── */}
+        {/* -- Free Account Rewards -- */}
         <div className="mt-14">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold mb-6">
@@ -4994,10 +4693,10 @@ const Affiliate = () => {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { sales: "10", account: "₹1L 1-Step", color: "from-green-500/20 to-green-600/10", border: "border-green-500/30", badge: "text-green-400" },
-              { sales: "25", account: "₹2L 1-Step", color: "from-emerald-500/20 to-emerald-600/10", border: "border-emerald-500/30", badge: "text-emerald-400" },
-              { sales: "50", account: "₹5L 1-Step", color: "from-teal-500/20 to-teal-600/10", border: "border-teal-500/30", badge: "text-teal-400" },
-              { sales: "100", account: "₹5L 2-Step", color: "from-cyan-500/20 to-cyan-600/10", border: "border-cyan-500/30", badge: "text-cyan-400" },
+              { sales: "10", account: "?1L 1-Step", color: "from-green-500/20 to-green-600/10", border: "border-green-500/30", badge: "text-green-400" },
+              { sales: "25", account: "?2L 1-Step", color: "from-emerald-500/20 to-emerald-600/10", border: "border-emerald-500/30", badge: "text-emerald-400" },
+              { sales: "50", account: "?5L 1-Step", color: "from-teal-500/20 to-teal-600/10", border: "border-teal-500/30", badge: "text-teal-400" },
+              { sales: "100", account: "?5L 2-Step", color: "from-cyan-500/20 to-cyan-600/10", border: "border-cyan-500/30", badge: "text-cyan-400" },
             ].map((r) => (
               <div key={r.sales} className={`relative rounded-2xl bg-gradient-to-b ${r.color} border ${r.border} p-6 flex flex-col gap-3`}>
                 <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-2xl">
@@ -5016,7 +4715,7 @@ const Affiliate = () => {
           </div>
         </div>
 
-        {/* ── Giveaway System ── */}
+        {/* -- Giveaway System -- */}
         <div className="mt-14">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
@@ -5027,14 +4726,14 @@ const Affiliate = () => {
                 Run <span className="text-gradient">Giveaways</span> & Go Viral
               </h3>
               <p className="text-white/60 mb-8 leading-relaxed">
-                Once you hit <span className="text-fw-orange font-bold">50 sales</span>, unlock the ability to request <span className="text-white font-semibold">3-10 free evaluation accounts</span> (₹1L or ₹2L) to run public giveaways on your social media channels. Drive massive growth and earn commissions on every new trader!
+                Once you hit <span className="text-fw-orange font-bold">50 sales</span>, unlock the ability to request <span className="text-white font-semibold">3-10 free evaluation accounts</span> (?1L or ?2L) to run public giveaways on your social media channels. Drive massive growth and earn commissions on every new trader!
               </p>
               <div className="space-y-4">
                 {[
                   { step: "01", text: "Complete 50+ sales to unlock giveaway credits" },
                   { step: "02", text: "Request 3-10 free evaluation accounts from your dashboard" },
                   { step: "03", text: "Run giveaways on Instagram, Telegram, or YouTube" },
-                  { step: "04", text: "Tag @FundedWealth — every winner is tracked to your affiliate ID" },
+                  { step: "04", text: "Tag @FundedWealth � every winner is tracked to your affiliate ID" },
                 ].map((s) => (
                   <div key={s.step} className="flex items-start gap-4">
                     <div className="w-8 h-8 rounded-lg bg-fw-purple/30 flex items-center justify-center text-xs font-bold text-fw-orange shrink-0">{s.step}</div>
@@ -5052,7 +4751,7 @@ const Affiliate = () => {
                 {[
                   { label: "Minimum Sales", value: "50 completed" },
                   { label: "Credits Available", value: "3-10 accounts" },
-                  { label: "Account Types", value: "₹1L or ₹2L Evaluation" },
+                  { label: "Account Types", value: "?1L or ?2L Evaluation" },
                   { label: "Must Tag", value: "@FundedWealth" },
                   { label: "Platform", value: "Instagram / Telegram / YouTube" },
                   { label: "Tracking", value: "Each account linked to your ID" },
@@ -5073,7 +4772,7 @@ const Affiliate = () => {
           </div>
         </div>
 
-        {/* ── Terms & Rules ── */}
+        {/* -- Terms & Rules -- */}
         <div className="mt-20 glass-card rounded-2xl p-8 border border-white/10">
           <h4 className="text-xl font-heading font-bold text-white mb-4 flex items-center gap-2">
             <ShieldCheck size={20} className="text-fw-purple" /> Affiliate Terms & Conditions
@@ -5083,7 +4782,7 @@ const Affiliate = () => {
             <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> No commission for signups or logins</div>
             <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Self-referral is strictly prohibited</div>
             <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Refund = automatic commission reversal</div>
-            <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Minimum payout: ₹1,000 (5-7 day holding period)</div>
+            <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Minimum payout: ?1,000 (5-7 day holding period)</div>
             <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Payouts via UPI or Bank Transfer</div>
             <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Free accounts are non-transferable & cannot be resold</div>
             <div className="flex items-start gap-2 py-1.5"><CheckCircle2 size={14} className="text-green-400 mt-0.5 shrink-0" /> Giveaway misuse leads to immediate ban</div>
@@ -5124,7 +4823,7 @@ const MobileAppCTA = () => {
                   <h3 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-4">
                     FundedWealth <span className="text-gradient">Mobile App</span>
                   </h3>
-                  <p className="text-white/60 mb-6">Trade on the go, track your accounts, view payouts, and manage your funded journey — all from your phone. Available soon on iOS and Android.</p>
+                  <p className="text-white/60 mb-6">Trade on the go, track your accounts, view payouts, and manage your funded journey � all from your phone. Available soon on iOS and Android.</p>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 text-white/70 text-sm">
                       <CheckCircle2 size={16} className="text-green-400 shrink-0" />
@@ -5171,12 +4870,12 @@ const MobileAppCTA = () => {
                         </div>
                         <div className="bg-white/5 rounded-xl p-3 mb-3">
                           <div className="text-white/40 text-[10px]">Portfolio Value</div>
-                          <div className="text-green-400 font-heading font-extrabold text-lg">₹10,00,000</div>
-                          <div className="text-green-400 text-[10px]">+₹1,82,000 (18.2%)</div>
+                          <div className="text-green-400 font-heading font-extrabold text-lg">?10,00,000</div>
+                          <div className="text-green-400 text-[10px]">+?1,82,000 (18.2%)</div>
                         </div>
                         <div className="bg-white/5 rounded-xl p-3 mb-3">
                           <div className="text-white/40 text-[10px]">Today's P&L</div>
-                          <div className="text-green-400 font-bold text-sm">+₹12,500</div>
+                          <div className="text-green-400 font-bold text-sm">+?12,500</div>
                           <div className="w-full h-1 bg-white/5 rounded-full mt-2">
                             <div className="h-1 bg-gradient-fw rounded-full" style={{ width: "72%" }} />
                           </div>
@@ -5212,10 +4911,10 @@ const MobileAppCTA = () => {
 const TrustAndSecurity = () => {
   const trustBadges = [
     { icon: Lock, title: "256-bit SSL Encryption", desc: "Bank-grade security protects all your data and transactions" },
-    { icon: ShieldCheck, title: "Verified Payouts", desc: "₹45 Lakhs+ paid out to 15,000+ funded traders with proof" },
-    { icon: Clock, title: "12-Hour Payout Processing", desc: "Industry-fastest payout processing — eligible approved payouts processed within 12 hours" },
-    { icon: Banknote, title: "UPI & Bank Transfer", desc: "Direct payouts to any Indian bank account or UPI — zero hidden fees" },
-    { icon: FileText, title: "Transparent Rules", desc: "Clear, published trading rules — no hidden clauses or surprises" },
+    { icon: ShieldCheck, title: "Verified Payouts", desc: "?45 Lakhs+ paid out to 15,000+ funded traders with proof" },
+    { icon: Clock, title: "12-Hour Payout Processing", desc: "Industry-fastest payout processing � eligible approved payouts processed within 12 hours" },
+    { icon: Banknote, title: "UPI & Bank Transfer", desc: "Direct payouts to any Indian bank account or UPI � zero hidden fees" },
+    { icon: FileText, title: "Transparent Rules", desc: "Clear, published trading rules � no hidden clauses or surprises" },
     { icon: Globe, title: "15,000+ Active Traders", desc: "Trusted by traders across all 28 states and 8 union territories" },
   ];
 
@@ -5308,7 +5007,7 @@ const TrustAndSecurity = () => {
             </div>
             <div className="p-6 space-y-4">
               {[
-                { stat: "₹45 Lakhs+", label: "In Trader Payouts", verified: true },
+                { stat: "?45 Lakhs+", label: "In Trader Payouts", verified: true },
                 { stat: "15,000+", label: "Traders on FundedWealth", verified: true },
                 { stat: "12 Hours", label: "Average Payout Time", verified: true },
                 { stat: "4.8/5", label: "Trader Satisfaction Rating", verified: true },
@@ -5337,14 +5036,14 @@ const TrustAndSecurity = () => {
             <TrendingUp size={22} className="text-fw-orange" />
             Transparent Fee Comparison
           </h3>
-          <p className="text-white/40 text-sm text-center mb-8">See exactly how FundedWealth stacks up against typical prop firms — no hidden fees, no surprises.</p>
+          <p className="text-white/40 text-sm text-center mb-8">See exactly how FundedWealth stacks up against typical prop firms � no hidden fees, no surprises.</p>
 
           <div className="overflow-x-auto mb-10">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10 bg-white/3">
                   <th className="text-left py-3 px-4 text-white/60 font-semibold">Account Size</th>
-                  <th className="text-center py-3 px-4 text-fw-orange font-bold" colSpan={1}>FundedWealth (Flash ⚡)</th>
+                  <th className="text-center py-3 px-4 text-fw-orange font-bold" colSpan={1}>FundedWealth (Flash ?)</th>
                   <th className="text-center py-3 px-4 text-fw-orange font-bold" colSpan={1}>FundedWealth (1-Step)</th>
                   <th className="text-center py-3 px-4 text-white/40 font-semibold">Typical Prop Firm</th>
                   <th className="text-center py-3 px-4 text-white/40 font-semibold">International Firm (USD)</th>
@@ -5352,11 +5051,11 @@ const TrustAndSecurity = () => {
               </thead>
               <tbody>
                 {[
-                  { size: "₹1,00,000", flash: "₹1,399", oneStep: "₹1,049", typical: "₹3,500-5,000", intl: "$50-100 (₹4,200+)" },
-                  { size: "₹2,50,000", flash: "₹2,999", oneStep: "—", typical: "₹6,000-8,000", intl: "$100-150 (₹8,400+)" },
-                  { size: "₹5,00,000", flash: "₹4,599", oneStep: "₹4,199", typical: "₹9,000-12,000", intl: "$200-300 (₹16,800+)" },
-                  { size: "₹10,00,000", flash: "₹7,799", oneStep: "₹7,699", typical: "₹15,000-20,000", intl: "$400-550 (₹33,600+)" },
-                  { size: "₹25,00,000", flash: "—", oneStep: "₹16,974", typical: "₹35,000-50,000", intl: "$800-1,200 (₹67,200+)" },
+                  { size: "?1,00,000", flash: "?1,399", oneStep: "?1,049", typical: "?3,500-5,000", intl: "$50-100 (?4,200+)" },
+                  { size: "?2,50,000", flash: "?2,999", oneStep: "�", typical: "?6,000-8,000", intl: "$100-150 (?8,400+)" },
+                  { size: "?5,00,000", flash: "?4,599", oneStep: "?4,199", typical: "?9,000-12,000", intl: "$200-300 (?16,800+)" },
+                  { size: "?10,00,000", flash: "?7,799", oneStep: "?7,699", typical: "?15,000-20,000", intl: "$400-550 (?33,600+)" },
+                  { size: "?25,00,000", flash: "�", oneStep: "?16,974", typical: "?35,000-50,000", intl: "$800-1,200 (?67,200+)" },
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="py-3 px-4 text-white font-bold">{row.size}</td>
@@ -5383,20 +5082,20 @@ const TrustAndSecurity = () => {
               </thead>
               <tbody>
                 {[
-                  { feature: "Currency", fw: "₹ INR (Native)", ind: "₹ INR", intl: "$ USD Only" },
-                  { feature: "Payout Speed", fw: "12 Hours ⚡", ind: "3-7 Days", intl: "7-30 Days" },
+                  { feature: "Currency", fw: "? INR (Native)", ind: "? INR", intl: "$ USD Only" },
+                  { feature: "Payout Speed", fw: "12 Hours ?", ind: "3-7 Days", intl: "7-30 Days" },
                   { feature: "Profit Split", fw: "Up to 90%", ind: "50-80%", intl: "70-80%" },
                   { feature: "Payout Method", fw: "UPI / Bank / All", ind: "Bank Transfer", intl: "Crypto / Wire Only" },
-                  { feature: "Instant Funding", fw: "Flash + Instant ✅", ind: "Rare", intl: "Not Available" },
-                  { feature: "Evaluation Fee Refund", fw: "100% on First Payout ✅", ind: "Varies", intl: "Rarely" },
-                  { feature: "Scaling (Max Capital)", fw: "₹50 Lakhs ✅", ind: "₹10-25 Lakhs", intl: "$200K-400K" },
+                  { feature: "Instant Funding", fw: "Flash + Instant ?", ind: "Rare", intl: "Not Available" },
+                  { feature: "Evaluation Fee Refund", fw: "100% on First Payout ?", ind: "Varies", intl: "Rarely" },
+                  { feature: "Scaling (Max Capital)", fw: "?50 Lakhs ?", ind: "?10-25 Lakhs", intl: "$200K-400K" },
                   { feature: "Min Trading Days", fw: "0 (Flash) / 1", ind: "5-10 Days", intl: "5-10 Days" },
-                  { feature: "Indian Support", fw: "WhatsApp + Email 24/7 ✅", ind: "Email Only", intl: "No Hindi / No IST" },
-                  { feature: "Weekend Holding", fw: "Allowed ✅", ind: "Varies", intl: "Usually No" },
-                  { feature: "News Trading", fw: "Allowed ✅", ind: "Restricted", intl: "Restricted" },
-                  { feature: "Hidden Fees", fw: "None — All Inclusive ✅", ind: "Platform Fees", intl: "Data Fees + FX" },
-                  { feature: "Free Retries", fw: "Available on Select Plans ✅", ind: "Paid Only", intl: "Paid Only" },
-                  { feature: "KYC Process", fw: "Aadhaar / PAN — Easy ✅", ind: "Aadhaar / PAN", intl: "Passport + Proof" },
+                  { feature: "Indian Support", fw: "WhatsApp + Email 24/7 ?", ind: "Email Only", intl: "No Hindi / No IST" },
+                  { feature: "Weekend Holding", fw: "Allowed ?", ind: "Varies", intl: "Usually No" },
+                  { feature: "News Trading", fw: "Allowed ?", ind: "Restricted", intl: "Restricted" },
+                  { feature: "Hidden Fees", fw: "None � All Inclusive ?", ind: "Platform Fees", intl: "Data Fees + FX" },
+                  { feature: "Free Retries", fw: "Available on Select Plans ?", ind: "Paid Only", intl: "Paid Only" },
+                  { feature: "KYC Process", fw: "Aadhaar / PAN � Easy ?", ind: "Aadhaar / PAN", intl: "Passport + Proof" },
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="py-3 px-4 text-white/70 font-medium">{row.feature}</td>
@@ -5430,11 +5129,11 @@ const TrustAndSecurity = () => {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/30">
             <span className="flex items-center gap-1"><Lock size={12} /> PCI DSS Compliant</span>
-            <span>•</span>
+            <span>�</span>
             <span className="flex items-center gap-1"><ShieldCheck size={12} /> 256-bit SSL</span>
-            <span>•</span>
+            <span>�</span>
             <span className="flex items-center gap-1"><Globe size={12} /> GDPR Ready</span>
-            <span>•</span>
+            <span>�</span>
             <span className="flex items-center gap-1"><FileText size={12} /> RBI Guidelines Followed</span>
           </div>
         </motion.div>
@@ -5537,7 +5236,7 @@ const Footer = () => {
 
         <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/40 text-sm">
-            © 2025 FundedWealth. All rights reserved.
+            � 2025 FundedWealth. All rights reserved.
           </p>
           <div className="flex flex-wrap gap-4 md:gap-6 text-xs text-white/30">
             <Link href="/terms" className="hover:text-white/60 transition-colors">Terms of Service</Link>

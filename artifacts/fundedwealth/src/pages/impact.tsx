@@ -120,15 +120,14 @@ export default function ImpactPage() {
             <Heart size={16} className="text-pink-400 fill-pink-400" />
             <span className="text-pink-400 text-sm font-bold flex items-center gap-2">
               <Heart size={12} className="text-pink-400" />
-              Powered by Real Impact
+              Powered by Real Impact in India
             </span>
           </div>
           <h1 className="text-3xl sm:text-5xl md:text-7xl font-heading font-extrabold text-white mb-6 leading-tight">
-            Trade for Change —<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">Profit with Purpose</span>
+            Trade with Purpose —<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">Create Real Impact</span>
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto mb-10">
-            Every trade you take creates real impact.<br />
-            FundedWealth contributes from its profits — and you can choose to give back too.
+            Your participation can support meaningful social initiatives. FundedWealth contributes through its impact program, and eligible participants may choose to contribute as well.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/dashboard">
@@ -161,7 +160,7 @@ export default function ImpactPage() {
                 </div>
                 <h3 className="text-white font-extrabold text-xl">FundedWealth Contribution 🏢</h3>
               </div>
-              <p className="text-white/60 mb-6">We allocate a portion of our profits to support real causes across India. Every trade on our platform automatically creates impact.</p>
+              <p className="text-white/60 mb-6">FundedWealth supports selected social initiatives across India through its impact program.</p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between bg-white/5 rounded-xl p-3">
                   <span className="text-white/50 text-sm">Contributed by FundedWealth</span>
@@ -186,7 +185,7 @@ export default function ImpactPage() {
                 </div>
                 <h3 className="text-white font-extrabold text-xl">Trader Contribution 👤</h3>
               </div>
-              <p className="text-white/60 mb-6">You can optionally contribute during withdrawals and increase your impact. 100% voluntary — no pressure, no auto-deductions.</p>
+              <p className="text-white/60 mb-6">Eligible participants can optionally contribute when requesting a reward payout. 100% voluntary — no pressure, no auto-deductions.</p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between bg-white/5 rounded-xl p-3">
                   <span className="text-white/50 text-sm">Contributed by Traders</span>
