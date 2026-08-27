@@ -3144,87 +3144,6 @@ const SmartScalingPlan = () => {
   );
 };
 
-const SEBIBrokers = () => {
-  const cards = [
-    {
-      title: "Market Data from Regulated Sources",
-      desc: "Our real-time price feeds come from SEBI-registered broker infrastructure, ensuring simulated account prices accurately mirror the live Indian market.",
-      icon: <ShieldCheck className="w-6 h-6" />,
-      iconBg: "bg-emerald-500/15",
-      iconColor: "text-emerald-400",
-      dot: "bg-emerald-400",
-    },
-    {
-      title: "SSL Encrypted",
-      desc: "End-to-end 256-bit encryption guards your account, payouts, and personal details across every session and device.",
-      icon: <Lock className="w-6 h-6" />,
-      iconBg: "bg-blue-500/15",
-      iconColor: "text-blue-400",
-      dot: "bg-blue-400",
-    },
-    {
-      title: "Real-time Data",
-      desc: "Direct exchange feeds from NSE and BSE keep your charts, P&L, and order fills in sync with the live market — no lag, no delay.",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
-          <path d="M5 12.55a11 11 0 0114 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
-        </svg>
-      ),
-      iconBg: "bg-violet-500/15",
-      iconColor: "text-violet-400",
-      dot: "bg-violet-400",
-    },
-    {
-      title: "24/7 Support",
-      desc: "A real human-led support desk is on standby any hour — pings answered in Hindi or English, no scripted bots.",
-      icon: <Clock className="w-6 h-6" />,
-      iconBg: "bg-orange-500/15",
-      iconColor: "text-orange-400",
-      dot: "bg-orange-400",
-    },
-  ];
-
-  return (
-    <section id="sebi-brokers" className="py-14 relative overflow-hidden">
-      <div className="glow-orb orb-3"></div>
-      <div className="container mx-auto px-4 md:px-6 relative">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3 leading-tight">
-            Powered by <span className="text-gradient">SEBI-Registered</span> Broker Data
-          </h2>
-          <p className="text-white/60 max-w-2xl mx-auto">
-            We use infrastructure from SEBI-registered brokers to source real-time market data feeds, so simulated account prices accurately reflect live NSE/BSE market conditions at all times.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          {cards.map((c) => (
-            <div key={c.title} className="rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-5 hover:border-white/20 hover:bg-white/[0.05] transition-all flex items-start gap-4">
-              <div className={`w-12 h-12 rounded-xl ${c.iconBg} ${c.iconColor} flex items-center justify-center shrink-0`}>
-                {c.icon}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <h3 className="text-white font-extrabold text-base">{c.title}</h3>
-                  <span className={`w-1.5 h-1.5 rounded-full ${c.dot} shadow-[0_0_6px_currentColor]`} />
-                </div>
-                <p className="text-white/55 text-xs leading-relaxed">{c.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center mt-10">
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-emerald-400/5 border border-emerald-500/30">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span className="text-white font-bold text-sm">Real-Time Market Data · Structured Simulated Evaluation Environment</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 const WhatPeopleSay = () => {
   const testimonials = [
     {
@@ -5358,7 +5277,6 @@ export default function Home() {
         <WhyChoose />
         <Calculator />
         <SmartScalingPlan />
-        <SEBIBrokers />
         <Education />
         <FAQ />
         <Affiliate />
