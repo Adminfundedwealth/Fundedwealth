@@ -207,7 +207,7 @@ export default function ImpactPage() {
             <div className="bg-gradient-to-r from-pink-500/15 via-purple-500/10 to-pink-500/15 border border-pink-500/20 rounded-2xl p-5 text-center">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Sparkles size={18} className="text-pink-400" />
-                <span className="text-white font-extrabold text-lg">Together, we create DOUBLE IMPACT</span>
+                <span className="text-white font-extrabold text-lg">Together, creating meaningful impact</span>
                 <Sparkles size={18} className="text-pink-400" />
               </div>
               <p className="text-white/40 text-sm">FundedWealth contributes automatically + Traders contribute voluntarily = Real change across India</p>
@@ -296,8 +296,8 @@ export default function ImpactPage() {
           <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
               { step: "1", icon: <TrendingUp size={24} className="text-white" />, title: "You Trade & Profit", desc: "Focus on your trading strategy. We handle everything else.", tag: null },
-              { step: "2", icon: <Building2 size={24} className="text-white" />, title: "We Contribute Automatically", desc: "FundedWealth donates from its profits — no action needed from you.", tag: "AUTO" },
-              { step: "3", icon: <Heart size={24} className="text-white" />, title: "You Can Give Back (Optional)", desc: "During withdrawal, optionally donate to a cause you care about.", tag: "OPTIONAL" },
+              { step: "2", icon: <Building2 size={24} className="text-white" />, title: "We Contribute Automatically", desc: "FundedWealth contributes through its impact program — no action needed from you.", tag: "AUTO" },
+              { step: "3", icon: <Heart size={24} className="text-white" />, title: "You Can Give Back (Optional)", desc: "When requesting an eligible reward payout, you may optionally contribute to a cause you care about.", tag: "OPTIONAL" },
               { step: "4", icon: <BarChart3 size={24} className="text-white" />, title: "Track & Share Your Impact", desc: "See your meals, students supported & badge level in your dashboard.", tag: null },
             ].map(s => (
               <div key={s.step} className="text-center">

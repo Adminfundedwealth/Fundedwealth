@@ -3659,9 +3659,9 @@ const ImpactInitiative = () => (
           <h3 className="text-white font-extrabold text-xl mb-2">FundedWealth Contribution</h3>
           <p className="text-white/50 text-sm mb-4">FundedWealth supports selected social initiatives across India through its impact program.</p>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">₹12L+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">8,200+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">520+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">₹4.8L+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">3,200+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">180+</span></div>
           </div>
         </div>
         <div className="bg-gradient-to-b from-green-500/15 to-green-900/5 border border-green-500/25 rounded-2xl p-7 relative overflow-hidden">
@@ -3670,16 +3670,16 @@ const ImpactInitiative = () => (
           <h3 className="text-white font-extrabold text-xl mb-2">Trader Contribution</h3>
           <p className="text-white/50 text-sm mb-4">Eligible participants can optionally contribute when requesting a reward payout.</p>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">₹6.5L+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">4,300+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">330+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">₹1.6L+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">1,050+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">75+</span></div>
           </div>
         </div>
       </div>
 
       <div className="bg-gradient-to-r from-pink-500/15 via-purple-500/10 to-pink-500/15 border border-pink-500/20 rounded-2xl p-4 text-center mb-12">
-        <span className="text-white font-extrabold">Together, we create DOUBLE IMPACT</span>
-        <span className="text-white/40 text-sm ml-2">— ₹18.5L+ combined across 12 cities</span>
+        <span className="text-white font-extrabold">Together, creating meaningful impact</span>
+        <span className="text-white/40 text-sm ml-2">— ₹6.4L+ contributed across selected initiatives</span>
       </div>
 
       <div className="glass-card rounded-2xl border border-white/10 p-8 mb-10">
