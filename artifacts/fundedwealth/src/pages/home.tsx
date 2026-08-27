@@ -3230,9 +3230,9 @@ const WhatPeopleSay = () => {
     {
       name: "Karan Malhotra",
       handle: "@karan.mal",
-      quote: "What I love is the absence of gimmicks � no flashy WhatsApp groups, no signal calls. Just a clean evaluation, real rules, and a payout when you earn it.",
+      quote: "What I like is the straightforward approach — no flashy signal groups or unnecessary distractions. Just a structured simulated evaluation with clearly defined rules and performance criteria.",
       ago: "1 day ago",
-      amount: "?89,500",
+      amount: "Community Member",
       gradient: "from-sky-500 to-cyan-600",
       initials: "KM",
     },
@@ -3255,7 +3255,7 @@ const WhatPeopleSay = () => {
       <p className="text-white/65 text-sm italic leading-relaxed mb-5 flex-1">&ldquo;{t.quote}&rdquo;</p>
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
         <span className="text-white/40 text-xs">{t.ago}</span>
-        <span className="text-emerald-400 font-extrabold text-sm">{t.amount}</span>
+        <span className="text-white/50 font-semibold text-xs">{t.amount}</span>
       </div>
     </div>
   );
@@ -3286,7 +3286,7 @@ const WhatPeopleSay = () => {
           What People <span className="text-gradient">Say About Us</span>
         </h2>
         <p className="text-center text-white/55 text-sm md:text-base max-w-2xl mx-auto">
-          Honest words from evaluation participants across India � auto-pulled from our community feed.
+          Feedback from members of the FundedWealth evaluation community.
         </p>
       </div>
 

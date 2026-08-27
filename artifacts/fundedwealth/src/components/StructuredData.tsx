@@ -103,7 +103,7 @@ const faqSchema = {
       name: "What is FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth is India's #1 best prop trading firm that provides funded trading accounts up to ₹50 Lakhs. Traders keep 70-90% of their profits with performance-based rewards typically processed within 12 hours for eligible approved requests. We support NSE, BSE, MCX, Forex, and Crypto trading."
+        text: "FundedWealth is a simulated trading evaluation platform that provides simulated evaluation accounts up to ₹50 Lakhs. Eligible participants keep 70-90% as performance-based rewards, typically processed within 12 hours for eligible approved requests. The platform focuses on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). All trading is simulated."
       }
     },
     {
@@ -111,7 +111,7 @@ const faqSchema = {
       name: "Is FundedWealth the best prop firm in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, FundedWealth is recognized as India's #1 prop trading firm with 15,000+ funded traders, ₹45 Lakhs+ in monthly payouts, performance-based rewards typically processed within 12 hours, up to 90% profit split, and the lowest evaluation fees starting at just ₹999. We are 100% dedicated to Indian traders."
+        text: "FundedWealth is a fast-growing Indian prop trading evaluation platform with 15,000+ evaluation participants, ₹45 Lakhs+ in performance-based rewards paid to date, rewards typically processed within 12 hours for eligible approved requests, up to 90% reward split, and evaluation fees starting at just ₹999. We are 100% dedicated to Indian traders."
       }
     },
     {
@@ -127,7 +127,7 @@ const faqSchema = {
       name: "What is the cheapest prop firm in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth offers the most affordable prop trading plans in India. Flash instant funded accounts start at just ₹999, making it the cheapest way to start prop trading in India. We also offer regular coupon codes for additional discounts."
+        text: "FundedWealth offers among the most affordable evaluation plans in India. Flash instant simulated funded accounts start at just ₹999. We also offer regular coupon codes for additional discounts."
       }
     },
     {
@@ -151,7 +151,7 @@ const faqSchema = {
       name: "What is the maximum funded account size?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Through our scaling program, traders can scale from ₹1 Lakh up to ₹50 Lakhs in funded capital across 6 levels. Start with a ₹1L Flash account and grow to ₹50L."
+        text: "Through our scaling program, participants can scale their simulated evaluation account from ₹1 Lakh up to ₹50 Lakhs across 6 levels. Start with a ₹1L Flash account and grow to ₹50L."
       }
     },
     {
@@ -199,7 +199,7 @@ const faqSchema = {
       name: "How to become a funded trader in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "To become a funded trader in India: 1) Visit fundedwealth.com, 2) Choose a plan (Flash for instant funding or 1-Step/2-Step for evaluation), 3) Pay the evaluation fee (starting ₹999), 4) Meet profit targets within drawdown limits, 5) Get funded and keep 70-90% of profits."
+        text: "To reach a simulated funded account with FundedWealth: 1) Visit fundedwealth.com, 2) Choose a plan (Flash for instant simulated funding or 1-Step/2-Step for evaluation), 3) Pay the evaluation fee (starting ₹999), 4) Meet profit targets within drawdown limits, 5) Reach a simulated funded account and become eligible to keep 70-90% as performance-based rewards. All trading is simulated."
       }
     }
   ]

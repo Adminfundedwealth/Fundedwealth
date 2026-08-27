@@ -67,7 +67,7 @@ export default function Blog() {
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
         title="Prop Trading Blog India — Trading Tips, Strategies & Market Analysis"
-        description="Learn prop trading from India's best funded traders. Expert tips on NSE, BSE, MCX, Forex & Crypto trading. Risk management, technical analysis, trading psychology. Free trading education from FundedWealth."
+        description="Learn trading discipline from experienced Indian traders. Expert tips on NSE, BSE and MCX instruments, risk management, technical analysis, and trading psychology. Free trading education from FundedWealth."
         keywords="prop trading blog India, trading tips India, NSE trading tips, BSE trading tips, MCX trading tips, forex trading tips India, crypto trading tips, trading psychology India, risk management trading, technical analysis India, prop trading strategies, how to become funded trader India, trading education India"
         canonical="/blog"
       />
