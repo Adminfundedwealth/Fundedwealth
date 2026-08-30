@@ -5249,17 +5249,17 @@ const Footer = () => {
       </div>
 
       {/* Large outlined watermark text — LangChain style */}
-      <div className="w-full overflow-hidden select-none pointer-events-none mt-6 px-2" aria-hidden="true">
+      <div className="w-full overflow-hidden select-none pointer-events-none mt-6" aria-hidden="true">
         <div
-          className="text-center font-heading font-extrabold leading-none whitespace-nowrap"
+          className="font-heading font-extrabold leading-[1.1] whitespace-nowrap text-center"
           style={{
-            fontSize: "clamp(3rem, 11vw, 11rem)",
+            fontSize: "clamp(2rem, 7.5vw, 8rem)",
             color: "transparent",
-            WebkitTextStroke: "1.5px rgba(255,255,255,0.08)",
-            letterSpacing: "-0.01em",
+            WebkitTextStroke: "1px rgba(255,255,255,0.09)",
+            paddingBottom: "0.15em",
           }}
         >
-          Funded<span style={{ WebkitTextStroke: "1.5px rgba(255,138,61,0.13)" }}>Wealth</span>
+          Funded<span style={{ WebkitTextStroke: "1px rgba(255,138,61,0.15)" }}>Wealth</span>
         </div>
       </div>
     </footer>
