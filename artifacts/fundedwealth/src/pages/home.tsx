@@ -5302,10 +5302,7 @@ export default function Home() {
 
       <Footer />
 
-      {/* AUTO DEPLOY TEST */}
-      <div style={{ textAlign: "center", padding: "8px", fontSize: "11px", color: "#ffffff", background: "#1a0030", letterSpacing: "0.1em" }}>
-        AUTO DEPLOY TEST
-      </div>
+
     </div>
   );
 }
