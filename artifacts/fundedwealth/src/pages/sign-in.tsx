@@ -2,6 +2,7 @@ import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Smartphone, Download } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { api } from "@/lib/api";
 
 // Force fresh deployment
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -190,19 +191,9 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
     if (!isLoaded || cooldown > 0) return;
     setError(""); setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
-      const res = await fetch(`${apiUrl}/api/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(friendlyResetError(data?.error || "Failed to send reset email. Please try again."));
-      } else {
-        setSuccess("Password reset link sent! Check your email (including spam folder).");
-        setCooldown(RESET_COOLDOWN_SECS);
-      }
+      await api.post("/auth/forgot-password", { email });
+      setSuccess("Password reset link sent! Check your email (including spam folder).");
+      setCooldown(RESET_COOLDOWN_SECS);
     } catch (err: any) {
       setError(friendlyResetError(err?.message || "Network error. Please check your connection and try again."));
     } finally { setLoading(false); }
