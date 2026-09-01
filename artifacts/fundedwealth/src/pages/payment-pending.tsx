@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
+import { getApiBase } from "@/lib/api-base";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -199,7 +200,7 @@ export default function PaymentPending() {
     }
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const token = isLoaded ? await getToken().catch(() => null) : null;
 
       const res = await fetch(`${apiBase}/api/payments/payment-status/${trackId}`, {
@@ -252,7 +253,7 @@ export default function PaymentPending() {
     }
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
 
       const res = await fetch(`${apiBase}/api/payments/provisioning-status/${orderId}`, {
         credentials: "include",

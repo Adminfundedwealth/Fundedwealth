@@ -1,23 +1,20 @@
 /**
  * api.ts — Thin fetch wrapper for the FundedWealth backend API.
  *
- * Routing:
- * - In production: VITE_API_URL points to the Render backend (e.g. https://fundedwealth-api.onrender.com)
- *   All calls go to VITE_API_URL/api/*
- * - In development: relative /api/* (Vite proxy forwards to localhost:9000 or Render)
+ * All calls use getApiBase() which strips dead domains and falls back to
+ * relative /api/* URLs (proxied by Vercel → Railway). Never hard-code
+ * api.fundedwealth.com here — that domain is dead (Vercel 404).
  */
+import { getApiBase } from "./api-base";
 
-// When VITE_API_URL is not set (e.g. Vercel deployment without the secret),
-// fall back to relative /api/* paths. Vercel's rewrite in vercel.json
-// proxies /api/* → real EC2 backend. Never fall back to a dead domain.
-const API_PREFIX = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : import.meta.env.VITE_API_BASE_URL
-    ? `${import.meta.env.VITE_API_BASE_URL}/api`
-    : "/api";
+function getApiPrefix(): string {
+  const base = getApiBase(); // "" | "https://fundedwealth-api-production.up.railway.app"
+  return base ? `${base}/api` : "/api";
+}
 
 async function apiFetch(path: string, options?: RequestInit) {
-  const res = await fetch(`${API_PREFIX}${path}`, {
+  const prefix = getApiPrefix();
+  const res = await fetch(`${prefix}${path}`, {
     ...options,
     credentials: "include",
     headers: {

@@ -2,22 +2,40 @@
  * Centralised API base URL resolver.
  *
  * Priority:
- *  1. VITE_API_URL  (set in GitHub Actions secret / local .env)
- *  2. VITE_API_BASE_URL  (legacy alias)
+ *  1. VITE_API_URL  — only used if it is NOT the dead api.fundedwealth.com domain
+ *  2. VITE_API_BASE_URL  — legacy alias, same guard
  *  3. Empty string ""  — falls back to RELATIVE /api/* URLs which Vercel
- *     proxies to the real EC2 backend via the /api rewrite in vercel.json.
- *     This means the frontend works correctly even when VITE_API_URL is not
- *     set at build time, as long as vercel.json points /api/* to the EC2.
+ *     proxies to the Railway backend via the /api rewrite in vercel.json.
  *
- * NEVER return a dead domain (like api.fundedwealth.com if DNS isn't set up).
- * Relative "" is always safe — Vercel handles the proxy.
+ * WHY THE GUARD:
+ *   api.fundedwealth.com DNS currently points to Vercel (returns 404) — it is
+ *   NOT the Railway Express server. Any build that had VITE_API_URL set to that
+ *   domain will silently fail all API calls. Relative "" is always safe because
+ *   vercel.json rewrites /api/* → fundedwealth-api-production.up.railway.app/api/*
+ *
+ * NEVER hard-code api.fundedwealth.com as a fallback anywhere in the codebase.
+ * Use getApiBase() from this file everywhere instead.
  */
-export const RAILWAY_API_BASE = "";   // empty = use relative /api/* via Vercel proxy
+
+/** Dead domains that must be treated as if unset. */
+const DEAD_DOMAINS = [
+  "api.fundedwealth.com",
+  "fundedwealth-api.onrender.com",  // Render service is suspended
+];
+
+function isDeadUrl(url: string | undefined): boolean {
+  if (!url) return false;
+  return DEAD_DOMAINS.some(d => url.includes(d));
+}
 
 export function getApiBase(): string {
-  return (
+  const fromEnv =
     import.meta.env.VITE_API_URL ||
     import.meta.env.VITE_API_BASE_URL ||
-    RAILWAY_API_BASE
-  );
+    "";
+
+  // If the env var is set to a known-dead domain, ignore it and use relative.
+  if (isDeadUrl(fromEnv)) return "";
+
+  return fromEnv;
 }

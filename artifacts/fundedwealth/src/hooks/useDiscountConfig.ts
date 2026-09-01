@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getApiBase } from "../lib/api-base";
 
 export interface DiscountConfigEntry {
   planType: string;
@@ -11,12 +12,9 @@ export interface DiscountConfigEntry {
 /** Map of planType → entry for convenient lookup */
 export type DiscountConfigMap = Record<string, DiscountConfigEntry>;
 
-const RAILWAY_API = "https://api.fundedwealth.com";
-const API_PREFIX = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : import.meta.env.VITE_API_BASE_URL
-    ? `${import.meta.env.VITE_API_BASE_URL}/api`
-    : `${RAILWAY_API}/api`;
+// getApiBase() strips dead domains and returns "" (relative) or a live URL
+const _base = getApiBase();
+const API_PREFIX = _base ? `${_base}/api` : "/api";
 
 /**
  * Static fallback used before the API responds or on error.

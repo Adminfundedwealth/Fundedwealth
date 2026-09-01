@@ -16,6 +16,7 @@ import {
 import { getFingerprint, getVisitorId, reportFingerprint, type FingerprintData } from "@/lib/fingerprint";
 import { installFetchInterceptor } from "@/lib/fetch-interceptor";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
+import { getApiBase } from "../lib/api-base";
 
 interface FingerprintContextValue {
     fingerprint: FingerprintData | null;
@@ -69,7 +70,7 @@ export function FingerprintProvider({ children }: { children: ReactNode }) {
     // Report to backend when authenticated
     useEffect(() => {
         if (isSignedIn && visitorId && session?.access_token) {
-            const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
+            const apiUrl = getApiBase();
             reportFingerprint(apiUrl, session.access_token).catch(() => { });
         }
     }, [isSignedIn, visitorId, session?.access_token]);

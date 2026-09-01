@@ -13,6 +13,7 @@ import { Eye, EyeOff, Lock, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SEOHead from "@/components/SEOHead";
+import { getApiBase } from "@/lib/api-base";
 
 type PageState = "idle" | "submitting" | "done" | "error" | "already_done" | "invalid_token";
 
@@ -41,7 +42,7 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
       }
       
       // Signed in - check onboarding status
-      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
+      const apiUrl = getApiBase();
       fetch(`${apiUrl}/api/auth/onboarding-status`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       })
@@ -72,7 +73,7 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
     setState("submitting");
     setErrorMsg("");
 
-    try {      const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
+    try {      const apiUrl = getApiBase();
       const res = await fetch(`${apiUrl}/api/auth/create-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

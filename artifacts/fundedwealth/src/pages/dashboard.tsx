@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useUser, useAuth } from "@/contexts/SupabaseAuthContext";
 import SEOHead from "@/components/SEOHead";
@@ -22,6 +22,7 @@ import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip,
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
+import { getApiBase } from "@/lib/api-base";
 
 type Section =
   | "home" | "accounts" | "platform" | "payouts" | "leaderboard"
@@ -53,7 +54,7 @@ type TradingAccount = {
 type Notification = DashboardNotification;
 
 const fmt = (n: number) =>
-  n >= 100000 ? `₹${(n / 100000).toFixed(1)}L` : `₹${n.toLocaleString("en-IN")}`;
+  n >= 100000 ? `?${(n / 100000).toFixed(1)}L` : `?${n.toLocaleString("en-IN")}`;
 
 const pnlColor = (v: number) => v >= 0 ? "text-green-400" : "text-red-400";
 
@@ -100,7 +101,7 @@ function JournalSection({ storageKey, initial }: { storageKey: string; initial: 
       </div>
       <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
         <div className="text-white font-bold text-sm flex items-center gap-2"><NotebookPen size={16} className="text-fw-pink" /> New entry</div>
-        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Setup name — e.g. BANKNIFTY breakout @ 9:25"
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Setup name � e.g. BANKNIFTY breakout @ 9:25"
           className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#4A00E0]/60" />
         <textarea value={note} onChange={e => setNote(e.target.value)} rows={4} placeholder="What went right or wrong? What will you do next time?"
           className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#4A00E0]/60 resize-none" />
@@ -121,7 +122,7 @@ function JournalSection({ storageKey, initial }: { storageKey: string; initial: 
       {entries.length === 0 ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
           <NotebookPen size={36} className="text-white/20 mx-auto mb-3" />
-          <div className="text-white/55 text-sm">No entries yet — your first lesson is the most valuable one.</div>
+          <div className="text-white/55 text-sm">No entries yet � your first lesson is the most valuable one.</div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -171,7 +172,7 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: displayName, email: displayEmail, phone: "",
-          subject: `[Dashboard feedback · ${type} · ${rating}★]`,
+          subject: `[Dashboard feedback � ${type} � ${rating}?]`,
           message: msg.trim(),
         }),
       });
@@ -184,7 +185,7 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
       <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 flex items-start gap-3">
         <CheckCircle size={22} className="text-green-400 mt-0.5 shrink-0" />
         <div>
-          <div className="text-white font-bold">Thank you — feedback received.</div>
+          <div className="text-white font-bold">Thank you � feedback received.</div>
           <div className="text-white/65 text-sm mt-1">Our product team reads every message. If you asked for a reply, we'll get back within 12 hours.</div>
           <button onClick={() => setDone(false)} className="mt-3 text-fw-pink text-xs font-bold hover:underline">Send another</button>
         </div>
@@ -214,13 +215,13 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
         <div className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Overall rating</div>
         <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map(n => (
-            <button key={n} onClick={() => setRating(n)} className={`text-2xl transition-transform hover:scale-110 ${n <= rating ? "text-fw-orange" : "text-white/20"}`}>★</button>
+            <button key={n} onClick={() => setRating(n)} className={`text-2xl transition-transform hover:scale-110 ${n <= rating ? "text-fw-orange" : "text-white/20"}`}>?</button>
           ))}
         </div>
       </div>
       <div>
         <div className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Your message</div>
-        <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={5} placeholder="Be as specific as possible — screenshots, steps to reproduce, ideas..."
+        <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={5} placeholder="Be as specific as possible � screenshots, steps to reproduce, ideas..."
           className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-[#4A00E0]/60 resize-none" />
       </div>
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -241,7 +242,7 @@ const RULES_LIST = [
   { title: "Profit Target", desc: "Achieve 10% profit to pass the challenge phase.", ok: false },
   { title: "No Holding Over Weekend", desc: "Close all positions before market close on Friday.", ok: true },
   { title: "No News Trading", desc: "No trades within 2 minutes of major news events.", ok: true },
-  { title: "Consistent Trading", desc: "Trades must be consistent — no single-day > 50% of total profit.", ok: false },
+  { title: "Consistent Trading", desc: "Trades must be consistent � no single-day > 50% of total profit.", ok: false },
 ];
 
 /**
@@ -305,13 +306,13 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
       : acc.phase === "verification" ? "Verification"
       : "Phase 1";
     const lines = [
-      `FundedWealth — Trading Account Credentials`,
+      `FundedWealth � Trading Account Credentials`,
       `==========================================`,
       `Account Code    : ${acc.accountCode}`,
       `Login Email     : ${(acc as any).loginEmail || "Check your registered email"}`,
       `Terminal Password: ${termPass}`,
       `Challenge       : ${phaseDisplay}`,
-      `Account Size    : ₹${acc.size.toLocaleString("en-IN")}`,
+      `Account Size    : ?${acc.size.toLocaleString("en-IN")}`,
       `Generated on    : ${new Date().toLocaleString("en-IN")}`,
     ].join("\n");
     const blob = new Blob([lines], { type: "text/plain" });
@@ -326,7 +327,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     setLaunchError("");
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
       console.info("[Launch Terminal] request start", {
         accountId: acc.id,
@@ -371,9 +372,9 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     return (
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3">
         <div className="w-10 h-10 border-2 border-amber-400/40 border-t-amber-400 rounded-full animate-spin" />
-        <div className="text-white font-bold">Setting up your account…</div>
+        <div className="text-white font-bold">Setting up your account�</div>
         <div className="text-white/50 text-sm">Your challenge account is being provisioned. This usually takes under a minute.</div>
-        <div className="text-amber-400 text-xs font-mono">{acc.accountCode !== "Provisioning..." ? acc.accountCode : "Assigning code…"}</div>
+        <div className="text-amber-400 text-xs font-mono">{acc.accountCode !== "Provisioning..." ? acc.accountCode : "Assigning code�"}</div>
       </div>
     );
   }
@@ -425,7 +426,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 
       {/* Progress bars */}
       <div className="space-y-3 mb-4">
-        {/* Profit Target — hidden for Flash (no profit target) */}
+        {/* Profit Target � hidden for Flash (no profit target) */}
         {acc.phase !== "flash" ? (
           <div>
             <div className="flex justify-between text-xs mb-1">
@@ -456,7 +457,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         </div>
       </div>
 
-      {/* ── Credentials panel ── */}
+      {/* -- Credentials panel -- */}
       <div className="border-t border-white/10 pt-4 mt-4 space-y-3">
         <button
           onClick={() => setShowCreds(v => !v)}
@@ -475,7 +476,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="text-white/40 text-[10px] uppercase tracking-wider">Login Email</div>
-                <div className="text-white text-xs font-mono truncate">{(acc as any).loginEmail || "—"}</div>
+                <div className="text-white text-xs font-mono truncate">{(acc as any).loginEmail || "�"}</div>
               </div>
               {(acc as any).loginEmail && (
                 <button onClick={() => copyField("email", (acc as any).loginEmail)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "email" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
@@ -520,7 +521,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             {/* Challenge */}
             <div>
               <div className="text-white/40 text-[10px] uppercase tracking-wider">Challenge</div>
-              <div className="text-white text-xs">{phaseLabel} — {acc.size > 0 ? `₹${acc.size.toLocaleString("en-IN")}` : "—"}</div>
+              <div className="text-white text-xs">{phaseLabel} � {acc.size > 0 ? `?${acc.size.toLocaleString("en-IN")}` : "�"}</div>
             </div>
 
             {/* Action buttons */}
@@ -537,7 +538,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
                 ) : (
                   <Monitor size={13} />
                 )}
-                {launching ? "Launching…" : "Launch Terminal"}
+                {launching ? "Launching�" : "Launch Terminal"}
               </button>
 
               {/* Copy all credentials */}
@@ -546,10 +547,10 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
                   const pw = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword);
                   const lines = [
                     `Account Code: ${acc.accountCode}`,
-                    `Login Email: ${(acc as any).loginEmail || "—"}`,
+                    `Login Email: ${(acc as any).loginEmail || "�"}`,
                     pw ? `Password: ${pw}` : "Password: Reset at fundedwealth.com/sign-in",
                     `Challenge: ${phaseLabel}`,
-                    `Size: ₹${acc.size.toLocaleString("en-IN")}`,
+                    `Size: ?${acc.size.toLocaleString("en-IN")}`,
                   ];
                   const text = lines.join("\n");
                   navigator.clipboard.writeText(text).catch(() => {});
@@ -584,7 +585,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 }
 
 /**
- * Single universal Launch Terminal card — works for ALL challenge types.
+ * Single universal Launch Terminal card � works for ALL challenge types.
  * Flash / Instant / 1-Step / 2-Step all use POST /api/terminal/launch.
  */
 function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
@@ -616,7 +617,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
     setError("");
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
       console.info("[Launch Terminal] request start", {
         accountId: acc.id,
@@ -663,9 +664,9 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-white font-bold text-lg">{acc.accountCode || "—"}</div>
+          <div className="text-white font-bold text-lg">{acc.accountCode || "�"}</div>
           <div className="text-white/50 text-xs mt-0.5">
-            {phaseLabel} · Balance: ₹{(acc.balance ?? 0).toLocaleString("en-IN")}
+            {phaseLabel} � Balance: ?{(acc.balance ?? 0).toLocaleString("en-IN")}
           </div>
         </div>
         <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${phaseColor}`}>
@@ -677,12 +678,12 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
       <div className="bg-black/20 border border-white/10 rounded-xl p-4 grid grid-cols-1 gap-2.5">
         {[
           { label: "Account ID", key: "accountId", value: acc.id },
-          { label: "Login Email", key: "email", value: (acc as any).loginEmail || creds?.email || "—" },
+          { label: "Login Email", key: "email", value: (acc as any).loginEmail || creds?.email || "�" },
           {
             label: "Password", key: "password",
             value: safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword || creds?.password) || "Password unavailable",
           },
-          { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "—" },
+          { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "�" },
           { label: "Server", key: "server", value: import.meta.env.VITE_TERMINAL_URL || "terminal.fundedwealth.com" },
           { label: "Status", key: "status", value: acc.status || creds?.status || "active" },
         ].map(({ label, key, value }) => (
@@ -691,7 +692,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
               <div className="text-white/40 text-[10px] uppercase tracking-wider">{label}</div>
               <div className="text-white text-xs font-mono truncate">{value}</div>
             </div>
-            {value && value !== "—" && (
+            {value && value !== "�" && (
               <button
                 onClick={() => copyCred(key, value)}
                 className={`shrink-0 text-xs font-bold px-2 py-1 rounded-lg transition-all ${copiedCred === key ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/50 hover:bg-white/20"}`}
@@ -710,7 +711,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold py-3 px-5 rounded-xl text-sm hover:shadow-lg hover:shadow-[#D63384]/30 transition-all disabled:opacity-60 disabled:cursor-wait"
       >
         {launching ? (
-          <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Launching…</>
+          <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Launching�</>
         ) : (
           <><Monitor size={16} /> Launch Terminal <ExternalLink size={13} /></>
         )}
@@ -725,7 +726,7 @@ function EmptyState({ onBuy }: { onBuy: () => void }) {
   return (
     <div className="col-span-full">
       <div className="bg-gradient-to-r from-[#4A00E0]/30 to-[#D63384]/20 border border-white/10 rounded-2xl p-8 text-center">
-        <div className="text-5xl mb-4">🚀</div>
+        <div className="text-5xl mb-4">??</div>
         <h3 className="text-white font-bold text-xl mb-2">No Active Accounts Yet</h3>
         <p className="text-white/60 mb-6 max-w-md mx-auto">Start your funded trading journey today. Choose a challenge size and prove your trading skills.</p>
         <div className="flex gap-3 justify-center">
@@ -850,7 +851,7 @@ function WithdrawalDetailsSection() {
       {loading ? (
         <div className="flex items-center gap-2 text-white/30 text-sm py-8">
           <div className="w-4 h-4 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-          Loading your details…
+          Loading your details�
         </div>
       ) : (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
@@ -944,7 +945,7 @@ function WithdrawalDetailsSection() {
               {saving ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Saving…
+                  Saving�
                 </>
               ) : (
                 <>
@@ -966,7 +967,7 @@ function WithdrawalDetailsSection() {
       <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
         <Clock size={14} className="text-white/40 mt-0.5 shrink-0" />
         <div className="text-white/40 text-xs">
-          <span className="text-white/60 font-semibold">Processing times:</span> UPI — instant to 4 hours. Bank Transfer — 1-2 business days. Payouts are processed Monday–Saturday, 10am–6pm IST.
+          <span className="text-white/60 font-semibold">Processing times:</span> UPI � instant to 4 hours. Bank Transfer � 1-2 business days. Payouts are processed Monday�Saturday, 10am�6pm IST.
         </div>
       </div>
     </div>
@@ -987,7 +988,7 @@ function CouponSection({ profile }: { profile: any }) {
   const [liveDiscounts, setLiveDiscounts] = useState<LiveDiscountEntry[]>([]);
   const [discountsLoading, setDiscountsLoading] = useState(true);
 
-  // Build a lookup map from the live discount data: code (uppercase) → description
+  // Build a lookup map from the live discount data: code (uppercase) ? description
   const validCoupons = useMemo(() => {
     const map: Record<string, string> = {};
     for (const entry of liveDiscounts) {
@@ -1000,14 +1001,14 @@ function CouponSection({ profile }: { profile: any }) {
 
   // Fetch live discount config from the API on mount
   useEffect(() => {
-    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    const apiBase = getApiBase();
     fetch(`${apiBase}/api/discount-config`)
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data) => {
         if (Array.isArray(data?.data)) setLiveDiscounts(data.data);
       })
       .catch(() => {
-        // silently fall back to empty — user can still type a code manually
+        // silently fall back to empty � user can still type a code manually
       })
       .finally(() => setDiscountsLoading(false));
   }, []);
@@ -1021,7 +1022,7 @@ function CouponSection({ profile }: { profile: any }) {
     }
   };
 
-  // Deduplicate badges: some plans share the same code — show each unique code once
+  // Deduplicate badges: some plans share the same code � show each unique code once
   const uniqueBadges = useMemo(() => {
     const seen = new Set<string>();
     const badges: { code: string; desc: string }[] = [];
@@ -1064,7 +1065,7 @@ function CouponSection({ profile }: { profile: any }) {
         </div>
         {couponStatus === "valid" && validCoupons[couponInput.trim().toUpperCase()] && (
           <div className="mt-4 flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
-            <span className="text-green-400 text-lg">✓</span>
+            <span className="text-green-400 text-lg">?</span>
             <div>
               <div className="text-white text-sm font-semibold">
                 Code <span className="text-green-400">{couponInput.trim().toUpperCase()}</span> is active
@@ -1081,7 +1082,7 @@ function CouponSection({ profile }: { profile: any }) {
         <div className="mt-5">
           <div className="text-white/40 text-xs mb-2 font-semibold uppercase tracking-wide">Available codes</div>
           {discountsLoading ? (
-            <div className="text-white/30 text-xs">Loading codes…</div>
+            <div className="text-white/30 text-xs">Loading codes�</div>
           ) : uniqueBadges.length === 0 ? (
             <div className="text-white/30 text-xs">No active codes at the moment.</div>
           ) : (
@@ -1092,7 +1093,7 @@ function CouponSection({ profile }: { profile: any }) {
                   onClick={() => { setCouponInput(code); setCouponStatus("idle"); }}
                   className="text-xs bg-white/5 border border-white/10 hover:border-[#4A00E0]/40 text-white/60 hover:text-white rounded-lg px-3 py-1.5 transition-all"
                 >
-                  {code} — {desc}
+                  {code} � {desc}
                 </button>
               ))}
             </div>
@@ -1103,7 +1104,7 @@ function CouponSection({ profile }: { profile: any }) {
   );
 }
 
-// ── Data & Privacy section — self-contained component ────────────────────────
+// -- Data & Privacy section � self-contained component ------------------------
 // Renders privacy info cards, "Download My Data" button, and
 // the existing "Request Data Deletion" button.
 function PrivacySection() {
@@ -1120,7 +1121,7 @@ function PrivacySection() {
 
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const res = await fetch(`${apiBase}/api/users/me/export`, {
         method: "GET",
         credentials: "include",
@@ -1208,10 +1209,10 @@ function PrivacySection() {
             className="flex items-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl px-5 py-2.5 text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Download size={14} />
-            {exporting ? "Preparing export…" : "Download My Data"}
+            {exporting ? "Preparing export�" : "Download My Data"}
           </Button>
 
-          {/* Keep the existing deletion button — backend not yet implemented */}
+          {/* Keep the existing deletion button � backend not yet implemented */}
           <Button
             variant="outline"
             onClick={() => {
@@ -1240,7 +1241,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const [copied, setCopied] = useState(false);
   const [analyticsRange, setAnalyticsRange] = useState<"1D" | "1W" | "1M" | "ALL">("ALL");
   // "all" = aggregate all accounts, otherwise = specific trading_account id
-  // Default: auto-select first active account (like real prop firms — per-account by default)
+  // Default: auto-select first active account (like real prop firms � per-account by default)
   const [analyticsAccountId, setAnalyticsAccountId] = useState<string>("all");
 
   // Once accounts load, auto-select the first active account instead of showing "all"
@@ -1262,7 +1263,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const notifRef = useRef<HTMLDivElement>(null);
   const [darkMode, setDarkMode] = useState(true);
 
-  // Leaderboard — fetched from real API
+  // Leaderboard � fetched from real API
   type LeaderboardEntry = {
     rank: number;
     firstName: string | null;
@@ -1284,7 +1285,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         return r.json();
       })
       .then((rows: any[]) => {
-        const BADGES = ["🏆", "🥈", "🥉"];
+        const BADGES = ["??", "??", "??"];
         setLeaderboardData(
           rows.map((row, i) => ({
             rank: i + 1,
@@ -1299,7 +1300,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       .finally(() => setLeaderboardLoading(false));
   }, [user?.id]);
 
-  // Analytics trades — fetched from real API (trade_logs via terminal-sync)
+  // Analytics trades � fetched from real API (trade_logs via terminal-sync)
   type TradeLog = { symbol: string; pnl: number; createdAt: string };
   const [analyticsTradesData, setAnalyticsTradesData] = useState<TradeLog[]>([]);
 
@@ -1319,7 +1320,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   // Fetch trade logs + rich analytics whenever the selected account changes
   useEffect(() => {
     if (!user || profile.accounts.length === 0) return;
-    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    const apiBase = getApiBase();
 
     const fetchTrades = async (accountId: string): Promise<TradeLog[]> => {
       try {
@@ -1398,7 +1399,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
   useEffect(() => {
     if (!user) return;
-    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    const apiBase = getApiBase();
     fetch(`${apiBase}/api/users/me`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1548,7 +1549,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       if (!res.ok) {
         setAffiliateMessage(data.error || "Unable to submit withdrawal request.");
       } else {
-        setAffiliateMessage(data.message || `Withdrawal requested for ₹${data.claimedAmount}.`);
+        setAffiliateMessage(data.message || `Withdrawal requested for ?${data.claimedAmount}.`);
         loadAffiliateStats();
         loadAffiliateHistory(historyFilter);
       }
@@ -1656,7 +1657,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         <div className="space-y-6">
           <div className="relative bg-gradient-to-r from-[#4A00E0] via-[#7B30FF] to-[#D63384] rounded-2xl p-8 overflow-hidden">
             <div className="relative z-10">
-              <h2 className="text-white text-2xl font-extrabold mb-1">Welcome back, {displayName}! 👋</h2>
+              <h2 className="text-white text-2xl font-extrabold mb-1">Welcome back, {displayName}! ??</h2>
               {profile.accounts.length === 0 ? (
                 <>
                   <p className="text-white/80 text-sm mb-5">Are You Ready To Buy Your First Challenge?<br />
@@ -2042,7 +2043,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   fetch(`${import.meta.env.BASE_URL}api/users/leaderboard`, { credentials: "include" })
                     .then(r => r.ok ? r.json() : Promise.reject())
                     .then((rows: any[]) => {
-                      const BADGES = ["🏆", "🥈", "🥉"];
+                      const BADGES = ["??", "??", "??"];
                       setLeaderboardData(rows.map((row, i) => ({ rank: i + 1, firstName: row.firstName || row.name || "Trader", city: row.city || null, totalPayout: row.totalPayout ?? 0, badge: BADGES[i] || "" })));
                     })
                     .catch(() => setLeaderboardError(true))
@@ -2132,7 +2133,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           );
         }
 
-        // ── Account selection ────────────────────────────────────────────────
+        // -- Account selection ------------------------------------------------
         const activeAccount = profile.accounts.find(acc => acc.status === "active") || profile.accounts[0];
         // Only show accounts that have real trading activity (active, funded, passed)
         const selectableAccounts = profile.accounts.filter(a =>
@@ -2141,19 +2142,19 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         const selectedAccount = analyticsAccountId !== "all"
           ? (profile.accounts.find(a => a.id === analyticsAccountId) || activeAccount)
           : activeAccount;
-        // Aggregate only live trading accounts — exclude pending/failed/breached
+        // Aggregate only live trading accounts � exclude pending/failed/breached
         const liveAccounts = profile.accounts.filter(a =>
           ["active", "passed", "funded"].includes(a.status)
         );
         const accountsForAgg = analyticsAccountId === "all" ? liveAccounts : [selectedAccount];
 
-        // ── Aggregated totals ────────────────────────────────────────────────
+        // -- Aggregated totals ------------------------------------------------
         const totalStart   = accountsForAgg.reduce((s, a) => s + (a.startBalance || 0), 0) || selectedAccount.startBalance;
         const totalBalance = accountsForAgg.reduce((s, a) => s + (a.balance || 0),      0) || selectedAccount.balance;
         const totalTrades  = accountsForAgg.reduce((s, a) => s + (a.tradeCount || 0),   0) || selectedAccount.tradeCount;
         const totalPnl     = totalBalance - totalStart;
 
-        // ── Metrics ──────────────────────────────────────────────────────────
+        // -- Metrics ----------------------------------------------------------
         const profitTargetProgress = Math.min(100, Math.max(0,
           ((totalPnl / Math.max(1, totalStart)) * 100) / Math.max(0.01, selectedAccount.profitTarget || 10) * 100
         ));
@@ -2161,7 +2162,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           ? Math.round(accountAnalytics.winRate * 10) / 10
           : selectedAccount.winRate > 0
             ? selectedAccount.winRate
-            : null; // null = no trades yet, show "—"
+            : null; // null = no trades yet, show "�"
         const winRateNum = displayWinRate ?? 50; // numeric fallback for calculations
         const consistencyScore = accountAnalytics?.consistencyScore != null
           ? Math.round(accountAnalytics.consistencyScore)
@@ -2178,7 +2179,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         const calmar = Number((Math.max(1, totalPnl) / Math.max(1, selectedAccount.maxLoss / 100 * totalStart)).toFixed(2));
         const ulcer  = Number(Math.pow(Math.max(1, selectedAccount.maxLoss), 0.8).toFixed(2));
 
-        // ── Equity curve — real data preferred, synthetic fallback ──────────
+        // -- Equity curve � real data preferred, synthetic fallback ----------
         const realEquityCurve = accountAnalytics?.equityCurve || [];
         const synthSeries = Array.from({ length: 28 }, (_, idx) => {
           const progress = idx / 27;
@@ -2205,7 +2206,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           ? realDailyPnl.slice(-rangeMap[analyticsRange]).map(d => ({ day: d.date, pnl: d.pnl }))
           : chartData.map((pt, i) => ({ day: pt.label, pnl: i === 0 ? 0 : pt.equity - chartData[i-1].equity }));
 
-        // ── Trade log metrics ────────────────────────────────────────────────
+        // -- Trade log metrics ------------------------------------------------
         const tradeLogs: { symbol: string; pnl: number; createdAt: string }[] = analyticsTradesData ?? [];
         const hasTradeData = tradeLogs.length > 0;
         const winningTrades = tradeLogs.filter(t => t.pnl > 0);
@@ -2230,7 +2231,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           else          { curLoss++; curWin = 0; longestLossStreak = Math.max(longestLossStreak, curLoss); }
         }
 
-        // ── Symbol breakdown ─────────────────────────────────────────────────
+        // -- Symbol breakdown -------------------------------------------------
         const SYMBOL_COLORS: Record<string,string> = { BANKNIFTY:"#7C3AED", NIFTY:"#22C55E", SENSEX:"#38BDF8", FINNIFTY:"#F97316", OTHER:"#A855F7" };
         type SymbolBreakdownEntry = { name: string; value: number; color: string; pnl: number };
         const symbolBreakdown: SymbolBreakdownEntry[] = (() => {
@@ -2248,7 +2249,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           })).sort((a,b)=>b.value-a.value);
         })();
 
-        // ── Day-of-week performance ──────────────────────────────────────────
+        // -- Day-of-week performance ------------------------------------------
         type DayPerf = { day: string; pnl: number; count: number };
         const dayOfWeek: { day: string; perf: number }[] = (() => {
           const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -2267,7 +2268,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           return raw.map(r=>({ day: r.day, perf: Math.max(0, Math.min(100, Math.round((r.rawPnl/maxAbs)*50+50))) }));
         })();
 
-        // ── P&L calendar heatmap ─────────────────────────────────────────────
+        // -- P&L calendar heatmap ---------------------------------------------
         const calendarHeat: { day: string; value: number; pnl: number }[] = (() => {
           const now = new Date();
           const pnlByDate: Record<string,number> = {};
@@ -2279,18 +2280,18 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           });
         })();
 
-        // ── AI insight cards ─────────────────────────────────────────────────
+        // -- AI insight cards -------------------------------------------------
         const insightCards: { title: string; description: string; tone: string }[] = (() => {
           if (!hasTradeData) return [];
           const cards: { title: string; description: string; tone: string }[] = [];
           if (symbolBreakdown.length > 0) {
             const best = symbolBreakdown.reduce((a,b)=>b.pnl>a.pnl?b:a);
-            if (best.pnl > 0) cards.push({ title:`Your best symbol is ${best.name}`, description:`${best.value}% of your trades — highest realised P&L across all symbols.`, tone:"good"});
+            if (best.pnl > 0) cards.push({ title:`Your best symbol is ${best.name}`, description:`${best.value}% of your trades � highest realised P&L across all symbols.`, tone:"good"});
           }
           const sortedDow = [...dayOfWeek].sort((a,b)=>a.perf-b.perf);
           if (sortedDow[0]?.perf < 45) cards.push({ title:`Trade less on ${sortedDow[0].day}days`, description:`${sortedDow[0].day} shows the weakest average P&L. Consider reducing size.`, tone:"warn"});
           if (longestLossStreak>=3) cards.push({ title:`Reduce size after ${longestLossStreak} consecutive losses`, description:"Preserve capital by scaling back position size during losing streaks.", tone:"warn"});
-          if (profitFactor!=null && profitFactor>=1.5) cards.push({ title:"Strong profit factor detected", description:`Profit factor of ${profitFactor} — your winners outpace your losers.`, tone:"good"});
+          if (profitFactor!=null && profitFactor>=1.5) cards.push({ title:"Strong profit factor detected", description:`Profit factor of ${profitFactor} � your winners outpace your losers.`, tone:"good"});
           if (cards.length===0) cards.push({ title:"Keep logging your trades", description:"More trade data will unlock personalised insights about your patterns.", tone:"good"});
           return cards;
         })();
@@ -2304,14 +2305,14 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         return (
           <div className="space-y-6">
 
-            {/* ── Account Selector ───────────────────────────────────────── */}
+            {/* -- Account Selector ----------------------------------------- */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <h2 className="text-white font-extrabold text-xl">Analytics</h2>
                 <p className="text-white/50 text-sm mt-0.5">
                   {analyticsAccountId === "all"
-                    ? `All Accounts · ${liveAccounts.length} active`
-                    : `${selectedAccount.accountCode || selectedAccount.id.slice(0,8)} · ${selectedAccount.phase === "funded" ? "Funded" : selectedAccount.phase === "flash" ? "Flash" : "Challenge"}`}
+                    ? `All Accounts � ${liveAccounts.length} active`
+                    : `${selectedAccount.accountCode || selectedAccount.id.slice(0,8)} � ${selectedAccount.phase === "funded" ? "Funded" : selectedAccount.phase === "flash" ? "Flash" : "Challenge"}`}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -2325,13 +2326,13 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <button key={acc.id}
                       onClick={() => setAnalyticsAccountId(acc.id)}
                       className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${analyticsAccountId === acc.id ? "bg-gradient-to-r from-[#4A00E0] to-[#D63384] border-transparent text-white" : "bg-white/5 border-white/15 text-white/60 hover:text-white"}`}
-                    >{pl} · {acc.size > 0 ? `₹${(acc.size/100000).toFixed(1)}L` : acc.accountCode}</button>
+                    >{pl} � {acc.size > 0 ? `?${(acc.size/100000).toFixed(1)}L` : acc.accountCode}</button>
                   );
                 })}
               </div>
             </div>
 
-            {/* ── Live Analytics + Equity Curve ──────────────────────────── */}
+            {/* -- Live Analytics + Equity Curve ---------------------------- */}
             <div className="grid lg:grid-cols-[1.6fr_1fr] gap-5">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6 shadow-[0_30px_60px_rgba(74,0,224,0.12)]">
                 <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -2340,8 +2341,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="mt-3 text-3xl md:text-4xl font-extrabold text-white">{fmt(totalBalance)}</div>
                     <div className="text-white/50 text-sm mt-1">
                       {analyticsAccountId === "all"
-                        ? `Combined equity · ${liveAccounts.length} active accounts`
-                        : `Equity · ${selectedAccount.accountCode || "this account"}`}
+                        ? `Combined equity � ${liveAccounts.length} active accounts`
+                        : `Equity � ${selectedAccount.accountCode || "this account"}`}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -2391,7 +2392,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   </div>
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
                     <div className="text-white/45 text-[11px] uppercase tracking-[0.25em] mb-3">Market cadence</div>
-                    <div className="text-white font-bold text-sm mb-1">09:15–11:00</div>
+                    <div className="text-white font-bold text-sm mb-1">09:15�11:00</div>
                     <div className="text-white/50 text-[11px]">Peak activity window</div>
                   </div>
                 </div>
@@ -2402,7 +2403,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   <div>
                     <div className="text-white/50 uppercase tracking-[0.35em] text-[11px] font-bold">Equity Curve</div>
                     <div className="text-white text-2xl font-extrabold mt-2">Equity vs NIFTY</div>
-                    {realEquityCurve.length >= 2 && <div className="text-emerald-400 text-[11px] mt-1">● Live data</div>}
+                    {realEquityCurve.length >= 2 && <div className="text-emerald-400 text-[11px] mt-1">? Live data</div>}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {(["1D","1W","1M","ALL"] as const).map(range => (
@@ -2424,7 +2425,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                       </defs>
                       <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} strokeDasharray="4 4"/>
                       <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.45)",fontSize:11}} minTickGap={20}/>
-                      <YAxis axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.45)",fontSize:11}} tickFormatter={(v)=>`₹${(v/1000).toFixed(0)}K`} width={60}/>
+                      <YAxis axisLine={false} tickLine={false} tick={{fill:"rgba(255,255,255,0.45)",fontSize:11}} tickFormatter={(v)=>`?${(v/1000).toFixed(0)}K`} width={60}/>
                       <Tooltip contentStyle={{background:"#0A0018",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,color:"#fff"}} formatter={(value:any,name:any)=>[fmt(value),name==="benchmark"?"NIFTY":name==="mcHigh"||name==="mcLow"?"Monte Carlo":"Equity"]}/>
                       <ReferenceLine y={totalStart} stroke="rgba(255,255,255,0.18)" strokeDasharray="3 5" label={{position:"insideTopLeft",value:"Start",fill:"rgba(255,255,255,0.55)",fontSize:11}}/>
                       <Area type="monotone" dataKey="mcHigh" stroke="transparent" fill="rgba(59,130,246,0.14)"/>
@@ -2442,17 +2443,17 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               </div>
             </div>
 
-            {/* ── Metric cards row 1 ─────────────────────────────────────── */}
+            {/* -- Metric cards row 1 --------------------------------------- */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {[
-                { label:"Profit Factor",   value: profitFactor!=null ? profitFactor.toFixed(2) : "—", icon:TrendingUp,    color:"text-emerald-400" },
+                { label:"Profit Factor",   value: profitFactor!=null ? profitFactor.toFixed(2) : "�", icon:TrendingUp,    color:"text-emerald-400" },
                 { label:"Sharpe Ratio",    value: sharpe.toFixed(2),                                   icon:Scale,         color:"text-sky-400" },
                 { label:"Sortino Ratio",   value: sortino.toFixed(2),                                  icon:Shield,        color:"text-violet-400" },
                 { label:"Max Drawdown",    value: `${drawdownMaxLoss}%`,                                icon:ArrowDownRight,color:"text-red-400" },
-                { label:"Win Rate",        value: displayWinRate != null ? `${displayWinRate}%` : "—",  icon:Trophy,        color:"text-green-400" },
+                { label:"Win Rate",        value: displayWinRate != null ? `${displayWinRate}%` : "�",  icon:Trophy,        color:"text-green-400" },
                 { label:"Recovery Factor", value: recoveryFactor.toFixed(2),                            icon:ArrowUpRight,  color:"text-amber-400" },
-                { label:"Avg Win",         value: avgWin!=null ? fmt(avgWin) : "—",                    icon:ArrowUp,       color:"text-green-400" },
-                { label:"Avg Loss",        value: avgLoss!=null ? fmt(avgLoss) : "—",                  icon:ArrowDown,     color:"text-red-400" },
+                { label:"Avg Win",         value: avgWin!=null ? fmt(avgWin) : "�",                    icon:ArrowUp,       color:"text-green-400" },
+                { label:"Avg Loss",        value: avgLoss!=null ? fmt(avgLoss) : "�",                  icon:ArrowDown,     color:"text-red-400" },
               ].map(m => (
                 <div key={m.label} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                   <div className="flex items-center justify-between gap-3 mb-4">
@@ -2464,13 +2465,13 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               ))}
             </div>
 
-            {/* ── Metric cards row 2 ─────────────────────────────────────── */}
+            {/* -- Metric cards row 2 --------------------------------------- */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {[
-                { label:"Largest Win",     value: winningTrades.length>0 ? fmt(Math.max(...winningTrades.map(t=>t.pnl))) : "—", icon:ArrowUpRight,  color:"text-emerald-400" },
-                { label:"Largest Loss",    value: losingTrades.length>0  ? fmt(Math.abs(Math.min(...losingTrades.map(t=>t.pnl)))) : "—", icon:ArrowDownRight,color:"text-red-400" },
-                { label:"Win/Loss Streak", value: hasTradeData ? `${longestWinStreak}/${longestLossStreak}` : "—", icon:TrendingUp, color:"text-violet-400" },
-                { label:"Edge Ratio",      value: edgeRatio!=null ? edgeRatio.toFixed(2) : "—", icon:Activity,  color:"text-emerald-400" },
+                { label:"Largest Win",     value: winningTrades.length>0 ? fmt(Math.max(...winningTrades.map(t=>t.pnl))) : "�", icon:ArrowUpRight,  color:"text-emerald-400" },
+                { label:"Largest Loss",    value: losingTrades.length>0  ? fmt(Math.abs(Math.min(...losingTrades.map(t=>t.pnl)))) : "�", icon:ArrowDownRight,color:"text-red-400" },
+                { label:"Win/Loss Streak", value: hasTradeData ? `${longestWinStreak}/${longestLossStreak}` : "�", icon:TrendingUp, color:"text-violet-400" },
+                { label:"Edge Ratio",      value: edgeRatio!=null ? edgeRatio.toFixed(2) : "�", icon:Activity,  color:"text-emerald-400" },
                 { label:"Total Lots",      value: String(totalLots),      icon:Users,   color:"text-indigo-400" },
                 { label:"Total Trades",    value: hasTradeData ? String(tradeLogs.length) : String(totalTrades), icon:Shield, color:"text-amber-400" },
               ].map(m => (
@@ -2484,7 +2485,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               ))}
             </div>
 
-            {/* ── Discipline / Calendar / Day-of-week ────────────────────── */}
+            {/* -- Discipline / Calendar / Day-of-week ---------------------- */}
             <div className="grid xl:grid-cols-3 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -2538,7 +2539,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               </div>
             </div>
 
-            {/* ── Symbol breakdown ───────────────────────────────────────── */}
+            {/* -- Symbol breakdown ----------------------------------------- */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -2549,7 +2550,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </div>
                 {!hasTradeData ? (
                   <div className="h-52 flex flex-col items-center justify-center text-center">
-                    <div className="text-white/20 text-3xl mb-2">◎</div>
+                    <div className="text-white/20 text-3xl mb-2">?</div>
                     <div className="text-white/40 text-xs">No trade data yet</div>
                   </div>
                 ) : (
@@ -2585,7 +2586,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               </div>
             </div>
 
-            {/* ── Risk dashboard ─────────────────────────────────────────── */}
+            {/* -- Risk dashboard ------------------------------------------- */}
             <div className="grid xl:grid-cols-2 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -2597,8 +2598,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </div>
                 <div className="grid gap-3">
                   {[
-                    { label:"Value at Risk (95%)", value:`₹${fmt(var95)}` },
-                    { label:"Expected Shortfall",  value:`₹${fmt(es)}` },
+                    { label:"Value at Risk (95%)", value:`?${fmt(var95)}` },
+                    { label:"Expected Shortfall",  value:`?${fmt(es)}` },
                     { label:"Calmar Ratio",         value:calmar.toFixed(2) },
                     { label:"Ulcer Index",          value:ulcer.toFixed(2) },
                   ].map(m=>(
@@ -2633,11 +2634,11 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               </div>
             </div>
 
-            {/* ── AI insight cards ───────────────────────────────────────── */}
+            {/* -- AI insight cards ----------------------------------------- */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {insightCards.length === 0 ? (
                 <div className="col-span-4 rounded-3xl border border-white/10 bg-[#0B021D]/80 p-8 text-center">
-                  <div className="text-white/20 text-3xl mb-2">💡</div>
+                  <div className="text-white/20 text-3xl mb-2">??</div>
                   <div className="text-white/50 text-sm">Trade more to unlock personalised insights.</div>
                 </div>
               ) : insightCards.map((ins,idx)=>(
@@ -2650,7 +2651,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               ))}
             </div>
 
-            {/* ── Funding progress + Rule compliance ─────────────────────── */}
+            {/* -- Funding progress + Rule compliance ----------------------- */}
             <div className="grid xl:grid-cols-2 gap-4">
               <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6">
                 <div className="flex items-center justify-between mb-5">
@@ -2662,7 +2663,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </div>
                 <div className="space-y-4">
                   <FundingRow label="Days remaining" value={`${remainingDays} days`}/>
-                  <FundingRow label="Daily profit needed" value={`₹${fmt(Math.max(0,Math.round((selectedAccount.profitTarget/100*selectedAccount.startBalance-totalPnl)/Math.max(1,remainingDays))))}`}/>
+                  <FundingRow label="Daily profit needed" value={`?${fmt(Math.max(0,Math.round((selectedAccount.profitTarget/100*selectedAccount.startBalance-totalPnl)/Math.max(1,remainingDays))))}`}/>
                   <FundingRow label="Pass probability" value={`${passProbability}%`}/>
                   <FundingRow label="Rule compliance" value={`${Math.min(100,80+winRateNum*0.2).toFixed(0)}%`}/>
                 </div>
@@ -2691,7 +2692,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               </div>
             </div>
 
-            {/* ── Trade History ──────────────────────────────────────────── */}
+            {/* -- Trade History -------------------------------------------- */}
             <div className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-6">
               <div className="flex items-center justify-between mb-5">
                 <div>
@@ -2724,9 +2725,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                         .slice(0,50)
                         .map((t,idx)=>(
                           <tr key={idx} className="bg-white/5">
-                            <td className="px-4 py-3 text-white font-semibold text-sm rounded-l-xl">{t.symbol||"—"}</td>
+                            <td className="px-4 py-3 text-white font-semibold text-sm rounded-l-xl">{t.symbol||"�"}</td>
                             <td className={`px-4 py-3 font-bold text-sm ${t.pnl>=0?"text-green-400":"text-red-400"}`}>
-                              {t.pnl>=0?"+":""}₹{Math.abs(t.pnl).toLocaleString("en-IN")}
+                              {t.pnl>=0?"+":""}?{Math.abs(t.pnl).toLocaleString("en-IN")}
                             </td>
                             <td className="px-4 py-3 text-white/50 text-xs rounded-r-xl">
                               {new Date(t.createdAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}
@@ -2783,9 +2784,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { icon: MessageSquare, title: "Live Chat", desc: "Quick questions, instant answers — open the chat bubble at the bottom-right of any page.", action: "Open chat", href: "javascript:void(0)", onClick: () => { window.dispatchEvent(new CustomEvent("open-chat-widget")); } },
-              { icon: Send, title: "Email", desc: "support@fundedwealth.com — best for KYC, payouts, billing or anything that needs attachments.", action: "Email us", href: "https://mail.google.com/mail/u/0/?view=cm&to=support@fundedwealth.com&su=Support+Request&body=Hi+FundedWealth+Team%2C%0A%0AI+need+help+with%3A", onClick: undefined },
-              { icon: LifeBuoy, title: "WhatsApp", desc: "Trading-hour priority support — text us during NSE hours for fastest response.", action: "Open WhatsApp", href: "https://wa.me/message/ZPLR472VQTXLL1", onClick: undefined },
+              { icon: MessageSquare, title: "Live Chat", desc: "Quick questions, instant answers � open the chat bubble at the bottom-right of any page.", action: "Open chat", href: "javascript:void(0)", onClick: () => { window.dispatchEvent(new CustomEvent("open-chat-widget")); } },
+              { icon: Send, title: "Email", desc: "support@fundedwealth.com � best for KYC, payouts, billing or anything that needs attachments.", action: "Email us", href: "https://mail.google.com/mail/u/0/?view=cm&to=support@fundedwealth.com&su=Support+Request&body=Hi+FundedWealth+Team%2C%0A%0AI+need+help+with%3A", onClick: undefined },
+              { icon: LifeBuoy, title: "WhatsApp", desc: "Trading-hour priority support � text us during NSE hours for fastest response.", action: "Open WhatsApp", href: "https://wa.me/message/ZPLR472VQTXLL1", onClick: undefined },
             ].map(c => (
               <div key={c.title} className="bg-white/5 border border-white/10 rounded-2xl p-5">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4A00E0]/30 to-[#D63384]/20 flex items-center justify-center mb-3">
@@ -2807,7 +2808,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               {[
                 { label: "How do payouts work?", to: "/faq" },
                 { label: "Drawdown & rules explained", to: "/rules" },
-                { label: "Scaling plan (₹1L → ₹50L)", to: "/scaling" },
+                { label: "Scaling plan (?1L ? ?50L)", to: "/scaling" },
                 { label: "KYC step-by-step", to: "/faq" },
                 { label: "Refund policy", to: "/refund" },
                 { label: "Affiliate programme", to: "/#affiliate" },
@@ -2950,7 +2951,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     {affiliateProcessing ? "Requesting..." : "Withdraw Commission"}
                   </Button>
                 </div>
-                <div className="text-white/50 text-xs">Minimum ₹500 withdrawal. Transfer via UPI / Bank transfer once approved.</div>
+                <div className="text-white/50 text-xs">Minimum ?500 withdrawal. Transfer via UPI / Bank transfer once approved.</div>
                 {affiliateMessage && <div className="text-white/60 text-sm mt-3">{affiliateMessage}</div>}
               </div>
             </div>
@@ -3067,7 +3068,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <h3 className="text-white font-extrabold text-2xl mb-2">FW Championship Giveaway</h3>
             <p className="text-white/65 mb-6 max-w-md mx-auto">Win top prizes including iPhone 16, MacBook, and cash rewards. Trade on any funded account during the championship period.</p>
             <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto mb-6">
-              {[["1st Place", "₹10L + MacBook"], ["2nd Place", "₹5L + ₹20K"], ["3rd Place", "₹2L + ₹9K"]].map(([place, prize]) => (
+              {[["1st Place", "?10L + MacBook"], ["2nd Place", "?5L + ?20K"], ["3rd Place", "?2L + ?9K"]].map(([place, prize]) => (
                 <div key={place} className="bg-white/5 border border-white/10 rounded-xl p-3">
                   <div className="text-amber-400 font-bold text-sm">{place}</div>
                   <div className="text-white text-xs font-semibold mt-1">{prize}</div>
@@ -3091,14 +3092,14 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="text-left py-3 px-4 text-white/40 font-semibold">Feature</th>
-                  {["₹25K", "₹50K", "₹2L", "₹5L", "₹10L"].map(p => (
+                  {["?25K", "?50K", "?2L", "?5L", "?10L"].map(p => (
                     <th key={p} className="py-3 px-4 text-center text-white font-bold">{p}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {[
-                  ["Price", "₹999", "₹1,799", "₹3,999", "₹7,999", "₹12,999"],
+                  ["Price", "?999", "?1,799", "?3,999", "?7,999", "?12,999"],
                   ["Profit Target", "10%", "10%", "10%", "10%", "10%"],
                   ["Daily Loss", "5%", "5%", "5%", "5%", "5%"],
                   ["Max Drawdown", "10%", "10%", "10%", "10%", "10%"],
@@ -3188,8 +3189,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <h3 className="text-white font-bold mb-2">Language</h3>
             <div className="flex gap-3">
               {[
-                { code: "en", label: "English", flag: "🇬🇧" },
-                { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
+                { code: "en", label: "English", flag: "????" },
+                { code: "hi", label: "??????", flag: "????" },
               ].map(lang => (
                 <button key={lang.code}
                   onClick={() => i18n.changeLanguage(lang.code)}
@@ -3244,9 +3245,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
         const badgeInfo: Record<string, { label: string; color: string; bg: string }> = {
           none: { label: "No Badge", color: "text-white/40", bg: "bg-white/5" },
-          supporter: { label: "🤝 Supporter", color: "text-blue-400", bg: "bg-blue-500/10" },
-          contributor: { label: "⭐ Contributor", color: "text-purple-400", bg: "bg-purple-500/10" },
-          leader: { label: "🏆 Impact Leader", color: "text-amber-400", bg: "bg-amber-500/10" },
+          supporter: { label: "?? Supporter", color: "text-blue-400", bg: "bg-blue-500/10" },
+          contributor: { label: "? Contributor", color: "text-purple-400", bg: "bg-purple-500/10" },
+          leader: { label: "?? Impact Leader", color: "text-amber-400", bg: "bg-amber-500/10" },
         };
         const myBadge = badgeInfo[imp.badge];
 
@@ -3255,7 +3256,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h2 className="text-white font-extrabold text-xl">Your Impact</h2>
-                <p className="text-white/50 text-sm mt-1">FW Impact Initiative — Trade for Change, Profit with Purpose.</p>
+                <p className="text-white/50 text-sm mt-1">FW Impact Initiative � Trade for Change, Profit with Purpose.</p>
               </div>
               <button onClick={() => setDonatePopup(true)}
                 className="flex items-center gap-2 bg-gradient-to-r from-pink-600 to-red-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 transition-opacity">
@@ -3269,7 +3270,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   {myBadge.label}
                 </div>
                 {imp.badge !== "none" && (
-                  <span className="text-white/40 text-xs">Next: {imp.badge === "supporter" ? "₹100 for Contributor" : imp.badge === "contributor" ? "₹1,000 for Impact Leader" : "You're at the top!"}</span>
+                  <span className="text-white/40 text-xs">Next: {imp.badge === "supporter" ? "?100 for Contributor" : imp.badge === "contributor" ? "?1,000 for Impact Leader" : "You're at the top!"}</span>
                 )}
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -3285,7 +3286,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-5 text-center">
                   <div className="text-4xl mb-2"><DollarSign className="mx-auto text-green-400" size={28} /></div>
-                  <div className="text-white font-extrabold text-2xl">₹{imp.totalDonated.toLocaleString("en-IN")}</div>
+                  <div className="text-white font-extrabold text-2xl">?{imp.totalDonated.toLocaleString("en-IN")}</div>
                   <div className="text-white/50 text-xs mt-1">Total Contribution</div>
                 </div>
               </div>
@@ -3308,7 +3309,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${badgeInfo[t.badge]?.bg} ${badgeInfo[t.badge]?.color}`}>
                         {badgeInfo[t.badge]?.label}
                       </span>
-                      <span className="text-green-400 font-bold text-sm">₹{t.amount.toLocaleString("en-IN")}</span>
+                      <span className="text-green-400 font-bold text-sm">?{t.amount.toLocaleString("en-IN")}</span>
                     </div>
                   </div>
                 ))}
@@ -3320,9 +3321,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               <p className="text-white/50 text-sm mb-4">Let the world know you trade with purpose!</p>
               <div className="flex gap-3 flex-wrap">
                 {[
-                  { label: "WhatsApp", color: "bg-green-600 hover:bg-green-700", icon: "💬" },
-                  { label: "Instagram", color: "bg-pink-600 hover:bg-pink-700", icon: "📸" },
-                  { label: "Telegram", color: "bg-blue-500 hover:bg-blue-600", icon: "✈️" },
+                  { label: "WhatsApp", color: "bg-green-600 hover:bg-green-700", icon: "??" },
+                  { label: "Instagram", color: "bg-pink-600 hover:bg-pink-700", icon: "??" },
+                  { label: "Telegram", color: "bg-blue-500 hover:bg-blue-600", icon: "??" },
                 ].map(s => (
                   <button key={s.label} onClick={() => {
                     const msg = encodeURIComponent(`My trading profits helped support ${imp.mealsSupported} meals and ${imp.studentsSupported} students. Join FundedWealth's Impact Initiative! #FWImpact #TradeForChange`);
@@ -3351,7 +3352,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                           <div className="text-white/40 text-xs">{d.date}</div>
                         </div>
                       </div>
-                      <span className="text-green-400 font-bold text-sm">₹{d.amount}</span>
+                      <span className="text-green-400 font-bold text-sm">?{d.amount}</span>
                     </div>
                   ))}
                 </div>
@@ -3363,15 +3364,15 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               <p className="text-white/50 text-sm mb-4">Every rupee makes a real difference across India.</p>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <div className="text-2xl mb-2">🐶</div>
+                  <div className="text-2xl mb-2">??</div>
                   <div className="text-white font-bold text-sm mb-1">Animal Feeding Program</div>
-                  <div className="text-white/50 text-xs">₹15 = 1 meal for a stray dog. We partner with local shelters and NGOs across 12 cities to provide daily meals.</div>
+                  <div className="text-white/50 text-xs">?15 = 1 meal for a stray dog. We partner with local shelters and NGOs across 12 cities to provide daily meals.</div>
                   <div className="mt-3 text-amber-400 text-xs font-bold">This month: 1,240 meals provided</div>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <div className="text-2xl mb-2">🎓</div>
+                  <div className="text-2xl mb-2">??</div>
                   <div className="text-white font-bold text-sm mb-1">Girls Education Initiative</div>
-                  <div className="text-white/50 text-xs">₹200 = 1 month of school supplies. Supporting underprivileged girls in rural India with books, uniforms, and tuition.</div>
+                  <div className="text-white/50 text-xs">?200 = 1 month of school supplies. Supporting underprivileged girls in rural India with books, uniforms, and tuition.</div>
                   <div className="mt-3 text-amber-400 text-xs font-bold">This month: 85 students supported</div>
                 </div>
               </div>
@@ -3394,7 +3395,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
     try {
       // 1. Create Razorpay order via backend
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const orderRes = await fetch(`${apiBase}/api/razorpay/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3462,7 +3463,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               setDonatePopup(false);
               setCustomAmt("");
               setDonateAmt(50);
-              alert("Thank you for your donation! 🙏");
+              alert("Thank you for your donation! ??");
             } else {
               alert("Payment verification failed. Contact support if amount was deducted.");
             }
@@ -3508,7 +3509,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             </button>
 
             <div className="text-center mb-6">
-              <div className="text-4xl mb-2">❤️</div>
+              <div className="text-4xl mb-2">??</div>
               <h3 className="text-white font-extrabold text-xl">Make Your Profit More Meaningful</h3>
               <p className="text-white/50 text-sm mt-1">Support real causes across India with a small contribution.</p>
             </div>
@@ -3518,12 +3519,12 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               <div className="grid grid-cols-2 gap-3">
                 <button onClick={() => setDonateCause("animal")}
                   className={`p-3 rounded-xl border text-center transition-all ${donateCause === "animal" ? "border-pink-500/50 bg-pink-500/15 text-white" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}>
-                  <div className="text-2xl mb-1">🐶</div>
+                  <div className="text-2xl mb-1">??</div>
                   <div className="text-sm font-bold">Animal Feeding</div>
                 </button>
                 <button onClick={() => setDonateCause("education")}
                   className={`p-3 rounded-xl border text-center transition-all ${donateCause === "education" ? "border-pink-500/50 bg-pink-500/15 text-white" : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"}`}>
-                  <div className="text-2xl mb-1">🎓</div>
+                  <div className="text-2xl mb-1">??</div>
                   <div className="text-sm font-bold">Girls Education</div>
                 </button>
               </div>
@@ -3535,11 +3536,11 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 {[10, 50, 100, 500].map(a => (
                   <button key={a} onClick={() => { setDonateAmt(a); setCustomAmt(""); }}
                     className={`py-2.5 rounded-xl text-sm font-bold transition-all ${!customAmt && donateAmt === a ? "bg-gradient-to-r from-pink-600 to-red-500 text-white" : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"}`}>
-                    ₹{a}
+                    ?{a}
                   </button>
                 ))}
               </div>
-              <input type="number" placeholder="Custom amount (₹)" value={customAmt}
+              <input type="number" placeholder="Custom amount (?)" value={customAmt}
                 onChange={e => { setCustomAmt(e.target.value); }}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-500/50" />
             </div>
@@ -3547,7 +3548,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <div className="flex gap-3">
               <button onClick={handleDonate}
                 className="flex-1 bg-gradient-to-r from-pink-600 to-red-500 text-white font-bold py-3 rounded-xl text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                <Heart size={15} /> Donate ₹{customAmt || donateAmt}
+                <Heart size={15} /> Donate ?{customAmt || donateAmt}
               </button>
               <button onClick={() => setDonatePopup(false)}
                 className="px-5 py-3 rounded-xl border border-white/10 bg-white/5 text-white/50 text-sm font-medium hover:bg-white/10 transition-colors">
@@ -3584,7 +3585,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg px-1.5 py-1">
                 <button onClick={() => switchLang("en")} className={`text-xs px-2 py-1 rounded ${i18n.language === "en" ? "bg-white/15 text-white font-bold" : "text-white/50"}`}>EN</button>
-                <button onClick={() => switchLang("hi")} className={`text-xs px-2 py-1 rounded ${i18n.language === "hi" ? "bg-white/15 text-white font-bold" : "text-white/50"}`}>हि</button>
+                <button onClick={() => switchLang("hi")} className={`text-xs px-2 py-1 rounded ${i18n.language === "hi" ? "bg-white/15 text-white font-bold" : "text-white/50"}`}>??</button>
               </div>
               <div className="relative" ref={notifRef}>
                 <button onClick={() => setNotifOpen(!notifOpen)} className="relative text-white/50 hover:text-white transition-colors p-2 rounded-xl hover:bg-white/5">
@@ -3609,7 +3610,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                       ))}
                     </div>
                     {notificationsLoading && (
-                      <div className="px-4 py-3 text-white/40 text-xs border-b border-white/10">Loading latest notifications…</div>
+                      <div className="px-4 py-3 text-white/40 text-xs border-b border-white/10">Loading latest notifications�</div>
                     )}
                     {notifications.filter(n => notificationFilter === "all" || n.category === notificationFilter).length === 0 ? (
                       <div className="p-6 text-center text-white/40 text-sm">{t("dashboard.noNotifications")}</div>
@@ -3659,7 +3660,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         </div>
       </div>
 
-      {/* ── Mobile Bottom Navigation ── */}
+      {/* -- Mobile Bottom Navigation -- */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0A0018]/95 backdrop-blur-md border-t border-white/10 px-2 py-2 safe-area-pb">
         <div className="flex items-center justify-around">
           {[

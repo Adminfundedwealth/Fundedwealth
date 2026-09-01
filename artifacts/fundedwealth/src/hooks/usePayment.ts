@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PlanType } from "../config/checkout";
+import { getApiBase } from "../lib/api-base";
 
 interface BillingInfo {
   firstName: string;
@@ -14,22 +15,6 @@ interface BillingInfo {
   street?: string;
   postalCode?: string;
   country?: string;
-}
-
-/**
- * Resolve the API base URL:
- * - In production: VITE_API_URL is set to the Render backend (e.g. https://fundedwealth-api.onrender.com)
- * - In development: Use empty string so requests go to /api/* which Vite proxies to localhost:9000
- *
- * The key insight: in dev, VITE_API_URL = "http://localhost:9000" but if that server
- * isn't running, fetch fails. Using "" lets Vite's built-in proxy handle it, OR
- * if the backend is on Render, we hit it directly in production.
- */
-function getApiBase(): string {
-  return (
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "" : "https://api.fundedwealth.com")
-  );
 }
 
 export const usePayment = (

@@ -25,6 +25,7 @@ import { motion } from "framer-motion";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
+import { getApiBase } from "@/lib/api-base";
 
 type SuccessPageData = {
   id?: string;
@@ -69,7 +70,7 @@ export default function PurchaseSuccess() {
       }
 
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+        const apiBase = getApiBase();
         const token = isLoaded ? await getToken().catch(() => null) : null;
 
         // Fetch from orders API using orderId
@@ -214,7 +215,7 @@ export default function PurchaseSuccess() {
     setLaunching(true);
     try {
       const token = await getToken();
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: { 

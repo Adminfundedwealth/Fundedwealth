@@ -30,6 +30,7 @@ import { useCheckout } from "@/hooks/useCheckout";
 import { usePayment } from "@/hooks/usePayment";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, ADDONS, PAYMENT_METHODS, PlanType, RAZORPAY_PAYMENT_ENABLED } from "@/config/checkout";
+import { getApiBase } from "@/lib/api-base";
 
 const RazorpayLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
   const h = size === "sm" ? 16 : size === "lg" ? 36 : 22;
@@ -142,7 +143,7 @@ export default function Checkout() {
     setUtrError("");
     setUtrStatus("verifying");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const token = isLoaded ? await getToken().catch(() => null) : null;
 
       // Use AbortController so we don't hang indefinitely

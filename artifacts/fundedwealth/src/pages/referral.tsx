@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
+import { getApiBase } from "@/lib/api-base";
 
 export default function ReferralLandingPage() {
   const [match, params] = useRoute("/ref/:code");
@@ -24,7 +25,7 @@ export default function ReferralLandingPage() {
     const trackClick = async () => {
       setStatus("saving");
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+        const apiBase = getApiBase();
         const res = await fetch(`${apiBase}/api/affiliate/click`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

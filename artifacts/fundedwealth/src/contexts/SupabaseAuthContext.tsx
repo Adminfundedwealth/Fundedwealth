@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { supabase, siteUrl } from "@/lib/supabase";
 import type { User, Session } from "@supabase/supabase-js";
+import { getApiBase } from "../lib/api-base";
 
 interface AuthContextType {
     user: User | null;
@@ -64,7 +65,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        const apiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://api.fundedwealth.com";
+        const apiUrl = getApiBase();
         fetch(`${apiUrl}/api/auth/account-status`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
         })

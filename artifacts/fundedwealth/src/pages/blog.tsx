@@ -4,6 +4,7 @@ import SEOHead from "@/components/SEOHead";
 import { ArrowLeft, BookOpen, Clock, User, Tag, Search, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getApiBase } from "@/lib/api-base";
 
 const CATEGORIES = ["All", "Market Analysis", "Trading Psychology", "Risk Management", "Technical Analysis", "Prop Trading Tips"];
 
@@ -34,7 +35,7 @@ export default function Blog() {
   const [posts, setPosts] = useState(FALLBACK_POSTS);
 
   useEffect(() => {
-    const apiBase = (import.meta.env.VITE_API_URL as string) || "https://api.fundedwealth.com";
+    const apiBase = getApiBase();
     fetch(`${apiBase}/api/blog`)
       .then(r => r.json())
       .then(data => {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, PlanType, COUPON_CODES } from "../config/checkout";
+import { getApiBase } from "../lib/api-base";
 
 /** Shape returned by GET /api/discount-config */
 interface LiveDiscountEntry {
@@ -22,7 +23,7 @@ export const useCheckout = () => {
   const [liveDiscounts, setLiveDiscounts] = useState<LiveDiscountEntry[]>([]);
 
   useEffect(() => {
-    const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+    const apiBase = getApiBase();
     fetch(`${apiBase}/api/discount-config`)
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data) => { if (Array.isArray(data?.data)) setLiveDiscounts(data.data); })
@@ -104,7 +105,7 @@ export const useCheckout = () => {
     setEmailChecking(true);
     const timer = setTimeout(async () => {
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+        const apiBase = getApiBase();
         const res = await fetch(`${apiBase}/api/auth/check-email?email=${encodeURIComponent(email)}`);
         const data = await res.json().catch(() => ({ exists: false }));
         setEmailExists(!!data.exists);

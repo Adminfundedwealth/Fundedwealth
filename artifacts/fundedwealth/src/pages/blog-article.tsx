@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getApiBase } from "@/lib/api-base";
 
 interface BlogPost {
   id: number;
@@ -84,7 +85,7 @@ export default function BlogArticle() {
     setLoading(true);
     setError(null);
 
-    const apiBase = (import.meta.env.VITE_API_URL as string) || "https://api.fundedwealth.com";
+    const apiBase = getApiBase();
     fetch(`${apiBase}/api/blog/${encodeURIComponent(slug)}`)
       .then(async (res) => {
         if (res.status === 404) throw new Error("Article not found");
