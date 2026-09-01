@@ -33,6 +33,7 @@ import provisioningRouter from "./provisioning";
 import adminWebhookRouter from "./admin-webhook";
 import discountConfigRouter from "./discount-config";
 import refundsRouter from "./refunds";
+import diagRouter from "./diag";
 
 const router: IRouter = Router();
 
@@ -44,6 +45,7 @@ router.use("/impact", impactRouter);
 router.use("/contact", contactRouter);
 router.use("/captcha", captchaRouter);
 router.use("/discount-config", discountConfigRouter);
+router.use("/diag", diagRouter);
 
 // ── Auth routes (mixed public + protected) ──────────────────────────────────
 router.use("/auth", authRouter);
