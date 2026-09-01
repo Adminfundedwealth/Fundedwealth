@@ -2570,7 +2570,7 @@ const Plans = () => {
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
           <div className="flex justify-center mb-10">
             <TabsList
-              className="relative h-auto rounded-2xl sm:rounded-full flex-wrap gap-1 p-1.5"
+              className="relative h-auto rounded-2xl flex-nowrap gap-2 p-2 w-full max-w-2xl"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                 backdropFilter: "blur(24px) saturate(1.6)",
@@ -2580,16 +2580,16 @@ const Plans = () => {
               }}
             >
               {/* Top gloss on container */}
-              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl sm:rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
+              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
 
               {/* Flash ⚡ — yellow/orange active */}
               <TabsTrigger
                 value="flash"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
+                style={{ background: "transparent", minWidth: 0 }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(234,179,8,0.28) 0%, rgba(249,115,22,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2598,18 +2598,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(234,179,8,0.3), 0 0 40px rgba(249,115,22,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(234,179,8,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">Flash ⚡</span>
               </TabsTrigger>
 
               {/* Instant — pink/violet active */}
               <TabsTrigger
                 value="instant"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
+                style={{ background: "transparent", minWidth: 0 }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(217,58,160,0.28) 0%, rgba(171,24,194,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2618,18 +2618,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(217,58,160,0.3), 0 0 40px rgba(171,24,194,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(217,58,160,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">Instant</span>
               </TabsTrigger>
 
               {/* 1-Step — cyan/violet active */}
               <TabsTrigger
                 value="1step"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
+                style={{ background: "transparent", minWidth: 0 }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(77,212,255,0.24) 0%, rgba(168,85,247,0.20) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2638,18 +2638,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(77,212,255,0.25), 0 0 40px rgba(168,85,247,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(77,212,255,0.10)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">1-Step</span>
               </TabsTrigger>
 
               {/* 2-Step — violet/pink active */}
               <TabsTrigger
                 value="2step"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
+                style={{ background: "transparent", minWidth: 0 }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(168,85,247,0.28) 0%, rgba(217,58,160,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2658,7 +2658,7 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(168,85,247,0.3), 0 0 40px rgba(217,58,160,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(168,85,247,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">2-Step</span>
               </TabsTrigger>
             </TabsList>

@@ -2143,7 +2143,7 @@ export default function Rules() {
               />
             </div>
             {/* Plan filter buttons */}
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-nowrap gap-2 justify-center w-full max-w-2xl mx-auto">
               {PLAN_TABS.map((tab) => {
                 const isActive = activePlan === tab.key;
                 return (
@@ -2151,7 +2151,7 @@ export default function Rules() {
                     key={tab.key}
                     onClick={() => setActivePlan(isActive ? null : tab.key)}
                     className={`
-                      flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold border transition-all duration-200
+                      flex-1 flex items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-sm font-bold border transition-all duration-200 whitespace-nowrap min-w-0
                       ${isActive
                         ? "bg-white text-[#1A0030] border-white shadow-md"
                         : "bg-white/[0.05] border-white/15 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/30"

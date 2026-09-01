@@ -285,9 +285,9 @@ export default function Checkout() {
               <div className="lg:col-span-2 space-y-6">
                 <div className="bg-[#1A0030] border border-white/10 rounded-2xl p-6">
                   <h3 className="text-white font-bold text-lg mb-4">Choose your account type</h3>
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-nowrap gap-2 mb-6">
                     {(Object.keys(PLANS) as PlanType[]).map((key) => (
-                      <button key={key} onClick={() => setSelectedPlan(key)} className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${selectedPlan === key ? "bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-lg" : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"}`}>
+                      <button key={key} onClick={() => setSelectedPlan(key)} className={`flex-1 min-w-0 py-3 px-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap text-center ${selectedPlan === key ? "bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-lg border border-purple-500/50" : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white"}`}>
                         {PLANS[key].label}
                         {key === "instant" && <span className="ml-2 text-[10px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">New</span>}
                       </button>
