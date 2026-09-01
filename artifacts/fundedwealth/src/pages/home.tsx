@@ -855,7 +855,7 @@ const HeroChampionshipPopup = () => {
 const Hero = () => {
   const [, navigate] = useLocation();
   return (
-    <section id="home" className="relative bg-[#03000A] overflow-hidden min-h-[94vh] flex items-start justify-center pt-16 lg:pt-20">
+    <section id="home" className="relative bg-[#03000A] overflow-hidden hero-viewport-fit flex items-center justify-center">
       <IndiaTraderNetworkHero />
 
       {/* Extra shooting stars & sparkle particles */}
@@ -922,18 +922,18 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 w-full">
+      <div className="relative z-20 w-full hero-content-pad">
         <div className="max-w-[1100px] mx-auto px-5 md:px-8">
           <div className="flex flex-col items-center text-center">
 
             {/* Top badge */}
-            <div className="mb-3 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
+            <div className="mb-2 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
               <span className="text-lg">🇮🇳</span>
               <span><BulgeText text="INDIA'S SIMULATED TRADING " /><BulgeText text="& EVALUATION PLATFORM" className="text-fw-orange" /></span>
             </div>
 
             {/* Subtitle line */}
-            <div className="mb-5 flex items-center gap-3">
+            <div className="mb-3 flex items-center gap-3">
               <div className="h-px w-8 bg-white/20" />
               <span className="text-white/50 text-xs md:text-sm italic tracking-widest font-medium">
                 <BulgeText text="Structured Simulated Trading for Indian Markets" radius={100} strength={0.4} />
@@ -941,20 +941,14 @@ const Hero = () => {
               <div className="h-px w-8 bg-white/20" />
             </div>
 
-
             {/* Main headline */}
-            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white text-3xl sm:text-4xl md:text-5xl lg:text-[56px] uppercase hero-color-cycle">
+            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white hero-headline uppercase hero-color-cycle">
               <BulgeText text="TRADE SMARTER." radius={150} strength={0.6} /><br />
               <BulgeText text="PROVE YOUR SKILLS." radius={150} strength={0.6} />
             </h1>
 
-            {/* Gradient sub-headline */}
-            <h2 className="mt-2 font-black tracking-[-0.04em] leading-[0.9] text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase bg-gradient-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent">
-              <BulgeText text="TURN DISCIPLINE INTO MEASURABLE PERFORMANCE." radius={140} strength={0.55} />
-            </h2>
-
-            {/* Description block */}
-            <div className="mt-6 max-w-[700px] space-y-4 text-white/85 text-lg md:text-xl leading-relaxed">
+            {/* Description block — condensed to keep everything above the fold */}
+            <div className="mt-4 max-w-[680px] space-y-2 text-white/85 hero-body-text leading-snug">
               <p>
                 Build your trading discipline in a structured simulated environment designed around risk management, consistent execution, and measurable performance.
               </p>
@@ -965,27 +959,26 @@ const Hero = () => {
                 </span>
               </p>
               <p>
-                Equities :<br />
-                <span className="text-white font-bold tracking-wide">
-                  <BulgeText text="NIFTY 500 • Stock Futures." radius={120} strength={0.45} />
+                Equities: <span className="text-white font-bold tracking-wide">
+                  <BulgeText text="NIFTY 500 • Stock Futures" radius={120} strength={0.45} />
                 </span>
               </p>
-              <p className="pt-4 text-white font-bold text-base md:text-lg">
-                Access simulated account sizes of up to <span className="text-fw-orange font-extrabold">₹50 Lakhs</span> and trade under clearly defined risk parameters.<br />
-                Demonstrate consistent performance and become eligible for <span className="text-blue-400 font-extrabold not-italic">performance-based rewards</span> under the applicable program terms.
+              <p className="text-white font-bold text-sm md:text-base">
+                Account sizes up to <span className="text-fw-orange font-extrabold">₹50 Lakhs</span> — trade under clearly defined risk parameters and become eligible for{" "}
+                <span className="text-blue-400 font-extrabold">performance-based rewards</span>.
               </p>
-              <p className="text-white/50 text-sm font-normal">
-                All trading activity on FundedWealth is simulated for evaluation purposes. Account balances shown on the platform are simulated balances and do not represent customer-owned funds.
+              <p className="text-white/45 text-xs font-normal">
+                All trading activity on FundedWealth is simulated for evaluation purposes. Balances shown are simulated and do not represent customer-owned funds.
               </p>
             </div>
 
-            {/* CTA Buttons — Liquid Glass */}
-            <div className="mt-10 flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
+            {/* CTA Buttons — all four in one responsive row */}
+            <div className="mt-5 flex items-center justify-center gap-3 flex-nowrap hero-cta-row" style={{ width: "100%", maxWidth: "900px" }}>
 
-              {/* 1. GET FUNDED NOW — Liquid Sunset Glass */}
+              {/* 1. EXPLORE PLANS — Liquid Sunset Glass */}
               <button
                 onClick={() => navigate("/checkout")}
-                className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(255,106,61,0.18) 0%, rgba(255,0,128,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -994,16 +987,13 @@ const Hero = () => {
                   boxShadow: "0 0 24px rgba(255,106,61,0.25), 0 0 60px rgba(255,0,128,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,106,61,0.15)",
                 }}
               >
-                {/* Top gloss reflection */}
-                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                {/* Hover glow fill */}
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,106,61,0.22) 0%, rgba(255,0,128,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(255,106,61,0.1)" }} />
-                {/* Ambient glow behind button */}
-                <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,106,61,0.4) 0%, rgba(255,0,128,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                  <Zap className="w-5 h-5 text-orange-300" />
+                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,106,61,0.22) 0%, rgba(255,0,128,0.18) 100%)" }} />
+                <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,106,61,0.4) 0%, rgba(255,0,128,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <Zap className="w-4 h-4 text-orange-300" />
                   <BulgeText text="EXPLORE PLANS" radius={100} strength={0.5} />
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </button>
 
@@ -1012,7 +1002,7 @@ const Hero = () => {
                 href="https://youtu.be/w3yyFx_hDcE"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(140,80,255,0.18) 0%, rgba(90,0,255,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -1021,22 +1011,19 @@ const Hero = () => {
                   boxShadow: "0 0 24px rgba(140,80,255,0.25), 0 0 60px rgba(90,0,255,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(140,80,255,0.15)",
                 }}
               >
-                {/* Top gloss reflection */}
-                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                {/* Hover glow fill */}
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(140,80,255,0.22) 0%, rgba(90,0,255,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(140,80,255,0.1)" }} />
-                {/* Ambient glow behind button */}
-                <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(140,80,255,0.4) 0%, rgba(90,0,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                  <svg className="w-5 h-5 text-violet-300" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(140,80,255,0.22) 0%, rgba(90,0,255,0.18) 100%)" }} />
+                <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(140,80,255,0.4) 0%, rgba(90,0,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                   <BulgeText text="WATCH DEMO" radius={100} strength={0.5} />
                 </span>
               </a>
 
-              {/* 3. TRADING RULES — Liquid Neon Blue Glass */}
+              {/* 3. HOW IT WORKS — Liquid Neon Blue Glass */}
               <Link href="/rules">
                 <button
-                  className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(0,180,255,0.18) 0%, rgba(90,80,255,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -1045,16 +1032,13 @@ const Hero = () => {
                     boxShadow: "0 0 24px rgba(0,180,255,0.25), 0 0 60px rgba(90,80,255,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,180,255,0.15)",
                   }}
                 >
-                  {/* Top gloss reflection */}
-                  <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                  {/* Hover glow fill */}
-                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,180,255,0.22) 0%, rgba(90,80,255,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(0,180,255,0.1)" }} />
-                  {/* Ambient glow behind button */}
-                  <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.4) 0%, rgba(90,80,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                  <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                    <FileText className="w-5 h-5 text-cyan-300" />
+                  <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,180,255,0.22) 0%, rgba(90,80,255,0.18) 100%)" }} />
+                  <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.4) 0%, rgba(90,80,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                  <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                    <FileText className="w-4 h-4 text-cyan-300" />
                     <BulgeText text="HOW IT WORKS" radius={100} strength={0.5} />
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </button>
               </Link>
@@ -1062,7 +1046,7 @@ const Hero = () => {
               {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
               <button
                 onClick={() => navigate("/sign-up?trial=true")}
-                className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(5,150,105,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -1071,13 +1055,13 @@ const Hero = () => {
                   boxShadow: "0 0 24px rgba(16,185,129,0.25), 0 0 60px rgba(5,150,105,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(16,185,129,0.15)",
                 }}
               >
-                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(16,185,129,0.1)" }} />
-                <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.4) 0%, rgba(5,150,105,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                  <Users className="w-5 h-5 text-emerald-300" />
+                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)" }} />
+                <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.4) 0%, rgba(5,150,105,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <Users className="w-4 h-4 text-emerald-300" />
                   <BulgeText text="FREE TRIAL ACCOUNT" radius={100} strength={0.5} />
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </button>
 
@@ -1089,6 +1073,111 @@ const Hero = () => {
 
       {/* Color cycle animation + shooting stars */}
       <style>{`
+        /* ── Hero viewport-fit ──────────────────────────────────────────────
+           The section always fills at least the full viewport height but
+           never forces content below the fold. content-pad adds vertical
+           breathing room while keeping everything inside the first screen.
+        ─────────────────────────────────────────────────────────────────── */
+        .hero-viewport-fit {
+          min-height: 100svh;          /* small viewport height — respects mobile browser chrome */
+          min-height: 100dvh;          /* dynamic viewport height — best on mobile */
+        }
+        /* Top + bottom padding so content breathes without overflowing */
+        .hero-content-pad {
+          padding-top: clamp(56px, 8vh, 96px);
+          padding-bottom: clamp(40px, 6vh, 80px);
+        }
+        /* Headline: fluid scale from 36px (short/small) to 60px (tall/wide) */
+        .hero-headline {
+          font-size: clamp(2.1rem, 5.5vw, 3.75rem);
+        }
+        /* Body text: fluid, comfortable on all sizes */
+        .hero-body-text {
+          font-size: clamp(0.875rem, 1.4vw, 1.0625rem);
+        }
+        /* CTA buttons: equal-width rectangular cards, fixed dimensions */
+        .hero-cta-btn {
+          flex: 1 1 0;
+          min-width: 0;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px 12px;
+          height: 64px;
+          white-space: nowrap;
+          text-align: center;
+        }
+        /* Row: no wrap on desktop — always 4 in a line */
+        .hero-cta-row {
+          flex-wrap: nowrap;
+          width: 100%;
+          max-width: 900px;
+        }
+        /* On very short viewports (≤720px height), compress vertically */
+        @media (max-height: 720px) {
+          .hero-content-pad {
+            padding-top: 44px;
+            padding-bottom: 28px;
+          }
+          .hero-headline {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+          }
+          .hero-body-text {
+            font-size: 0.8125rem;
+          }
+          .hero-cta-btn {
+            padding: 10px 10px;
+            height: 54px;
+          }
+          .hero-cta-row {
+            gap: 8px;
+          }
+        }
+        /* Tablet (769px–1024px) — still 4 in a row, slightly smaller text/padding */
+        @media (max-width: 1024px) and (min-width: 769px) {
+          .hero-cta-btn {
+            padding: 14px 10px;
+            height: 60px;
+            font-size: 0.7rem;
+          }
+          .hero-cta-row {
+            gap: 10px;
+            max-width: 720px;
+          }
+        }
+        /* Tablet portrait — 2×2 grid */
+        @media (max-width: 768px) {
+          .hero-headline {
+            font-size: clamp(2rem, 7vw, 3rem);
+          }
+          .hero-cta-row {
+            flex-wrap: wrap;
+            max-width: 480px;
+            gap: 10px;
+          }
+          .hero-cta-btn {
+            flex: 1 1 calc(50% - 5px);
+            min-width: calc(50% - 5px);
+            height: 58px;
+          }
+        }
+        /* Mobile — full width stack */
+        @media (max-width: 480px) {
+          .hero-headline {
+            font-size: clamp(1.75rem, 8vw, 2.5rem);
+          }
+          .hero-cta-btn {
+            flex: 1 1 100%;
+            min-width: 100%;
+            height: 52px;
+          }
+          .hero-cta-row {
+            flex-direction: column;
+            align-items: stretch;
+            max-width: 320px;
+          }
+        }
         .hero-color-cycle {
           animation: _colorCycle 8s ease-in-out infinite;
         }
