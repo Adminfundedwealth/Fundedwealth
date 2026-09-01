@@ -2,12 +2,15 @@
  * Centralised API base URL resolver.
  *
  * Priority:
- *  1. VITE_API_URL  (set in Vercel / local .env)
+ *  1. VITE_API_URL  (set in GitHub Actions secret / local .env — MUST point to the
+ *                    real EC2 backend hostname/IP, e.g. http://13.x.x.x:8080)
  *  2. VITE_API_BASE_URL  (legacy alias)
- *  3. Railway production URL  (hard-coded fallback so relative "" never happens)
+ *  3. Hard-coded fallback — update this if the EC2 Elastic IP/hostname changes
+ *     and VITE_API_URL cannot be set in time.
  *
- * NOTE: Never return "" — that causes fetch("/api/...") which goes to Vercel
- * instead of Railway, triggering 405 on POST endpoints.
+ * NOTE: If api.fundedwealth.com DNS is not configured, set VITE_API_URL in
+ * GitHub Actions secrets to the EC2 public hostname or Elastic IP directly.
+ * All frontend API calls route through this resolver.
  */
 export const RAILWAY_API_BASE = "https://api.fundedwealth.com";
 

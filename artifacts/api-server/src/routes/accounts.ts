@@ -108,13 +108,46 @@ router.get("/my", async (req: Request, res: Response) => {
     }
 
     // 2. Resolve the user's terminal trader identity.
-    //    terminal_traders.external_id = users.id is the AUTHORITATIVE ownership link
-    //    for every provisioned account. It is populated identically by website
-    //    checkout AND Founder/manual emergency provisioning, so anchoring discovery
-    //    here makes both paths produce the EXACT SAME dashboard result.
-    const traderRes = await db.execute(sql`
+    //    PRIMARY: terminal_traders.external_id = users.id (the public.users UUID)
+    //    FALLBACK: if no row found by users.id, search by email and re-link.
+    //    This handles accounts provisioned before the user's first login, where the
+    //    placeholder clerkId was used and the users.id may differ from what was
+    //    stored in terminal_traders.external_id at provisioning time.
+    let traderRes = await db.execute(sql`
       SELECT id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
     `);
+
+    if ((!traderRes.rows || traderRes.rows.length === 0) && user.email) {
+      // Fallback: find terminal_traders by email, then re-link external_id → users.id
+      const traderByEmail = await db.execute(sql`
+        SELECT id, external_id FROM terminal_traders WHERE email = ${user.email} LIMIT 1
+      `);
+      if (traderByEmail.rows && traderByEmail.rows.length > 0) {
+        const row = traderByEmail.rows[0] as any;
+        console.info("[Accounts/my] terminal_traders found by email — re-linking external_id", {
+          traderId: row.id,
+          oldExternalId: row.external_id,
+          newExternalId: user.id,
+          email: user.email,
+        });
+        // Re-link: update external_id to the current canonical users.id
+        if (String(row.external_id) !== String(user.id)) {
+          await db.execute(sql`
+            UPDATE terminal_traders
+            SET external_id = ${String(user.id)}, updated_at = now()
+            WHERE id = ${row.id}::uuid
+          `).catch((relinkErr: any) => {
+            // Non-fatal: concurrent update or constraint violation — still use the row
+            console.warn("[Accounts/my] terminal_traders re-link failed (non-fatal):", relinkErr?.message);
+          });
+        }
+        // Re-read to confirm
+        traderRes = await db.execute(sql`
+          SELECT id FROM terminal_traders WHERE id = ${row.id}::uuid LIMIT 1
+        `);
+      }
+    }
+
     const traderId = (traderRes.rows as any[])[0]?.id ?? null;
 
     // 3. Pull every LIVE account for this trader straight from the terminal-owned
@@ -484,21 +517,37 @@ router.get("/:accountId", async (req: Request, res: Response) => {
 
     const { accountId } = req.params;
 
-    // 1. Find user
-    const [user] = await db
+    // 1. Find user — clerkId primary, email fallback (same as /my)
+    let [user] = await db
       .select()
       .from(users)
       .where(eq(users.clerkId, auth.userId))
       .limit(1);
+
+    if (!user && auth.email) {
+      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
+      if (byEmail) {
+        try {
+          const updated = await db
+            .update(users)
+            .set({ clerkId: auth.userId, updatedAt: new Date() })
+            .where(eq(users.id, byEmail.id))
+            .returning();
+          user = updated[0] ?? byEmail;
+        } catch {
+          user = byEmail;
+        }
+      }
+    }
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // 2. Resolve the account via the TRADER CHAIN and verify ownership.
-    //    trading_accounts.trader_id → terminal_traders.external_id = users.id.
-    //    Works for website AND manual/emergency provisions (no order dependency).
-    const ownRes = await db.execute(sql`
+    //    PRIMARY:  terminal_traders.external_id = users.id
+    //    FALLBACK: terminal_traders.email = user.email (handles external_id mismatch)
+    let ownRes = await db.execute(sql`
       SELECT
         ta.id  AS trading_account_id,
         ca.id  AS challenge_account_id,
@@ -510,6 +559,32 @@ router.get("/:accountId", async (req: Request, res: Response) => {
         AND tt.external_id = ${String(user.id)}
       LIMIT 1
     `);
+
+    // Email fallback — re-link and retry if external_id lookup missed
+    if ((!ownRes.rows || ownRes.rows.length === 0) && user.email) {
+      ownRes = await db.execute(sql`
+        SELECT
+          ta.id  AS trading_account_id,
+          ca.id  AS challenge_account_id,
+          tt.id  AS trader_id
+        FROM trading_accounts ta
+        JOIN terminal_traders tt ON tt.id = ta.trader_id
+        LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+        WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
+          AND tt.email = ${user.email}
+        LIMIT 1
+      `);
+      // Re-link the found trader to the canonical users.id so future lookups work
+      if (ownRes.rows && ownRes.rows.length > 0) {
+        const foundTraderId = (ownRes.rows[0] as any).trader_id;
+        db.execute(sql`
+          UPDATE terminal_traders
+          SET external_id = ${String(user.id)}, updated_at = now()
+          WHERE id = ${foundTraderId}::uuid
+            AND external_id != ${String(user.id)}
+        `).catch(() => {});
+      }
+    }
 
     if (!ownRes.rows || ownRes.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Account not found" });

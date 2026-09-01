@@ -258,6 +258,9 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     console.info("[Terminal Launch] user resolved", { userId: user.id, email: user.email });
 
     // ── 4. VERIFY OWNERSHIP VIA TRADER CHAIN ────────────────────────────────
+    // PRIMARY:  terminal_traders.external_id = users.id
+    // FALLBACK: terminal_traders.email = user.email (handles external_id mismatch
+    //           for accounts provisioned before first login, placeholder clerkId path)
     let ownershipResult;
     try {
       ownershipResult = await db.execute(sql`
@@ -277,6 +280,39 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           AND tt.external_id = ${String(user.id)}
         LIMIT 1
       `);
+
+      // Email fallback — if external_id lookup missed, find by email and re-link
+      if ((!ownershipResult.rows || ownershipResult.rows.length === 0) && user.email) {
+        ownershipResult = await db.execute(sql`
+          SELECT
+            tt.id  AS trader_id,
+            ca.id  AS challenge_account_id,
+            ta.id  AS trading_account_id,
+            ca.status AS challenge_status,
+            ca.plan AS plan,
+            ca.initial_balance AS initial_balance,
+            ta.account_code AS account_code,
+            ta.status AS trading_status
+          FROM trading_accounts ta
+          JOIN terminal_traders tt ON tt.id = ta.trader_id
+          LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+          WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
+            AND tt.email = ${user.email}
+          LIMIT 1
+        `);
+        if (ownershipResult.rows && ownershipResult.rows.length > 0) {
+          const foundTraderId = (ownershipResult.rows[0] as any).trader_id;
+          console.info("[Terminal Launch] ownership found via email fallback — re-linking external_id", {
+            traderId: foundTraderId, userId: user.id, email: user.email,
+          });
+          db.execute(sql`
+            UPDATE terminal_traders
+            SET external_id = ${String(user.id)}, updated_at = now()
+            WHERE id = ${foundTraderId}::uuid
+              AND external_id != ${String(user.id)}
+          `).catch(() => {});
+        }
+      }
     } catch (dbErr: any) {
       console.error("[Terminal Launch] DB query failed:", dbErr.message);
       return res.status(500).json({ success: false, message: "Failed to verify account ownership." });

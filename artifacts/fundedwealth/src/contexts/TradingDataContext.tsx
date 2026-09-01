@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { useAuth } from "./SupabaseAuthContext";
+import { getApiBase } from "@/lib/api-base";
 
 /**
  * TradingDataContext — provides the user's purchased trading accounts to the dashboard.
@@ -229,7 +230,7 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
 
     try {
       const token = await getTokenRef.current();
-      const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+      const apiBase = getApiBase();
       const res = await fetch(`${apiBase}/api/accounts/my`, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -272,7 +273,7 @@ export function TradingDataProvider({ children }: { children: ReactNode }) {
     const fetchMeta = async () => {
       try {
         const token = await getToken();
-        const apiBase = import.meta.env.VITE_API_URL || "https://api.fundedwealth.com";
+        const apiBase = getApiBase();
         const res = await fetch(`${apiBase}/api/users/me`, {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           credentials: "include",

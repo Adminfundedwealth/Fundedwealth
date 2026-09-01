@@ -30,6 +30,19 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Verify API URL is configured
+        run: |
+          if [ -z "$VITE_API_URL" ]; then
+            echo "⚠️  WARNING: VITE_API_URL secret is not set. Frontend will fall back to"
+            echo "   https://api.fundedwealth.com — if that DNS record does not exist,"
+            echo "   ALL dashboard API calls will fail and users will see 'No Active Accounts'."
+            echo "   FIX: Set VITE_API_URL in GitHub Actions secrets to the real EC2 hostname or IP."
+          else
+            echo "✅ VITE_API_URL is set (length=${#VITE_API_URL})"
+          fi
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
       - name: Build Frontend
         run: pnpm --filter @workspace/fundedwealth build
         env:
@@ -59,6 +72,17 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Verify API URL is configured
+        run: |
+          if [ -z "$VITE_API_URL" ]; then
+            echo "⚠️  WARNING: VITE_API_URL not set — frontend will use https://api.fundedwealth.com fallback"
+            echo "   If DNS is not configured, users will see 'No Active Accounts' on dashboard."
+          else
+            echo "✅ VITE_API_URL configured (length=${#VITE_API_URL})"
+          fi
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Build Frontend
         run: pnpm --filter @workspace/fundedwealth build
