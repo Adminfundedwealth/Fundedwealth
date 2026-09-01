@@ -108,47 +108,98 @@ router.get("/my", async (req: Request, res: Response) => {
     }
 
     // 2. Resolve the user's terminal trader identity.
-    //    PRIMARY: terminal_traders.external_id = users.id (the public.users UUID)
-    //    FALLBACK: if no row found by users.id, search by email and re-link.
-    //    This handles accounts provisioned before the user's first login, where the
-    //    placeholder clerkId was used and the users.id may differ from what was
-    //    stored in terminal_traders.external_id at provisioning time.
+    //
+    // COMPATIBILITY RESOLVER — handles all historical ownership patterns:
+    //
+    //   Path A (canonical): terminal_traders.external_id = users.id
+    //                        (public.users UUID — set by provisioning-service since 2026-06)
+    //
+    //   Path B (auth-id mismatch): terminal_traders.external_id = auth.users.id
+    //                        (Supabase JWT sub, not the public.users UUID — used in
+    //                         early provisions where the auth UUID was passed directly)
+    //
+    //   Path C (email fallback): terminal_traders.email = users.email
+    //                        (catches any external_id mismatch; re-links on every hit
+    //                         so future requests use Path A)
+    //
+    // Resolution is SAFE — it only READS or RE-LINKS (idempotent UPDATE), never
+    // creates accounts or exposes another user's data.
+
+    // Path A — canonical: external_id = public.users.id
     let traderRes = await db.execute(sql`
-      SELECT id FROM terminal_traders WHERE external_id = ${String(user.id)} LIMIT 1
+      SELECT id, external_id FROM terminal_traders
+      WHERE external_id = ${String(user.id)}
+      LIMIT 1
     `);
 
+    // Path B — auth-id stored directly as external_id (early provisioning pattern)
+    if ((!traderRes.rows || traderRes.rows.length === 0) && auth.userId && auth.userId !== String(user.id)) {
+      const traderByAuthId = await db.execute(sql`
+        SELECT id, external_id FROM terminal_traders
+        WHERE external_id = ${auth.userId}
+        LIMIT 1
+      `);
+      if (traderByAuthId.rows && traderByAuthId.rows.length > 0) {
+        const row = traderByAuthId.rows[0] as any;
+        console.info("[Accounts/my] terminal_traders found by auth.userId — re-linking external_id to users.id", {
+          traderId: row.id,
+          oldExternalId: row.external_id,
+          newExternalId: user.id,
+        });
+        await db.execute(sql`
+          UPDATE terminal_traders
+          SET external_id = ${String(user.id)}, updated_at = now()
+          WHERE id = ${row.id}::uuid
+        `).catch((relinkErr: any) => {
+          console.warn("[Accounts/my] Path B re-link failed (non-fatal):", relinkErr?.message);
+        });
+        // Re-read after re-link
+        traderRes = await db.execute(sql`
+          SELECT id, external_id FROM terminal_traders WHERE id = ${row.id}::uuid LIMIT 1
+        `);
+      }
+    }
+
+    // Path C — email fallback: catches any remaining external_id mismatch
     if ((!traderRes.rows || traderRes.rows.length === 0) && user.email) {
-      // Fallback: find terminal_traders by email, then re-link external_id → users.id
       const traderByEmail = await db.execute(sql`
-        SELECT id, external_id FROM terminal_traders WHERE email = ${user.email} LIMIT 1
+        SELECT id, external_id FROM terminal_traders
+        WHERE lower(email) = lower(${user.email})
+        LIMIT 1
       `);
       if (traderByEmail.rows && traderByEmail.rows.length > 0) {
         const row = traderByEmail.rows[0] as any;
-        console.info("[Accounts/my] terminal_traders found by email — re-linking external_id", {
+        console.info("[Accounts/my] terminal_traders found by email (Path C) — re-linking external_id", {
           traderId: row.id,
           oldExternalId: row.external_id,
           newExternalId: user.id,
           email: user.email,
         });
-        // Re-link: update external_id to the current canonical users.id
         if (String(row.external_id) !== String(user.id)) {
           await db.execute(sql`
             UPDATE terminal_traders
             SET external_id = ${String(user.id)}, updated_at = now()
             WHERE id = ${row.id}::uuid
           `).catch((relinkErr: any) => {
-            // Non-fatal: concurrent update or constraint violation — still use the row
-            console.warn("[Accounts/my] terminal_traders re-link failed (non-fatal):", relinkErr?.message);
+            console.warn("[Accounts/my] Path C re-link failed (non-fatal):", relinkErr?.message);
           });
         }
         // Re-read to confirm
         traderRes = await db.execute(sql`
-          SELECT id FROM terminal_traders WHERE id = ${row.id}::uuid LIMIT 1
+          SELECT id, external_id FROM terminal_traders WHERE id = ${row.id}::uuid LIMIT 1
         `);
       }
     }
 
     const traderId = (traderRes.rows as any[])[0]?.id ?? null;
+
+    console.info("[Accounts/my] trader resolution", {
+      userId: user.id,
+      authUserId: auth.userId,
+      email: user.email,
+      traderId,
+      resolvedExternalId: (traderRes.rows as any[])[0]?.external_id ?? null,
+    });
 
     // 3. Pull every LIVE account for this trader straight from the terminal-owned
     //    tables, joined challenge ⇄ trading. Discovery is anchored on trader_id
@@ -545,9 +596,11 @@ router.get("/:accountId", async (req: Request, res: Response) => {
     }
 
     // 2. Resolve the account via the TRADER CHAIN and verify ownership.
-    //    PRIMARY:  terminal_traders.external_id = users.id
-    //    FALLBACK: terminal_traders.email = user.email (handles external_id mismatch)
-    let ownRes = await db.execute(sql`
+    //    Mirrors the 3-path compatibility resolver in GET /my:
+    //    Path A: tt.external_id = users.id (canonical)
+    //    Path B: tt.external_id = auth.userId (early provision stored auth UUID directly)
+    //    Path C: tt.email = user.email (any remaining mismatch — case-insensitive)
+    const buildAccountQuery = (ownershipClause: ReturnType<typeof sql>) => sql`
       SELECT
         ta.id  AS trading_account_id,
         ca.id  AS challenge_account_id,
@@ -556,34 +609,32 @@ router.get("/:accountId", async (req: Request, res: Response) => {
       JOIN terminal_traders tt ON tt.id = ta.trader_id
       LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
       WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-        AND tt.external_id = ${String(user.id)}
+        AND ${ownershipClause}
       LIMIT 1
-    `);
+    `;
 
-    // Email fallback — re-link and retry if external_id lookup missed
+    // Path A — canonical
+    let ownRes = await db.execute(buildAccountQuery(sql`tt.external_id = ${String(user.id)}`));
+
+    // Path B — auth UUID stored as external_id
+    if ((!ownRes.rows || ownRes.rows.length === 0) && auth.userId && auth.userId !== String(user.id)) {
+      ownRes = await db.execute(buildAccountQuery(sql`tt.external_id = ${auth.userId}`));
+    }
+
+    // Path C — email fallback (case-insensitive)
     if ((!ownRes.rows || ownRes.rows.length === 0) && user.email) {
-      ownRes = await db.execute(sql`
-        SELECT
-          ta.id  AS trading_account_id,
-          ca.id  AS challenge_account_id,
-          tt.id  AS trader_id
-        FROM trading_accounts ta
-        JOIN terminal_traders tt ON tt.id = ta.trader_id
-        LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-        WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-          AND tt.email = ${user.email}
-        LIMIT 1
-      `);
-      // Re-link the found trader to the canonical users.id so future lookups work
-      if (ownRes.rows && ownRes.rows.length > 0) {
-        const foundTraderId = (ownRes.rows[0] as any).trader_id;
-        db.execute(sql`
-          UPDATE terminal_traders
-          SET external_id = ${String(user.id)}, updated_at = now()
-          WHERE id = ${foundTraderId}::uuid
-            AND external_id != ${String(user.id)}
-        `).catch(() => {});
-      }
+      ownRes = await db.execute(buildAccountQuery(sql`lower(tt.email) = lower(${user.email})`));
+    }
+
+    // Re-link the found trader's external_id → users.id so future lookups use Path A
+    if (ownRes.rows && ownRes.rows.length > 0) {
+      const foundTraderId = (ownRes.rows[0] as any).trader_id;
+      db.execute(sql`
+        UPDATE terminal_traders
+        SET external_id = ${String(user.id)}, updated_at = now()
+        WHERE id = ${foundTraderId}::uuid
+          AND external_id != ${String(user.id)}
+      `).catch(() => {});
     }
 
     if (!ownRes.rows || ownRes.rows.length === 0) {
