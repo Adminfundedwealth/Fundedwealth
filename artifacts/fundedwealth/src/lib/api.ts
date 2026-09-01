@@ -7,13 +7,14 @@
  * - In development: relative /api/* (Vite proxy forwards to localhost:9000 or Render)
  */
 
-const RAILWAY_API = "https://api.fundedwealth.com";
-
+// When VITE_API_URL is not set (e.g. Vercel deployment without the secret),
+// fall back to relative /api/* paths. Vercel's rewrite in vercel.json
+// proxies /api/* → real EC2 backend. Never fall back to a dead domain.
 const API_PREFIX = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : import.meta.env.VITE_API_BASE_URL
     ? `${import.meta.env.VITE_API_BASE_URL}/api`
-    : `${RAILWAY_API}/api`;
+    : "/api";
 
 async function apiFetch(path: string, options?: RequestInit) {
   const res = await fetch(`${API_PREFIX}${path}`, {
