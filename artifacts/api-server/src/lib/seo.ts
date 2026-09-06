@@ -1,8 +1,47 @@
 import fs from 'fs';
 import path from 'path';
 
+const PRIVATE_PATHS = [
+  '/dashboard',
+  '/dashboard/',
+  '/sign-in',
+  '/sign-up',
+  '/login',
+  '/register',
+  '/checkout',
+  '/payment-pending',
+  '/purchase-success',
+  '/kyc',
+  '/auth/',
+  '/sso-callback',
+  '/reset-password',
+  '/ref/',
+  '/admin',
+];
+
 export function generateRobotsTxt(hostname: string) {
-  return `User-agent: *\nDisallow:\nSitemap: ${hostname.replace(/\/$/, '')}/sitemap.xml\n`;
+  const host = hostname.replace(/\/$/, '');
+  const disallowLines = PRIVATE_PATHS.map(path => `Disallow: ${path}`).join('\n');
+
+  return [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    '# Private / auth / account / checkout pages',
+    disallowLines,
+    '',
+    'User-agent: Googlebot',
+    'Allow: /',
+    disallowLines,
+    '',
+    'User-agent: Bingbot',
+    'Allow: /',
+    disallowLines,
+    'Crawl-delay: 1',
+    '',
+    `Sitemap: ${host}/sitemap.xml`,
+    '',
+  ].join('\n');
 }
 
 export function generateSitemapXml(entries: { loc: string; lastmod?: string; changefreq?: string; priority?: number }[]) {

@@ -5496,7 +5496,11 @@ const Footer = () => {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-fw-pink selection:text-white">
-      <SEOHead canonical="/" />
+      <SEOHead
+        title="NIFTY Funded Account Evaluations in India"
+        description="Explore simulated NIFTY, BANKNIFTY and SENSEX trading evaluations in India. FundedWealth offers structured risk rules, accounts up to ₹50 Lakhs and performance-based rewards."
+        canonical="/"
+      />
       <FAQSchema />
       <ServiceSchema />
       <AnnouncementBar />

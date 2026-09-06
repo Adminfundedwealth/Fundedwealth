@@ -8,8 +8,8 @@
     <lastmod>2026-08-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en-IN" href="https://www.fundedwealth.com/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.fundedwealth.com/"/>
+    <xhtml:link rel="alternate" hreflang="en-IN" href="https://fundedwealth.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fundedwealth.com/"/>
   </url>
 
   <!-- ── High-traffic marketing pages ───────────────────────────────── -->
@@ -130,17 +130,6 @@
     <priority>0.4</priority>
   </url>
 
-  <!-- Published blog articles from the production blog API -->
-  <url><loc>https://www.fundedwealth.com/blog/5-golden-rules-every-prop-trader-must-follow</loc><lastmod>2026-08-09</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/understanding-drawdown-your-1-risk-metric</loc><lastmod>2026-08-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/nifty-50-weekly-analysis-key-levels-to-watch</loc><lastmod>2026-08-06</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/the-psychology-behind-revenge-trading</loc><lastmod>2026-08-05</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/how-to-use-rsi-and-macd-together</loc><lastmod>2026-08-04</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/from-rs1l-to-rs25l-a-scaling-success-story</loc><lastmod>2026-08-03</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/position-sizing-the-1-5-percent-rule-explained</loc><lastmod>2026-08-02</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/bank-nifty-expiry-day-strategies</loc><lastmod>2026-08-01</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://www.fundedwealth.com/blog/why-90-percent-of-traders-fail</loc><lastmod>2026-07-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-
   <!--
     NOTE: The following routes are intentionally excluded from the sitemap
     because they are noindex or require authentication:
@@ -148,7 +137,9 @@
       /purchase-success, /kyc, /auth/*, /sso-callback,
       /reset-password, /ref/:code
 
-    The following published article URLs are generated from the live published API inventory.
+    Blog article URLs (/blog/:slug) should be added dynamically during
+    build or via a separate sitemap-blog.xml once the API is available
+    at build time.
   -->
 
 </urlset>

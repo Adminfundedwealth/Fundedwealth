@@ -101,7 +101,7 @@ function JournalSection({ storageKey, initial }: { storageKey: string; initial: 
       </div>
       <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
         <div className="text-white font-bold text-sm flex items-center gap-2"><NotebookPen size={16} className="text-fw-pink" /> New entry</div>
-        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Setup name — e.g. BANKNIFTY breakout @ 9:25"
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Setup name ï¿½ e.g. BANKNIFTY breakout @ 9:25"
           className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#4A00E0]/60" />
         <textarea value={note} onChange={e => setNote(e.target.value)} rows={4} placeholder="What went right or wrong? What will you do next time?"
           className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#4A00E0]/60 resize-none" />
@@ -122,7 +122,7 @@ function JournalSection({ storageKey, initial }: { storageKey: string; initial: 
       {entries.length === 0 ? (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
           <NotebookPen size={36} className="text-white/20 mx-auto mb-3" />
-          <div className="text-white/55 text-sm">No entries yet — your first lesson is the most valuable one.</div>
+          <div className="text-white/55 text-sm">No entries yet ï¿½ your first lesson is the most valuable one.</div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -172,7 +172,7 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: displayName, email: displayEmail, phone: "",
-          subject: `[Dashboard feedback · ${type} · ${rating}?]`,
+          subject: `[Dashboard feedback ï¿½ ${type} ï¿½ ${rating}?]`,
           message: msg.trim(),
         }),
       });
@@ -185,7 +185,7 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
       <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 flex items-start gap-3">
         <CheckCircle size={22} className="text-green-400 mt-0.5 shrink-0" />
         <div>
-          <div className="text-white font-bold">Thank you — feedback received.</div>
+          <div className="text-white font-bold">Thank you ï¿½ feedback received.</div>
           <div className="text-white/65 text-sm mt-1">Our product team reads every message. If you asked for a reply, we'll get back within 12 hours.</div>
           <button onClick={() => setDone(false)} className="mt-3 text-fw-pink text-xs font-bold hover:underline">Send another</button>
         </div>
@@ -221,7 +221,7 @@ function FeedbackForm({ displayName, displayEmail }: { displayName: string; disp
       </div>
       <div>
         <div className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Your message</div>
-        <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={5} placeholder="Be as specific as possible — screenshots, steps to reproduce, ideas..."
+        <textarea value={msg} onChange={e => setMsg(e.target.value)} rows={5} placeholder="Be as specific as possible ï¿½ screenshots, steps to reproduce, ideas..."
           className="w-full bg-white/5 border border-white/15 text-white rounded-xl px-4 py-3 text-sm outline-none focus:border-[#4A00E0]/60 resize-none" />
       </div>
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -242,7 +242,7 @@ const RULES_LIST = [
   { title: "Profit Target", desc: "Achieve 10% profit to pass the challenge phase.", ok: false },
   { title: "No Holding Over Weekend", desc: "Close all positions before market close on Friday.", ok: true },
   { title: "No News Trading", desc: "No trades within 2 minutes of major news events.", ok: true },
-  { title: "Consistent Trading", desc: "Trades must be consistent — no single-day > 50% of total profit.", ok: false },
+  { title: "Consistent Trading", desc: "Trades must be consistent ï¿½ no single-day > 50% of total profit.", ok: false },
 ];
 
 /**
@@ -306,7 +306,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
       : acc.phase === "verification" ? "Verification"
       : "Phase 1";
     const lines = [
-      `FundedWealth — Trading Account Credentials`,
+      `FundedWealth ï¿½ Trading Account Credentials`,
       `==========================================`,
       `Account Code    : ${acc.accountCode}`,
       `Login Email     : ${(acc as any).loginEmail || "Check your registered email"}`,
@@ -372,9 +372,9 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     return (
       <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3">
         <div className="w-10 h-10 border-2 border-amber-400/40 border-t-amber-400 rounded-full animate-spin" />
-        <div className="text-white font-bold">Setting up your account…</div>
+        <div className="text-white font-bold">Setting up your accountï¿½</div>
         <div className="text-white/50 text-sm">Your challenge account is being provisioned. This usually takes under a minute.</div>
-        <div className="text-amber-400 text-xs font-mono">{acc.accountCode !== "Provisioning..." ? acc.accountCode : "Assigning code…"}</div>
+        <div className="text-amber-400 text-xs font-mono">{acc.accountCode !== "Provisioning..." ? acc.accountCode : "Assigning codeï¿½"}</div>
       </div>
     );
   }
@@ -426,7 +426,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 
       {/* Progress bars */}
       <div className="space-y-3 mb-4">
-        {/* Profit Target — hidden for Flash (no profit target) */}
+        {/* Profit Target ï¿½ hidden for Flash (no profit target) */}
         {acc.phase !== "flash" ? (
           <div>
             <div className="flex justify-between text-xs mb-1">
@@ -476,7 +476,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="text-white/40 text-[10px] uppercase tracking-wider">Login Email</div>
-                <div className="text-white text-xs font-mono truncate">{(acc as any).loginEmail || "—"}</div>
+                <div className="text-white text-xs font-mono truncate">{(acc as any).loginEmail || "ï¿½"}</div>
               </div>
               {(acc as any).loginEmail && (
                 <button onClick={() => copyField("email", (acc as any).loginEmail)} className={`shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg ${copied === "email" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
@@ -521,7 +521,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
             {/* Challenge */}
             <div>
               <div className="text-white/40 text-[10px] uppercase tracking-wider">Challenge</div>
-              <div className="text-white text-xs">{phaseLabel} — {acc.size > 0 ? `?${acc.size.toLocaleString("en-IN")}` : "—"}</div>
+              <div className="text-white text-xs">{phaseLabel} ï¿½ {acc.size > 0 ? `?${acc.size.toLocaleString("en-IN")}` : "ï¿½"}</div>
             </div>
 
             {/* Action buttons */}
@@ -538,7 +538,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
                 ) : (
                   <Monitor size={13} />
                 )}
-                {launching ? "Launching…" : "Launch Terminal"}
+                {launching ? "Launchingï¿½" : "Launch Terminal"}
               </button>
 
               {/* Copy all credentials */}
@@ -547,7 +547,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
                   const pw = safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword);
                   const lines = [
                     `Account Code: ${acc.accountCode}`,
-                    `Login Email: ${(acc as any).loginEmail || "—"}`,
+                    `Login Email: ${(acc as any).loginEmail || "ï¿½"}`,
                     pw ? `Password: ${pw}` : "Password: Reset at fundedwealth.com/sign-in",
                     `Challenge: ${phaseLabel}`,
                     `Size: ?${acc.size.toLocaleString("en-IN")}`,
@@ -585,7 +585,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 }
 
 /**
- * Single universal Launch Terminal card — works for ALL challenge types.
+ * Single universal Launch Terminal card ï¿½ works for ALL challenge types.
  * Flash / Instant / 1-Step / 2-Step all use POST /api/terminal/launch.
  */
 function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
@@ -664,9 +664,9 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-white font-bold text-lg">{acc.accountCode || "—"}</div>
+          <div className="text-white font-bold text-lg">{acc.accountCode || "ï¿½"}</div>
           <div className="text-white/50 text-xs mt-0.5">
-            {phaseLabel} · Balance: ?{(acc.balance ?? 0).toLocaleString("en-IN")}
+            {phaseLabel} ï¿½ Balance: ?{(acc.balance ?? 0).toLocaleString("en-IN")}
           </div>
         </div>
         <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${phaseColor}`}>
@@ -678,12 +678,12 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
       <div className="bg-black/20 border border-white/10 rounded-xl p-4 grid grid-cols-1 gap-2.5">
         {[
           { label: "Account ID", key: "accountId", value: acc.id },
-          { label: "Login Email", key: "email", value: (acc as any).loginEmail || creds?.email || "—" },
+          { label: "Login Email", key: "email", value: (acc as any).loginEmail || creds?.email || "ï¿½" },
           {
             label: "Password", key: "password",
             value: safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword || creds?.password) || "Password unavailable",
           },
-          { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "—" },
+          { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "ï¿½" },
           { label: "Server", key: "server", value: import.meta.env.VITE_TERMINAL_URL || "terminal.fundedwealth.com" },
           { label: "Status", key: "status", value: acc.status || creds?.status || "active" },
         ].map(({ label, key, value }) => (
@@ -692,7 +692,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
               <div className="text-white/40 text-[10px] uppercase tracking-wider">{label}</div>
               <div className="text-white text-xs font-mono truncate">{value}</div>
             </div>
-            {value && value !== "—" && (
+            {value && value !== "ï¿½" && (
               <button
                 onClick={() => copyCred(key, value)}
                 className={`shrink-0 text-xs font-bold px-2 py-1 rounded-lg transition-all ${copiedCred === key ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/50 hover:bg-white/20"}`}
@@ -711,7 +711,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold py-3 px-5 rounded-xl text-sm hover:shadow-lg hover:shadow-[#D63384]/30 transition-all disabled:opacity-60 disabled:cursor-wait"
       >
         {launching ? (
-          <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Launching…</>
+          <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Launchingï¿½</>
         ) : (
           <><Monitor size={16} /> Launch Terminal <ExternalLink size={13} /></>
         )}
@@ -851,7 +851,7 @@ function WithdrawalDetailsSection() {
       {loading ? (
         <div className="flex items-center gap-2 text-white/30 text-sm py-8">
           <div className="w-4 h-4 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-          Loading your details…
+          Loading your detailsï¿½
         </div>
       ) : (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
@@ -945,7 +945,7 @@ function WithdrawalDetailsSection() {
               {saving ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Saving…
+                  Savingï¿½
                 </>
               ) : (
                 <>
@@ -967,7 +967,7 @@ function WithdrawalDetailsSection() {
       <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3">
         <Clock size={14} className="text-white/40 mt-0.5 shrink-0" />
         <div className="text-white/40 text-xs">
-          <span className="text-white/60 font-semibold">Processing times:</span> UPI — instant to 4 hours. Bank Transfer — 1-2 business days. Payouts are processed Monday–Saturday, 10am–6pm IST.
+          <span className="text-white/60 font-semibold">Processing times:</span> UPI ï¿½ instant to 4 hours. Bank Transfer ï¿½ 1-2 business days. Payouts are processed Mondayï¿½Saturday, 10amï¿½6pm IST.
         </div>
       </div>
     </div>
@@ -1008,7 +1008,7 @@ function CouponSection({ profile }: { profile: any }) {
         if (Array.isArray(data?.data)) setLiveDiscounts(data.data);
       })
       .catch(() => {
-        // silently fall back to empty — user can still type a code manually
+        // silently fall back to empty ï¿½ user can still type a code manually
       })
       .finally(() => setDiscountsLoading(false));
   }, []);
@@ -1022,7 +1022,7 @@ function CouponSection({ profile }: { profile: any }) {
     }
   };
 
-  // Deduplicate badges: some plans share the same code — show each unique code once
+  // Deduplicate badges: some plans share the same code ï¿½ show each unique code once
   const uniqueBadges = useMemo(() => {
     const seen = new Set<string>();
     const badges: { code: string; desc: string }[] = [];
@@ -1082,7 +1082,7 @@ function CouponSection({ profile }: { profile: any }) {
         <div className="mt-5">
           <div className="text-white/40 text-xs mb-2 font-semibold uppercase tracking-wide">Available codes</div>
           {discountsLoading ? (
-            <div className="text-white/30 text-xs">Loading codes…</div>
+            <div className="text-white/30 text-xs">Loading codesï¿½</div>
           ) : uniqueBadges.length === 0 ? (
             <div className="text-white/30 text-xs">No active codes at the moment.</div>
           ) : (
@@ -1093,7 +1093,7 @@ function CouponSection({ profile }: { profile: any }) {
                   onClick={() => { setCouponInput(code); setCouponStatus("idle"); }}
                   className="text-xs bg-white/5 border border-white/10 hover:border-[#4A00E0]/40 text-white/60 hover:text-white rounded-lg px-3 py-1.5 transition-all"
                 >
-                  {code} — {desc}
+                  {code} ï¿½ {desc}
                 </button>
               ))}
             </div>
@@ -1104,7 +1104,7 @@ function CouponSection({ profile }: { profile: any }) {
   );
 }
 
-// -- Data & Privacy section — self-contained component ------------------------
+// -- Data & Privacy section ï¿½ self-contained component ------------------------
 // Renders privacy info cards, "Download My Data" button, and
 // the existing "Request Data Deletion" button.
 function PrivacySection() {
@@ -1209,10 +1209,10 @@ function PrivacySection() {
             className="flex items-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl px-5 py-2.5 text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Download size={14} />
-            {exporting ? "Preparing export…" : "Download My Data"}
+            {exporting ? "Preparing exportï¿½" : "Download My Data"}
           </Button>
 
-          {/* Keep the existing deletion button — backend not yet implemented */}
+          {/* Keep the existing deletion button ï¿½ backend not yet implemented */}
           <Button
             variant="outline"
             onClick={() => {
@@ -1241,7 +1241,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const [copied, setCopied] = useState(false);
   const [analyticsRange, setAnalyticsRange] = useState<"1D" | "1W" | "1M" | "ALL">("ALL");
   // "all" = aggregate all accounts, otherwise = specific trading_account id
-  // Default: auto-select first active account (like real prop firms — per-account by default)
+  // Default: auto-select first active account (like real prop firms ï¿½ per-account by default)
   const [analyticsAccountId, setAnalyticsAccountId] = useState<string>("all");
 
   // Once accounts load, auto-select the first active account instead of showing "all"
@@ -1263,7 +1263,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const notifRef = useRef<HTMLDivElement>(null);
   const [darkMode, setDarkMode] = useState(true);
 
-  // Leaderboard — fetched from real API
+  // Leaderboard ï¿½ fetched from real API
   type LeaderboardEntry = {
     rank: number;
     firstName: string | null;
@@ -1300,7 +1300,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
       .finally(() => setLeaderboardLoading(false));
   }, [user?.id]);
 
-  // Analytics trades — fetched from real API (trade_logs via terminal-sync)
+  // Analytics trades ï¿½ fetched from real API (trade_logs via terminal-sync)
   type TradeLog = { symbol: string; pnl: number; createdAt: string };
   const [analyticsTradesData, setAnalyticsTradesData] = useState<TradeLog[]>([]);
 
@@ -2142,7 +2142,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         const selectedAccount = analyticsAccountId !== "all"
           ? (profile.accounts.find(a => a.id === analyticsAccountId) || activeAccount)
           : activeAccount;
-        // Aggregate only live trading accounts — exclude pending/failed/breached
+        // Aggregate only live trading accounts ï¿½ exclude pending/failed/breached
         const liveAccounts = profile.accounts.filter(a =>
           ["active", "passed", "funded"].includes(a.status)
         );
@@ -2162,7 +2162,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           ? Math.round(accountAnalytics.winRate * 10) / 10
           : selectedAccount.winRate > 0
             ? selectedAccount.winRate
-            : null; // null = no trades yet, show "—"
+            : null; // null = no trades yet, show "ï¿½"
         const winRateNum = displayWinRate ?? 50; // numeric fallback for calculations
         const consistencyScore = accountAnalytics?.consistencyScore != null
           ? Math.round(accountAnalytics.consistencyScore)
@@ -2179,7 +2179,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         const calmar = Number((Math.max(1, totalPnl) / Math.max(1, selectedAccount.maxLoss / 100 * totalStart)).toFixed(2));
         const ulcer  = Number(Math.pow(Math.max(1, selectedAccount.maxLoss), 0.8).toFixed(2));
 
-        // -- Equity curve — real data preferred, synthetic fallback ----------
+        // -- Equity curve ï¿½ real data preferred, synthetic fallback ----------
         const realEquityCurve = accountAnalytics?.equityCurve || [];
         const synthSeries = Array.from({ length: 28 }, (_, idx) => {
           const progress = idx / 27;
@@ -2286,12 +2286,12 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           const cards: { title: string; description: string; tone: string }[] = [];
           if (symbolBreakdown.length > 0) {
             const best = symbolBreakdown.reduce((a,b)=>b.pnl>a.pnl?b:a);
-            if (best.pnl > 0) cards.push({ title:`Your best symbol is ${best.name}`, description:`${best.value}% of your trades — highest realised P&L across all symbols.`, tone:"good"});
+            if (best.pnl > 0) cards.push({ title:`Your best symbol is ${best.name}`, description:`${best.value}% of your trades ï¿½ highest realised P&L across all symbols.`, tone:"good"});
           }
           const sortedDow = [...dayOfWeek].sort((a,b)=>a.perf-b.perf);
           if (sortedDow[0]?.perf < 45) cards.push({ title:`Trade less on ${sortedDow[0].day}days`, description:`${sortedDow[0].day} shows the weakest average P&L. Consider reducing size.`, tone:"warn"});
           if (longestLossStreak>=3) cards.push({ title:`Reduce size after ${longestLossStreak} consecutive losses`, description:"Preserve capital by scaling back position size during losing streaks.", tone:"warn"});
-          if (profitFactor!=null && profitFactor>=1.5) cards.push({ title:"Strong profit factor detected", description:`Profit factor of ${profitFactor} — your winners outpace your losers.`, tone:"good"});
+          if (profitFactor!=null && profitFactor>=1.5) cards.push({ title:"Strong profit factor detected", description:`Profit factor of ${profitFactor} ï¿½ your winners outpace your losers.`, tone:"good"});
           if (cards.length===0) cards.push({ title:"Keep logging your trades", description:"More trade data will unlock personalised insights about your patterns.", tone:"good"});
           return cards;
         })();
@@ -2311,8 +2311,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 <h2 className="text-white font-extrabold text-xl">Analytics</h2>
                 <p className="text-white/50 text-sm mt-0.5">
                   {analyticsAccountId === "all"
-                    ? `All Accounts · ${liveAccounts.length} active`
-                    : `${selectedAccount.accountCode || selectedAccount.id.slice(0,8)} · ${selectedAccount.phase === "funded" ? "Funded" : selectedAccount.phase === "flash" ? "Flash" : "Challenge"}`}
+                    ? `All Accounts ï¿½ ${liveAccounts.length} active`
+                    : `${selectedAccount.accountCode || selectedAccount.id.slice(0,8)} ï¿½ ${selectedAccount.phase === "funded" ? "Funded" : selectedAccount.phase === "flash" ? "Flash" : "Challenge"}`}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -2326,7 +2326,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <button key={acc.id}
                       onClick={() => setAnalyticsAccountId(acc.id)}
                       className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${analyticsAccountId === acc.id ? "bg-gradient-to-r from-[#4A00E0] to-[#D63384] border-transparent text-white" : "bg-white/5 border-white/15 text-white/60 hover:text-white"}`}
-                    >{pl} · {acc.size > 0 ? `?${(acc.size/100000).toFixed(1)}L` : acc.accountCode}</button>
+                    >{pl} ï¿½ {acc.size > 0 ? `?${(acc.size/100000).toFixed(1)}L` : acc.accountCode}</button>
                   );
                 })}
               </div>
@@ -2341,8 +2341,8 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                     <div className="mt-3 text-3xl md:text-4xl font-extrabold text-white">{fmt(totalBalance)}</div>
                     <div className="text-white/50 text-sm mt-1">
                       {analyticsAccountId === "all"
-                        ? `Combined equity · ${liveAccounts.length} active accounts`
-                        : `Equity · ${selectedAccount.accountCode || "this account"}`}
+                        ? `Combined equity ï¿½ ${liveAccounts.length} active accounts`
+                        : `Equity ï¿½ ${selectedAccount.accountCode || "this account"}`}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -2392,7 +2392,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                   </div>
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
                     <div className="text-white/45 text-[11px] uppercase tracking-[0.25em] mb-3">Market cadence</div>
-                    <div className="text-white font-bold text-sm mb-1">09:15–11:00</div>
+                    <div className="text-white font-bold text-sm mb-1">09:15ï¿½11:00</div>
                     <div className="text-white/50 text-[11px]">Peak activity window</div>
                   </div>
                 </div>
@@ -2446,14 +2446,14 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             {/* -- Metric cards row 1 --------------------------------------- */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {[
-                { label:"Profit Factor",   value: profitFactor!=null ? profitFactor.toFixed(2) : "—", icon:TrendingUp,    color:"text-emerald-400" },
+                { label:"Profit Factor",   value: profitFactor!=null ? profitFactor.toFixed(2) : "ï¿½", icon:TrendingUp,    color:"text-emerald-400" },
                 { label:"Sharpe Ratio",    value: sharpe.toFixed(2),                                   icon:Scale,         color:"text-sky-400" },
                 { label:"Sortino Ratio",   value: sortino.toFixed(2),                                  icon:Shield,        color:"text-violet-400" },
                 { label:"Max Drawdown",    value: `${drawdownMaxLoss}%`,                                icon:ArrowDownRight,color:"text-red-400" },
-                { label:"Win Rate",        value: displayWinRate != null ? `${displayWinRate}%` : "—",  icon:Trophy,        color:"text-green-400" },
+                { label:"Win Rate",        value: displayWinRate != null ? `${displayWinRate}%` : "ï¿½",  icon:Trophy,        color:"text-green-400" },
                 { label:"Recovery Factor", value: recoveryFactor.toFixed(2),                            icon:ArrowUpRight,  color:"text-amber-400" },
-                { label:"Avg Win",         value: avgWin!=null ? fmt(avgWin) : "—",                    icon:ArrowUp,       color:"text-green-400" },
-                { label:"Avg Loss",        value: avgLoss!=null ? fmt(avgLoss) : "—",                  icon:ArrowDown,     color:"text-red-400" },
+                { label:"Avg Win",         value: avgWin!=null ? fmt(avgWin) : "ï¿½",                    icon:ArrowUp,       color:"text-green-400" },
+                { label:"Avg Loss",        value: avgLoss!=null ? fmt(avgLoss) : "ï¿½",                  icon:ArrowDown,     color:"text-red-400" },
               ].map(m => (
                 <div key={m.label} className="rounded-3xl border border-white/10 bg-[#0B021D]/80 p-5">
                   <div className="flex items-center justify-between gap-3 mb-4">
@@ -2468,10 +2468,10 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             {/* -- Metric cards row 2 --------------------------------------- */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
               {[
-                { label:"Largest Win",     value: winningTrades.length>0 ? fmt(Math.max(...winningTrades.map(t=>t.pnl))) : "—", icon:ArrowUpRight,  color:"text-emerald-400" },
-                { label:"Largest Loss",    value: losingTrades.length>0  ? fmt(Math.abs(Math.min(...losingTrades.map(t=>t.pnl)))) : "—", icon:ArrowDownRight,color:"text-red-400" },
-                { label:"Win/Loss Streak", value: hasTradeData ? `${longestWinStreak}/${longestLossStreak}` : "—", icon:TrendingUp, color:"text-violet-400" },
-                { label:"Edge Ratio",      value: edgeRatio!=null ? edgeRatio.toFixed(2) : "—", icon:Activity,  color:"text-emerald-400" },
+                { label:"Largest Win",     value: winningTrades.length>0 ? fmt(Math.max(...winningTrades.map(t=>t.pnl))) : "ï¿½", icon:ArrowUpRight,  color:"text-emerald-400" },
+                { label:"Largest Loss",    value: losingTrades.length>0  ? fmt(Math.abs(Math.min(...losingTrades.map(t=>t.pnl)))) : "ï¿½", icon:ArrowDownRight,color:"text-red-400" },
+                { label:"Win/Loss Streak", value: hasTradeData ? `${longestWinStreak}/${longestLossStreak}` : "ï¿½", icon:TrendingUp, color:"text-violet-400" },
+                { label:"Edge Ratio",      value: edgeRatio!=null ? edgeRatio.toFixed(2) : "ï¿½", icon:Activity,  color:"text-emerald-400" },
                 { label:"Total Lots",      value: String(totalLots),      icon:Users,   color:"text-indigo-400" },
                 { label:"Total Trades",    value: hasTradeData ? String(tradeLogs.length) : String(totalTrades), icon:Shield, color:"text-amber-400" },
               ].map(m => (
@@ -2725,7 +2725,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                         .slice(0,50)
                         .map((t,idx)=>(
                           <tr key={idx} className="bg-white/5">
-                            <td className="px-4 py-3 text-white font-semibold text-sm rounded-l-xl">{t.symbol||"—"}</td>
+                            <td className="px-4 py-3 text-white font-semibold text-sm rounded-l-xl">{t.symbol||"ï¿½"}</td>
                             <td className={`px-4 py-3 font-bold text-sm ${t.pnl>=0?"text-green-400":"text-red-400"}`}>
                               {t.pnl>=0?"+":""}?{Math.abs(t.pnl).toLocaleString("en-IN")}
                             </td>
@@ -2784,9 +2784,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { icon: MessageSquare, title: "Live Chat", desc: "Quick questions, instant answers — open the chat bubble at the bottom-right of any page.", action: "Open chat", href: "javascript:void(0)", onClick: () => { window.dispatchEvent(new CustomEvent("open-chat-widget")); } },
-              { icon: Send, title: "Email", desc: "support@fundedwealth.com — best for KYC, payouts, billing or anything that needs attachments.", action: "Email us", href: "https://mail.google.com/mail/u/0/?view=cm&to=support@fundedwealth.com&su=Support+Request&body=Hi+FundedWealth+Team%2C%0A%0AI+need+help+with%3A", onClick: undefined },
-              { icon: LifeBuoy, title: "WhatsApp", desc: "Trading-hour priority support — text us during NSE hours for fastest response.", action: "Open WhatsApp", href: "https://wa.me/message/ZPLR472VQTXLL1", onClick: undefined },
+              { icon: MessageSquare, title: "Live Chat", desc: "Quick questions, instant answers ï¿½ open the chat bubble at the bottom-right of any page.", action: "Open chat", href: "javascript:void(0)", onClick: () => { window.dispatchEvent(new CustomEvent("open-chat-widget")); } },
+              { icon: Send, title: "Email", desc: "support@fundedwealth.com ï¿½ best for KYC, payouts, billing or anything that needs attachments.", action: "Email us", href: "https://mail.google.com/mail/u/0/?view=cm&to=support@fundedwealth.com&su=Support+Request&body=Hi+FundedWealth+Team%2C%0A%0AI+need+help+with%3A", onClick: undefined },
+              { icon: LifeBuoy, title: "WhatsApp", desc: "Trading-hour priority support ï¿½ text us during NSE hours for fastest response.", action: "Open WhatsApp", href: "https://wa.me/message/ZPLR472VQTXLL1", onClick: undefined },
             ].map(c => (
               <div key={c.title} className="bg-white/5 border border-white/10 rounded-2xl p-5">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4A00E0]/30 to-[#D63384]/20 flex items-center justify-center mb-3">
@@ -3256,7 +3256,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h2 className="text-white font-extrabold text-xl">Your Impact</h2>
-                <p className="text-white/50 text-sm mt-1">FW Impact Initiative — Trade for Change, Profit with Purpose.</p>
+                <p className="text-white/50 text-sm mt-1">FW Impact Initiative ï¿½ Trade for Change, Profit with Purpose.</p>
               </div>
               <button onClick={() => setDonatePopup(true)}
                 className="flex items-center gap-2 bg-gradient-to-r from-pink-600 to-red-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 transition-opacity">
@@ -3610,7 +3610,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                       ))}
                     </div>
                     {notificationsLoading && (
-                      <div className="px-4 py-3 text-white/40 text-xs border-b border-white/10">Loading latest notifications…</div>
+                      <div className="px-4 py-3 text-white/40 text-xs border-b border-white/10">Loading latest notificationsï¿½</div>
                     )}
                     {notifications.filter(n => notificationFilter === "all" || n.category === notificationFilter).length === 0 ? (
                       <div className="p-6 text-center text-white/40 text-sm">{t("dashboard.noNotifications")}</div>

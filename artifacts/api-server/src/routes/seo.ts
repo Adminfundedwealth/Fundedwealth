@@ -27,11 +27,11 @@ const STATIC_PAGES = [
 ];
 
 function safeHost(req: express.Request): string {
-  const configured = process.env.CANONICAL_HOST || 'https://fundedwealth.com';
+  const configured = process.env.CANONICAL_HOST || 'https://www.fundedwealth.com';
   const raw = configured || req.get('host') || 'localhost';
   const cleaned = String(raw).replace(/[^a-zA-Z0-9.:-]/g, '');
-  // If configured already starts with http, use as-is
   if (configured.startsWith('http')) return configured.replace(/\/$/, '');
+  if (cleaned.startsWith('http')) return cleaned.replace(/\/$/, '');
   return `${req.protocol}://${cleaned}`;
 }
 

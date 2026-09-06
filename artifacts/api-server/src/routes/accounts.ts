@@ -3,6 +3,7 @@ import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users, orders } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { decrypt, isEncrypted } from "../lib/encryption-service";
+import { resolveUserTraderId, fetchUserLiveAccounts } from "../lib/accountOwnershipCompat";
 
 const router = Router();
 
@@ -56,189 +57,27 @@ router.get("/my", async (req: Request, res: Response) => {
     if (!user && auth.email) {
       const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
       if (byEmail) {
-        // Attempt to write the new auth ID. If the row was already updated concurrently
-        // (RETURNING yields 0 rows), fall back to re-reading the row directly so we
-        // always have a valid user object.
-        try {
-          const updated = await db
-            .update(users)
-            .set({ clerkId: auth.userId, updatedAt: new Date() })
-            .where(eq(users.id, byEmail.id))
-            .returning();
-          user = updated[0] ?? byEmail; // Use byEmail as fallback if RETURNING is empty
-        } catch (linkErr: any) {
-          // Unique constraint violation or other DB error — the row exists, just use it
-          console.warn("[Accounts/my] clerkId link failed (non-fatal):", {
-            message: linkErr?.message || String(linkErr),
-            userId: byEmail.id,
-            authUserId: auth.userId,
-          });
-          user = byEmail;
-        }
+        [user] = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
       }
     }
 
     if (!user) {
-      // Auto-create user row for users who authenticated via Supabase Auth directly
-      // (admin-provisioned, invited) but whose public.users row was never created.
-      if (auth.email) {
-        try {
-          const affiliateCode = `FW${auth.userId.slice(-6).toUpperCase()}`;
-          const emailParts = auth.email.split('@')[0].split('.');
-          const [inserted] = await db
-            .insert(users)
-            .values({
-              clerkId: auth.userId,
-              email: auth.email,
-              firstName: emailParts[0] || null,
-              lastName: emailParts[1] || null,
-              affiliateCode,
-            })
-            .returning();
-          user = inserted;
-        } catch {
-          // Concurrent insert — re-read
-          const [refetch] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
-          user = refetch;
-        }
-      }
-      if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" });
-      }
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // 2. Resolve the user's terminal trader identity.
-    //
-    // COMPATIBILITY RESOLVER — handles all historical ownership patterns:
-    //
-    //   Path A (canonical): terminal_traders.external_id = users.id
-    //                        (public.users UUID — set by provisioning-service since 2026-06)
-    //
-    //   Path B (auth-id mismatch): terminal_traders.external_id = auth.users.id
-    //                        (Supabase JWT sub, not the public.users UUID — used in
-    //                         early provisions where the auth UUID was passed directly)
-    //
-    //   Path C (email fallback): terminal_traders.email = users.email
-    //                        (catches any external_id mismatch; re-links on every hit
-    //                         so future requests use Path A)
-    //
-    // Resolution is SAFE — it only READS or RE-LINKS (idempotent UPDATE), never
-    // creates accounts or exposes another user's data.
+    //    Different deployments store this link as either external_id or user_id.
+    //    Support both so valid active accounts remain visible regardless of schema version.
+    const traderId = await resolveUserTraderId(db, String(user.id));
 
-    // Path A — canonical: external_id = public.users.id
-    let traderRes = await db.execute(sql`
-      SELECT id, external_id FROM terminal_traders
-      WHERE external_id = ${String(user.id)}
-      LIMIT 1
-    `);
-
-    // Path B — auth-id stored directly as external_id (early provisioning pattern)
-    if ((!traderRes.rows || traderRes.rows.length === 0) && auth.userId && auth.userId !== String(user.id)) {
-      const traderByAuthId = await db.execute(sql`
-        SELECT id, external_id FROM terminal_traders
-        WHERE external_id = ${auth.userId}
-        LIMIT 1
-      `);
-      if (traderByAuthId.rows && traderByAuthId.rows.length > 0) {
-        const row = traderByAuthId.rows[0] as any;
-        console.info("[Accounts/my] terminal_traders found by auth.userId — re-linking external_id to users.id", {
-          traderId: row.id,
-          oldExternalId: row.external_id,
-          newExternalId: user.id,
-        });
-        await db.execute(sql`
-          UPDATE terminal_traders
-          SET external_id = ${String(user.id)}, updated_at = now()
-          WHERE id = ${row.id}::uuid
-        `).catch((relinkErr: any) => {
-          console.warn("[Accounts/my] Path B re-link failed (non-fatal):", relinkErr?.message);
-        });
-        // Re-read after re-link
-        traderRes = await db.execute(sql`
-          SELECT id, external_id FROM terminal_traders WHERE id = ${row.id}::uuid LIMIT 1
-        `);
-      }
-    }
-
-    // Path C — email fallback: catches any remaining external_id mismatch
-    if ((!traderRes.rows || traderRes.rows.length === 0) && user.email) {
-      const traderByEmail = await db.execute(sql`
-        SELECT id, external_id FROM terminal_traders
-        WHERE lower(email) = lower(${user.email})
-        LIMIT 1
-      `);
-      if (traderByEmail.rows && traderByEmail.rows.length > 0) {
-        const row = traderByEmail.rows[0] as any;
-        console.info("[Accounts/my] terminal_traders found by email (Path C) — re-linking external_id", {
-          traderId: row.id,
-          oldExternalId: row.external_id,
-          newExternalId: user.id,
-          email: user.email,
-        });
-        if (String(row.external_id) !== String(user.id)) {
-          await db.execute(sql`
-            UPDATE terminal_traders
-            SET external_id = ${String(user.id)}, updated_at = now()
-            WHERE id = ${row.id}::uuid
-          `).catch((relinkErr: any) => {
-            console.warn("[Accounts/my] Path C re-link failed (non-fatal):", relinkErr?.message);
-          });
-        }
-        // Re-read to confirm
-        traderRes = await db.execute(sql`
-          SELECT id, external_id FROM terminal_traders WHERE id = ${row.id}::uuid LIMIT 1
-        `);
-      }
-    }
-
-    const traderId = (traderRes.rows as any[])[0]?.id ?? null;
-
-    console.info("[Accounts/my] trader resolution", {
-      userId: user.id,
-      authUserId: auth.userId,
-      email: user.email,
-      traderId,
-      resolvedExternalId: (traderRes.rows as any[])[0]?.external_id ?? null,
-    });
-
-    // 3. Pull every LIVE account for this trader straight from the terminal-owned
-    //    tables, joined challenge ⇄ trading. Discovery is anchored on trader_id
-    //    (NOT order_id), so manually/emergency provisioned accounts surface exactly
-    //    like website-purchased ones.
-    let liveRows: any[] = [];
-    if (traderId) {
-      const liveRes = await db.execute(sql`
-        SELECT
-          ta.id               AS trading_account_id,
-          ta.account_code     AS account_code,
-          ta.broker_provider  AS broker_provider,
-          ta.broker_client_id AS broker_client_id,
-          ta.balance          AS ta_balance,
-          ta.available_margin AS available_margin,
-          ta.status           AS trading_status,
-          ta.broker_credentials_encrypted AS broker_credentials_encrypted,
-          ca.id               AS challenge_account_id,
-          ca.type             AS challenge_type,
-          ca.plan             AS plan,
-          ca.initial_balance  AS initial_balance,
-          ca.current_balance  AS current_balance,
-          ca.profit_target_pct    AS profit_target_pct,
-          ca.daily_loss_limit_pct AS daily_loss_limit_pct,
-          ca.max_drawdown_pct     AS max_drawdown_pct,
-          ca.min_trading_days     AS min_trading_days,
-          ca.status           AS challenge_status,
-          ca.started_at       AS started_at,
-          ca.expires_at       AS expires_at,
-          ca.created_at       AS created_at,
-          ca.updated_at       AS updated_at
-        FROM trading_accounts ta
-        LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-        WHERE ta.trader_id = ${traderId}::uuid
-          AND ta.status != 'inactive'
-        ORDER BY ca.created_at DESC NULLS LAST
-      `);
-      liveRows = liveRes.rows as any[];
-    }
+    // 3. Pull every LIVE account for this user/trader straight from the terminal-owned
+    //    tables, joined challenge ⇄ trading. We support both the trader_id and user_id
+    //    schema variants because the repo has both legacy and migrated data paths.
+    const liveRows = await fetchUserLiveAccounts(db, String(user.id), traderId);
 
     // 4. Load the user's orders + provisioning logs to (a) attach purchase/fee context
     //    to each live account and (b) surface pending/failed provisioning attempts that
@@ -282,46 +121,30 @@ router.get("/my", async (req: Request, res: Response) => {
     const accounts: any[] = [];
     const accountedOrderIds = new Set<string>();
 
-    // 5a. Batch-fetch per-account stats — trade_logs (authoritative) with session_analytics fallback.
+    // 5a. Batch-fetch session_analytics for ALL live trading accounts in one query.
+    //     This replaces the N+1 per-account subquery that caused timeouts.
     const tradingAccountIds = liveRows
-      .map(r => r.trading_account_id)
-      .filter(Boolean);
+      .map((r: any) => r.trading_account_id)
+      .filter(Boolean) as string[];
     const batchStatsMap = new Map<string, { totalTrades: number; winRate: number; tradingDays: number }>();
 
     if (tradingAccountIds.length > 0 && traderId) {
       try {
         const idLiterals = sql.join(
-          tradingAccountIds.map(id => sql`${id}::uuid`),
+          tradingAccountIds.map((id: string) => sql`${id}::uuid`),
           sql`, `
         );
         const batchStats = await db.execute(sql`
           SELECT
             ta.id AS trading_account_id,
-            COALESCE(tl_agg.total_trades, sa_agg.total_trades, 0)  AS total_trades,
-            COALESCE(tl_agg.win_rate,     sa_agg.avg_win_rate, 0)  AS avg_win_rate,
-            COALESCE(tl_agg.trading_days, sa_agg.trading_days, 0)  AS trading_days
+            COALESCE(SUM(sa.trades), 0)                          AS total_trades,
+            COALESCE(AVG(sa.win_rate), 0)                        AS avg_win_rate,
+            COUNT(DISTINCT DATE(sa.start_at))                    AS trading_days
           FROM trading_accounts ta
-          LEFT JOIN LATERAL (
-            SELECT
-              COUNT(*)::int                                                     AS total_trades,
-              CASE WHEN COUNT(*) > 0
-                THEN ROUND(COUNT(*) FILTER (WHERE pnl > 0)::numeric / COUNT(*) * 100, 2)
-                ELSE 0
-              END                                                               AS win_rate,
-              COUNT(DISTINCT DATE(exited_at))::int                             AS trading_days
-            FROM trade_logs
-            WHERE trading_account_id = ta.id
-          ) tl_agg ON true
-          LEFT JOIN LATERAL (
-            SELECT
-              COALESCE(SUM(sa.trades), 0)::int       AS total_trades,
-              COALESCE(AVG(sa.win_rate), 0)           AS avg_win_rate,
-              COUNT(DISTINCT DATE(sa.start_at))::int  AS trading_days
-            FROM terminal_traders tt
-            JOIN session_analytics sa ON sa.user_id = tt.external_id
-            WHERE tt.id = ta.trader_id
-          ) sa_agg ON true
+          LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id
+          LEFT JOIN session_analytics sa ON sa.user_id = tt.external_id
           WHERE ta.id IN (${idLiterals})
+          GROUP BY ta.id
         `);
         for (const row of batchStats.rows as any[]) {
           batchStatsMap.set(String(row.trading_account_id), {
@@ -351,13 +174,8 @@ router.get("/my", async (req: Request, res: Response) => {
           try {
             const raw = row.broker_credentials_encrypted as string;
             const decrypted = isEncrypted(raw) ? decrypt(raw) : raw;
-            // Try parse as JSON — handle both key variants; never return raw JSON blob
-            try {
-              const parsed = JSON.parse(decrypted);
-              const pw = parsed?.temporary_password ?? parsed?.password ?? parsed?.tempPassword;
-              // If we got a real string password back, use it; otherwise fall back to raw (plain-string creds)
-              return (typeof pw === "string" && pw.length > 0) ? pw : (typeof parsed === "string" ? parsed : null);
-            } catch { return decrypted; }
+            // Try parse as JSON {password: "..."} or return as-is
+            try { return JSON.parse(decrypted)?.password ?? decrypted; } catch { return decrypted; }
           } catch { return null; }
         }
         return null;
@@ -568,39 +386,21 @@ router.get("/:accountId", async (req: Request, res: Response) => {
 
     const { accountId } = req.params;
 
-    // 1. Find user — clerkId primary, email fallback (same as /my)
-    let [user] = await db
+    // 1. Find user
+    const [user] = await db
       .select()
       .from(users)
       .where(eq(users.clerkId, auth.userId))
       .limit(1);
-
-    if (!user && auth.email) {
-      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
-      if (byEmail) {
-        try {
-          const updated = await db
-            .update(users)
-            .set({ clerkId: auth.userId, updatedAt: new Date() })
-            .where(eq(users.id, byEmail.id))
-            .returning();
-          user = updated[0] ?? byEmail;
-        } catch {
-          user = byEmail;
-        }
-      }
-    }
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // 2. Resolve the account via the TRADER CHAIN and verify ownership.
-    //    Mirrors the 3-path compatibility resolver in GET /my:
-    //    Path A: tt.external_id = users.id (canonical)
-    //    Path B: tt.external_id = auth.userId (early provision stored auth UUID directly)
-    //    Path C: tt.email = user.email (any remaining mismatch — case-insensitive)
-    const buildAccountQuery = (ownershipClause: ReturnType<typeof sql>) => sql`
+    //    trading_accounts.trader_id → terminal_traders.external_id = users.id.
+    //    Works for website AND manual/emergency provisions (no order dependency).
+    const ownRes = await db.execute(sql`
       SELECT
         ta.id  AS trading_account_id,
         ca.id  AS challenge_account_id,
@@ -609,33 +409,9 @@ router.get("/:accountId", async (req: Request, res: Response) => {
       JOIN terminal_traders tt ON tt.id = ta.trader_id
       LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
       WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-        AND ${ownershipClause}
+        AND tt.external_id = ${String(user.id)}
       LIMIT 1
-    `;
-
-    // Path A — canonical
-    let ownRes = await db.execute(buildAccountQuery(sql`tt.external_id = ${String(user.id)}`));
-
-    // Path B — auth UUID stored as external_id
-    if ((!ownRes.rows || ownRes.rows.length === 0) && auth.userId && auth.userId !== String(user.id)) {
-      ownRes = await db.execute(buildAccountQuery(sql`tt.external_id = ${auth.userId}`));
-    }
-
-    // Path C — email fallback (case-insensitive)
-    if ((!ownRes.rows || ownRes.rows.length === 0) && user.email) {
-      ownRes = await db.execute(buildAccountQuery(sql`lower(tt.email) = lower(${user.email})`));
-    }
-
-    // Re-link the found trader's external_id → users.id so future lookups use Path A
-    if (ownRes.rows && ownRes.rows.length > 0) {
-      const foundTraderId = (ownRes.rows[0] as any).trader_id;
-      db.execute(sql`
-        UPDATE terminal_traders
-        SET external_id = ${String(user.id)}, updated_at = now()
-        WHERE id = ${foundTraderId}::uuid
-          AND external_id != ${String(user.id)}
-      `).catch(() => {});
-    }
+    `);
 
     if (!ownRes.rows || ownRes.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Account not found" });
@@ -945,144 +721,8 @@ router.get("/:accountId/trades", async (req: Request, res: Response) => {
 
     return res.json({ success: true, trades: tradesResult.rows });
   } catch (err: any) {
+    // trade_logs table may not exist in all environments
     return res.json({ success: true, trades: [] });
-  }
-});
-
-/**
- * GET /api/accounts/:accountId/analytics
- * Per-account analytics computed from trade_logs — single source of truth.
- * Returns: equity curve, daily/weekly/monthly PnL, win rate, profit factor,
- *          max drawdown, consistency score, avg win/loss.
- */
-router.get("/:accountId/analytics", async (req: Request, res: Response) => {
-  try {
-    const auth = getAuth(req);
-    if (!auth?.userId) return res.status(401).json({ success: false, message: "Authentication required" });
-    const { accountId } = req.params;
-
-    const [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-    const ownerCheck = await db.execute(sql`
-      SELECT ta.id, ca.initial_balance, ca.current_balance, ca.peak_balance,
-             ca.max_drawdown_pct, ca.profit_target_pct
-      FROM trading_accounts ta
-      JOIN terminal_traders tt ON tt.id = ta.trader_id
-      LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-      WHERE (ta.id = ${accountId}::uuid OR ta.challenge_id = ${accountId}::uuid)
-        AND tt.external_id = ${String(user.id)}
-      LIMIT 1
-    `);
-    if (!ownerCheck.rows || ownerCheck.rows.length === 0)
-      return res.status(404).json({ success: false, message: "Account not found" });
-
-    const acct = ownerCheck.rows[0] as any;
-    const tradingAccountId = acct.id;
-    const initialBalance = Number(acct.initial_balance) || 0;
-
-    const tradesRes = await db.execute(sql`
-      SELECT pnl, exited_at, symbol, side
-      FROM trade_logs
-      WHERE trading_account_id = ${tradingAccountId}::uuid AND exited_at IS NOT NULL
-      ORDER BY exited_at ASC
-    `).catch(() => ({ rows: [] }));
-
-    const trades = (tradesRes.rows as any[]).map(t => ({
-      pnl: Number(t.pnl) || 0,
-      exitedAt: String(t.exited_at),
-      symbol: String(t.symbol || ""),
-    }));
-
-    const totalTrades = trades.length;
-    const wins = trades.filter(t => t.pnl > 0);
-    const losses = trades.filter(t => t.pnl < 0);
-    const grossProfit = wins.reduce((s, t) => s + t.pnl, 0);
-    const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0));
-    const netPnl = grossProfit - grossLoss;
-    const winRate = totalTrades > 0 ? (wins.length / totalTrades) * 100 : 0;
-    const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? 999 : 0;
-    const avgWin = wins.length > 0 ? grossProfit / wins.length : 0;
-    const avgLoss = losses.length > 0 ? grossLoss / losses.length : 0;
-
-    // Max drawdown from running equity
-    let runningEq = initialBalance, peak = initialBalance, maxDD = 0;
-    for (const t of trades) {
-      runningEq += t.pnl;
-      peak = Math.max(peak, runningEq);
-      maxDD = Math.max(maxDD, peak - runningEq);
-    }
-    const maxDDPct = initialBalance > 0 ? (maxDD / initialBalance) * 100 : 0;
-
-    // Daily PnL
-    const pnlByDay: Record<string, number> = {};
-    for (const t of trades) {
-      const d = t.exitedAt.slice(0, 10);
-      pnlByDay[d] = (pnlByDay[d] || 0) + t.pnl;
-    }
-    const dailyVals = Object.values(pnlByDay);
-    const meanDay = dailyVals.length ? dailyVals.reduce((s, v) => s + v, 0) / dailyVals.length : 0;
-    const variance = dailyVals.length > 1
-      ? dailyVals.reduce((s, v) => s + Math.pow(v - meanDay, 2), 0) / (dailyVals.length - 1) : 0;
-    const consistencyScore = Math.min(100, Math.max(0,
-      100 - (Math.sqrt(variance) > 0 && Math.abs(meanDay) > 0
-        ? (Math.sqrt(variance) / Math.abs(meanDay)) * 20 : 0)
-    ));
-
-    // Equity curve
-    let eqBal = initialBalance;
-    const sortedDays = Object.keys(pnlByDay).sort();
-    const equityCurve = sortedDays.map(date => {
-      eqBal += pnlByDay[date];
-      return { date, equity: Math.round(eqBal * 100) / 100, pnl: Math.round(pnlByDay[date] * 100) / 100 };
-    });
-
-    // Weekly PnL
-    const pnlByWeek: Record<string, number> = {};
-    for (const t of trades) {
-      const d = new Date(t.exitedAt);
-      const ws = new Date(d); ws.setDate(d.getDate() - d.getDay());
-      const key = ws.toISOString().slice(0, 10);
-      pnlByWeek[key] = (pnlByWeek[key] || 0) + t.pnl;
-    }
-    const weeklyPnl = Object.entries(pnlByWeek).sort(([a], [b]) => a.localeCompare(b))
-      .map(([week, pnl]) => ({ week, pnl: Math.round(pnl * 100) / 100 }));
-
-    // Monthly PnL
-    const pnlByMonth: Record<string, number> = {};
-    for (const t of trades) {
-      const key = t.exitedAt.slice(0, 7);
-      pnlByMonth[key] = (pnlByMonth[key] || 0) + t.pnl;
-    }
-    const monthlyPnl = Object.entries(pnlByMonth).sort(([a], [b]) => a.localeCompare(b))
-      .map(([month, pnl]) => ({ month, pnl: Math.round(pnl * 100) / 100 }));
-
-    return res.json({
-      success: true,
-      accountId: tradingAccountId,
-      initialBalance,
-      currentBalance: Number(acct.current_balance) || initialBalance,
-      peakBalance: Number(acct.peak_balance) || Math.max(initialBalance, initialBalance + netPnl),
-      netPnl: Math.round(netPnl * 100) / 100,
-      totalTrades,
-      winRate: Math.round(winRate * 100) / 100,
-      profitFactor: Math.round(profitFactor * 100) / 100,
-      grossProfit: Math.round(grossProfit * 100) / 100,
-      grossLoss: Math.round(grossLoss * 100) / 100,
-      avgWin: Math.round(avgWin * 100) / 100,
-      avgLoss: Math.round(avgLoss * 100) / 100,
-      maxDrawdown: Math.round(maxDD * 100) / 100,
-      maxDrawdownPct: Math.round(maxDDPct * 100) / 100,
-      consistencyScore: Math.round(consistencyScore * 100) / 100,
-      tradingDays: sortedDays.length,
-      equityCurve,
-      dailyPnl: sortedDays.map(date => ({ date, pnl: Math.round(pnlByDay[date] * 100) / 100 })),
-      weeklyPnl,
-      monthlyPnl,
-    });
-  } catch (err: any) {
-    console.error("[Accounts] /analytics error:", err.message);
-    return res.json({ success: true, equityCurve: [], dailyPnl: [], weeklyPnl: [], monthlyPnl: [] });
   }
 });
 

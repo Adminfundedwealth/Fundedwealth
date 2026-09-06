@@ -4,6 +4,7 @@ import { db, users } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { createHash, createHmac, randomUUID } from "crypto";
 import { resolveTerminalLaunchUser } from "../lib/terminalLaunchAuth.js";
+import { resolveUserAccountOwnership } from "../lib/accountOwnershipCompat";
 
 const router = Router();
 
@@ -258,67 +259,15 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     console.info("[Terminal Launch] user resolved", { userId: user.id, email: user.email });
 
     // ── 4. VERIFY OWNERSHIP VIA TRADER CHAIN ────────────────────────────────
-    // PRIMARY:  terminal_traders.external_id = users.id
-    // FALLBACK: terminal_traders.email = user.email (handles external_id mismatch
-    //           for accounts provisioned before first login, placeholder clerkId path)
     let ownershipResult;
     try {
-      ownershipResult = await db.execute(sql`
-        SELECT
-          tt.id  AS trader_id,
-          ca.id  AS challenge_account_id,
-          ta.id  AS trading_account_id,
-          ca.status AS challenge_status,
-          ca.plan AS plan,
-          ca.initial_balance AS initial_balance,
-          ta.account_code AS account_code,
-          ta.status AS trading_status
-        FROM trading_accounts ta
-        JOIN terminal_traders tt ON tt.id = ta.trader_id
-        LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-        WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-          AND tt.external_id = ${String(user.id)}
-        LIMIT 1
-      `);
-
-      // Email fallback — if external_id lookup missed, find by email and re-link
-      if ((!ownershipResult.rows || ownershipResult.rows.length === 0) && user.email) {
-        ownershipResult = await db.execute(sql`
-          SELECT
-            tt.id  AS trader_id,
-            ca.id  AS challenge_account_id,
-            ta.id  AS trading_account_id,
-            ca.status AS challenge_status,
-            ca.plan AS plan,
-            ca.initial_balance AS initial_balance,
-            ta.account_code AS account_code,
-            ta.status AS trading_status
-          FROM trading_accounts ta
-          JOIN terminal_traders tt ON tt.id = ta.trader_id
-          LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-          WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-            AND tt.email = ${user.email}
-          LIMIT 1
-        `);
-        if (ownershipResult.rows && ownershipResult.rows.length > 0) {
-          const foundTraderId = (ownershipResult.rows[0] as any).trader_id;
-          console.info("[Terminal Launch] ownership found via email fallback — re-linking external_id", {
-            traderId: foundTraderId, userId: user.id, email: user.email,
-          });
-          db.execute(sql`
-            UPDATE terminal_traders
-            SET external_id = ${String(user.id)}, updated_at = now()
-            WHERE id = ${foundTraderId}::uuid
-              AND external_id != ${String(user.id)}
-          `).catch(() => {});
-        }
-      }
+      ownershipResult = await resolveUserAccountOwnership(db, String(user.id), accountId);
     } catch (dbErr: any) {
       console.error("[Terminal Launch] DB query failed:", dbErr.message);
       return res.status(500).json({ success: false, message: "Failed to verify account ownership." });
     }
 
-    if (!ownershipResult.rows || ownershipResult.rows.length === 0) {
+    if (!ownershipResult || !ownershipResult.rows || ownershipResult.rows.length === 0) {
       console.warn("[Terminal Launch] ownership check failed", { authUserId: auth.userId, accountId });
       return res.status(404).json({
         success: false,
@@ -435,7 +384,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     }
 
     // ── 8. LOCAL FALLBACK — generate token signed with shared SSO secret ──────
-    const ssoToken = generateSSOToken(String(user.id), prov.trading_account_id, storedLoginEmail, prov.challenge_account_id, storedAccountCode);
+    const ssoToken = generateSSOToken(String(user.id), prov.trading_account_id, storedLoginEmail);
     const terminalBase = TERMINAL_API_URL || PRODUCTION_TERMINAL_URL;
     const launchUrl = buildTerminalLaunchUrl(terminalBase, ssoToken, storedAccountCode);
     lastReturnedTerminalJwt = ssoToken;
@@ -512,20 +461,18 @@ function verifyActivationToken(token: string): { accountId: string; email: strin
  * Uses signTerminalJWT() (HS256, base64url) to produce a standard JWT that
  * jsonwebtoken.verify() on the terminal side accepts. Payload matches what
  * terminal's validateSSOToken() requires:
- *   - sub         = fwUserId  (required by validateSSOToken)
- *   - accountId   = tradingAccountId (required by validateSSOToken)
- *   - challengeId = challenge_account_id
- *   - accountCode = account_code (passed through so terminal can use it directly)
+ *   - sub       = fwUserId  (required by validateSSOToken)
+ *   - accountId = tradingAccountId (required by validateSSOToken)
  *   - email, nonce
  *   - exp = now + 60s  (terminal's maxAge: '120s' check will pass)
  *
  * Signed with SSO_SHARED_SECRET || SSO_API_KEY — same priority as the
  * terminal's sso.service.js so secrets always align.
  */
-function generateSSOToken(fwUserId: string, tradingAccountId: string, email: string, challengeId?: string | null, accountCode?: string): string {
+function generateSSOToken(fwUserId: string, tradingAccountId: string, email: string): string {
   const { secret, source } = getTerminalSSOSecret();
   const now = Math.floor(Date.now() / 1000);
-  const payload: Record<string, unknown> = {
+  const payload = {
     sub: fwUserId,
     accountId: tradingAccountId,
     email,
@@ -533,15 +480,11 @@ function generateSSOToken(fwUserId: string, tradingAccountId: string, email: str
     iat: now,
     exp: now + 60,
   };
-  if (challengeId) payload.challengeId = challengeId;
-  if (accountCode) payload.accountCode = accountCode;
   console.info("[Terminal Launch] signing SSO token", {
     secretSource: source,
     algorithm: SSO_TOKEN_ALGORITHM,
     sub: fwUserId,
     accountId: tradingAccountId,
-    challengeId: challengeId ?? null,
-    accountCode: accountCode ?? null,
   });
   return signTerminalJWT(payload, secret);
 }

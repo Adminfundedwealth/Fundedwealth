@@ -1873,7 +1873,7 @@ export default function Rules() {
 
   // Flash plan — show its own full detail page
   if (activePlan === "flash") {
-    const flashUrl = "https://www.fundedwealth.com/rules?plan=flash";
+    const flashUrl = "https://fundedwealth.com/rules?plan=flash";
 
     const handleShare = async () => {
       if (navigator.share) {
@@ -1933,7 +1933,7 @@ export default function Rules() {
 
   // Instant Funding plan — show its own full detail page
   if (activePlan === "instant") {
-    const instantUrl = "https://www.fundedwealth.com/rules?plan=instant";
+    const instantUrl = "https://fundedwealth.com/rules?plan=instant";
     const handleInstantShare = async () => {
       if (navigator.share) {
         try {
@@ -1986,7 +1986,7 @@ export default function Rules() {
 
   // 1-Step plan — show its own full detail page
   if (activePlan === "1step") {
-    const oneStepUrl = "https://www.fundedwealth.com/rules?plan=1step";
+    const oneStepUrl = "https://fundedwealth.com/rules?plan=1step";
     const handleOneStepShare = async () => {
       if (navigator.share) {
         try { await navigator.share({ title: "FundedWealth 1-Step Rules", text: "Check out the 1-Step challenge rules on FundedWealth — one evaluation, then funded forever.", url: oneStepUrl }); } catch (_) {}
@@ -2027,7 +2027,7 @@ export default function Rules() {
 
   // 2-Step plan — show its own full detail page
   if (activePlan === "2step") {
-    const twoStepUrl = "https://www.fundedwealth.com/rules?plan=2step";
+    const twoStepUrl = "https://fundedwealth.com/rules?plan=2step";
     const handleTwoStepShare = async () => {
       if (navigator.share) {
         try { await navigator.share({ title: "FundedWealth 2-Step Rules", text: "Check out the 2-Step challenge rules on FundedWealth — two phases, then funded with 6% max drawdown.", url: twoStepUrl }); } catch (_) {}
