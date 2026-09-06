@@ -49,7 +49,6 @@ const SocialMediaRail = lazy(() => import("@/components/SocialMediaRail"));
 import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
 import MobileShell from "@/components/MobileShell";
 import ForexLaunchPopup from "@/components/ForexLaunchPopup";
-import { trackPageView } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -149,20 +148,9 @@ function AppRouter() {
     );
 }
 
-function AnalyticsRouteTracker() {
-    const [location] = useLocation();
-
-    useEffect(() => {
-        trackPageView(location);
-    }, [location]);
-
-    return null;
-}
-
 function App() {
     return (
         <WouterRouter base={basePath}>
-            <AnalyticsRouteTracker />
             <SupabaseAuthProvider>
                 <FingerprintProvider>
                     <TradingDataProvider>
