@@ -9,6 +9,7 @@
   ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://fundedwealth-api-production.up.railway.app/api/:path*" },
+    { "source": "/blog/:slug", "destination": "/api/blog-route?slug=:slug" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
