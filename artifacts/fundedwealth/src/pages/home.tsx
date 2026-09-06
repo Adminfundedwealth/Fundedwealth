@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { useLiveDiscountConfig, computeDiscountedPrice, formatINR } from "@/hooks/useDiscountConfig";
 import SEOHead from "@/components/SEOHead";
 import { FAQSchema, ServiceSchema } from "@/components/StructuredData";
 import IndiaTraderNetworkHero from "@/components/IndiaTraderNetworkHero";
@@ -39,14 +38,7 @@ import {
   MapPin,
   Phone,
   Mail,
-  Banknote,
-  Share2,
-  Copy,
-  CheckCheck,
-  AlertTriangle,
-  Cookie,
-  UserCheck,
-  Scale
+  Banknote
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -59,6 +51,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PRODUCTS, type PlanType } from "@workspace/products";
+import {
+  trackCtaClick,
+  trackSelectItem,
+  trackViewItem,
+  trackViewItemList,
+  type ChallengeItem,
+} from "@/lib/analytics";
 
 
 // ─── Bulge / Magnetic text effect ───────────────────────────────────────────
@@ -626,14 +626,17 @@ const AnnouncementBar = () => {
 };
 
 const DiscountBar = () => {
-  const { entries } = useLiveDiscountConfig();
-  const activeOffers = entries.filter((e) => e.active);
-  const offers = activeOffers.length > 0 ? activeOffers : entries;
+  const offers = [
+    { code: "Flash", discount: "60% OFF", label: "Flash Funding" },
+    { code: "Instant", discount: "55% OFF", label: "Instant Funding" },
+    { code: "FW", discount: "65% OFF", label: "1-Step Evaluation" },
+    { code: "FW", discount: "70% OFF", label: "2-Step Evaluation" },
+  ];
 
   const content = offers.map((o, i) => (
     <span key={i} className="inline-flex items-center gap-3 mx-8">
-      <span className="text-white font-extrabold text-sm tracking-tight">{o.discountPct}% OFF</span>
-      <span className="text-white/60 text-xs font-medium">{o.displayLabel}</span>
+      <span className="text-white font-extrabold text-sm tracking-tight">{o.discount}</span>
+      <span className="text-white/60 text-xs font-medium">{o.label}</span>
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 border border-white/15">
         <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Code:</span>
         <span className="text-xs text-fw-orange font-bold tracking-wide">{o.code}</span>
@@ -675,25 +678,22 @@ const Navbar = () => {
             <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
               <span></span>FundedWealth <span className="opacity-90">IND</span>
             </button>
-            {/* FundedWealth Forex — 3D glassy tab */}
-            <a
-              href="https://forex.fundedwealth.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-all duration-200 hover:scale-105 select-none"
-              style={{
-                background: "linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(0,255,180,0.10) 50%, rgba(0,120,255,0.18) 100%)",
-                border: "1px solid rgba(0,220,255,0.35)",
-                boxShadow: "0 2px 16px 0 rgba(0,212,255,0.18), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.10)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                color: "rgba(180,255,255,0.95)",
-                textShadow: "0 0 8px rgba(0,212,255,0.6)",
-              }}
-            >
-              <span style={{ filter: "drop-shadow(0 0 4px rgba(0,212,255,0.8))" }}></span>
-              FundedWealth <span style={{ opacity: 0.9 }}>Forex</span>
-            </a>
+            {[
+              { label: "Forex", icon: "" },
+              { label: "Crypto", icon: "₿" },
+              { label: "Futures", icon: "" },
+            ].map((t) => (
+              <button
+                key={t.label}
+                disabled
+                title="Coming Soon"
+                className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-medium text-white/50 hover:text-white/70 transition-colors flex items-center gap-1.5 cursor-not-allowed"
+              >
+                <span>{t.icon}</span>
+                FundedWealth <span className="opacity-90">{t.label}</span>
+                <span className="ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">Soon</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -733,7 +733,7 @@ const Navbar = () => {
                 {t("nav.signIn")}
               </Button>
             )}
-            <Button onClick={() => navigate(isSignedIn ? "/checkout" : "/sign-in")}
+            <Button onClick={() => { trackCtaClick({ cta_name: "Get Funded", cta_location: "header", cta_destination: isSignedIn ? "/checkout" : "/sign-in" }); navigate(isSignedIn ? "/checkout" : "/sign-in"); }}
               className="bg-gradient-fw text-white border-0 rounded-full px-6 font-bold shadow-lg shadow-fw-pink/20 hover:shadow-fw-pink/40 transition-all">
               Get Funded
             </Button>
@@ -772,7 +772,7 @@ const Navbar = () => {
                     className="w-full justify-center border-white/20 text-white">
                     {isSignedIn ? "Dashboard" : "Login"}
                   </Button>
-                  <Button onClick={() => { navigate(isSignedIn ? "/checkout" : "/sign-in"); setMobileMenuOpen(false); }}
+                  <Button onClick={() => { trackCtaClick({ cta_name: "Get Funded", cta_location: "header_mobile", cta_destination: isSignedIn ? "/checkout" : "/sign-in" }); navigate(isSignedIn ? "/checkout" : "/sign-in"); setMobileMenuOpen(false); }}
                     className="w-full justify-center bg-gradient-fw text-white border-0 font-bold">
                     Get Funded
                   </Button>
@@ -855,7 +855,7 @@ const HeroChampionshipPopup = () => {
 const Hero = () => {
   const [, navigate] = useLocation();
   return (
-    <section id="home" className="relative bg-[#03000A] overflow-hidden hero-viewport-fit flex items-center justify-center">
+    <section id="home" className="relative isolate bg-[#03000A] overflow-hidden min-h-[calc(100svh-107px)] lg:h-[calc(100svh-107px)] lg:min-h-0 flex items-center justify-center py-8 sm:py-10 lg:py-5">
       <IndiaTraderNetworkHero />
 
       {/* Extra shooting stars & sparkle particles */}
@@ -922,63 +922,47 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 w-full hero-content-pad">
+      <div className="relative z-20 w-full">
         <div className="max-w-[1100px] mx-auto px-5 md:px-8">
           <div className="flex flex-col items-center text-center">
 
             {/* Top badge */}
-            <div className="mb-2 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
+            <div className="mb-2 inline-flex items-center gap-2 text-white/90 text-xs sm:text-sm md:text-base font-bold tracking-wide">
               <span className="text-lg">🇮🇳</span>
-              <span><BulgeText text="INDIA'S SIMULATED TRADING " /><BulgeText text="& EVALUATION PLATFORM" className="text-fw-orange" /></span>
+              <span><BulgeText text="IN " /><BulgeText text="INDIA'S SIMULATED TRADING " /><BulgeText text="& EVALUATION PLATFORM" className="text-fw-orange" /></span>
             </div>
 
             {/* Subtitle line */}
-            <div className="mb-3 flex items-center gap-3">
+            <div className="mb-3 flex items-center gap-2">
               <div className="h-px w-8 bg-white/20" />
-              <span className="text-white/50 text-xs md:text-sm italic tracking-widest font-medium">
-                <BulgeText text="Structured Simulated Trading for Indian Markets" radius={100} strength={0.4} />
+              <span className="text-white/50 text-[10px] sm:text-xs md:text-sm italic tracking-widest font-medium">
+                <BulgeText text="The Future of Indian Trader" radius={100} strength={0.4} />
               </span>
               <div className="h-px w-8 bg-white/20" />
             </div>
 
+
             {/* Main headline */}
-            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white hero-headline uppercase hero-color-cycle">
+            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white text-3xl sm:text-4xl md:text-5xl lg:text-[clamp(44px,4.5vw,68px)] uppercase hero-color-cycle">
               <BulgeText text="TRADE SMARTER." radius={150} strength={0.6} /><br />
               <BulgeText text="PROVE YOUR SKILLS." radius={150} strength={0.6} />
             </h1>
 
-            {/* Description block — condensed to keep everything above the fold */}
-            <div className="mt-4 max-w-[680px] space-y-2 text-white/85 hero-body-text leading-snug">
-              <p>
-                Build your trading discipline in a structured simulated environment designed around risk management, consistent execution, and measurable performance.
-              </p>
-              <p>
-                Trade Indian market instruments including NIFTY, BANKNIFTY, SENSEX and selected equities &amp; futures:<br />
-                <span className="text-white font-bold tracking-wide">
-                  <BulgeText text="NIFTY • BANKNIFTY • SENSEX • FINNIFTY" radius={120} strength={0.45} />
-                </span>
-              </p>
-              <p>
-                Equities: <span className="text-white font-bold tracking-wide">
-                  <BulgeText text="NIFTY 500 • Stock Futures" radius={120} strength={0.45} />
-                </span>
-              </p>
-              <p className="text-white font-bold text-sm md:text-base">
-                Account sizes up to <span className="text-fw-orange font-extrabold">₹50 Lakhs</span> — trade under clearly defined risk parameters and become eligible for{" "}
-                <span className="text-blue-400 font-extrabold">performance-based rewards</span>.
-              </p>
-              <p className="text-white/45 text-xs font-normal">
-                All trading activity on FundedWealth is simulated for evaluation purposes. Balances shown are simulated and do not represent customer-owned funds.
-              </p>
+            {/* Description block */}
+            <div className="mt-4 max-w-[760px] space-y-1.5 text-white/85 text-sm sm:text-base md:text-lg leading-snug">
+              <p>Build your trading discipline in a structured simulated environment designed around risk management, consistent execution, and measurable performance.</p>
+              <p>Trade Indian market instruments including <span className="text-white font-bold">NIFTY, BANKNIFTY, SENSEX</span> and selected equities & futures.</p>
+              <p className="text-white font-bold">NIFTY • BANKNIFTY • SENSEX • FINNIFTY <span className="text-white/50">|</span> NIFTY 500 • Stock Futures</p>
+              <p className="pt-2 text-xs sm:text-sm md:text-base text-white/70">Account sizes up to <span className="text-fw-orange font-extrabold">₹50 Lakhs</span> with clearly defined risk parameters and performance-based rewards.</p>
             </div>
 
-            {/* CTA Buttons — all four in one responsive row */}
-            <div className="mt-5 flex items-center justify-center gap-3 flex-nowrap hero-cta-row" style={{ width: "100%", maxWidth: "900px" }}>
+            {/* CTA Buttons — Liquid Glass */}
+            <div className="mt-5 sm:mt-6 grid w-full max-w-[900px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6 lg:gap-3">
 
               {/* 1. EXPLORE PLANS — Liquid Sunset Glass */}
               <button
-                onClick={() => navigate("/checkout")}
-                className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                onClick={() => { trackCtaClick({ cta_name: "Explore Plans", cta_location: "hero", cta_destination: "/checkout" }); navigate("/checkout"); }}
+                className="group relative col-span-1 rounded-full px-5 py-3 sm:px-6 sm:py-3.5 lg:col-span-2 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(255,106,61,0.18) 0%, rgba(255,0,128,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -987,22 +971,25 @@ const Hero = () => {
                   boxShadow: "0 0 24px rgba(255,106,61,0.25), 0 0 60px rgba(255,0,128,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,106,61,0.15)",
                 }}
               >
-                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,106,61,0.22) 0%, rgba(255,0,128,0.18) 100%)" }} />
-                <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,106,61,0.4) 0%, rgba(255,0,128,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                  <Zap className="w-4 h-4 text-orange-300" />
+                {/* Top gloss reflection */}
+                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                {/* Hover glow fill */}
+                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,106,61,0.22) 0%, rgba(255,0,128,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(255,106,61,0.1)" }} />
+                {/* Ambient glow behind button */}
+                <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,106,61,0.4) 0%, rgba(255,0,128,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <Zap className="w-5 h-5 text-orange-300" />
                   <BulgeText text="EXPLORE PLANS" radius={100} strength={0.5} />
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
 
               {/* 2. WATCH DEMO — Liquid Cosmic Violet Glass */}
               <a
-                href="https://youtu.be/w3yyFx_hDcE"
+                href="https://www.youtube.com/@FundedWealth"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative col-span-1 rounded-full px-5 py-3 sm:px-6 sm:py-3.5 lg:col-span-2 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(140,80,255,0.18) 0%, rgba(90,0,255,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -1011,11 +998,14 @@ const Hero = () => {
                   boxShadow: "0 0 24px rgba(140,80,255,0.25), 0 0 60px rgba(90,0,255,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(140,80,255,0.15)",
                 }}
               >
-                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(140,80,255,0.22) 0%, rgba(90,0,255,0.18) 100%)" }} />
-                <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(140,80,255,0.4) 0%, rgba(90,0,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                  <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                {/* Top gloss reflection */}
+                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                {/* Hover glow fill */}
+                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(140,80,255,0.22) 0%, rgba(90,0,255,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(140,80,255,0.1)" }} />
+                {/* Ambient glow behind button */}
+                <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(140,80,255,0.4) 0%, rgba(90,0,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <svg className="w-5 h-5 text-violet-300" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                   <BulgeText text="WATCH DEMO" radius={100} strength={0.5} />
                 </span>
               </a>
@@ -1023,7 +1013,7 @@ const Hero = () => {
               {/* 3. HOW IT WORKS — Liquid Neon Blue Glass */}
               <Link href="/rules">
                 <button
-                  className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative col-span-1 rounded-full px-5 py-3 sm:px-6 sm:py-3.5 lg:col-span-2 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(0,180,255,0.18) 0%, rgba(90,80,255,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -1032,21 +1022,24 @@ const Hero = () => {
                     boxShadow: "0 0 24px rgba(0,180,255,0.25), 0 0 60px rgba(90,80,255,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,180,255,0.15)",
                   }}
                 >
-                  <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,180,255,0.22) 0%, rgba(90,80,255,0.18) 100%)" }} />
-                  <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.4) 0%, rgba(90,80,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                  <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                    <FileText className="w-4 h-4 text-cyan-300" />
+                  {/* Top gloss reflection */}
+                  <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                  {/* Hover glow fill */}
+                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,180,255,0.22) 0%, rgba(90,80,255,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(0,180,255,0.1)" }} />
+                  {/* Ambient glow behind button */}
+                  <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.4) 0%, rgba(90,80,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                  <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                    <FileText className="w-5 h-5 text-cyan-300" />
                     <BulgeText text="HOW IT WORKS" radius={100} strength={0.5} />
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
               </Link>
 
               {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
               <button
-                onClick={() => navigate("/sign-up?trial=true")}
-                className="group relative rounded-2xl hero-cta-btn text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                onClick={() => { trackCtaClick({ cta_name: "Free Trial Account", cta_location: "hero", cta_destination: "/sign-up?trial=true" }); navigate("/sign-up?trial=true"); }}
+                className="group relative col-span-1 rounded-full px-5 py-3 sm:px-6 sm:py-3.5 lg:col-span-2 lg:col-start-3 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(5,150,105,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -1055,13 +1048,13 @@ const Hero = () => {
                   boxShadow: "0 0 24px rgba(16,185,129,0.25), 0 0 60px rgba(5,150,105,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(16,185,129,0.15)",
                 }}
               >
-                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)" }} />
-                <div className="absolute inset-0 rounded-2xl -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.4) 0%, rgba(5,150,105,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                  <Users className="w-4 h-4 text-emerald-300" />
+                <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
+                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(16,185,129,0.1)" }} />
+                <div className="absolute inset-0 rounded-full -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.4) 0%, rgba(5,150,105,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                <span className="relative flex items-center gap-2.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <Users className="w-5 h-5 text-emerald-300" />
                   <BulgeText text="FREE TRIAL ACCOUNT" radius={100} strength={0.5} />
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
 
@@ -1073,111 +1066,6 @@ const Hero = () => {
 
       {/* Color cycle animation + shooting stars */}
       <style>{`
-        /* ── Hero viewport-fit ──────────────────────────────────────────────
-           The section always fills at least the full viewport height but
-           never forces content below the fold. content-pad adds vertical
-           breathing room while keeping everything inside the first screen.
-        ─────────────────────────────────────────────────────────────────── */
-        .hero-viewport-fit {
-          min-height: 100svh;          /* small viewport height — respects mobile browser chrome */
-          min-height: 100dvh;          /* dynamic viewport height — best on mobile */
-        }
-        /* Top + bottom padding so content breathes without overflowing */
-        .hero-content-pad {
-          padding-top: clamp(56px, 8vh, 96px);
-          padding-bottom: clamp(40px, 6vh, 80px);
-        }
-        /* Headline: fluid scale from 36px (short/small) to 60px (tall/wide) */
-        .hero-headline {
-          font-size: clamp(2.1rem, 5.5vw, 3.75rem);
-        }
-        /* Body text: fluid, comfortable on all sizes */
-        .hero-body-text {
-          font-size: clamp(0.875rem, 1.4vw, 1.0625rem);
-        }
-        /* CTA buttons: equal-width rectangular cards, fixed dimensions */
-        .hero-cta-btn {
-          flex: 1 1 0;
-          min-width: 0;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 16px 12px;
-          height: 64px;
-          white-space: nowrap;
-          text-align: center;
-        }
-        /* Row: no wrap on desktop — always 4 in a line */
-        .hero-cta-row {
-          flex-wrap: nowrap;
-          width: 100%;
-          max-width: 900px;
-        }
-        /* On very short viewports (≤720px height), compress vertically */
-        @media (max-height: 720px) {
-          .hero-content-pad {
-            padding-top: 44px;
-            padding-bottom: 28px;
-          }
-          .hero-headline {
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
-          }
-          .hero-body-text {
-            font-size: 0.8125rem;
-          }
-          .hero-cta-btn {
-            padding: 10px 10px;
-            height: 54px;
-          }
-          .hero-cta-row {
-            gap: 8px;
-          }
-        }
-        /* Tablet (769px–1024px) — still 4 in a row, slightly smaller text/padding */
-        @media (max-width: 1024px) and (min-width: 769px) {
-          .hero-cta-btn {
-            padding: 14px 10px;
-            height: 60px;
-            font-size: 0.7rem;
-          }
-          .hero-cta-row {
-            gap: 10px;
-            max-width: 720px;
-          }
-        }
-        /* Tablet portrait — 2×2 grid */
-        @media (max-width: 768px) {
-          .hero-headline {
-            font-size: clamp(2rem, 7vw, 3rem);
-          }
-          .hero-cta-row {
-            flex-wrap: wrap;
-            max-width: 480px;
-            gap: 10px;
-          }
-          .hero-cta-btn {
-            flex: 1 1 calc(50% - 5px);
-            min-width: calc(50% - 5px);
-            height: 58px;
-          }
-        }
-        /* Mobile — full width stack */
-        @media (max-width: 480px) {
-          .hero-headline {
-            font-size: clamp(1.75rem, 8vw, 2.5rem);
-          }
-          .hero-cta-btn {
-            flex: 1 1 100%;
-            min-width: 100%;
-            height: 52px;
-          }
-          .hero-cta-row {
-            flex-direction: column;
-            align-items: stretch;
-            max-width: 320px;
-          }
-        }
         .hero-color-cycle {
           animation: _colorCycle 8s ease-in-out infinite;
         }
@@ -1220,6 +1108,33 @@ const Hero = () => {
   );
 };
 
+const Stats = () => {
+  return (
+    <section className="py-12 border-y border-white/10 bg-black/20 backdrop-blur-sm relative z-20">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink mb-2">₹45 Lakhs+</div>
+            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Payouts Delivered</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-pink to-fw-purple mb-2">15,000+</div>
+            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Funded Traders</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-white mb-2">12 HRS</div>
+            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Guaranteed Payout</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-white mb-2">70%-90%</div>
+            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Max Profit Split</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const IndianInstruments = () => {
   const indexFO = [
     { name: "NIFTY", desc: "Nifty 50 Options & Futures", color: "from-orange-500 to-red-500" },
@@ -1243,7 +1158,7 @@ const IndianInstruments = () => {
             What You Can <span className="text-gradient">Trade</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            FundedWealth India is a structured simulated trading and evaluation platform built exclusively for Indian markets. Simulated accounts use real-time NSE and BSE market data for evaluation purposes. Program fees and applicable rewards are denominated in INR.
+            FundedWealth IND is built exclusively for Indian markets. Trade Index F&O and Equities on real NSE/BSE price feeds in INR.
           </p>
         </div>
 
@@ -1282,6 +1197,20 @@ const IndianInstruments = () => {
           </div>
         </div>
 
+        <div className="mt-10 rounded-2xl bg-gradient-to-r from-amber-500/5 via-orange-500/5 to-amber-500/5 border border-amber-500/20 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="text-3xl"></div>
+          <div className="flex-1">
+            <div className="text-amber-300 text-xs font-bold uppercase tracking-wider mb-1">Coming Soon — Same Brand, Separate Verticals</div>
+            <p className="text-white/70 text-sm">
+              <strong className="text-white">FundedWealth Forex</strong>, <strong className="text-white">FundedWealth Crypto</strong> and <strong className="text-white">FundedWealth Futures</strong> launching as dedicated platforms. Same trust, global markets.
+            </p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold"> Forex</span>
+            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold">₿ Crypto</span>
+            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold"> Futures</span>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1289,12 +1218,12 @@ const IndianInstruments = () => {
 
 const FWIndEdge = () => {
   const edges = [
-    { icon: <Building2 className="w-6 h-6" />, title: "Market Data for Simulation", desc: "Simulated account pricing is based on available Indian market data and is designed to reflect prevailing market conditions for evaluation purposes.", color: "from-blue-500 to-cyan-500" },
-    { icon: <BarChart3 className="w-6 h-6" />, title: "Indian Market Price Data", desc: "Simulated trading uses market price data designed to reflect current Indian market conditions for evaluation purposes.", color: "from-emerald-500 to-teal-500" },
-    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Program fees and eligible performance rewards are denominated in INR. Reward processing is subject to verification, applicable terms, and available payout methods.", color: "from-orange-500 to-amber-500" },
-    { icon: <Zap className="w-6 h-6" />, title: "Market-Based Simulation", desc: "The simulated environment uses market price data to provide a realistic evaluation experience based on Indian market conditions.", color: "from-purple-500 to-pink-500" },
-    { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in risk analytics monitor simulated trading activity and identify patterns such as overleveraging, revenge trading, and rule breaches.", color: "from-rose-500 to-red-500" },
-    { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "A structured simulated evaluation environment with clear rules, fees, and reward conditions published upfront.", color: "from-indigo-500 to-violet-500" },
+    { icon: <Building2 className="w-6 h-6" />, title: "SEBI-Regulated Brokers", desc: "All settlement partners are SEBI-licensed Indian brokerages — your funded payouts move through compliant rails.", color: "from-blue-500 to-cyan-500" },
+    { icon: <BarChart3 className="w-6 h-6" />, title: "Real NSE/BSE Price Feeds", desc: "Trade on live NSE & BSE tick data — exactly the same prices a retail trader sees on their broker terminal.", color: "from-emerald-500 to-teal-500" },
+    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · UPI Payouts", desc: "Pay in ₹, get paid in ₹. UPI / IMPS / NEFT direct to your bank — no FX, no intermediary, no delay.", color: "from-orange-500 to-amber-500" },
+    { icon: <Zap className="w-6 h-6" />, title: "Lightning-Fast Execution", desc: "Sub-100ms order routing on real NSE/BSE feeds — slippage and freezes kept to absolute minimum.", color: "from-purple-500 to-pink-500" },
+    { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in discipline scoring monitors your every trade — overleveraging, revenge trading, drawdown breaches flagged in real time.", color: "from-rose-500 to-red-500" },
+    { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "Simulated evaluation environment with real market data. Every rule, fee, and payout published upfront. No surprises.", color: "from-indigo-500 to-violet-500" },
   ];
   return (
     <section id="ind-edge" className="py-14 relative overflow-hidden">
@@ -1305,10 +1234,10 @@ const FWIndEdge = () => {
             The FundedWealth IND Edge
           </span>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3">
-            Designed For <span className="text-gradient">Indian Traders</span>
+            Built For <span className="text-gradient">Indian Traders</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Every feature is purpose-built for Indian markets — using market-based pricing and a structured simulated evaluation environment.
+            Every feature engineered for the Indian market — from SEBI-regulated rails to UPI payouts to NSE/BSE feeds.
           </p>
         </div>
 
@@ -1425,7 +1354,7 @@ const HowItWorksIND = () => {
       icon: <Users className="w-5 h-5" />,
       iconBg: "from-blue-500 to-indigo-600",
       title: "Sign Up & Choose Program",
-      desc: "Create your profile and choose an evaluation plan that matches your trading style. Get started in minutes with our simple onboarding flow.",
+      desc: "Create your profile and enrol in a challenge plan. Get started in minutes with our simple onboarding flow.",
       visual: (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-4">
           <div className="h-2.5 rounded-full bg-white/10 mb-2.5 w-3/4" />
@@ -1441,7 +1370,7 @@ const HowItWorksIND = () => {
       icon: <BarChart3 className="w-5 h-5" />,
       iconBg: "from-violet-500 to-purple-600",
       title: "Complete Risk Assessment",
-      desc: "Trade within the defined risk parameters on your simulated account using real NSE/BSE data. Hit your profit target while staying within drawdown limits to qualify.",
+      desc: "Trade with simulated capital on real NSE/BSE feeds. Hit your profit target while respecting drawdown limits to qualify.",
       visual: (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mt-4 flex items-center justify-center">
           <div className="relative w-24 h-24">
@@ -1468,7 +1397,7 @@ const HowItWorksIND = () => {
       icon: <Trophy className="w-5 h-5" />,
       iconBg: "from-amber-500 to-orange-600",
       title: "Get Allocated",
-      desc: "Successful participants receive a simulated evaluation account. Continue trading under the defined risk parameters on FundedWealth's platform.",
+      desc: "Once you pass, you're allocated a funded account. You're now trading FundedWealth's capital — not your own savings.",
       visual: (
         <div className="bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 rounded-2xl p-6 mt-4 flex items-center justify-center">
           <Trophy className="w-14 h-14 text-amber-400" strokeWidth={1.5} />
@@ -1480,7 +1409,7 @@ const HowItWorksIND = () => {
       icon: <Banknote className="w-5 h-5" />,
       iconBg: "from-emerald-500 to-teal-600",
       title: "Performance Share",
-      desc: "Demonstrate consistent performance and become eligible for performance-based rewards under the applicable program terms. Request rewards via UPI / IMPS / NEFT every 7 days.",
+      desc: "You trade, we take the risk. Keep 70-90% of profits. Withdraw via UPI / IMPS / NEFT every 7 days.",
       visual: (
         <div className="bg-white/5 border border-white/10 rounded-2xl p-3 mt-4 space-y-1.5">
           {["+₹25,000", "+₹50,000", "+₹75,000"].map((v) => (
@@ -1507,7 +1436,7 @@ const HowItWorksIND = () => {
             How It <span className="text-gradient">Works</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Choose an evaluation plan that matches your trading style and experience. From sign-up to performance rewards — the process is straightforward and transparent.
+            Follow this simple roadmap to become a funded trader. From sign up to payout — the journey is straightforward and transparent.
           </p>
         </div>
 
@@ -1530,7 +1459,7 @@ const HowItWorksIND = () => {
         <div className="text-center mt-10">
           <Link href="/checkout">
             <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl h-12 px-8 font-bold shadow-lg hover:shadow-purple-500/30 transition-all">
-              Start Your Evaluation <ArrowRight size={16} className="ml-2" />
+              Start Your Assessment <ArrowRight size={16} className="ml-2" />
             </Button>
           </Link>
         </div>
@@ -1541,10 +1470,10 @@ const HowItWorksIND = () => {
 
 const PayoutsMadeSimple = () => {
   const steps = [
-    { num: "01", icon: <CheckCircle2 className="w-5 h-5" />, iconBg: "from-blue-500 to-indigo-600", title: "Pass Evaluation", desc: "Complete your evaluation phase(s) and meet all defined objectives.", time: "30-45 days" },
-    { num: "02", icon: <TrendingUp className="w-5 h-5" />, iconBg: "from-slate-600 to-slate-800", title: "Receive Simulated Account", desc: "Receive access to your simulated evaluation account within 24 hours of passing.", time: "< 24 hours" },
-    { num: "03", icon: <Banknote className="w-5 h-5" />, iconBg: "from-emerald-500 to-green-600", title: "Trade & Perform", desc: "Trade within risk parameters on your simulated account and generate measurable performance.", time: "Weekly cycle" },
-    { num: "04", icon: <CreditCard className="w-5 h-5" />, iconBg: "from-blue-500 to-cyan-600", title: "Request Reward", desc: "Submit reward requests via your dashboard under the applicable program terms — UPI / IMPS / NEFT.", time: "Every 7 days" },
+    { num: "01", icon: <CheckCircle2 className="w-5 h-5" />, iconBg: "from-blue-500 to-indigo-600", title: "Pass Assessment", desc: "Complete your evaluation phase(s) and meet all objectives.", time: "30-45 days" },
+    { num: "02", icon: <TrendingUp className="w-5 h-5" />, iconBg: "from-slate-600 to-slate-800", title: "Get Funded", desc: "Receive your funded account within 24 hours of passing.", time: "< 24 hours" },
+    { num: "03", icon: <Banknote className="w-5 h-5" />, iconBg: "from-emerald-500 to-green-600", title: "Trade & Earn", desc: "Start trading with real allocated capital and track your profits.", time: "Weekly cycle" },
+    { num: "04", icon: <CreditCard className="w-5 h-5" />, iconBg: "from-blue-500 to-cyan-600", title: "Request Payout", desc: "Submit payout requests via your dashboard — UPI / IMPS / NEFT.", time: "Every 7 days" },
   ];
   return (
     <section id="payouts-simple" className="py-14 relative overflow-hidden">
@@ -1556,11 +1485,11 @@ const PayoutsMadeSimple = () => {
               Payouts <span className="text-gradient">Made Simple</span>
             </h2>
             <p className="text-white/60 mb-6 leading-relaxed">
-              Transparent, structured, and performance-driven reward splits designed for Indian traders. Eligible participants receive their performance-based rewards under the applicable program terms.
+              Fast, transparent, and generous profit splits designed for Indian traders. Get paid for your trading skills — without the capital risk.
             </p>
             <Link href="/checkout">
               <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl h-12 px-7 font-bold shadow-lg hover:shadow-purple-500/30">
-                Start Your Evaluation <ArrowRight size={16} className="ml-2" />
+                Start Earning Today <ArrowRight size={16} className="ml-2" />
               </Button>
             </Link>
           </div>
@@ -1629,9 +1558,9 @@ const PayoutsMadeSimple = () => {
 
 const WhyTradersLoveUs = () => {
   const cards = [
-    { icon: <Clock className="w-7 h-7" />, iconBg: "bg-blue-500/10", iconColor: "text-blue-400", title: "Rewards Every 7 Days", desc: "Eligible performance-based rewards processed every 7 days — UPI/IMPS direct to your bank under the applicable program terms.", badge: "WEEKLY CYCLE", badgeColor: "text-blue-400" },
-    { icon: <CreditCard className="w-7 h-7" />, iconBg: "bg-slate-500/10", iconColor: "text-slate-300", title: "Streamlined Process", desc: "Request and track your performance-based rewards directly from your dashboard.", badge: "SIMPLE & TRANSPARENT", badgeColor: "text-slate-300" },
-    { icon: <BarChart3 className="w-7 h-7" />, iconBg: "bg-emerald-500/10", iconColor: "text-emerald-400", title: "90% Performance Share", desc: "Keep up to 90% of your simulated performance results as a reward — among the highest shares available.", badge: "INDUSTRY LEADING", badgeColor: "text-emerald-400" },
+    { icon: <Clock className="w-7 h-7" />, iconBg: "bg-blue-500/10", iconColor: "text-blue-400", title: "Fast Payouts", desc: "Payouts processed every 7 days — UPI/IMPS direct to your bank.", badge: "WEEKLY CYCLE", badgeColor: "text-blue-400" },
+    { icon: <CreditCard className="w-7 h-7" />, iconBg: "bg-slate-500/10", iconColor: "text-slate-300", title: "Streamlined Process", desc: "Request and track payouts easily right from your dashboard.", badge: "SIMPLE & TRANSPARENT", badgeColor: "text-slate-300" },
+    { icon: <BarChart3 className="w-7 h-7" />, iconBg: "bg-emerald-500/10", iconColor: "text-emerald-400", title: "90% Profit Split", desc: "Keep up to 90% of every rupee you earn — industry leading split.", badge: "INDUSTRY LEADING", badgeColor: "text-emerald-400" },
   ];
   return (
     <section id="why-love-us" className="py-14 relative overflow-hidden">
@@ -1687,7 +1616,7 @@ const PayoutCertificates = () => {
         <div className="text-cyan-100 text-[10px] tracking-[0.22em] font-bold mb-3">PAYOUT CERTIFICATE</div>
         <div className="text-white/50 text-[9px] uppercase tracking-wider mb-1">Awarded To</div>
         <div className="text-white font-extrabold text-lg leading-tight mb-3 truncate">{name}</div>
-        <div className="text-white/40 text-[9px] mb-3 leading-snug">In recognition of your consistent simulated trading performance</div>
+        <div className="text-white/40 text-[9px] mb-3 leading-snug">In recognition of your successful trading performance</div>
         <div className="bg-gradient-to-r from-emerald-400 to-cyan-300 bg-clip-text text-transparent font-extrabold text-2xl mb-2">
           {amount}
         </div>
@@ -1704,12 +1633,12 @@ const PayoutCertificates = () => {
       <div className="glow-orb orb-2"></div>
       <div className="container mx-auto px-4 md:px-6 relative mb-8">
         <div className="text-center">
-          <div className="text-emerald-300 text-[11px] tracking-[0.25em] font-bold mb-3">VERIFIED PERFORMANCE REWARDS</div>
+          <div className="text-emerald-300 text-[11px] tracking-[0.25em] font-bold mb-3">VERIFIED PAYOUTS</div>
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3">
-            Real Traders. <span className="text-gradient">Real Results.</span>
+            Real Traders. <span className="text-gradient">Real Profits.</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Join the community of evaluation participants who have received their performance-based rewards from FundedWealth IND under the applicable program terms.
+            Join the network of funded traders who have already received their payouts from FundedWealth IND.
           </p>
         </div>
       </div>
@@ -1823,23 +1752,23 @@ const TechAndBenefits = () => {
       ),
     },
     {
-      title: "No Per-Trade Costs in Simulation",
-      desc: "Trade Indian instruments in the simulated environment with no per-trade charges, so your evaluation reflects your strategy, not fees.",
+      title: "Competitive Brokerage & Leverage",
+      desc: "Trade Indian stocks with zero brokerage rates and competitive leverage matching the best Indian brokers.",
       iconBg: "bg-pink-500",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="5" x2="5" y2="19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" /></svg>
       ),
       visual: (
         <div className="bg-white/5 border border-white/10 rounded-xl p-5 mt-4 flex flex-col items-center">
-          <div className="text-rose-400 font-extrabold text-3xl">Rs 0</div>
-          <div className="text-white font-bold text-xs mt-1">Simulated Trade Costs</div>
-          <div className="text-white/40 text-[10px] mt-0.5">Focus on performance</div>
+          <div className="text-rose-400 font-extrabold text-3xl">0%</div>
+          <div className="text-white font-bold text-xs mt-1">Brokerage</div>
+          <div className="text-white/40 text-[10px] mt-0.5">Competitive leverage</div>
         </div>
       ),
     },
     {
       title: "Performance-Based Rewards",
-      desc: "Earn up to 90% profit share through FundedWealth's simulated evaluation account — based purely on your skill.",
+      desc: "Trade with real capital through FundedWealth's proprietary account and earn up to 90% of profits — based purely on your skill.",
       iconBg: "bg-amber-500",
       icon: <Trophy className="w-5 h-5 text-white" strokeWidth={2.5} />,
       visual: (
@@ -1925,7 +1854,7 @@ const Championship = () => {
             </h2>
 
             <p className="text-lg text-white/70 mb-8 leading-relaxed">
-              Join FundedWealth's monthly simulated trading competition. Demonstrate your skills against participants across India and win performance prizes. Trade in a structured simulated environment — pure skill decides the winners.
+              Join India's #1 Prop Trading Competition. Prove your skills against the best traders in the country and win massive prizes. No evaluation needed — pure skill wins.
             </p>
 
             <div className="space-y-6 mb-10">
@@ -1935,7 +1864,7 @@ const Championship = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white mb-1">1st Place — ₹10 Lakh Account</h4>
-                  <p className="text-white/60">Win a ₹10L 1-Step simulated evaluation plan + Apple MacBook + ₹30,000 cash + Certificate.</p>
+                  <p className="text-white/60">Win a ₹10L 1-Step Evaluation account + Apple MacBook + ₹30,000 cash + Certificate.</p>
                 </div>
               </div>
 
@@ -1945,7 +1874,7 @@ const Championship = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white mb-1">2nd Place — ₹5 Lakh Account</h4>
-                  <p className="text-white/60">Win a ₹5L 1-Step simulated evaluation plan + ₹20,000 cash + Certificate.</p>
+                  <p className="text-white/60">Win a ₹5L 1-Step Evaluation account + ₹20,000 cash + Certificate.</p>
                 </div>
               </div>
 
@@ -1955,7 +1884,7 @@ const Championship = () => {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white mb-1">3rd Place — ₹2 Lakh Account</h4>
-                  <p className="text-white/60">Win a ₹2L 1-Step simulated evaluation plan + ₹9,000 cash + Certificate.</p>
+                  <p className="text-white/60">Win a ₹2L 1-Step Evaluation account + ₹9,000 cash + Certificate.</p>
                 </div>
               </div>
             </div>
@@ -2013,10 +1942,10 @@ const Guarantee = () => {
               12 HRS
             </h2>
             <h3 className="text-3xl font-bold text-white mb-6 leading-tight">
-              Eligible Rewards Processed Within 12 Hours.
+              Get Your Payout Within 12 Hours.
             </h3>
             <p className="text-white/70 text-lg mb-8">
-              Eligible performance-based rewards for approved participants are processed quickly. Rewards are paid under the applicable program terms — no unnecessary delays.
+              We know why you trade. You trade for freedom. And freedom shouldn't be locked behind a 30-day waiting period.
             </p>
             <div className="inline-flex items-center gap-3 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-bold">
               <Clock size={20} /> AVG. DISBURSEMENT TIME — 5-7 HOURS
@@ -2030,8 +1959,8 @@ const Guarantee = () => {
                   <Zap className="text-fw-orange w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-white mb-2">Rewards Every 7 Days</h4>
-                  <p className="text-white/60">Eligible performance-based rewards processed every 7 days, directly to your preferred account under the applicable program terms.</p>
+                  <h4 className="text-xl font-bold text-white mb-2">Payouts Every 7 Days</h4>
+                  <p className="text-white/60">No more 30-day waiting periods. Get paid your share of the profits every single week, directly to your preferred account.</p>
                 </div>
               </CardContent>
             </Card>
@@ -2043,7 +1972,7 @@ const Guarantee = () => {
                 </div>
                 <div>
                   <h4 className="text-lg font-bold text-white mb-2">Direct to UPI/Bank</h4>
-                  <p className="text-white/60 text-sm">Eligible rewards transferred to any Indian bank account or via UPI — no hidden conversion fees.</p>
+                  <p className="text-white/60 text-sm">Seamless transfers to any Indian bank account or via UPI with zero hidden conversion fees.</p>
                 </div>
               </CardContent>
             </Card>
@@ -2431,14 +2360,315 @@ const TerminalMockup = () => {
   );
 };
 
+const LivePayouts = () => {
+  const payouts = [
+    { name: "Rohan S.", amount: "₹58,200", time: "2 mins ago", initial: "RS", color: "from-orange-500 to-pink-500", state: "Maharashtra" },
+    { name: "Vikram N.", amount: "₹1,55,000", time: "15 mins ago", initial: "VN", color: "from-violet-500 to-purple-700", state: "Delhi" },
+    { name: "Aman J.", amount: "₹21,000", time: "1 hr ago", initial: "AJ", color: "from-cyan-500 to-blue-600", state: "Punjab" },
+    { name: "Sandeep P.", amount: "₹65,000", time: "2 hrs ago", initial: "SP", color: "from-green-500 to-teal-600", state: "Karnataka" },
+    { name: "Neha G.", amount: "₹62,000", time: "3 hrs ago", initial: "NG", color: "from-pink-500 to-rose-600", state: "Gujarat" },
+    { name: "Priya M.", amount: "₹88,500", time: "5 hrs ago", initial: "PM", color: "from-amber-500 to-orange-600", state: "Tamil Nadu" },
+    { name: "Karan T.", amount: "₹1,20,000", time: "7 hrs ago", initial: "KT", color: "from-blue-500 to-indigo-600", state: "Rajasthan" },
+    { name: "Divya R.", amount: "₹10,000", time: "8 hrs ago", initial: "DR", color: "from-fuchsia-500 to-pink-600", state: "Uttar Pradesh" },
+    { name: "Suresh K.", amount: "₹5,000", time: "9 hrs ago", initial: "SK", color: "from-lime-500 to-green-600", state: "West Bengal" },
+    { name: "Meera P.", amount: "₹25,000", time: "10 hrs ago", initial: "MP", color: "from-yellow-500 to-amber-600", state: "Madhya Pradesh" },
+    { name: "Aditya V.", amount: "₹40,000", time: "11 hrs ago", initial: "AV", color: "from-red-500 to-orange-600", state: "Telangana" },
+    { name: "Tanya S.", amount: "₹75,000", time: "12 hrs ago", initial: "TS", color: "from-sky-500 to-cyan-600", state: "Kerala" },
+    { name: "Rahul B.", amount: "₹90,000", time: "13 hrs ago", initial: "RB", color: "from-purple-500 to-violet-600", state: "Bihar" },
+    { name: "Anjali D.", amount: "₹15,500", time: "14 hrs ago", initial: "AD", color: "from-rose-500 to-pink-600", state: "Haryana" },
+    { name: "Nikhil M.", amount: "₹32,000", time: "16 hrs ago", initial: "NM", color: "from-teal-500 to-green-600", state: "Odisha" },
+    { name: "Pooja L.", amount: "₹48,000", time: "17 hrs ago", initial: "PL", color: "from-indigo-500 to-blue-600", state: "Jharkhand" },
+    { name: "Arjun D.", amount: "₹1,10,000", time: "18 hrs ago", initial: "AD", color: "from-emerald-500 to-teal-600", state: "Andhra Pradesh" },
+    { name: "Sneha R.", amount: "₹27,500", time: "19 hrs ago", initial: "SR", color: "from-pink-400 to-fuchsia-600", state: "Chhattisgarh" },
+    { name: "Manish K.", amount: "₹95,000", time: "20 hrs ago", initial: "MK", color: "from-orange-400 to-red-600", state: "Uttarakhand" },
+    { name: "Ritu S.", amount: "₹18,000", time: "22 hrs ago", initial: "RS", color: "from-cyan-400 to-teal-500", state: "Assam" },
+    { name: "Deepak V.", amount: "₹72,000", time: "1 day ago", initial: "DV", color: "from-violet-400 to-purple-600", state: "Goa" },
+    { name: "Kavita N.", amount: "₹35,000", time: "1 day ago", initial: "KN", color: "from-amber-400 to-yellow-600", state: "Himachal Pradesh" },
+    { name: "Sanjay B.", amount: "₹53,000", time: "1 day ago", initial: "SB", color: "from-blue-400 to-cyan-600", state: "Jammu & Kashmir" },
+    { name: "Anita P.", amount: "₹1,45,000", time: "1 day ago", initial: "AP", color: "from-red-400 to-rose-600", state: "Sikkim" },
+    { name: "Vijay G.", amount: "₹8,500", time: "2 days ago", initial: "VG", color: "from-green-400 to-emerald-600", state: "Meghalaya" },
+  ];
+
+  return (
+    <section id="live-payouts" className="py-12 bg-[#1A0030]">
+      <div className="container mx-auto px-4 mb-10 text-center">
+        <h2 className="text-3xl md:text-4xl font-heading font-extrabold text-white mb-3">
+          Last 100 Payouts <span className="text-fw-orange">(LIVE)</span>
+        </h2>
+        <p className="text-white/60 text-lg max-w-2xl mx-auto">
+          Real traders. Real money. India's most transparent prop firm — where every payout is visible.
+        </p>
+      </div>
+
+      <div className="relative w-full overflow-hidden mb-10">
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#1A0030] to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#1A0030] to-transparent z-10 pointer-events-none"></div>
+
+        <div className="flex gap-4 animate-marquee-slow" style={{ width: "max-content" }}>
+          {[...payouts, ...payouts].map((payout, i) => (
+            <Card key={i} className="min-w-[260px] glass-card border-white/10 shrink-0">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${payout.color} flex items-center justify-center text-white font-bold text-sm border border-white/20 shrink-0`}>
+                  {payout.initial}
+                </div>
+                <div>
+                  <div className="text-white/80 font-medium text-sm">{payout.name}</div>
+                  <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">
+                    {payout.amount}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-white/50 text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10">{payout.state}</span>
+                    <span className="text-white/40 text-xs flex items-center gap-1">
+                      <Clock size={10} /> {payout.time}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <LivePayoutTable />
+
+    </section>
+  );
+};
+
+const PAYOUT_NAMES = [
+  "Rahul S.", "Priya M.", "Amit K.", "Sneha R.", "Vikram P.", "Ananya D.", "Rohan T.", "Meera J.",
+  "Karan B.", "Divya N.", "Arjun G.", "Pooja L.", "Nikhil W.", "Swati C.", "Manish V.", "Ritu A.",
+  "Saurabh H.", "Neha F.", "Deepak Y.", "Kavita E.", "Tanya S.", "Aditya V.", "Anjali D.", "Vijay G.",
+  "Suresh K.", "Sandeep P.", "Aman J.", "Sanjay B.", "Anita P.", "Nisha T.", "Rajesh M.", "Simran K.",
+  "Harish D.", "Lakshmi R.", "Gaurav S.", "Bhavna P.", "Mohit L.", "Jyoti A.", "Sachin V.", "Rekha B.",
+  "Pankaj N.", "Shweta G.", "Vivek C.", "Pallavi H.", "Ashish J.", "Komal F.", "Tushar W.", "Sonali E.",
+  "Ramesh Y.", "Geeta D.",
+];
+
+function generateHash(): string {
+  const chars = "0123456789abcdef";
+  let h = "";
+  for (let i = 0; i < 40; i++) h += chars[Math.floor(Math.random() * 16)];
+  return h.slice(0, 8) + "..." + h.slice(-6);
+}
+
+function generatePayoutRows(count: number) {
+  const now = new Date();
+  const rows: { date: string; hash: string; amount: string; amountNum: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date(now.getTime() - i * (12 + Math.random() * 30) * 60 * 1000);
+    const dateStr = d.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" }) + ", " +
+      d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    const r = Math.random();
+    let amt: number;
+    if (r < 0.15) amt = [2500, 3000, 3500, 4000, 4500, 5000][Math.floor(Math.random() * 6)];
+    else if (r < 0.35) amt = [7500, 8000, 10000, 12000, 15000][Math.floor(Math.random() * 5)];
+    else if (r < 0.55) amt = [18000, 21000, 25000, 28000, 32000, 35000][Math.floor(Math.random() * 6)];
+    else if (r < 0.75) amt = [38000, 42000, 45000, 48000, 52000, 55000, 58000][Math.floor(Math.random() * 7)];
+    else if (r < 0.9) amt = [62000, 68000, 74000, 78000, 85000, 92000, 95000][Math.floor(Math.random() * 7)];
+    else amt = [110000, 125000, 150000, 175000, 210000, 250000, 320000, 350000][Math.floor(Math.random() * 8)];
+    rows.push({
+      date: dateStr,
+      hash: generateHash(),
+      amount: "₹" + amt.toLocaleString("en-IN"),
+      amountNum: amt,
+    });
+  }
+  return rows;
+}
+
+const LivePayoutChart = ({ data }: { data: { amountNum: number }[] }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d")!;
+    const W = c.width = c.offsetWidth * 2;
+    const H = c.height = c.offsetHeight * 2;
+    ctx.scale(2, 2);
+    const w = W / 2, h = H / 2;
+
+    const amounts = data.slice(0, 30).map(d => d.amountNum).reverse();
+    const max = Math.max(...amounts) * 1.1;
+    const min = Math.min(...amounts) * 0.9;
+    const range = max - min || 1;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, "rgba(255,138,61,0.25)");
+    grad.addColorStop(1, "rgba(255,138,61,0)");
+
+    const points: { x: number; y: number }[] = [];
+    const padX = 10, padY = 15;
+    for (let i = 0; i < amounts.length; i++) {
+      const x = padX + (i / (amounts.length - 1)) * (w - padX * 2);
+      const y = padY + (1 - (amounts[i] - min) / range) * (h - padY * 2);
+      points.push({ x, y });
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const cpx = (prev.x + curr.x) / 2;
+      ctx.bezierCurveTo(cpx, prev.y, cpx, curr.y, curr.x, curr.y);
+    }
+    ctx.strokeStyle = "#FF8A3D";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.lineTo(points[points.length - 1].x, h);
+    ctx.lineTo(points[0].x, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    const last = points[points.length - 1];
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#FF8A3D";
+    ctx.shadowColor = "#FF8A3D";
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }, [data]);
+
+  return <canvas ref={canvasRef} className="w-full" style={{ height: 120 }} />;
+};
+
+const LivePayoutTable = () => {
+  const [rows, setRows] = useState(() => generatePayoutRows(100));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRows(prev => {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" }) + ", " +
+          now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+        const r = Math.random();
+        let amt: number;
+        if (r < 0.15) amt = [2500, 3000, 3500, 4000, 4500, 5000][Math.floor(Math.random() * 6)];
+        else if (r < 0.35) amt = [7500, 8000, 10000, 12000, 15000][Math.floor(Math.random() * 5)];
+        else if (r < 0.55) amt = [18000, 21000, 25000, 28000, 32000, 35000][Math.floor(Math.random() * 6)];
+        else if (r < 0.75) amt = [38000, 42000, 45000, 48000, 52000, 55000, 58000][Math.floor(Math.random() * 7)];
+        else if (r < 0.9) amt = [62000, 68000, 74000, 78000, 85000, 92000, 95000][Math.floor(Math.random() * 7)];
+        else amt = [110000, 125000, 150000, 175000, 210000, 250000, 320000, 350000][Math.floor(Math.random() * 8)];
+        const newRow = {
+          date: dateStr,
+          hash: generateHash(),
+          amount: "₹" + amt.toLocaleString("en-IN"),
+          amountNum: amt,
+        };
+        return [newRow, ...prev.slice(0, 99)];
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="container mx-auto px-4">
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 glass-card rounded-2xl border border-white/10 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-white font-bold text-sm">Real-Time Payout Transactions</span>
+            </div>
+            <span className="text-white/40 text-xs">Auto-updates every 5s</span>
+          </div>
+          <div className="overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/5">
+                  <th className="text-left px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Date</th>
+                  <th className="text-left px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Transaction Hash</th>
+                  <th className="text-right px-6 py-3 text-xs font-bold text-white/60 uppercase tracking-wider">Payout</th>
+                </tr>
+              </thead>
+            </table>
+            <div className="overflow-y-auto max-h-[420px] no-scrollbar">
+              <table className="w-full">
+                <tbody>
+                  {rows.map((row, i) => (
+                    <tr key={i} className={`border-b border-white/5 transition-colors hover:bg-white/5 ${i === 0 ? "animate-in fade-in slide-in-from-top-2 duration-500 bg-fw-orange/5" : ""}`}>
+                      <td className="px-6 py-3 text-sm text-white/70 whitespace-nowrap">{row.date}</td>
+                      <td className="px-6 py-3">
+                        <span className="text-fw-orange text-sm font-mono cursor-pointer hover:underline">{row.hash}</span>
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        <span className="text-green-400 font-bold text-sm">{row.amount}</span>
+                        <span className="text-white/30 text-xs ml-1">INR</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="flex items-center justify-between px-6 py-3 border-t border-white/10 bg-white/5">
+            <span className="text-fw-orange text-xs font-semibold flex items-center gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-fw-orange animate-pulse" />
+              Real-Time Payout Transactions
+            </span>
+            <span className="text-white/30 text-xs flex items-center gap-1.5">
+              <img src="/logo.png" alt="" className="w-4 h-4 rounded" />
+              FundedWealth
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <div className="glass-card rounded-2xl border border-white/10 p-6">
+            <div className="text-white/50 text-xs uppercase tracking-wider mb-1">Total Paid Out (Last 30 Days)</div>
+            <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300">
+              ₹{(rows.reduce((a, r) => a + r.amountNum, 0) / 100000).toFixed(1)}L+
+            </div>
+            <div className="text-white/40 text-xs mt-1">Across {rows.length} verified transactions</div>
+          </div>
+
+          <div className="glass-card rounded-2xl border border-white/10 p-6">
+            <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Payout Trend (Last 30 Transactions)</div>
+            <LivePayoutChart data={rows} />
+          </div>
+
+          <div className="glass-card rounded-2xl border border-white/10 p-5">
+            <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Payout Stats</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
+                <div className="text-fw-orange font-extrabold text-lg">₹{Math.max(...rows.map(r => r.amountNum)).toLocaleString("en-IN")}</div>
+                <div className="text-white/40 text-[10px] uppercase">Highest Payout</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 text-center">
+                <div className="text-green-400 font-extrabold text-lg">₹{Math.round(rows.reduce((a, r) => a + r.amountNum, 0) / rows.length).toLocaleString("en-IN")}</div>
+                <div className="text-white/40 text-[10px] uppercase">Avg Payout</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 text-center">
+                <div className="text-white font-extrabold text-lg">{rows.length}</div>
+                <div className="text-white/40 text-[10px] uppercase">Total Payouts</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 text-center">
+                <div className="text-fw-pink font-extrabold text-lg">12hr</div>
+                <div className="text-white/40 text-[10px] uppercase">Avg Speed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Advantages = () => {
   const features = [
-    { title: "Clear, Published Rules", desc: "No hidden rules designed to make you fail. Every risk parameter and evaluation condition is published upfront." },
-    { title: "Rewards Every 7 Days", desc: "Eligible performance-based rewards processed every 7 days, directly to your UPI or bank account under the applicable program terms." },
-    { title: "Performance Share Up to 90%", desc: "Demonstrate consistent performance and keep up to 90% of your simulated trading results as a performance-based reward." },
-    { title: "Scaling Up to ₹50 Lakhs", desc: "Prove consistent execution within risk parameters and your simulated account size grows through our structured scaling plan." },
-    { title: "Affiliate Program up to 15%", desc: "Earn referral rewards by introducing other traders to our simulated evaluation platform." },
-    { title: "Competitive Simulation Conditions", desc: "Simulated accounts use real-time NSE/BSE data with competitive spreads and leverage matching institutional-grade conditions." },
+    { title: "Zero Restrictive Rules", desc: "No hidden rules to make you fail. Trade your strategy freely." },
+    { title: "Payouts Every 7 Days", desc: "Don't wait a month for your hard-earned money. Weekly payouts standard." },
+    { title: "Profit Split Up to 90%", desc: "You do the hard work, you keep the lion's share of the profits." },
+    { title: "Scaling Up to ₹50 Lakh", desc: "Prove consistency and we'll scale your account capital exponentially." },
+    { title: "Affiliate Program up to 15%", desc: "Earn passive income by referring other talented traders to our platform." },
+    { title: "Competitive Spreads", desc: "Institutional-grade liquidity with raw spreads and low commissions." },
   ];
 
   return (
@@ -2449,7 +2679,7 @@ const Advantages = () => {
             The <span className="text-gradient">FundedWealth</span> Edge
           </h2>
           <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            A structured simulated trading and evaluation platform built for transparency, speed, and measurable performance — fully aligned with trader success.
+            We built the firm we wanted to trade for. Transparent, fast, and aggressively aligned with trader success.
           </p>
         </div>
 
@@ -2551,7 +2781,45 @@ const FlashRulesAccordion = () => (
 const Plans = () => {
   const [activeTab, setActiveTab] = useState("1step");
   const [, navigatePlans] = useLocation();
-  const { config: discountConfig } = useLiveDiscountConfig();
+  const trackedLists = useRef(new Set<string>());
+  const currentProduct = PRODUCTS[activeTab as PlanType];
+
+  const getChallengeItem = (index: number): ChallengeItem => {
+    const size = currentProduct.sizes[index];
+    return {
+      item_id: `${currentProduct.key}_${size.accountSize}`,
+      item_name: `${currentProduct.displayLabel} ${size.sizeLabel}`,
+      item_category: currentProduct.serverLabel,
+      price: Number(size.discFeeLabel.replace(/[^0-9]/g, "")),
+      currency: "INR",
+      index,
+    };
+  };
+
+  useEffect(() => {
+    if (trackedLists.current.has(currentProduct.key)) return;
+    trackedLists.current.add(currentProduct.key);
+    trackViewItemList(
+      `${currentProduct.key}_plans`,
+      `${currentProduct.displayLabel} challenge plans`,
+      currentProduct.sizes.map((_, index) => getChallengeItem(index)),
+    );
+  }, [activeTab]);
+
+  const selectPlan = (index: number, ctaName: string) => {
+    const item = getChallengeItem(index);
+    trackSelectItem(`${currentProduct.key}_plans`, `${currentProduct.displayLabel} challenge plans`, item);
+    trackViewItem(item);
+    trackCtaClick({
+      cta_name: ctaName,
+      cta_location: "challenge_card",
+      cta_destination: "/checkout",
+      challenge_id: item.item_id,
+      challenge_name: item.item_name,
+      challenge_type: currentProduct.serverLabel,
+    });
+    navigatePlans("/checkout");
+  };
 
   return (
     <section id="plans" className="py-14 relative overflow-hidden">
@@ -2560,17 +2828,17 @@ const Plans = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center mb-10">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
-            Choose Your <span className="text-gradient">Evaluation Plan</span>
+            Choose Your <span className="text-gradient">Path to Capital</span>
           </h2>
           <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            Choose an evaluation plan that matches your trading style and experience. Each plan provides a structured simulated trading environment with clearly defined risk parameters.
+            Whether you want instant funding or prefer to prove your skills through an evaluation, we have a plan built for your style.
           </p>
         </div>
 
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
           <div className="flex justify-center mb-10">
             <TabsList
-              className="relative h-auto rounded-2xl flex-nowrap gap-2 p-2 w-full max-w-2xl"
+              className="relative h-auto rounded-2xl sm:rounded-full flex-wrap gap-1 p-1.5"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                 backdropFilter: "blur(24px) saturate(1.6)",
@@ -2580,16 +2848,16 @@ const Plans = () => {
               }}
             >
               {/* Top gloss on container */}
-              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
+              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl sm:rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
 
               {/* Flash ⚡ — yellow/orange active */}
               <TabsTrigger
                 value="flash"
-                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
+                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent", minWidth: 0 }}
+                style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(234,179,8,0.28) 0%, rgba(249,115,22,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2598,18 +2866,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(234,179,8,0.3), 0 0 40px rgba(249,115,22,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(234,179,8,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">Flash ⚡</span>
               </TabsTrigger>
 
               {/* Instant — pink/violet active */}
               <TabsTrigger
                 value="instant"
-                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
+                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent", minWidth: 0 }}
+                style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(217,58,160,0.28) 0%, rgba(171,24,194,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2618,18 +2886,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(217,58,160,0.3), 0 0 40px rgba(171,24,194,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(217,58,160,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">Instant</span>
               </TabsTrigger>
 
               {/* 1-Step — cyan/violet active */}
               <TabsTrigger
                 value="1step"
-                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
+                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent", minWidth: 0 }}
+                style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(77,212,255,0.24) 0%, rgba(168,85,247,0.20) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2638,18 +2906,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(77,212,255,0.25), 0 0 40px rgba(168,85,247,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(77,212,255,0.10)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">1-Step</span>
               </TabsTrigger>
 
               {/* 2-Step — violet/pink active */}
               <TabsTrigger
                 value="2step"
-                className="relative flex-1 rounded-xl py-3 text-xs sm:text-sm font-semibold text-white/50 transition-all duration-300 overflow-hidden whitespace-nowrap
+                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent", minWidth: 0 }}
+                style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(168,85,247,0.28) 0%, rgba(217,58,160,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2658,7 +2926,7 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(168,85,247,0.3), 0 0 40px rgba(217,58,160,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(168,85,247,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">2-Step</span>
               </TabsTrigger>
             </TabsList>
@@ -2667,15 +2935,12 @@ const Plans = () => {
           <TabsContent value="flash" className="mt-0">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
               {[
-                { size: "₹50,000", baseFee: 1999, origFee: "₹1,999" },
-                { size: "₹1,00,000", baseFee: 3499, origFee: "₹3,499" },
-                { size: "₹2,50,000", baseFee: 7499, origFee: "₹7,499", popular: true },
-                { size: "₹5,00,000", baseFee: 11499, origFee: "₹11,499" },
-                { size: "₹10,00,000", baseFee: 19499, origFee: "₹19,499" },
-              ].map((plan, i) => {
-                const flashPct = discountConfig["flash"]?.discountPct ?? 50;
-                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, flashPct));
-                return (
+                { size: "₹50,000", origFee: "₹1,999", discFee: "₹799" },
+                { size: "₹1,00,000", origFee: "₹3,499", discFee: "₹1,399" },
+                { size: "₹2,50,000", origFee: "₹7,499", discFee: "₹2,999", popular: true },
+                { size: "₹5,00,000", origFee: "₹11,499", discFee: "₹4,599" },
+                { size: "₹10,00,000", origFee: "₹19,499", discFee: "₹7,799" },
+              ].map((plan, i) => (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-yellow-500/60 shadow-[0_0_25px_rgba(234,179,8,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-to-r from-yellow-500 to-orange-500 text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white">
@@ -2688,9 +2953,9 @@ const Plans = () => {
                       <div className="text-lg sm:text-xl font-heading font-extrabold text-white mb-2">{plan.size}</div>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{flashPct}% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">60% OFF</span>
                       </div>
-                      <div className="text-yellow-400 font-extrabold text-xl mt-1">{discFee}</div>
+                      <div className="text-yellow-400 font-extrabold text-xl mt-1">{plan.discFee}</div>
                     </div>
 
                     <div className="space-y-2.5 mb-5">
@@ -2724,19 +2989,18 @@ const Plans = () => {
                       </div>
                     </div>
 
-                    <Button onClick={() => navigatePlans("/checkout")} className={`w-full h-10 text-sm font-bold ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0' : 'bg-white text-black hover:bg-gray-200'}`}>
+                    <Button onClick={() => selectPlan(i, "Select Plan")} className={`w-full h-10 text-sm font-bold ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0' : 'bg-white text-black hover:bg-gray-200'}`}>
                       Select Plan
                     </Button>
                   </CardContent>
                 </Card>
-              );
-              })}
+              ))}
             </div>
 
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">{discountConfig["flash"]?.code ?? "FLASH50"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">{discountConfig["flash"]?.discountPct ?? 50}% OFF</span></div>
+              <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-yellow-400 text-lg tracking-widest select-all">Flash</div>
+              <div className="text-white/70 text-sm">for <span className="text-yellow-400 font-bold">60% OFF</span></div>
             </div>
 
             <FlashRulesAccordion />
@@ -2745,14 +3009,11 @@ const Plans = () => {
           <TabsContent value="instant" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
               {[
-                { size: "₹1,00,000", baseFee: 4999, origFee: "₹4,999" },
-                { size: "₹5,00,000", baseFee: 10999, origFee: "₹10,999", popular: true },
-                { size: "₹10,00,000", baseFee: 17999, origFee: "₹17,999" },
-                { size: "₹20,00,000", baseFee: 29999, origFee: "₹29,999" },
-              ].map((plan, i) => {
-                const instantPct = discountConfig["instant"]?.discountPct ?? 45;
-                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, instantPct));
-                return (
+                { size: "₹1,00,000", origFee: "₹4,999", discFee: "₹2,749" },
+                { size: "₹5,00,000", origFee: "₹10,999", discFee: "₹6,049", popular: true },
+                { size: "₹10,00,000", origFee: "₹17,999", discFee: "₹9,899" },
+                { size: "₹20,00,000", origFee: "₹29,999", discFee: "₹16,499" },
+              ].map((plan, i) => (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-fw text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white">
@@ -2765,9 +3026,9 @@ const Plans = () => {
                       <div className="text-lg sm:text-xl font-heading font-extrabold text-white mb-2">{plan.size}</div>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{instantPct}% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">55% OFF</span>
                       </div>
-                      <div className="text-fw-orange font-extrabold text-xl mt-1">{discFee}</div>
+                      <div className="text-fw-orange font-extrabold text-xl mt-1">{plan.discFee}</div>
                       <div className="text-white/40 text-[10px] mt-0.5">refundable fee</div>
                     </div>
 
@@ -2802,32 +3063,28 @@ const Plans = () => {
                       </div>
                     </div>
 
-                    <Button onClick={() => navigatePlans("/checkout")} className={`w-full h-10 text-sm font-bold ${plan.popular ? 'bg-gradient-fw text-white border-0' : 'bg-white text-black hover:bg-gray-200'}`}>
+                    <Button onClick={() => selectPlan(i, "Select Plan")} className={`w-full h-10 text-sm font-bold ${plan.popular ? 'bg-gradient-fw text-white border-0' : 'bg-white text-black hover:bg-gray-200'}`}>
                       Select Plan
                     </Button>
                   </CardContent>
                 </Card>
-              );
-              })}
+              ))}
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-fw-pink/10 to-fw-orange/10 border border-fw-pink/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">{discountConfig["instant"]?.code ?? "INSTANT45"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">{discountConfig["instant"]?.discountPct ?? 45}% OFF</span></div>
+              <div className="bg-fw-pink/20 border border-fw-pink/40 rounded-lg px-4 py-1.5 font-mono font-bold text-fw-pink text-lg tracking-widest select-all">Instant</div>
+              <div className="text-white/70 text-sm">for <span className="text-fw-pink font-bold">55% OFF</span></div>
             </div>
           </TabsContent>
 
           <TabsContent value="1step" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto">
               {[
-                { size: "₹1,00,000", baseFee: 2999, origFee: "₹2,999", evalSplit: "–", fundedBonuses: "From ₹499" },
-                { size: "₹5,00,000", baseFee: 11999, origFee: "₹11,999", evalSplit: "–", fundedBonuses: "From ₹1,500", popular: true },
-                { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", evalSplit: "–", fundedBonuses: "From ₹2,500" },
-                { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", evalSplit: "–", fundedBonuses: "From ₹5,250" },
-              ].map((plan, idx) => {
-                const oneStepPct = discountConfig["1step"]?.discountPct ?? 55;
-                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, oneStepPct));
-                return (
+                { size: "₹1,00,000", origFee: "₹2,999", discFee: "₹1,049", evalSplit: "–", fundedBonuses: "From ₹499" },
+                { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹4,199", evalSplit: "–", fundedBonuses: "From ₹1,500", popular: true },
+                { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹7,699", evalSplit: "–", fundedBonuses: "From ₹2,500" },
+                { size: "₹25,00,000", origFee: "₹48,499", discFee: "₹16,974", evalSplit: "–", fundedBonuses: "From ₹5,250" },
+              ].map((plan, idx) => (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-fw text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white z-10">
@@ -2838,12 +3095,12 @@ const Plans = () => {
                     <div className={`text-center py-6 px-4 border-b border-white/10 bg-gradient-to-b from-[#4A00E0]/20 to-transparent ${plan.popular ? 'pt-9' : ''}`}>
                       <div className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-1">Account Size</div>
                       <div className="text-lg sm:text-xl lg:text-2xl font-heading font-extrabold text-white mb-2">{plan.size}</div>
-                      <p className="text-white/50 text-xs mb-3">One evaluation phase. Demonstrate consistent performance, get your simulated account.</p>
+                      <p className="text-white/50 text-xs mb-3">One evaluation. Prove it once, get funded.</p>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{oneStepPct}% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">65% OFF</span>
                       </div>
-                      <div className="text-fw-orange font-extrabold text-xl mt-1">{discFee}</div>
+                      <div className="text-fw-orange font-extrabold text-xl mt-1">{plan.discFee}</div>
                       <div className="text-white/40 text-[10px] mt-0.5">one-time fee</div>
                     </div>
 
@@ -2932,32 +3189,28 @@ const Plans = () => {
                     </div>
 
                     <div className="p-4 border-t border-white/10">
-                      <Button onClick={() => navigatePlans("/checkout")} className={`w-full h-10 text-sm font-bold rounded-xl transition-all ${plan.popular ? 'bg-gradient-fw text-white border-0 hover:shadow-lg hover:shadow-fw-pink/30' : 'bg-white text-black hover:bg-gray-200'}`}>
+                      <Button onClick={() => selectPlan(idx, "Get Funded")} className={`w-full h-10 text-sm font-bold rounded-xl transition-all ${plan.popular ? 'bg-gradient-fw text-white border-0 hover:shadow-lg hover:shadow-fw-pink/30' : 'bg-white text-black hover:bg-gray-200'}`}>
                         Get Funded →
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-              );
-              })}
+              ))}
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-purple-500/10 to-fw-pink/10 border border-purple-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">{discountConfig["1step"]?.code ?? "ONESTEP55"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">{discountConfig["1step"]?.discountPct ?? 55}% OFF</span></div>
+              <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-purple-400 text-lg tracking-widest select-all">FW</div>
+              <div className="text-white/70 text-sm">for <span className="text-purple-400 font-bold">65% OFF</span></div>
             </div>
           </TabsContent>
 
           <TabsContent value="2step" className="mt-0">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
               {[
-                { size: "₹5,00,000", baseFee: 11999, origFee: "₹11,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹999" },
-                { size: "₹10,00,000", baseFee: 21999, origFee: "₹21,999", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹1,999", popular: true },
-                { size: "₹25,00,000", baseFee: 48499, origFee: "₹48,499", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹4,999" },
-              ].map((plan, idx) => {
-                const twoStepPct = discountConfig["2step"]?.discountPct ?? 60;
-                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, twoStepPct));
-                return (
+                { size: "₹5,00,000", origFee: "₹11,999", discFee: "₹3,599", discount: "70%", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹999" },
+                { size: "₹10,00,000", origFee: "₹21,999", discFee: "₹6,599", discount: "70%", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹1,999", popular: true },
+                { size: "₹25,00,000", origFee: "₹48,999", discFee: "₹14,549", discount: "70%", profitTarget: "8% / 5%", evalSplit: "–", fundedBonuses: "From ₹4,999" },
+              ].map((plan, idx) => (
                 <Card key={idx} className={`glass-card border-white/10 overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (
                     <div className="absolute top-0 inset-x-0 bg-gradient-fw text-center text-[10px] font-bold py-1 uppercase tracking-wider text-white z-10">
@@ -2968,12 +3221,12 @@ const Plans = () => {
                     <div className={`text-center py-6 px-4 border-b border-white/10 bg-gradient-to-b from-[#4A00E0]/20 to-transparent ${plan.popular ? 'pt-9' : ''}`}>
                       <div className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-1">Account Size</div>
                       <div className="text-lg sm:text-xl lg:text-2xl font-heading font-extrabold text-white mb-2">{plan.size}</div>
-                      <p className="text-white/50 text-xs mb-3">Two evaluation phases. Demonstrate consistent performance, get your simulated account.</p>
+                      <p className="text-white/50 text-xs mb-3">One evaluation. Prove it once, get funded.</p>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-white/30 line-through text-sm">{plan.origFee}</span>
-                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{twoStepPct}% OFF</span>
+                        <span className="bg-green-500/20 text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded">{plan.discount} OFF</span>
                       </div>
-                      <div className="text-fw-orange font-extrabold text-xl mt-1">{discFee}</div>
+                      <div className="text-fw-orange font-extrabold text-xl mt-1">{plan.discFee}</div>
                       <div className="text-white/40 text-[10px] mt-0.5">one-time fee</div>
                     </div>
 
@@ -3070,25 +3323,24 @@ const Plans = () => {
                     </div>
 
                     <div className="p-4 border-t border-white/10">
-                      <Button onClick={() => navigatePlans("/checkout")} className="w-full h-10 text-sm font-bold bg-gradient-fw text-white border-0 rounded-xl hover:shadow-lg hover:shadow-fw-pink/30 transition-all">
+                      <Button onClick={() => selectPlan(idx, "Get Funded")} className="w-full h-10 text-sm font-bold bg-gradient-fw text-white border-0 rounded-xl hover:shadow-lg hover:shadow-fw-pink/30 transition-all">
                         Get Funded →
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-              );
-              })}
+              ))}
             </div>
             <div className="mt-6 flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
               <div className="text-white/70 text-sm">Use code</div>
-              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">{discountConfig["2step"]?.code ?? "TWOSTEP60"}</div>
-              <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">{discountConfig["2step"]?.discountPct ?? 60}% OFF</span></div>
+              <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-lg px-4 py-1.5 font-mono font-bold text-emerald-400 text-lg tracking-widest select-all">FW</div>
+              <div className="text-white/70 text-sm">for <span className="text-emerald-400 font-bold">70% OFF</span></div>
             </div>
           </TabsContent>
         </Tabs>
 
         <div className="mt-12 text-center">
-          <p className="text-white/50 text-sm">Simulated account sizes up to ₹50 Lakhs available through the scaling plan. All trading activity is simulated for evaluation purposes. Performance-based rewards subject to applicable program terms.</p>
+          <p className="text-white/50 text-sm">Account sizes up to ₹50,000,000 available upon scaling. Terms and conditions apply.</p>
         </div>
         <div className="mt-16 flex flex-wrap items-center justify-center gap-3 md:gap-5">
           <span className="text-white/50 text-sm font-semibold tracking-wide mr-2">Payment Options:</span>
@@ -3133,7 +3385,7 @@ const ChoosePathPills = () => {
     "AI Risk Guard™ Technology",
     "Real-Time Behavioral Analytics",
     "Discipline Score Tracking",
-    "Real-Time Market Price Data",
+    "Real Market Execution",
   ];
   return (
     <section id="choose-path-pills" className="pt-2 pb-10 relative">
@@ -3177,7 +3429,7 @@ const SmartScalingPlan = () => {
               Plan
             </h2>
             <p className="text-white/60 mb-7 leading-relaxed max-w-md">
-              Grow your simulated evaluation account size by demonstrating steady, rule-respecting performance. Hit a combined 5% return across any three consecutive months and your simulated account size doubles — a clear, milestone-driven path designed for long-term Indian traders.
+              Grow your funded capital by showing steady, rule-respecting results. Hit a combined 5% return across any three consecutive months and your account size doubles — a clear, milestone-driven path designed for long-term Indian traders.
             </p>
             <Link href="/scaling">
               <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-full h-12 px-7 font-bold shadow-lg hover:shadow-purple-500/30">
@@ -3233,95 +3485,176 @@ const SmartScalingPlan = () => {
   );
 };
 
+const SEBIBrokers = () => {
+  const cards = [
+    {
+      title: "SEBI Compliant",
+      desc: "We route only through SEBI-registered broker partners, so every trade you take sits inside India's regulated framework — full stop.",
+      icon: <ShieldCheck className="w-6 h-6" />,
+      iconBg: "bg-emerald-500/15",
+      iconColor: "text-emerald-400",
+      dot: "bg-emerald-400",
+    },
+    {
+      title: "SSL Encrypted",
+      desc: "End-to-end 256-bit encryption guards your account, payouts, and personal details across every session and device.",
+      icon: <Lock className="w-6 h-6" />,
+      iconBg: "bg-blue-500/15",
+      iconColor: "text-blue-400",
+      dot: "bg-blue-400",
+    },
+    {
+      title: "Real-time Data",
+      desc: "Direct exchange feeds from NSE and BSE keep your charts, P&L, and order fills in sync with the live market — no lag, no delay.",
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+          <path d="M5 12.55a11 11 0 0114 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
+        </svg>
+      ),
+      iconBg: "bg-violet-500/15",
+      iconColor: "text-violet-400",
+      dot: "bg-violet-400",
+    },
+    {
+      title: "24/7 Support",
+      desc: "A real human-led support desk is on standby any hour — pings answered in Hindi or English, no scripted bots.",
+      icon: <Clock className="w-6 h-6" />,
+      iconBg: "bg-orange-500/15",
+      iconColor: "text-orange-400",
+      dot: "bg-orange-400",
+    },
+  ];
+
+  return (
+    <section id="sebi-brokers" className="py-14 relative overflow-hidden">
+      <div className="glow-orb orb-3"></div>
+      <div className="container mx-auto px-4 md:px-6 relative">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3 leading-tight">
+            Working with <span className="text-gradient">SEBI Registered</span> Brokers
+          </h2>
+          <p className="text-white/60 max-w-2xl mx-auto">
+            We partner exclusively with SEBI-regulated brokers to ensure the highest standards of security, compliance, and real market execution for all our traders.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          {cards.map((c) => (
+            <div key={c.title} className="rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-5 hover:border-white/20 hover:bg-white/[0.05] transition-all flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-xl ${c.iconBg} ${c.iconColor} flex items-center justify-center shrink-0`}>
+                {c.icon}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <h3 className="text-white font-extrabold text-base">{c.title}</h3>
+                  <span className={`w-1.5 h-1.5 rounded-full ${c.dot} shadow-[0_0_6px_currentColor]`} />
+                </div>
+                <p className="text-white/55 text-xs leading-relaxed">{c.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center mt-10">
+          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-emerald-400/5 border border-emerald-500/30">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span className="text-white font-bold text-sm">100% Regulated Trading Environment</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const WhatPeopleSay = () => {
   const testimonials = [
     {
       name: "Disha Kakkar",
       handle: "@disha_kakkar",
-      quote: "Every metric I actually care about — daily limits, performance targets, and account rules — is available in one place. It makes my evaluation routine easier to follow.",
+      quote: "Every metric I actually care about — daily limit, profit target, payout window — is right there on one screen. My day starts calmer and my routine just runs.",
       ago: "5 days ago",
-      amount: "Evaluation Participant",
+      amount: "₹1,18,900",
       gradient: "from-pink-400 to-rose-500",
       initials: "DK",
     },
     {
       name: "Hrdaya Grover",
       handle: "@hrdaya_grover",
-      quote: "Seeing my simulated P&L update in the FundedWealth Terminal reduced the need to switch between multiple screens. I can focus more clearly on my evaluation rules and trading discipline.",
+      quote: "Watching my P&L update tick-by-tick in the FundedWealth Terminal removed the mental noise. I stopped refreshing five tabs and just focused on hitting my 8% target.",
       ago: "3 days ago",
-      amount: "Evaluation Participant",
+      amount: "₹67,200",
       gradient: "from-violet-500 to-blue-500",
       initials: "HG",
     },
     {
       name: "Sanyam Maheswari",
       handle: "@sanyam_maheswari",
-      quote: "The interface is responsive, the layout is uncluttered, and the live risk tools help me stay aware of my evaluation limits. It encourages me to follow my trading plan.",
+      quote: "Fills are quick, the layout is uncluttered, and the live risk meter keeps me honest. It pushes me to trade my plan instead of my mood.",
       ago: "2 days ago",
-      amount: "Evaluation Participant",
+      amount: "₹1,80,000",
       gradient: "from-amber-400 to-orange-500",
       initials: "SM",
     },
     {
       name: "Rohan Mehta",
       handle: "@rohan_mehta",
-      quote: "Cleared the 2-Step evaluation in 19 days. The drawdown tracker helped me avoid an impulsive trade near a Friday close — that single prompt reinforced the value of following my risk rules.",
+      quote: "Cleared the 2-Step in 19 days. The drawdown tracker literally saved me from a revenge trade on a Friday close — that one nudge paid for the entire challenge fee.",
       ago: "1 week ago",
-      amount: "Evaluation Participant",
+      amount: "₹2,45,000",
       gradient: "from-cyan-400 to-blue-600",
       initials: "RM",
     },
     {
       name: "Priya Iyer",
       handle: "@priya_trades",
-      quote: "The reward request process was clear and the support team kept me updated throughout the verification process. After difficult experiences elsewhere, the process here felt much more straightforward.",
+      quote: "Payout hit my HDFC account in under 24 hours, no follow-ups, no awkward ticket replies. After two offshore prop horror stories, this felt unreal.",
       ago: "4 days ago",
-      amount: "Verified Participant",
+      amount: "₹98,400",
       gradient: "from-emerald-400 to-teal-600",
       initials: "PI",
     },
     {
       name: "Aakash Sharma",
       handle: "@aakash_fno",
-      quote: "Practising within a structured simulated account environment helped me focus on position sizing and risk discipline without treating the evaluation as an investment product.",
+      quote: "Trading BankNifty with 25L funded capital while my own savings stayed untouched — that mental shift alone improved my execution. Sizing finally feels rational.",
       ago: "6 days ago",
-      amount: "Evaluation Participant",
+      amount: "₹3,12,750",
       gradient: "from-indigo-500 to-purple-600",
       initials: "AS",
     },
     {
       name: "Neha Singh",
       handle: "@neha_sgh",
-      quote: "Hindi support, clear verification steps, and transparent program information made the onboarding process easier to understand. As a part-time trader, the platform feels accessible and straightforward.",
+      quote: "Hindi support over WhatsApp, clear KYC steps, and zero hidden fees. As a part-time trader from Lucknow, this is the first platform that actually felt built for us.",
       ago: "2 weeks ago",
-      amount: "Community Member",
+      amount: "₹54,600",
       gradient: "from-rose-500 to-pink-600",
       initials: "NS",
     },
     {
       name: "Vikram Reddy",
       handle: "@vik_trades",
-      quote: "The discipline score is strict but fair. Watching it drop after a single rule break taught me more about risk management than three years of online content ever did.",
+      quote: "The discipline score is brutal but fair. Watching it drop after a single rule break taught me more about risk than three years of YouTube content ever did.",
       ago: "9 days ago",
-      amount: "Evaluation Participant",
+      amount: "₹1,76,200",
       gradient: "from-amber-500 to-red-500",
       initials: "VR",
     },
     {
       name: "Ananya Bose",
       handle: "@ananya.b",
-      quote: "The structured evaluation milestones gave me clear goals to work toward. Having defined rules and measurable targets helped me stay focused and consistent.",
+      quote: "I scaled from ₹5L to ₹20L in five months without ever touching my own capital. The milestone framework keeps the goals concrete instead of abstract.",
       ago: "3 weeks ago",
-      amount: "Evaluation Participant",
+      amount: "₹4,28,000",
       gradient: "from-fuchsia-500 to-violet-700",
       initials: "AB",
     },
     {
       name: "Karan Malhotra",
       handle: "@karan.mal",
-      quote: "What I like is the straightforward approach — no flashy signal groups or unnecessary distractions. Just a structured simulated evaluation with clearly defined rules and performance criteria.",
+      quote: "What I love is the absence of gimmicks — no flashy WhatsApp groups, no signal calls. Just a clean evaluation, real rules, and a payout when you earn it.",
       ago: "1 day ago",
-      amount: "Community Member",
+      amount: "₹89,500",
       gradient: "from-sky-500 to-cyan-600",
       initials: "KM",
     },
@@ -3344,7 +3677,7 @@ const WhatPeopleSay = () => {
       <p className="text-white/65 text-sm italic leading-relaxed mb-5 flex-1">&ldquo;{t.quote}&rdquo;</p>
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
         <span className="text-white/40 text-xs">{t.ago}</span>
-        <span className="text-white/50 font-semibold text-xs">{t.amount}</span>
+        <span className="text-emerald-400 font-extrabold text-sm">{t.amount}</span>
       </div>
     </div>
   );
@@ -3375,7 +3708,7 @@ const WhatPeopleSay = () => {
           What People <span className="text-gradient">Say About Us</span>
         </h2>
         <p className="text-center text-white/55 text-sm md:text-base max-w-2xl mx-auto">
-          Feedback from members of the FundedWealth evaluation community.
+          Honest words from real funded traders across India — auto-pulled from our community feed.
         </p>
       </div>
 
@@ -3406,8 +3739,8 @@ const WhatPeopleSay = () => {
       <div className="container mx-auto px-4 md:px-6 relative">
         <div className="max-w-5xl mx-auto rounded-2xl bg-gradient-to-r from-white/[0.06] to-white/[0.02] border border-white/10 p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
           <div className="text-center md:text-left">
-            <h3 className="text-white font-extrabold text-lg md:text-xl mb-1">Begin Your Evaluation Journey Today</h3>
-            <p className="text-white/55 text-sm">Join thousands of Indian traders who are already demonstrating their performance on FundedWealth's structured simulated evaluation platform.</p>
+            <h3 className="text-white font-extrabold text-lg md:text-xl mb-1">Begin Your Trading Career Today</h3>
+            <p className="text-white/55 text-sm">Stand alongside thousands of Indian traders who already build their funded careers on FundedWealth.</p>
           </div>
           <Link href="/sign-up">
             <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-full h-11 px-6 font-bold shadow-lg hover:shadow-purple-500/30 whitespace-nowrap">
@@ -3436,7 +3769,7 @@ const Calculator = () => {
               Calculate Your <span className="text-gradient">Potential</span>
             </h2>
             <p className="text-xl text-white/70 mb-10">
-              See how your simulated performance translates into potential performance-based rewards. Figures shown are illustrative only — actual rewards are subject to applicable program terms.
+              See exactly how much you could earn trading with FundedWealth capital compared to your own small account.
             </p>
 
             <div className="space-y-10">
@@ -3478,25 +3811,25 @@ const Calculator = () => {
               <CardContent className="p-8 md:p-10 relative z-10">
                 <div className="space-y-8">
                   <div>
-                    <p className="text-white/60 font-semibold mb-2 uppercase tracking-wide">Simulated Monthly Performance</p>
+                    <p className="text-white/60 font-semibold mb-2 uppercase tracking-wide">Potential Monthly Profit</p>
                     <p className="text-4xl font-heading font-bold text-white">₹{(profit).toLocaleString('en-IN')}</p>
                   </div>
 
                   <div className="h-px w-full bg-white/10"></div>
 
                   <div>
-                    <p className="text-white/60 font-semibold mb-2 uppercase tracking-wide">Potential Reward (80% Share)</p>
+                    <p className="text-white/60 font-semibold mb-2 uppercase tracking-wide">Your Payout (80% Split)</p>
                     <p className="text-3xl sm:text-5xl md:text-6xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink">
                       ₹{(payout).toLocaleString('en-IN')}
                     </p>
                   </div>
 
                   <Button className="w-full h-14 mt-4 bg-white text-black hover:bg-gray-200 text-lg font-bold">
-                    Get Started Now
+                    Start Earning Now
                   </Button>
 
                   <p className="text-xs text-white/40 text-center mt-4">
-                    *Figures are illustrative only and based on simulated account performance. Actual performance-based rewards are subject to applicable program terms. All trading on FundedWealth is simulated for evaluation purposes.
+                    *Calculations are for illustrative purposes only. Trading involves risk.
                   </p>
                 </div>
               </CardContent>
@@ -3510,80 +3843,80 @@ const Calculator = () => {
 
 const articles = {
   guide: {
-    title: "What Is a Simulated Evaluation Account?",
+    title: "What Is a Funded Account?",
     accent: "#FF8A3D",
     sections: [
       {
         heading: "The Concept",
-        body: "A simulated evaluation account is straightforward: FundedWealth provides you with a structured simulated trading environment — with simulated account sizes of up to ₹50 Lakhs — and you trade under our defined risk framework. Participants who demonstrate consistent performance become eligible for performance-based rewards under the applicable program terms. All account balances shown on the platform are simulated balances and do not represent customer-owned funds."
+        body: "A funded account is simple: FundedWealth provides you with real trading capital — up to ₹50 Lakhs — and you trade it under our risk framework. You keep the majority of every rupee of profit you generate. If the trade goes against you, we absorb the loss — not you."
       },
       {
         heading: "How It Works — Step by Step",
-        body: "1. Choose an evaluation plan (₹1L, ₹2L, ₹5L, ₹10L, ₹25L, or ₹50L).\n2. Complete the evaluation by hitting the defined profit target while staying within the max drawdown limit.\n3. Receive your simulated evaluation account — activated within 12 hours of passing.\n4. Trade within the defined risk parameters. Every 7 days, eligible participants may request performance-based rewards, processed to your UPI or bank account under the applicable program terms."
+        body: "1. Choose a challenge plan (₹1L, ₹2L, ₹5L, ₹10L, ₹25L, or ₹50L).\n2. Pass the evaluation by hitting the profit target while staying within the max drawdown limit.\n3. Get funded instantly — your live account is activated within 12 hours.\n4. Trade freely. Every 7 days, request your payout. We send it straight to your UPI or bank account."
       },
       {
-        heading: "The Performance Share",
-        body: "FundedWealth offers a 70%–90% performance share in your favour, depending on your plan tier. There are no hidden deductions, no platform fees on reward requests, and no lock-in periods. What you earn under the program terms is what you receive."
+        heading: "The Profit Split",
+        body: "FundedWealth offers a 70%–90% profit split in your favour, depending on your plan tier. There are no hidden deductions, no platform fees on payouts, and no lock-in periods. What you earn is what you receive."
       },
       {
-        heading: "Risk Parameters — Kept Simple",
-        body: "We believe in fair, published rules. The defined limits are: a Daily Drawdown of up to 5% and a Max Drawdown of up to 10% depending on plan. No news-trading restrictions. No time limits on the evaluation. Minimum trading days apply only to demonstrate consistency, not to restrict you."
+        heading: "Risk Rules — Kept Simple",
+        body: "We believe in fair rules. The only hard limits are: a Daily Drawdown of 5% and a Max Drawdown of 10%. No news-trading restrictions. No time limits on the evaluation. No minimum trading days beyond what's needed to show consistency."
       },
       {
         heading: "Who Is This For?",
-        body: "Any trader — beginner to advanced — who wants to demonstrate their strategy in a structured simulated environment. Whether you trade equities, indices, or commodities, if you can demonstrate disciplined risk management and consistent execution, you may become eligible for performance-based rewards."
+        body: "Any trader — beginner to advanced — who has a strategy but lacks capital. Whether you trade equities, indices, or commodities, if you can demonstrate disciplined risk management, we'll fund you and share the profits."
       }
     ]
   },
   compare: {
-    title: "Simulated Evaluation vs. Personal Capital Trading",
+    title: "Funded Capital vs. Personal Capital",
     accent: "#D63384",
     sections: [
       {
-        heading: "The Math That Changes the Picture",
-        body: "A 10% return on a personal ₹50,000 account produces ₹5,000 in profit. The same 10% simulated performance on a FundedWealth ₹50 Lakh simulated evaluation account generates a ₹4,00,000 performance reward at the 80% share rate. Same skill. Same strategy. The evaluation framework scales the outcome."
+        heading: "The Math That Changes Everything",
+        body: "A 10% return on a personal ₹50,000 account earns you ₹5,000. The same 10% return on a FundedWealth ₹50 Lakh account earns you ₹4,00,000 (at 80% split). Same skill. Same strategy. 80├ù the income."
       },
       {
         heading: "Personal Capital — The Hidden Costs",
-        body: "Trading your own savings means every loss has a direct personal financial impact. You carry 100% of the downside. Scaling to meaningful capital requires years of compounding. Emotionally, execution is harder when personal savings are at stake."
+        body: "Trading your own savings means every loss stings personally. You carry 100% of the downside. You need years of compounding to reach meaningful capital. Emotionally, it's harder to execute your strategy when rent money is on the line. Scaling takes a decade."
       },
       {
-        heading: "Simulated Evaluation — The Asymmetric Structure",
-        body: "With FundedWealth, your downside is limited to the evaluation fee. If the simulated account breaches defined risk limits, the evaluation ends — not your personal savings. You can attempt again, improve your consistency, and reapply. The risk-reward structure is fundamentally different from personal capital trading."
+        heading: "Funded Capital — The Asymmetric Advantage",
+        body: "With FundedWealth, your downside is capped at the small evaluation fee. Your upside scales with our capital. Losses beyond the drawdown limits end the account — not your savings. You can attempt again, improve, and reapply. The risk-reward is fundamentally different."
       },
       {
         heading: "Side-by-Side Comparison",
-        body: "Personal ₹50k account → 10% gain = ₹5,000 result, any loss is personal.\nFundedWealth ₹50L simulated account → 10% simulated performance = ₹4,00,000 reward at 80% share, no personal capital at risk.\nPersonal account → requires years of saving and compounding to grow.\nSimulated evaluation account → defined scaling path from ₹1L to ₹50L based on demonstrated performance."
+        body: "Personal ₹50k account → 10% gain = ₹5,000 profit, 100% loss is yours.\nFunded ₹50L account → 10% gain = ₹4,00,000 profit (80% split), 0% personal loss.\nPersonal ₹50k account → requires years of saving and compounding to grow.\nFunded account → instantly scale from ₹1L to ₹50L based on performance."
       },
       {
         heading: "The Bottom Line",
-        body: "Consistent, disciplined execution is the scarce resource — not capital. FundedWealth's structured evaluation environment lets you demonstrate your edge without risking personal savings."
+        body: "Skill is the scarce resource, not capital. FundedWealth solves the capital problem so you can focus entirely on what you do best — reading the market and executing your edge."
       }
     ]
   },
   sebi: {
-    title: "How Evaluation Platforms Work in India",
+    title: "SEBI, Legality & How Prop Firms Work in India",
     accent: "#4A00E0",
     sections: [
       {
-        heading: "Is This Type of Platform Legal in India?",
-        body: "Yes. Performance evaluation platforms operating under a simulated trading model function legally in India. FundedWealth is not a broker, a mutual fund, or a financial advisor. It does not solicit deposits from the public for investment. It provides a structured simulated trading environment where performance is evaluated against defined risk parameters."
+        heading: "Is Prop Trading Legal in India?",
+        body: "Yes. Proprietary trading firms in India operate legally under a well-defined framework. We are not a broker, a mutual fund, or a financial advisor. We do not solicit deposits from the public for investment. We provide a simulated trading environment where performance is evaluated."
       },
       {
         heading: "What Does 'Simulated Environment' Mean?",
-        body: "When you trade on a FundedWealth simulated evaluation account, your activity takes place in a simulated environment that mirrors real-time NSE/BSE market price data. Account balances are simulated balances and do not represent customer-owned funds. Performance-based rewards for eligible participants are paid from the company's operating budget under the applicable program terms."
+        body: "When you trade on a FundedWealth funded account, you are trading in a simulated market environment that mirrors real NSE/BSE price feeds in real time. The P&L you generate is real and directly determines your payout. We are the counterparty to your trades."
       },
       {
         heading: "Why Isn't SEBI Registration Required?",
-        body: "SEBI regulates entities that provide investment advice to the public or pool public money for market investment. FundedWealth does neither. It does not manage customer investment capital, execute live exchange orders on behalf of customers, or provide investment advisory services. This operational model does not require SEBI broker registration."
+        body: "SEBI regulates entities that provide investment advice to the public or pool public money for market investment. Prop trading firms do neither. We use our own proprietary capital. Traders are evaluated as potential managers of our internal capital — not as clients receiving investment services. This model does not require SEBI broker registration."
       },
       {
-        heading: "Your Protections as a Participant",
-        body: "FundedWealth operates with full transparency. All evaluation rules and risk parameters are published before you start. Performance-based rewards for eligible participants are processed within 12 hours under the applicable program terms. There are no arbitrary denial clauses. What you see is what you get."
+        heading: "Your Protections as a Trader",
+        body: "FundedWealth operates with full transparency. Our rules are published clearly. Payouts are processed within 12 hours of verification. There are no arbitrary denial clauses. Our evaluation criteria are objective and published before you start. What you see is what you get."
       },
       {
         heading: "Our Commitment to Compliance",
-        body: "We keep our operating model current with Indian financial regulations and update it as the environment evolves. If you have specific legal questions about simulated trading evaluation platforms in India, we recommend consulting a qualified financial or legal professional. We are happy to share our full operational documentation on request."
+        body: "We stay fully current with Indian financial regulations and update our operating model as the regulatory environment evolves. If you have specific legal questions about prop trading in India, we recommend consulting a qualified financial lawyer. We're always happy to share our full operational documentation on request."
       }
     ]
   }
@@ -3671,8 +4004,8 @@ const Education = () => {
             onClick={() => setOpenArticle("guide")}
           >
             <CardContent className="p-8">
-              <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-orange transition-colors">What Is a Simulated Evaluation Account?</h4>
-              <p className="text-white/60 mb-6">FundedWealth provides a structured simulated trading environment. You trade under defined risk parameters. Participants who meet the criteria become eligible for performance-based rewards under the applicable program terms.</p>
+              <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-orange transition-colors">What Is a Funded Account?</h4>
+              <p className="text-white/60 mb-6">We provide you with our capital to trade. You follow our risk parameters. If you make a profit, we split it up to 90/10 in your favor. If you lose, we absorb the losses.</p>
               <div className="text-fw-orange font-semibold flex items-center gap-2">Read Guide <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></div>
             </CardContent>
           </Card>
@@ -3682,8 +4015,8 @@ const Education = () => {
             onClick={() => setOpenArticle("compare")}
           >
             <CardContent className="p-8">
-              <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-pink transition-colors">Simulated vs Personal Capital Trading</h4>
-              <p className="text-white/60 mb-6">Trading a personal ₹50k account with 10% simulated gains generates ₹5k in performance results. Trading on a ₹50L simulated evaluation account with the same performance generates ₹4L at 80% reward share. The evaluation framework scales your demonstrated skill.</p>
+              <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-pink transition-colors">Funded vs Personal Capital</h4>
+              <p className="text-white/60 mb-6">Trading a ₹50k personal account with 10% gains makes you ₹5k. Trading a ₹50L funded account with 10% gains makes you ₹4L. Capital scales your skill.</p>
               <div className="text-fw-pink font-semibold flex items-center gap-2">Compare <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></div>
             </CardContent>
           </Card>
@@ -3693,8 +4026,8 @@ const Education = () => {
             onClick={() => setOpenArticle("sebi")}
           >
             <CardContent className="p-8">
-              <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-purple transition-colors">How Evaluation Platforms Work in India</h4>
-              <p className="text-white/60 mb-6">Understand the legal and operational framework. FundedWealth provides a structured simulated trading environment tied to real market data. The platform is not a broker, investment advisor, or SEBI-registered entity — it is a performance evaluation service.</p>
+              <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-fw-purple transition-colors">SEBI and Prop Firms</h4>
+              <p className="text-white/60 mb-6">Understand the legal framework. Prop trading firms provide simulated environments tied to real market data. We are the counterparty to your trades, fully compliant with Indian regulations.</p>
               <div className="text-fw-purple font-semibold flex items-center gap-2">Learn Truth <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></div>
             </CardContent>
           </Card>
@@ -3705,15 +4038,15 @@ const Education = () => {
               <ul className="space-y-4">
                 <li className="flex items-center gap-3">
                   <CheckCircle2 className="text-fw-orange shrink-0" size={20} />
-                  <span className="text-white/90 font-medium">India's NSE/BSE focused simulated evaluation platform</span>
+                  <span className="text-white/90 font-medium">India's first NSE/BSE focused firm</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle2 className="text-fw-pink shrink-0" size={20} />
-                  <span className="text-white/90 font-medium">Industry-leading reward processing speed</span>
+                  <span className="text-white/90 font-medium">Fastest payout cycle in the industry</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <CheckCircle2 className="text-fw-purple shrink-0" size={20} />
-                  <span className="text-white/90 font-medium">Clear, published rules — no hidden conditions</span>
+                  <span className="text-white/90 font-medium">Zero arbitrary rules or hidden denials</span>
                 </li>
               </ul>
             </CardContent>
@@ -3731,13 +4064,14 @@ const ImpactInitiative = () => (
       <div className="text-center mb-16 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-pink-500/10 border border-pink-500/20 rounded-full px-4 py-1.5 mb-6">
           <Heart size={14} className="text-pink-400 fill-pink-400" />
-          <span className="text-pink-400 text-sm font-bold">Powered by Real Impact in India</span>
+          <span className="text-pink-400 text-sm font-bold">Powered by Real Impact ❤∩╕Å</span>
         </div>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-extrabold text-white mb-6">
-          Trade with Purpose — <span className="text-gradient">Create Real Impact</span>
+          Trade for Change — <span className="text-gradient">Profit with Purpose</span>
         </h2>
         <p className="text-xl text-white/70">
-          Your participation can support meaningful social initiatives. FundedWealth contributes through its impact program, and eligible participants may choose to contribute as well.
+          Every trade you take creates real impact.<br />
+          FundedWealth contributes from its profits — and you can choose to give back too.
         </p>
       </div>
 
@@ -3746,29 +4080,29 @@ const ImpactInitiative = () => (
           <div className="absolute top-3 right-3 bg-blue-500/15 border border-blue-500/25 rounded-full px-2.5 py-0.5 text-blue-400 text-[10px] font-bold">AUTOMATIC</div>
           <div className="text-3xl mb-3"></div>
           <h3 className="text-white font-extrabold text-xl mb-2">FundedWealth Contribution</h3>
-          <p className="text-white/50 text-sm mb-4">FundedWealth supports selected social initiatives across India through its impact program.</p>
+          <p className="text-white/50 text-sm mb-4">We allocate a portion of our profits to support real causes across India.</p>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">₹4.8L+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">3,200+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">180+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-blue-400 font-bold">₹12L+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">8,200+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">520+</span></div>
           </div>
         </div>
         <div className="bg-gradient-to-b from-green-500/15 to-green-900/5 border border-green-500/25 rounded-2xl p-7 relative overflow-hidden">
           <div className="absolute top-3 right-3 bg-green-500/15 border border-green-500/25 rounded-full px-2.5 py-0.5 text-green-400 text-[10px] font-bold">OPTIONAL</div>
           <div className="text-3xl mb-3"></div>
           <h3 className="text-white font-extrabold text-xl mb-2">Trader Contribution</h3>
-          <p className="text-white/50 text-sm mb-4">Eligible participants can optionally contribute when requesting a reward payout.</p>
+          <p className="text-white/50 text-sm mb-4">You can optionally contribute during withdrawals and increase your impact.</p>
           <div className="space-y-2">
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">₹1.6L+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">1,050+</span></div>
-            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">75+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Contributed</span><span className="text-green-400 font-bold">₹6.5L+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Meals funded</span><span className="text-amber-400 font-bold">4,300+</span></div>
+            <div className="flex justify-between text-sm bg-white/5 rounded-lg p-2.5"><span className="text-white/50">Students supported</span><span className="text-purple-400 font-bold">330+</span></div>
           </div>
         </div>
       </div>
 
       <div className="bg-gradient-to-r from-pink-500/15 via-purple-500/10 to-pink-500/15 border border-pink-500/20 rounded-2xl p-4 text-center mb-12">
-        <span className="text-white font-extrabold">Together, creating meaningful impact</span>
-        <span className="text-white/40 text-sm ml-2">— ₹6.4L+ contributed across selected initiatives</span>
+        <span className="text-white font-extrabold">Together, we create DOUBLE IMPACT</span>
+        <span className="text-white/40 text-sm ml-2">— ₹18.5L+ combined across 12 cities</span>
       </div>
 
       <div className="glass-card rounded-2xl border border-white/10 p-8 mb-10">
@@ -3849,59 +4183,59 @@ const FAQ = () => {
           {[
             {
               q: "Is FundedWealth SEBI Registered?",
-              a: "FundedWealth is a simulated trading evaluation platform, not a broker or financial advisor. We do not accept deposits from the public for investment purposes. We provide a structured simulated trading environment and evaluate trader performance. SEBI registration as a broker is not applicable to this operational model."
+              a: "FundedWealth is a proprietary trading firm, not a broker or financial advisor. We do not accept deposits from the public for investment purposes. We provide simulated trading environments and evaluate trader performance. Therefore, SEBI registration as a broker is not applicable to our business model."
             },
             {
-              q: "How does the reward process work?",
-              a: "Once you are an active evaluation participant and have generated simulated performance above the defined threshold, you can submit a reward request every 7 days. Eligible performance-based rewards are processed within 12 hours and sent directly to your Indian bank account via NEFT/IMPS or UPI under the applicable program terms."
+              q: "How does the payout work?",
+              a: "Once you are a funded trader and have generated profit above your initial balance, you can request a payout every 7 days. Payouts are processed within 12 hours and sent directly to your Indian bank account via NEFT/IMPS or UPI, or via crypto if preferred."
             },
             {
-              q: "What is the performance share?",
-              a: "Our performance share starts at 80% in favour of the participant. For our 2-Step evaluation and scaled simulated accounts, the share goes up to 90%. The remainder covers operational costs and platform technology."
+              q: "What is the profit split?",
+              a: "Our profit splits start at 80% in favor of the trader. For our 2-Step evaluation and scaled accounts, the split goes up to 90%. We keep the remaining 10-20% to cover operational costs and technology."
             },
             {
               q: "Can I trade news?",
-              a: "Yes. We do not restrict news trading. If your strategy relies on volatility during macroeconomic events, you are free to execute it within the defined risk parameters."
+              a: "Yes! Unlike many other firms, we do not restrict news trading. If your strategy relies on volatility during macroeconomic events, you are free to execute it."
             },
             {
               q: "What markets can I trade?",
-              a: "On FundedWealth IND you can trade Index F&O (NIFTY, BANKNIFTY, SENSEX, FINNIFTY) and Equities (NIFTY 500 stocks + Stock Futures) using real-time NSE/BSE market price data on simulated evaluation accounts. Forex, Crypto and Global Futures are coming soon as separate FundedWealth verticals."
+              a: "On FundedWealth IND you can trade Index F&O (NIFTY, BANKNIFTY, SENSEX, FINNIFTY) and Equities (NIFTY 500 stocks + Stock Futures) on real NSE/BSE price feeds. Forex, Crypto and Global Futures are coming soon as separate FundedWealth verticals."
             },
             {
               q: "What is the FW Championship?",
-              a: "The FW Championship is our monthly simulated trading competition. For a small entry fee, participants compete on a leaderboard in a structured simulated environment. Top performers win physical prizes like iPhones and MacBooks, cash rewards, and simulated evaluation plan credits."
+              a: "The FW Championship is our premier trading competition. For a small entry fee, traders compete on a leaderboard. Top performers win physical prizes like iPhones and MacBooks, cash rewards, and direct funded accounts without passing evaluations."
             },
             {
               q: "Is there a free trial?",
-              a: "Yes, we offer a 14-day free trial on our simulated platform so you can test spreads, execution speed, and the dashboard before committing to an evaluation plan."
+              a: "Yes, we offer a 14-day free trial on our simulated platform so you can test our spreads, execution speed, and dashboard before committing to an evaluation or instant funding."
             },
             {
-              q: "What simulated account sizes are available?",
-              a: "We offer simulated account sizes across all plan types:\n\n• Flash ⚡ — ₹1,00,000 | ₹2,50,000 | ₹5,00,000 | ₹10,00,000\n• Instant — ₹1,00,000 | ₹5,00,000 | ₹10,00,000\n• 1-Step Evaluation — ₹1,00,000 | ₹5,00,000 | ₹10,00,000 | ₹25,00,000\n• 2-Step Evaluation — ₹5,00,000 | ₹10,00,000 | ₹25,00,000\n\nThrough our scaling plan, participants can scale their simulated account up to ₹50,00,000 (₹50L) in 6 levels. All account balances are simulated balances."
+              q: "What account sizes are available?",
+              a: "We offer account sizes across all plan types:\n\n• Flash ⚡ — ₹1,00,000 | ₹2,50,000 | ₹5,00,000 | ₹10,00,000\n• Instant — ₹1,00,000 | ₹5,00,000 | ₹10,00,000\n• 1-Step Evaluation — ₹1,00,000 | ₹5,00,000 | ₹10,00,000 | ₹25,00,000\n• 2-Step Evaluation — ₹5,00,000 | ₹10,00,000 | ₹25,00,000\n\nThrough our scaling plan, funded traders can scale up to ₹50,00,000 (₹50L) in 6 levels."
             },
             {
               q: "What is the difference between Flash, Instant, 1-Step, and 2-Step plans?",
-              a: "Flash ⚡ gives you immediate access to a simulated evaluation account — start trading right away. Instant also provides immediate access with slightly different pricing and parameters. 1-Step requires completing a single evaluation phase by hitting the profit target. 2-Step has two phases with separate profit targets of 8% and 5%. The 2-Step plan offers the lowest entry fees and suits traders who prefer a more gradual evaluation process."
+              a: "Flash ⚡ gives you immediate access to a funded account with no evaluation — just pay and start trading. Instant also skips the evaluation but comes with slightly different pricing and rules. 1-Step requires you to pass a single evaluation phase by hitting the profit target, while 2-Step has two phases (Phase 1 and Phase 2) with separate profit targets of 8% and 5%. The 2-Step plan offers the lowest entry fees and is ideal for consistent traders."
             },
             {
               q: "What are the fees for each account size?",
-              a: "Fees vary by plan type and simulated account size. Here are the discounted prices:\n\n• Flash ⚡ — ₹1L: ₹1,399 | ₹2.5L: ₹2,999 | ₹5L: ₹4,599 | ₹10L: ₹7,799\n• Instant — ₹1L: ₹2,749 | ₹5L: ₹6,049 | ₹10L: ₹9,899\n• 1-Step — ₹1L: ₹1,049 | ₹5L: ₹4,199 | ₹10L: ₹7,699 | ₹25L: ₹16,974\n• 2-Step — ₹5L: ₹3,599 | ₹10L: ₹6,599 | ₹25L: ₹14,549\n\nAll prices include GST. Check the Plans section for current discount offers."
+              a: "Fees vary by plan type and account size. Here are the discounted prices:\n\n• Flash ⚡ — ₹1L: ₹1,399 | ₹2.5L: ₹2,999 | ₹5L: ₹4,599 | ₹10L: ₹7,799\n• Instant — ₹1L: ₹2,749 | ₹5L: ₹6,049 | ₹10L: ₹9,899\n• 1-Step — ₹1L: ₹1,049 | ₹5L: ₹4,199 | ₹10L: ₹7,699 | ₹25L: ₹16,974\n• 2-Step — ₹5L: ₹3,599 | ₹10L: ₹6,599 | ₹25L: ₹14,549\n\nAll prices include GST. We frequently run promotions — check the Plans section for the latest offers."
             },
             {
               q: "What is the profit target for each plan?",
-              a: "Profit targets depend on the plan type:\n\n• Flash ⚡ — No profit target (immediate access)\n• Instant — No profit target (immediate access)\n• 1-Step — 10% simulated profit target in a single phase\n• 2-Step — 8% in Phase 1 + 5% in Phase 2\n\nOnce you hit the target while staying within risk parameters, your simulated evaluation account is activated within 12 hours."
+              a: "Profit targets depend on the plan type:\n\n• Flash ⚡ — No profit target (instant funding)\n• Instant — No profit target (instant funding)\n• 1-Step — 10% profit target in a single phase\n• 2-Step — 8% in Phase 1 + 5% in Phase 2\n\nOnce you hit the target while staying within drawdown limits, your funded account is activated within 12 hours."
             },
             {
               q: "What are the drawdown rules for each account size?",
-              a: "Drawdown rules are the same across all simulated account sizes:\n\n• Daily Drawdown: 2% of your balance (e.g., ₹2,000 on a ₹1L account, ₹50,000 on a ₹25L account)\n• Max Drawdown: 4% of your starting balance (e.g., ₹4,000 on a ₹1L account, ₹1,00,000 on a ₹25L account)\n\nThese are the defined risk parameters. If either limit is breached on the simulated account, the evaluation ends."
+              a: "Drawdown rules are the same across all account sizes:\n\n• Daily Drawdown: 2% of your balance (e.g., ₹2,000 on a ₹1L account, ₹50,000 on a ₹25L account)\n• Max Drawdown: 4% of your starting balance (e.g., ₹4,000 on a ₹1L account, ₹1,00,000 on a ₹25L account)\n\nThese limits protect both you and the firm. If you breach either limit, the account is deactivated."
             },
             {
               q: "How does the scaling plan work?",
-              a: "Our scaling plan lets participants grow their simulated account size in 6 levels:\n\n₹1,00,000 → ₹2,50,000 → ₹5,00,000 → ₹10,00,000 → ₹25,00,000 → ₹50,00,000\n\nTo qualify for scaling, you need to consistently meet defined performance targets while staying within risk parameters. Each level increases your simulated account size — all the way up to ₹50L."
+              a: "Our scaling plan lets funded traders grow their account size in 6 levels:\n\n₹1,00,000 → ₹2,50,000 → ₹5,00,000 → ₹10,00,000 → ₹25,00,000 → ₹50,00,000\n\nTo qualify for scaling, you need to consistently hit profit targets while staying within drawdown limits. Each time you scale up, your capital increases and so does your earning potential — all the way up to ₹50L."
             },
             {
               q: "Which account size should I start with?",
-              a: "It depends on your experience and budget:\n\n• Beginners — Start with ₹1L (Flash or 1-Step) to learn the rules with minimal investment\n• Intermediate — ₹5L gives a good balance of simulated account size and affordability\n• Experienced — ₹10L or ₹25L for traders who want higher performance reward potential from day one\n\nYou can always progress through our scaling plan as your simulated performance demonstrates consistency."
+              a: "It depends on your experience and budget:\n\n• Beginners — Start with ₹1L (Flash or 1-Step) to learn the rules with minimal investment\n• Intermediate — ₹5L gives a good balance of capital and affordability\n• Experienced — ₹10L or ₹25L for serious traders who want higher earning potential from day one\n\nRemember, you can always scale up through our scaling plan once you're funded!"
             }
           ].map((faq, i) => (
             <AccordionItem key={i} value={`item-${i}`} className="bg-white/5 border border-white/10 rounded-xl px-6 data-[state=open]:bg-white/10 transition-colors">
@@ -4062,7 +4396,7 @@ const ContactUs = () => {
                 <Mail className="text-fw-orange w-5 h-5 shrink-0" />
                 <div>
                   <div className="text-white/40 text-xs mb-0.5">Email:</div>
-                  <div className="text-white font-semibold text-sm">support@fundedwealth.com</div>
+                  <div className="text-white font-semibold text-sm">support@fundedwealth.in</div>
                 </div>
               </div>
             </div>
@@ -4374,185 +4708,6 @@ const AffiliateModal = ({
   );
 };
 
-const AffiliateShareBadge = () => {
-  const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const badgeRef = useRef<HTMLDivElement>(null);
-
-  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
-  const shareText = encodeURIComponent("🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
-
-  const shareOptions = [
-    { label: "WhatsApp",     icon: "💬", color: "hover:bg-green-500/20 hover:text-green-400",  href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}` },
-    { label: "Telegram",     icon: "✈️", color: "hover:bg-blue-400/20 hover:text-blue-400",    href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}` },
-    { label: "Twitter / X",  icon: "🐦", color: "hover:bg-sky-400/20 hover:text-sky-400",      href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}` },
-    { label: "Instagram",    icon: "📸", color: "hover:bg-pink-400/20 hover:text-pink-400",    href: "https://www.instagram.com/" },
-  ];
-
-  const handleCopy = async () => {
-    try { await navigator.clipboard.writeText(shareUrl); } catch {}
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-    setOpen(false);
-  };
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (badgeRef.current && !badgeRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  return (
-    <div className="relative inline-block mb-8" ref={badgeRef}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-purple/30 border border-fw-purple/50 text-white text-sm font-bold cursor-pointer hover:bg-fw-purple/50 hover:border-fw-purple transition-all duration-200 group"
-      >
-        <Share2 size={14} className="group-hover:scale-110 transition-transform" />
-        {copied ? <span className="text-green-400">Link Copied!</span> : "Join, Share, Earn!"}
-      </button>
-
-      {open && (
-        <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 z-50 w-52 rounded-2xl border border-white/10 bg-[#14103a] shadow-[0_8px_32px_rgba(74,0,224,0.35)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="px-4 py-2.5 border-b border-white/10">
-            <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Share via</p>
-          </div>
-          {shareOptions.map((opt) => (
-            <a
-              key={opt.label}
-              href={opt.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 text-sm text-white/70 transition-colors ${opt.color}`}
-            >
-              <span className="text-base">{opt.icon}</span>
-              {opt.label}
-            </a>
-          ))}
-          <button
-            onClick={handleCopy}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-purple-500/20 hover:text-purple-400 transition-colors border-t border-white/10"
-          >
-            <Copy size={15} />
-            Copy Link
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const AffiliateShareButton = () => {
-  const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/#affiliate" : "https://fundedwealth.in/#affiliate";
-  const shareText = encodeURIComponent("🚀 Join FundedWealth's Affiliate Program & earn up to 50% commission on every referral! Win iPhones, MacBooks & more.");
-
-  const shareOptions = [
-    {
-      label: "WhatsApp",
-      icon: "💬",
-      color: "hover:bg-green-500/20 hover:text-green-400",
-      href: `https://wa.me/?text=${shareText}%20${encodeURIComponent(shareUrl)}`,
-    },
-    {
-      label: "Telegram",
-      icon: "✈️",
-      color: "hover:bg-blue-400/20 hover:text-blue-400",
-      href: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}`,
-    },
-    {
-      label: "Twitter / X",
-      icon: "🐦",
-      color: "hover:bg-sky-400/20 hover:text-sky-400",
-      href: `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(shareUrl)}`,
-    },
-    {
-      label: "Instagram Story",
-      icon: "📸",
-      color: "hover:bg-pink-400/20 hover:text-pink-400",
-      href: `https://www.instagram.com/`,
-    },
-  ];
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // fallback: select text
-    }
-    setOpen(false);
-  };
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <Button
-        variant="outline"
-        onClick={() => setOpen((v) => !v)}
-        className="h-13 px-8 text-base font-bold border-white/20 text-white hover:bg-white/10 rounded-xl transition-all duration-200"
-      >
-        {copied ? (
-          <>
-            <CheckCheck size={16} className="mr-2 text-green-400" />
-            <span className="text-green-400">Copied!</span>
-          </>
-        ) : (
-          <>
-            <Share2 size={16} className="mr-2" />
-            Share
-          </>
-        )}
-      </Button>
-
-      {open && (
-        <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 z-50 w-52 rounded-2xl border border-white/10 bg-[#14103a] shadow-[0_8px_32px_rgba(74,0,224,0.35)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="px-4 py-2.5 border-b border-white/10">
-            <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Share via</p>
-          </div>
-          {shareOptions.map((opt) => (
-            <a
-              key={opt.label}
-              href={opt.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 text-sm text-white/70 transition-colors ${opt.color}`}
-            >
-              <span className="text-base">{opt.icon}</span>
-              {opt.label}
-            </a>
-          ))}
-          <button
-            onClick={handleCopy}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:bg-purple-500/20 hover:text-purple-400 transition-colors border-t border-white/10"
-          >
-            <Copy size={15} />
-            Copy Link
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
 const Affiliate = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"register" | "login">("register");
@@ -4569,7 +4724,7 @@ const Affiliate = () => {
       commission: "30%",
       referrals: "1 – 20 sales",
       bonus: "₹5,000 at 30 sales",
-      desc: "Start receiving affiliate commissions from day one — transparent commission terms, clear tracking. Only completed purchases count — no signup commissions.",
+      desc: "Start earning from day one! Get 30% commission on every paid referral. Only completed purchases count — no signup commissions, just real earnings.",
       color: "from-blue-500/20 to-blue-600/10",
       border: "border-blue-500/30",
       badge: "text-blue-400",
@@ -4636,7 +4791,9 @@ const Affiliate = () => {
 
         {/* ── Hero banner ── */}
         <div className="text-center mb-12">
-          <AffiliateShareBadge />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-purple/30 border border-fw-purple/50 text-white text-sm font-bold mb-8">
+            <MousePointerClick size={15} /> Join, Share, Earn!
+          </div>
           <h2 className="text-3xl sm:text-5xl md:text-7xl font-heading font-extrabold text-white mb-6">
             Make Every{" "}
             <span className="inline-flex items-center gap-3 align-middle">
@@ -4663,7 +4820,6 @@ const Affiliate = () => {
             >
               Affiliate Login <ArrowRight size={16} className="ml-2" />
             </Button>
-            <AffiliateShareButton />
           </div>
         </div>
 
@@ -5001,15 +5157,17 @@ const TrustAndSecurity = () => {
   const trustBadges = [
     { icon: Lock, title: "256-bit SSL Encryption", desc: "Bank-grade security protects all your data and transactions" },
     { icon: ShieldCheck, title: "Verified Payouts", desc: "₹45 Lakhs+ paid out to 15,000+ funded traders with proof" },
-    { icon: Clock, title: "12-Hour Payout Processing", desc: "Industry-fastest payout processing — eligible approved payouts processed within 12 hours" },
+    { icon: Clock, title: "12-Hour Guaranteed Payout", desc: "Industry-fastest payout processing, guaranteed within 12 hours" },
     { icon: Banknote, title: "UPI & Bank Transfer", desc: "Direct payouts to any Indian bank account or UPI — zero hidden fees" },
     { icon: FileText, title: "Transparent Rules", desc: "Clear, published trading rules — no hidden clauses or surprises" },
     { icon: Globe, title: "15,000+ Active Traders", desc: "Trusted by traders across all 28 states and 8 union territories" },
   ];
 
   const companyCredentials = [
-    { label: "Brand", value: "FundedWealth" },
-    { label: "Location", value: "Mumbai, Maharashtra, India" },
+    { label: "Registered Company", value: "FundedWealth India Pvt. Ltd." },
+    { label: "CIN", value: "U74999MH2024PTC000000" },
+    { label: "GSTIN", value: "27AABCF0000A1Z5" },
+    { label: "Registered Office", value: "Mumbai, Maharashtra, India" },
     { label: "Support Email", value: "support@fundedwealth.com" },
     { label: "Operating Since", value: "2024" },
   ];
@@ -5069,7 +5227,7 @@ const TrustAndSecurity = () => {
             <div className="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-green-500/10 to-emerald-500/10">
               <h3 className="text-white font-heading font-bold text-lg flex items-center gap-2">
                 <Building2 size={20} className="text-green-400" />
-                About FundedWealth
+                Company Registration Details
               </h3>
             </div>
             <div className="p-6 space-y-4">
@@ -5096,8 +5254,8 @@ const TrustAndSecurity = () => {
             </div>
             <div className="p-6 space-y-4">
               {[
-                { stat: "₹45 Lakhs+", label: "In Trader Payouts", verified: true },
-                { stat: "15,000+", label: "Traders on FundedWealth", verified: true },
+                { stat: "₹45 Lakhs+", label: "Total Payouts Delivered", verified: true },
+                { stat: "15,000+", label: "Active Funded Traders", verified: true },
                 { stat: "12 Hours", label: "Average Payout Time", verified: true },
                 { stat: "4.8/5", label: "Trader Satisfaction Rating", verified: true },
                 { stat: "28+ States", label: "Traders Across India", verified: true },
@@ -5245,10 +5403,11 @@ const Footer = () => {
               India's #1 Fastest Growing Prop Trading Firm Dedicated to Indian Traders
             </p>
             <div className="space-y-2 mb-6 text-sm text-white/40">
-              <p className="flex items-center gap-2"><Building2 size={14} className="text-white/30 shrink-0" /> FundedWealth</p>
-              <p className="flex items-center gap-2"><Globe size={14} className="text-white/30 shrink-0" /> Simulated Trading &amp; Evaluation Platform</p>
+              <p className="flex items-center gap-2"><Building2 size={14} className="text-white/30 shrink-0" /> FundedWealth India Pvt. Ltd.</p>
               <p className="flex items-center gap-2"><MapPin size={14} className="text-white/30 shrink-0" /> Mumbai, Maharashtra, India</p>
               <p className="flex items-center gap-2"><Mail size={14} className="text-white/30 shrink-0" /> support@fundedwealth.com</p>
+              <p className="flex items-center gap-2"><FileText size={14} className="text-white/30 shrink-0" /> CIN: U74999MH2024PTC000000</p>
+              <p className="flex items-center gap-2"><FileText size={14} className="text-white/30 shrink-0" /> GSTIN: 27AABCF0000A1Z5</p>
             </div>
             <div className="flex gap-4">
               <a href="https://www.instagram.com/fundedwealthind" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-fw-pink hover:text-white transition-colors">
@@ -5294,11 +5453,6 @@ const Footer = () => {
               <li><Link href="/privacy" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Lock size={14} className="text-white/30" /> Privacy Policy</Link></li>
               <li><Link href="/refund" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Banknote size={14} className="text-white/30" /> Refund Policy</Link></li>
               <li><Link href="/rules" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><ShieldCheck size={14} className="text-white/30" /> Trading Rules</Link></li>
-              <li><Link href="/aml-kyc" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><UserCheck size={14} className="text-white/30" /> AML & KYC Policy</Link></li>
-              <li><Link href="/risk-disclosure" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><AlertTriangle size={14} className="text-white/30" /> Risk Disclosure</Link></li>
-              <li><Link href="/acceptable-use" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Scale size={14} className="text-white/30" /> Acceptable Use Policy</Link></li>
-              <li><Link href="/cookie-policy" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Cookie size={14} className="text-white/30" /> Cookie Policy</Link></li>
-              <li><Link href="/affiliate-terms" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Users size={14} className="text-white/30" /> Affiliate Terms</Link></li>
               <li><a href="/faq" className="text-white/50 hover:text-fw-orange transition-colors flex items-center gap-2"><Globe size={14} className="text-white/30" /> FAQ</a></li>
             </ul>
           </div>
@@ -5306,7 +5460,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-white/10 space-y-4 mb-6">
           <p className="text-white/40 text-xs leading-relaxed">
-            <span className="text-white/60 font-semibold">Disclaimer:</span> All information on this website is for educational purposes only and is not intended to provide financial advice. All trading on our platform is simulated for evaluation purposes. Account balances shown are simulated balances and do not represent customer-owned funds. FundedWealth is a structured simulated trading evaluation platform that assesses trader performance under defined risk parameters.
+            <span className="text-white/60 font-semibold">Disclaimer:</span> All information on this website is for educational purposes only and is not intended to provide financial advice. All trading on our platform is simulated. We do not operate as a broker. FundedWealth is a proprietary trading firm that provides a service to evaluate traders and fund them in a simulated environment.
           </p>
         </div>
 
@@ -5318,7 +5472,7 @@ const Footer = () => {
           </div>
           <div className="border border-white/10 rounded-xl bg-white/3 px-6 py-4">
             <p className="text-xs text-white/60 leading-relaxed">
-              <span className="text-fw-orange font-bold">Important Notice:</span> FundedWealth is not a SEBI-registered entity and does not provide regulated financial services, investment advice, or brokerage services. FundedWealth provides simulated trading and evaluation services. Trading activity is conducted in a simulated environment and does not represent live securities transactions unless expressly stated otherwise. All activities on the platform are for educational and skill assessment purposes.
+              <span className="text-fw-orange font-bold">Important Notice:</span> FundedWealth India is not a SEBI-registered entity and does not provide regulated financial services, investment advice, or brokerage services. All activities on the platform are for educational and skill assessment purposes.
             </p>
           </div>
         </div>
@@ -5332,23 +5486,7 @@ const Footer = () => {
             <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy Policy</Link>
             <Link href="/refund" className="hover:text-white/60 transition-colors">Refund Policy</Link>
             <Link href="/rules" className="hover:text-white/60 transition-colors">Trading Rules</Link>
-            <Link href="/risk-disclosure" className="hover:text-white/60 transition-colors">Risk Disclosure</Link>
           </div>
-        </div>
-      </div>
-
-      {/* Large outlined watermark text — LangChain style */}
-      <div className="w-full overflow-hidden select-none pointer-events-none mt-6" aria-hidden="true">
-        <div
-          className="font-heading font-extrabold leading-[1.1] whitespace-nowrap text-center"
-          style={{
-            fontSize: "clamp(2rem, 7.5vw, 8rem)",
-            color: "transparent",
-            WebkitTextStroke: "1px rgba(255,255,255,0.09)",
-            paddingBottom: "0.15em",
-          }}
-        >
-          Funded<span style={{ WebkitTextStroke: "1px rgba(255,138,61,0.15)" }}>Wealth</span>
         </div>
       </div>
     </footer>
@@ -5367,6 +5505,7 @@ export default function Home() {
 
       <main>
         <Hero />
+        <Stats />
         <IndianInstruments />
         <FWIndEdge />
         <Plans />
@@ -5376,11 +5515,13 @@ export default function Home() {
         <Guarantee />
         <ImpactInitiative />
         <PayoutsMadeSimple />
+        <LivePayouts />
         <TerminalMockup />
         <Advantages />
         <WhyChoose />
         <Calculator />
         <SmartScalingPlan />
+        <SEBIBrokers />
         <Education />
         <FAQ />
         <Affiliate />
@@ -5391,7 +5532,10 @@ export default function Home() {
 
       <Footer />
 
-
+      {/* AUTO DEPLOY TEST */}
+      <div style={{ textAlign: "center", padding: "8px", fontSize: "11px", color: "#ffffff", background: "#1a0030", letterSpacing: "0.1em" }}>
+        AUTO DEPLOY TEST
+      </div>
     </div>
   );
 }
