@@ -2806,19 +2806,21 @@ const Plans = () => {
     );
   }, [activeTab]);
 
-  const selectPlan = (index: number, ctaName: string) => {
+  const selectPlan = async (index: number, ctaName: string) => {
     const item = getChallengeItem(index);
-    trackSelectItem(`${currentProduct.key}_plans`, `${currentProduct.displayLabel} challenge plans`, item);
-    trackViewItem(item);
-    trackCtaClick({
+    await Promise.all([
+      trackSelectItem(`${currentProduct.key}_plans`, `${currentProduct.displayLabel} challenge plans`, item),
+      trackViewItem(item),
+      trackCtaClick({
       cta_name: ctaName,
       cta_location: "challenge_card",
       cta_destination: "/checkout",
       challenge_id: item.item_id,
       challenge_name: item.item_name,
       challenge_type: currentProduct.serverLabel,
-    });
-    window.setTimeout(() => navigatePlans("/checkout"), 250);
+      }),
+    ]);
+    navigatePlans("/checkout");
   };
 
   return (

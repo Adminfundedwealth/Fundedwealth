@@ -47,24 +47,35 @@ export function trackPageView(path: string): void {
 export function trackAnalyticsEvent(
   eventName: string,
   parameters: Record<string, unknown>,
-): void {
-  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
-  window.gtag("event", eventName, {
-    ...parameters,
-    send_to: GA4_MEASUREMENT_ID,
+): Promise<void> {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") return Promise.resolve();
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    window.gtag("event", eventName, {
+      ...parameters,
+      send_to: GA4_MEASUREMENT_ID,
+      event_callback: finish,
+      event_timeout: 1000,
+    });
+    window.setTimeout(finish, 350);
   });
 }
 
-export function trackViewItemList(listId: string, listName: string, items: ChallengeItem[]): void {
-  trackAnalyticsEvent("view_item_list", { item_list_id: listId, item_list_name: listName, items });
+export function trackViewItemList(listId: string, listName: string, items: ChallengeItem[]): Promise<void> {
+  return trackAnalyticsEvent("view_item_list", { item_list_id: listId, item_list_name: listName, items });
 }
 
-export function trackViewItem(item: ChallengeItem): void {
-  trackAnalyticsEvent("view_item", { currency: "INR", value: item.price, items: [{ ...item, quantity: 1 }] });
+export function trackViewItem(item: ChallengeItem): Promise<void> {
+  return trackAnalyticsEvent("view_item", { currency: "INR", value: item.price, items: [{ ...item, quantity: 1 }] });
 }
 
-export function trackSelectItem(listId: string, listName: string, item: ChallengeItem): void {
-  trackAnalyticsEvent("select_item", { item_list_id: listId, item_list_name: listName, items: [item] });
+export function trackSelectItem(listId: string, listName: string, item: ChallengeItem): Promise<void> {
+  return trackAnalyticsEvent("select_item", { item_list_id: listId, item_list_name: listName, items: [item] });
 }
 
 export function trackCtaClick(parameters: {
@@ -74,8 +85,8 @@ export function trackCtaClick(parameters: {
   challenge_id?: string;
   challenge_name?: string;
   challenge_type?: string;
-}): void {
-  trackAnalyticsEvent("cta_click", parameters);
+}): Promise<void> {
+  return trackAnalyticsEvent("cta_click", parameters);
 }
 
 export { GA4_MEASUREMENT_ID };
