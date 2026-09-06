@@ -54,7 +54,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   "Prop Trading Tips": <BookOpen size={14} />,
 };
 
-const BASE_URL = "https://fundedwealth.com";
+const BASE_URL = "https://www.fundedwealth.com";
 
 function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return "";

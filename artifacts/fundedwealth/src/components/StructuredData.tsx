@@ -5,9 +5,9 @@ const organizationSchema = {
   "@type": "Organization",
   name: "FundedWealth",
   alternateName: ["FundedWealth India", "FW", "Funded Wealth"],
-  url: "https://fundedwealth.com",
-  logo: "https://fundedwealth.com/logo.png",
-  image: "https://fundedwealth.com/opengraph.jpg",
+  url: "https://www.fundedwealth.com",
+  logo: "https://www.fundedwealth.com/logo.png",
+  image: "https://www.fundedwealth.com/opengraph.jpg",
   description: "FundedWealth is a simulated trading evaluation platform focused on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). Eligible participants can earn performance-based rewards, typically processed within 12 hours for approved requests, under program terms.",
   foundingDate: "2023",
   slogan: "India's #1 Prop Trading Firm — Trade Smarter, Get Funded",
@@ -56,7 +56,7 @@ const organizationSchema = {
         priceCurrency: "INR",
         price: "999",
         availability: "https://schema.org/InStock",
-        url: "https://fundedwealth.com/#plans"
+        url: "https://www.fundedwealth.com/#plans"
       },
       {
         "@type": "Offer",
@@ -65,7 +65,7 @@ const organizationSchema = {
         priceCurrency: "INR",
         price: "2999",
         availability: "https://schema.org/InStock",
-        url: "https://fundedwealth.com/#plans"
+        url: "https://www.fundedwealth.com/#plans"
       },
       {
         "@type": "Offer",
@@ -74,7 +74,7 @@ const organizationSchema = {
         priceCurrency: "INR",
         price: "1999",
         availability: "https://schema.org/InStock",
-        url: "https://fundedwealth.com/#plans"
+        url: "https://www.fundedwealth.com/#plans"
       }
     ]
   }
@@ -85,11 +85,11 @@ const websiteSchema = {
   "@type": "WebSite",
   name: "FundedWealth — India's Best Prop Trading Firm",
   alternateName: "FundedWealth",
-  url: "https://fundedwealth.com",
+  url: "https://www.fundedwealth.com",
   inLanguage: ["en-IN", "hi-IN"],
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://fundedwealth.com/blog?q={search_term_string}",
+    target: "https://www.fundedwealth.com/blog?q={search_term_string}",
     "query-input": "required name=search_term_string"
   }
 };
@@ -323,16 +323,16 @@ export function ArticleSchema({
     author: {
       "@type": "Person",
       name: author,
-      url: "https://fundedwealth.com",
+      url: "https://www.fundedwealth.com",
     },
     publisher: {
       "@type": "Organization",
       name: "FundedWealth",
       logo: {
         "@type": "ImageObject",
-        url: "https://fundedwealth.com/logo.png",
+        url: "https://www.fundedwealth.com/logo.png",
       },
-      url: "https://fundedwealth.com",
+      url: "https://www.fundedwealth.com",
     },
     mainEntityOfPage: {
       "@type": "WebPage",

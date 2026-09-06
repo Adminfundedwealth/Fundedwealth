@@ -281,7 +281,7 @@ export default function RiskDisclosure() {
             <p className="mt-2 text-white/60">support@fundedwealth.com</p>
             <p className="mt-3">For privacy and personal-data matters:</p>
             <p className="mt-2 text-white/60">privacy@fundedwealth.com</p>
-            <p className="mt-3">Website: <a href="https://fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a></p>
+            <p className="mt-3">Website: <a href="https://www.fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a></p>
           </section>
 
         </div>

@@ -57,4 +57,4 @@ Disallow: /ref/
 Disallow: /admin
 Crawl-delay: 1
 
-Sitemap: https://fundedwealth.com/sitemap.xml
+Sitemap: https://www.fundedwealth.com/sitemap.xml

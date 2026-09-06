@@ -300,7 +300,7 @@ export default function AcceptableUse() {
             <h2 className="text-xl font-bold text-white mb-3">11. Contact</h2>
             <p>For questions about this Policy:</p>
             <p className="mt-2 text-white font-medium">support@fundedwealth.com</p>
-            <p className="mt-2">Website: <a href="https://fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a></p>
+            <p className="mt-2">Website: <a href="https://www.fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a></p>
           </section>
 
         </div>

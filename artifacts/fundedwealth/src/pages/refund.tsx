@@ -30,7 +30,7 @@ export default function Refund() {
           <section>
             <h2 className="text-xl font-bold text-white mb-3">1. Overview</h2>
             <p>
-              This Refund Policy ("Policy") sets out the conditions under which FundedWealth may issue refunds for challenge and evaluation purchases made on the FundedWealth platform (<a href="https://fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a>). It applies to all purchases of evaluation programs, challenge plans, and associated services offered by FundedWealth.
+              This Refund Policy ("Policy") sets out the conditions under which FundedWealth may issue refunds for challenge and evaluation purchases made on the FundedWealth platform (<a href="https://www.fundedwealth.com" className="text-fw-orange hover:underline">fundedwealth.com</a>). It applies to all purchases of evaluation programs, challenge plans, and associated services offered by FundedWealth.
             </p>
             <p className="mt-3">
               FundedWealth is committed to fair, transparent, and operationally complete refund practices. Nothing in this Policy is intended to limit or waive any statutory rights you may have under applicable Indian consumer protection law. We encourage all customers to read this Policy in full before making a purchase.
