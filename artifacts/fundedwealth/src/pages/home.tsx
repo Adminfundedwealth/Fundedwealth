@@ -2808,18 +2808,16 @@ const Plans = () => {
 
   const selectPlan = async (index: number, ctaName: string) => {
     const item = getChallengeItem(index);
-    await Promise.all([
-      trackSelectItem(`${currentProduct.key}_plans`, `${currentProduct.displayLabel} challenge plans`, item),
-      trackViewItem(item),
-      trackCtaClick({
+    await trackViewItem(item);
+    await trackSelectItem(`${currentProduct.key}_plans`, `${currentProduct.displayLabel} challenge plans`, item);
+    await trackCtaClick({
       cta_name: ctaName,
       cta_location: "challenge_card",
       cta_destination: "/checkout",
       challenge_id: item.item_id,
       challenge_name: item.item_name,
       challenge_type: currentProduct.serverLabel,
-      }),
-    ]);
+    });
     navigatePlans("/checkout");
   };
 
