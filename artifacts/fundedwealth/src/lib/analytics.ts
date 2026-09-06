@@ -76,7 +76,9 @@ function sendGa4Event(eventName: string, parameters: Record<string, unknown>): v
     if (key === "items" && Array.isArray(value)) {
       value.forEach((item, index) => {
         if (item && typeof item === "object") {
-          payload.set(`pr${index + 1}`, serializeItem(item as ChallengeItem, eventName === "view_item" ? 1 : undefined));
+          const quantity = (item as ChallengeItem & { quantity?: number }).quantity
+            ?? (eventName === "view_item" || eventName === "begin_checkout" || eventName === "purchase" ? 1 : undefined);
+          payload.set(`pr${index + 1}`, serializeItem(item as ChallengeItem, quantity));
         }
       });
       continue;
@@ -181,6 +183,23 @@ export function trackPaymentInitiated(paymentMethod: string, item: ChallengeItem
     challenge_type: item.item_category,
     value,
     currency: "INR",
+  });
+}
+
+export function trackPurchase(transactionId: string, item: ChallengeItem, value: number): Promise<void> {
+  if (typeof window === "undefined" || !transactionId) return Promise.resolve();
+  const key = `fw_purchase:${transactionId}`;
+  try {
+    if (window.localStorage.getItem(key) === "1") return Promise.resolve();
+    window.localStorage.setItem(key, "1");
+  } catch {
+    // Collection still proceeds when storage is unavailable.
+  }
+  return trackAnalyticsEvent("purchase", {
+    transaction_id: transactionId,
+    value,
+    currency: "INR",
+    items: [{ ...item, quantity: 1 }],
   });
 }
 

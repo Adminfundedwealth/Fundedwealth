@@ -30,6 +30,7 @@ export const usePayment = (
   isLoaded: boolean,
   signIn?: (email: string, password: string) => Promise<{ error: string | null }>,
   onPaymentInitiated?: (context: PaymentInitiatedContext) => void,
+  onPurchaseVerified?: (orderId: string) => void,
 ) => {
   const [oxapayLoading, setOxapayLoading] = useState(false);
   const [oxapayError, setOxapayError] = useState("");
@@ -83,7 +84,7 @@ export const usePayment = (
           challengeType: selectedPlan,
           value: finalTotal,
         });
-        const pendingUrl = `${window.location.origin}/payment-pending?trackId=${encodeURIComponent(data.trackId)}&plan=${encodeURIComponent(selectedPlan)}&amount=${encodeURIComponent(finalTotal)}`;
+        const pendingUrl = `${window.location.origin}/payment-pending?trackId=${encodeURIComponent(data.trackId)}&plan=${encodeURIComponent(selectedPlan)}&sizeIndex=${encodeURIComponent(selectedSizeIdx)}&amount=${encodeURIComponent(finalTotal)}`;
         localStorage.setItem("oxapay_pending", JSON.stringify({
           trackId: data.trackId,
           plan: selectedPlan,
@@ -188,6 +189,7 @@ export const usePayment = (
             });
             const verifyData = await verifyRes.json().catch(() => ({}));
             if (verifyRes.ok && verifyData.success) {
+              if (verifyData.orderId) onPurchaseVerified?.(String(verifyData.orderId));
               // Same guest flow as UPI: the backend created/linked the Supabase
               // auth identity using the chosen password. Sign in now so the user
               // lands authenticated on the dashboard — never the login page.

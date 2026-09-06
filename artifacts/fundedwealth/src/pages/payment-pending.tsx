@@ -28,6 +28,8 @@ import {
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
 import { getApiBase } from "@/lib/api-base";
+import { PLANS, type PlanType } from "@/config/checkout";
+import { trackPurchase, type ChallengeItem } from "@/lib/analytics";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -142,6 +144,7 @@ export default function PaymentPending() {
   const initialTrackId = getQueryParam(search, "trackId");
   const initialOrderId = getQueryParam(search, "orderId");
   const initialPlan = getQueryParam(search, "plan") ?? "";
+  const initialSizeIndex = Number(getQueryParam(search, "sizeIndex") ?? "0");
   const initialAmount = getQueryParam(search, "amount") ?? "";
   const initialMethod = getQueryParam(search, "method") ?? "";
 
@@ -156,6 +159,20 @@ export default function PaymentPending() {
   const [pollCount, setPollCount] = useState(0);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [apiError, setApiError] = useState("");
+
+  const getPurchaseItem = (): ChallengeItem => {
+    const planType = (plan || "1step") as PlanType;
+    const selectedPlan = PLANS[planType] || PLANS["1step"];
+    const selectedSize = selectedPlan.sizes[initialSizeIndex] || selectedPlan.sizes[0];
+    return {
+      item_id: `${planType}_${selectedSize.size.replace(/[^0-9]/g, "")}`,
+      item_name: `${selectedPlan.label} ${selectedSize.size}`,
+      item_category: `${selectedPlan.label} Evaluation`,
+      price: Number(amount) || 0,
+      currency: "INR",
+      index: initialSizeIndex,
+    };
+  };
 
   // ── Crypto: recover from localStorage ──────────────────────────────────────
   useEffect(() => {
@@ -228,6 +245,7 @@ export default function PaymentPending() {
           if (orderRes?.ok) {
             const orderData = await orderRes.json().catch(() => ({}));
             if (orderData.success && orderData.orderId) {
+              void trackPurchase(String(orderData.orderId), getPurchaseItem(), Number(amount) || 0);
               setTimeout(() => navigate(`/purchase-success?orderId=${encodeURIComponent(orderData.orderId)}`), 2500);
               return;
             }
@@ -272,6 +290,7 @@ export default function PaymentPending() {
       if (res.ok && data.success) {
         if (data.status === "completed") {
           setStatus("completed");
+          void trackPurchase(orderId, getPurchaseItem(), Number(amount) || 0);
           const params = new URLSearchParams({ orderId });
           if (data.accountId) params.set("accountId", data.accountId);
           setTimeout(() => navigate(`/purchase-success?${params.toString()}`), 2500);

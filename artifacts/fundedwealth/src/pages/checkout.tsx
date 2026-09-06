@@ -31,7 +31,7 @@ import { usePayment } from "@/hooks/usePayment";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, ADDONS, PAYMENT_METHODS, PlanType, RAZORPAY_PAYMENT_ENABLED } from "@/config/checkout";
 import { getApiBase } from "@/lib/api-base";
-import { trackAddPaymentInfo, trackBeginCheckout, trackPaymentInitiated, type ChallengeItem } from "@/lib/analytics";
+import { trackAddPaymentInfo, trackBeginCheckout, trackPaymentInitiated, trackPurchase, type ChallengeItem } from "@/lib/analytics";
 
 const RazorpayLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
   const h = size === "sm" ? 16 : size === "lg" ? 36 : 22;
@@ -121,6 +121,8 @@ export default function Checkout() {
     handleRazorpayPayment,
   } = usePayment(getToken, isLoaded, signIn, (context) => {
     trackPaymentInitiated(context.paymentMethod, checkoutItem, context.value);
+  }, (orderId) => {
+    void trackPurchase(orderId, checkoutItem, finalTotal);
   });
 
   const [payCategory, setPayCategory] = useState<"upi" | "card" | "crypto" | null>(null);
@@ -204,6 +206,7 @@ export default function Checkout() {
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
+        if (data.orderId) void trackPurchase(String(data.orderId), checkoutItem, finalTotal);
         setUtrStatus("success");
 
         if (isSignedIn) {
@@ -248,6 +251,7 @@ export default function Checkout() {
           const pending = new URLSearchParams({
             orderId: data.orderId,
             plan: selectedPlan,
+            sizeIndex: String(selectedSizeIdx),
             amount: String(finalTotal),
             method: "upi",
           });
