@@ -8,52 +8,39 @@ import { getApiBase } from "@/lib/api-base";
 
 const CATEGORIES = ["All", "Market Analysis", "Trading Psychology", "Risk Management", "Technical Analysis", "Prop Trading Tips"];
 
-function titleToSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[₹]/g, "rs")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 80);
-}
-
-const FALLBACK_POSTS = [
-  { id: 1, slug: "5-golden-rules-every-prop-trader-must-follow", title: "5 Golden Rules Every Prop Trader Must Follow", excerpt: "Discipline separates profitable traders from the rest. Learn the 5 rules that our top-performing traders swear by.", category: "Prop Trading Tips", author: "FundedWealth Team", date: "14 Apr 2026", readTime: "5 min", featured: true },
-  { id: 2, slug: "understanding-drawdown-your-1-risk-metric", title: "Understanding Drawdown: Your #1 Risk Metric", excerpt: "Drawdown is the most critical metric in prop trading. Here's how to monitor, manage, and recover from drawdown effectively.", category: "Risk Management", author: "Ravi Kumar", date: "12 Apr 2026", readTime: "7 min", featured: false },
-  { id: 3, slug: "nifty-50-weekly-analysis-key-levels-to-watch", title: "Nifty 50 Weekly Analysis: Key Levels to Watch", excerpt: "Our technical breakdown of Nifty's current structure, support/resistance levels, and what to expect this week.", category: "Market Analysis", author: "Priya Sharma", date: "11 Apr 2026", readTime: "6 min", featured: false },
-  { id: 4, slug: "the-psychology-behind-revenge-trading", title: "The Psychology Behind Revenge Trading", excerpt: "Why do traders revenge trade after a loss? Understanding the psychology helps you break the cycle.", category: "Trading Psychology", author: "FundedWealth Team", date: "10 Apr 2026", readTime: "8 min", featured: false },
-  { id: 5, slug: "how-to-use-rsi-and-macd-together", title: "How to Use RSI and MACD Together", excerpt: "Combining RSI and MACD gives you a powerful confirmation system. Learn the exact setup our traders use.", category: "Technical Analysis", author: "Arjun Nair", date: "9 Apr 2026", readTime: "6 min", featured: false },
-  { id: 6, slug: "from-rs1l-to-rs25l-a-scaling-success-story", title: "From ₹1L to ₹25L: A Scaling Success Story", excerpt: "How Sneha Patel scaled her funded account from ₹1 Lakh to ₹25 Lakhs in just 6 months.", category: "Prop Trading Tips", author: "FundedWealth Team", date: "8 Apr 2026", readTime: "4 min", featured: false },
-  { id: 7, slug: "position-sizing-the-1-5-percent-rule-explained", title: "Position Sizing: The 1.5% Rule Explained", excerpt: "Never risk more than 1.5% per trade. Here's the exact formula and why it works.", category: "Risk Management", author: "Deepak Mehta", date: "7 Apr 2026", readTime: "5 min", featured: false },
-  { id: 8, slug: "bank-nifty-expiry-day-strategies", title: "Bank Nifty Expiry Day Strategies", excerpt: "Expiry days offer unique opportunities. Learn 3 strategies specifically designed for Bank Nifty expiry trading.", category: "Technical Analysis", author: "Vikram Singh", date: "6 Apr 2026", readTime: "7 min", featured: false },
-  { id: 9, slug: "why-90-percent-of-traders-fail", title: "Why 90% of Traders Fail (And How to Be the 10%)", excerpt: "The statistics are brutal, but the solution is simple. Here's what separates winners from losers in trading.", category: "Trading Psychology", author: "FundedWealth Team", date: "5 Apr 2026", readTime: "9 min", featured: false },
-];
-
 export default function Blog() {
   const [category, setCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [posts, setPosts] = useState(FALLBACK_POSTS);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const apiBase = getApiBase();
     fetch(`${apiBase}/api/blog`)
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setPosts(data.map((p: any) => ({
-            id: p.id,
-            slug: p.slug || titleToSlug(p.title),
-            title: p.title,
-            excerpt: p.excerpt || p.content?.slice(0, 150) || "",
-            category: p.category || "Prop Trading Tips",
-            author: p.author || "FundedWealth Team",
-            date: new Date(p.publishedAt || p.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
-            readTime: p.readTime || `${Math.max(3, Math.ceil((p.content?.length || 500) / 1000))} min`,
-            featured: p.isFeatured || p.featured || false,
-          })));
-        }
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to load blog posts");
+        return r.json();
       })
-      .catch(() => {});
+      .then(data => {
+        if (!Array.isArray(data)) throw new Error("Invalid blog response");
+        setPosts(data.map((p: any) => ({
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          excerpt: p.excerpt || p.content?.slice(0, 150) || "",
+          category: p.category || "Prop Trading Tips",
+          author: p.author || "FundedWealth Team",
+          date: new Date(p.publishedAt || p.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+          readTime: p.readTime || `${Math.max(3, Math.ceil((p.content?.length || 500) / 1000))} min`,
+          featured: p.isFeatured || p.featured || false,
+        })));
+      })
+      .catch(() => {
+        setPosts([]);
+        setError(true);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = posts.filter((p: any) => {
@@ -100,8 +87,22 @@ export default function Blog() {
           </p>
         </div>
 
+        {loading && (
+          <div className="text-center py-16 text-white/40">
+            <BookOpen size={40} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm">Loading published articles...</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="text-center py-16 text-white/40">
+            <BookOpen size={40} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm">Unable to load published articles right now.</p>
+          </div>
+        )}
+
         {/* ── Featured article ── */}
-        {featured && (
+        {!loading && !error && featured && (
           <Link href={`/blog/${featured.slug}`}>
             <Card className="glass-card border-blue-500/20 mb-12 max-w-4xl mx-auto overflow-hidden cursor-pointer hover:border-blue-400/40 transition-all group">
               <CardContent className="p-8">
@@ -127,7 +128,7 @@ export default function Blog() {
         )}
 
         {/* ── Filters ── */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 max-w-4xl mx-auto">
+        {!loading && !error && <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 max-w-4xl mx-auto">
           <div className="flex gap-2 flex-wrap">
             {CATEGORIES.map((cat) => (
               <Button
@@ -151,10 +152,10 @@ export default function Blog() {
               className="bg-white/5 border border-white/10 rounded-full pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 w-48"
             />
           </div>
-        </div>
+        </div>}
 
         {/* ── Article grid — every card is a link ── */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
+        {!loading && !error && <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1600px] mx-auto">
           {filtered.filter(p => !p.featured).map((post) => (
             <Link key={post.id} href={`/blog/${post.slug}`}>
               <Card className="glass-card border-white/10 hover:border-white/30 hover:bg-white/[0.03] transition-all cursor-pointer group h-full">
@@ -178,9 +179,9 @@ export default function Blog() {
               </Card>
             </Link>
           ))}
-        </div>
+        </div>}
 
-        {filtered.filter(p => !p.featured).length === 0 && (
+        {!loading && !error && filtered.filter(p => !p.featured).length === 0 && (
           <div className="text-center py-16 text-white/40">
             <BookOpen size={40} className="mx-auto mb-3 opacity-30" />
             <p className="text-sm">No articles found. Try a different category or search term.</p>
