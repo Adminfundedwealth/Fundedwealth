@@ -2818,7 +2818,7 @@ const Plans = () => {
       challenge_name: item.item_name,
       challenge_type: currentProduct.serverLabel,
     });
-    navigatePlans("/checkout");
+    window.setTimeout(() => navigatePlans("/checkout"), 250);
   };
 
   return (
