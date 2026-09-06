@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SEOHead from "@/components/SEOHead";
 import {
   ArrowLeft,
@@ -31,6 +31,7 @@ import { usePayment } from "@/hooks/usePayment";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { PLANS, ADDONS, PAYMENT_METHODS, PlanType, RAZORPAY_PAYMENT_ENABLED } from "@/config/checkout";
 import { getApiBase } from "@/lib/api-base";
+import { trackAddPaymentInfo, trackBeginCheckout, trackPaymentInitiated, type ChallengeItem } from "@/lib/analytics";
 
 const RazorpayLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
   const h = size === "sm" ? 16 : size === "lg" ? 36 : 22;
@@ -94,6 +95,23 @@ export default function Checkout() {
 
   const { signIn, isSignedIn } = useAuth();
 
+  const plan = PLANS[selectedPlan];
+  const size = plan.sizes[selectedSizeIdx];
+  const origNum = size.fee;
+  const priceNum = couponDiscount > 0 ? Math.round(origNum * (1 - couponDiscount / 100)) : origNum;
+  const selectedAddonData = ADDONS.find((a) => a.id === selectedAddon) ?? null;
+  const addonPrice = selectedAddonData ? parseInt(selectedAddonData.price.replace(/[₹,/a-zA-Z]/g, "")) : 0;
+  const finalTotal = priceNum + addonPrice;
+  const productName = `${size.size} ${plan.label} (FundedWealth IND)`;
+  const checkoutItem: ChallengeItem = {
+    item_id: `${selectedPlan}_${size.size.replace(/[^0-9]/g, "")}`,
+    item_name: `${plan.label} ${size.size}`,
+    item_category: `${plan.label} Evaluation`,
+    price: finalTotal,
+    currency: "INR",
+    index: selectedSizeIdx,
+  };
+
   const {
     oxapayLoading,
     oxapayError,
@@ -101,7 +119,9 @@ export default function Checkout() {
     razorpayError,
     handleOxaPayPayment,
     handleRazorpayPayment,
-  } = usePayment(getToken, isLoaded, signIn);
+  } = usePayment(getToken, isLoaded, signIn, (context) => {
+    trackPaymentInitiated(context.paymentMethod, checkoutItem, context.value);
+  });
 
   const [payCategory, setPayCategory] = useState<"upi" | "card" | "crypto" | null>(null);
   const [utrInput, setUtrInput] = useState("");
@@ -112,16 +132,7 @@ export default function Checkout() {
   const [utrPendingOrderId, setUtrPendingOrderId] = useState<string | null>(null);
   const [paySecondsLeft, setPaySecondsLeft] = useState(900);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
-  const plan = PLANS[selectedPlan];
-  const size = plan.sizes[selectedSizeIdx];
-  // Compute discounted price dynamically from base fee + live admin discount
-  const origNum = size.fee;
-  const priceNum = couponDiscount > 0 ? Math.round(origNum * (1 - couponDiscount / 100)) : origNum;
-  const selectedAddonData = ADDONS.find((a) => a.id === selectedAddon) ?? null;
-  const addonPrice = selectedAddonData ? parseInt(selectedAddonData.price.replace(/[₹,/a-zA-Z]/g, "")) : 0;
-  const finalTotal = priceNum + addonPrice;
-  const productName = `${size.size} ${plan.label} (FundedWealth IND)`;
+  const trackedPaymentMethods = useRef(new Set<string>());
 
   const FW_UPI_ID = "BHARATPE09S9C1V8L1Z53809@yesbankltd";
   const FW_MERCHANT_NAME = "AMAN KUMAR SINGH";
@@ -134,6 +145,13 @@ export default function Checkout() {
     }, 1000);
     return () => clearInterval(t);
   }, [step, payCategory]);
+
+  const recordPaymentMethod = (paymentType: string, initiated = false) => {
+    if (trackedPaymentMethods.current.has(paymentType)) return;
+    trackedPaymentMethods.current.add(paymentType);
+    trackAddPaymentInfo(paymentType, checkoutItem, finalTotal);
+    if (initiated) trackPaymentInitiated(paymentType, checkoutItem, finalTotal);
+  };
 
   const handleVerifyUtr = async () => {
     if (utrInput.trim().length < 10) {
@@ -424,7 +442,11 @@ export default function Checkout() {
                 <Button onClick={() => setTermsOpen(true)} disabled={!billingValid} className="w-full h-12 mt-6 text-base font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white border-0 disabled:opacity-40">Proceed To Pay</Button>
               </div>
 
-              <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} onAgree={() => setStep(3)} />
+              <TermsModal
+                open={termsOpen}
+                onClose={() => setTermsOpen(false)}
+                onAgree={() => { trackBeginCheckout(checkoutItem, finalTotal); setStep(3); }}
+              />
             </motion.div>
           )}
 
@@ -451,7 +473,7 @@ export default function Checkout() {
                   {!payCategory ? (
                     <div className="grid sm:grid-cols-2 gap-4">
                       {/* UPI / QR Code — PRIMARY / RECOMMENDED */}
-                      <button onClick={() => { setPayCategory("upi"); setSelectedPayment("upi-qr"); }} className="group relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] hover:from-[#4A00E0]/15 hover:to-[#8E2DE2]/10 border border-white/10 hover:border-[#8E2DE2]/40 rounded-2xl p-5 text-left transition-all">
+                      <button onClick={() => { setPayCategory("upi"); setSelectedPayment("upi-qr"); recordPaymentMethod("upi-qr", true); }} className="group relative bg-gradient-to-br from-white/[0.06] to-white/[0.02] hover:from-[#4A00E0]/15 hover:to-[#8E2DE2]/10 border border-white/10 hover:border-[#8E2DE2]/40 rounded-2xl p-5 text-left transition-all">
                         <div className="flex items-start justify-between mb-4">
                           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A00E0] to-[#8E2DE2] flex items-center justify-center"><QrCode size={22} className="text-white" /></div>
                           <span className="bg-emerald-500/15 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full border border-emerald-500/30">RECOMMENDED</span>
@@ -511,7 +533,7 @@ export default function Checkout() {
                         ].map(o => (
                           <button
                             key={o.id}
-                            onClick={() => setSelectedPayment(o.id)}
+                            onClick={() => { setSelectedPayment(o.id); recordPaymentMethod(o.id); }}
                             className={`p-4 rounded-xl text-left border transition-all ${selectedPayment === o.id ? "bg-blue-500/10 border-blue-400 shadow-lg shadow-blue-500/20" : "bg-white/3 border-white/10 hover:border-white/30"}`}
                           >
                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${selectedPayment === o.id ? "bg-blue-500/20 text-blue-300" : "bg-white/5 text-white/60"}`}>{o.icon}</div>
@@ -529,7 +551,7 @@ export default function Checkout() {
                     <div className="space-y-4">
                       <div className="grid sm:grid-cols-2 gap-3 mb-6">
                         {PAYMENT_METHODS.filter(m => m.group === "crypto").map((method) => (
-                          <button key={method.id} onClick={() => setSelectedPayment(method.id)} className={`flex items-center gap-3 p-4 rounded-xl border transition-all text-left w-full ${selectedPayment === method.id ? "border-emerald-400 bg-emerald-500/10" : "border-white/10 bg-white/3"}`}>
+                          <button key={method.id} onClick={() => { setSelectedPayment(method.id); recordPaymentMethod(method.id); }} className={`flex items-center gap-3 p-4 rounded-xl border transition-all text-left w-full ${selectedPayment === method.id ? "border-emerald-400 bg-emerald-500/10" : "border-white/10 bg-white/3"}`}>
                             <span className="text-[11px] font-bold text-white/70 bg-white/10 rounded-md px-2 py-1.5 min-w-[52px] text-center shrink-0">{method.icon}</span>
                             <div className="flex-1 min-w-0"><div className="text-white font-bold text-sm">{method.label}</div><div className="text-white/40 text-[11px] truncate">{method.desc}</div></div>
                           </button>

@@ -152,4 +152,36 @@ export function trackCtaClick(parameters: {
   return trackAnalyticsEvent("cta_click", parameters);
 }
 
+export function trackBeginCheckout(item: ChallengeItem, value: number): Promise<void> {
+  if (typeof window === "undefined") return Promise.resolve();
+  const key = `fw_begin_checkout:${item.item_id}:${value}`;
+  try {
+    if (window.sessionStorage.getItem(key) === "1") return Promise.resolve();
+    window.sessionStorage.setItem(key, "1");
+  } catch {
+    // Continue collection when session storage is unavailable.
+  }
+  return trackAnalyticsEvent("begin_checkout", { currency: "INR", value, items: [{ ...item, quantity: 1 }] });
+}
+
+export function trackAddPaymentInfo(paymentType: string, item: ChallengeItem, value: number): Promise<void> {
+  return trackAnalyticsEvent("add_payment_info", {
+    currency: "INR",
+    value,
+    payment_type: paymentType,
+    items: [{ ...item, quantity: 1 }],
+  });
+}
+
+export function trackPaymentInitiated(paymentMethod: string, item: ChallengeItem, value: number): Promise<void> {
+  return trackAnalyticsEvent("payment_initiated", {
+    payment_method: paymentMethod,
+    challenge_id: item.item_id,
+    challenge_name: item.item_name,
+    challenge_type: item.item_category,
+    value,
+    currency: "INR",
+  });
+}
+
 export { GA4_MEASUREMENT_ID };

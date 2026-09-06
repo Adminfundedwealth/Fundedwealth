@@ -17,10 +17,19 @@ interface BillingInfo {
   country?: string;
 }
 
+interface PaymentInitiatedContext {
+  paymentMethod: string;
+  challengeId: string;
+  challengeName: string;
+  challengeType: string;
+  value: number;
+}
+
 export const usePayment = (
   getToken: () => Promise<string | null>,
   isLoaded: boolean,
-  signIn?: (email: string, password: string) => Promise<{ error: string | null }>
+  signIn?: (email: string, password: string) => Promise<{ error: string | null }>,
+  onPaymentInitiated?: (context: PaymentInitiatedContext) => void,
 ) => {
   const [oxapayLoading, setOxapayLoading] = useState(false);
   const [oxapayError, setOxapayError] = useState("");
@@ -67,6 +76,13 @@ export const usePayment = (
       clearTimeout(timeout);
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success && data.payLink) {
+        onPaymentInitiated?.({
+          paymentMethod: selectedPayment,
+          challengeId: `${selectedPlan}_${selectedSizeIdx}`,
+          challengeName: `${selectedPlan} ${selectedSizeIdx}`,
+          challengeType: selectedPlan,
+          value: finalTotal,
+        });
         const pendingUrl = `${window.location.origin}/payment-pending?trackId=${encodeURIComponent(data.trackId)}&plan=${encodeURIComponent(selectedPlan)}&amount=${encodeURIComponent(finalTotal)}`;
         localStorage.setItem("oxapay_pending", JSON.stringify({
           trackId: data.trackId,
@@ -244,6 +260,13 @@ export const usePayment = (
         setRazorpayLoading(false);
       });
       rzp.open();
+      onPaymentInitiated?.({
+        paymentMethod: selectedPayment,
+        challengeId: `${selectedPlan}_${selectedSizeIdx}`,
+        challengeName: productName,
+        challengeType: selectedPlan,
+        value: finalTotal,
+      });
     } catch (err: any) {
       const isAbort = err?.name === "AbortError";
       setRazorpayError(
