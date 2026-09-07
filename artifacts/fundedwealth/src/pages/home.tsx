@@ -52,6 +52,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PRODUCTS, type PlanType } from "@workspace/products";
+import { useLiveDiscountConfig } from "@/hooks/useDiscountConfig";
 import {
   trackCtaClick,
   trackSelectItem,
@@ -626,29 +627,32 @@ const AnnouncementBar = () => {
 };
 
 const DiscountBar = () => {
-  const offers = [
-    { code: "Flash", discount: "60% OFF", label: "Flash Funding" },
-    { code: "Instant", discount: "55% OFF", label: "Instant Funding" },
-    { code: "FW", discount: "65% OFF", label: "1-Step Evaluation" },
-    { code: "FW", discount: "70% OFF", label: "2-Step Evaluation" },
-  ];
-
-  const content = offers.map((o, i) => (
-    <span key={i} className="inline-flex items-center gap-3 mx-8">
-      <span className="text-white font-extrabold text-sm tracking-tight">{o.discount}</span>
-      <span className="text-white/60 text-xs font-medium">{o.label}</span>
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 border border-white/15">
-        <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Code:</span>
-        <span className="text-xs text-fw-orange font-bold tracking-wide">{o.code}</span>
-      </span>
-    </span>
-  ));
+  const { config } = useLiveDiscountConfig();
+  const offers = ["flash", "instant", "1step", "2step"]
+    .map((planType) => config[planType])
+    .filter((offer) => offer?.active);
 
   return (
-    <div className="bg-[#060012] border-b border-white/5 py-2 overflow-hidden whitespace-nowrap relative z-50">
-      <div className="animate-marquee-slow inline-block">
-        {content}
-        {content}
+    <div className="sticky top-0 bg-gradient-to-r from-[#0F0020] via-[#1A0030] to-[#0F0020] border-b border-white/5 relative z-50">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide py-1.5 whitespace-nowrap">
+          <a href="/" className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
+            <span></span>FundedWealth <span className="opacity-90">IND</span>
+          </a>
+          <a href="https://forex.fundedwealth.com/" className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#0891B2] to-[#2563EB] text-white shadow-md flex items-center gap-1.5">
+            FundedWealth <span className="opacity-90">Forex</span>
+          </a>
+          {offers.map((offer) => (
+            <span key={`row-${offer.planType}`} className="shrink-0 inline-flex items-center gap-3 mx-2 sm:mx-4">
+              <span className="text-white font-extrabold text-sm tracking-tight">{offer.discountPct}% OFF</span>
+              <span className="text-white/60 text-xs font-medium">{offer.displayLabel}</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 border border-white/15">
+                <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Code:</span>
+                <span className="text-xs text-fw-orange font-bold tracking-wide">{offer.code}</span>
+              </span>
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -672,32 +676,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="sticky top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0F0020] via-[#1A0030] to-[#0F0020] border-b border-white/5">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 overflow-x-auto scrollbar-hide py-1.5">
-            <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
-              <span></span>FundedWealth <span className="opacity-90">IND</span>
-            </button>
-            {[
-              { label: "Forex", icon: "" },
-              { label: "Crypto", icon: "₿" },
-              { label: "Futures", icon: "" },
-            ].map((t) => (
-              <button
-                key={t.label}
-                disabled
-                title="Coming Soon"
-                className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-medium text-white/50 hover:text-white/70 transition-colors flex items-center gap-1.5 cursor-not-allowed"
-              >
-                <span>{t.icon}</span>
-                FundedWealth <span className="opacity-90">{t.label}</span>
-                <span className="ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">Soon</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <header className={`sticky top-[34px] sm:top-[36px] left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-3' : 'bg-[#1A0030]/85 backdrop-blur-md border-b border-white/10 py-4'}`}>
+      <header className={`sticky top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-3' : 'bg-[#1A0030]/85 backdrop-blur-md border-b border-white/10 py-4'}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 rounded-lg" />
@@ -1197,20 +1176,6 @@ const IndianInstruments = () => {
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-amber-500/5 via-orange-500/5 to-amber-500/5 border border-amber-500/20 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="text-3xl"></div>
-          <div className="flex-1">
-            <div className="text-amber-300 text-xs font-bold uppercase tracking-wider mb-1">Coming Soon — Same Brand, Separate Verticals</div>
-            <p className="text-white/70 text-sm">
-              <strong className="text-white">FundedWealth Forex</strong>, <strong className="text-white">FundedWealth Crypto</strong> and <strong className="text-white">FundedWealth Futures</strong> launching as dedicated platforms. Same trust, global markets.
-            </p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold"> Forex</span>
-            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold">₿ Crypto</span>
-            <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs font-bold"> Futures</span>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -2838,7 +2803,7 @@ const Plans = () => {
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
           <div className="flex justify-center mb-10">
             <TabsList
-              className="relative h-auto rounded-2xl sm:rounded-full flex-wrap gap-1 p-1.5"
+              className="relative h-auto rounded-md flex-wrap gap-1 p-1.5"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                 backdropFilter: "blur(24px) saturate(1.6)",
@@ -2848,16 +2813,16 @@ const Plans = () => {
               }}
             >
               {/* Top gloss on container */}
-              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl sm:rounded-t-full pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
+              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-md pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
 
               {/* Flash ⚡ — yellow/orange active */}
               <TabsTrigger
                 value="flash"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative rounded-md px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
                 style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-md opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(234,179,8,0.28) 0%, rgba(249,115,22,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2866,18 +2831,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(234,179,8,0.3), 0 0 40px rgba(249,115,22,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(234,179,8,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-md pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">Flash ⚡</span>
               </TabsTrigger>
 
               {/* Instant — pink/violet active */}
               <TabsTrigger
                 value="instant"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative rounded-md px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
                 style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-md opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(217,58,160,0.28) 0%, rgba(171,24,194,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2886,18 +2851,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(217,58,160,0.3), 0 0 40px rgba(171,24,194,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(217,58,160,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-md pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">Instant</span>
               </TabsTrigger>
 
               {/* 1-Step — cyan/violet active */}
               <TabsTrigger
                 value="1step"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative rounded-md px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
                 style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-md opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(77,212,255,0.24) 0%, rgba(168,85,247,0.20) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2906,18 +2871,18 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(77,212,255,0.25), 0 0 40px rgba(168,85,247,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(77,212,255,0.10)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-md pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">1-Step</span>
               </TabsTrigger>
 
               {/* 2-Step — violet/pink active */}
               <TabsTrigger
                 value="2step"
-                className="relative rounded-full px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative rounded-md px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
                 style={{ background: "transparent" }}
               >
-                <span className="glass-tab-overlay absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"
+                <span className="glass-tab-overlay absolute inset-0 rounded-md opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
                     background: "linear-gradient(135deg, rgba(168,85,247,0.28) 0%, rgba(217,58,160,0.22) 100%)",
                     backdropFilter: "blur(12px)",
@@ -2926,7 +2891,7 @@ const Plans = () => {
                     boxShadow: "0 0 18px rgba(168,85,247,0.3), 0 0 40px rgba(217,58,160,0.15), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(168,85,247,0.12)",
                   }}
                 />
-                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-full pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-md pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
                 <span className="relative z-10">2-Step</span>
               </TabsTrigger>
             </TabsList>
