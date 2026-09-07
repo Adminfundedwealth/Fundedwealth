@@ -84,6 +84,21 @@ export async function fetchUserLiveAccounts(db: DbLike, userId: string, traderId
   const joinClauses: string[] = [];
   const whereClauses: string[] = [];
 
+  // Admin OS resolves ownership through the purchase chain:
+  // users -> orders -> provisioning_logs -> challenge/trading account IDs.
+  // This is the authoritative link for provisioned accounts and must be part
+  // of the dashboard query, even when trader identity columns have drifted.
+  whereClauses.push(`EXISTS (
+    SELECT 1
+    FROM orders o
+    INNER JOIN provisioning_logs pl ON pl.order_id::text = o.id::text
+    WHERE o.user_id::text = ${String(userId)}::text
+      AND (
+        pl.trading_account_id::text = ta.id::text
+        OR pl.challenge_account_id::text = ca.id::text
+      )
+  )`);
+
   if (terminalColumns.has("external_id") || terminalColumns.has("user_id")) {
     joinClauses.push("LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id");
   }
@@ -94,13 +109,21 @@ export async function fetchUserLiveAccounts(db: DbLike, userId: string, traderId
     }
   }
 
+  const directOwnerClauses: string[] = [];
   if (terminalColumns.has("external_id")) {
-    whereClauses.push(`(tt.external_id = ${String(userId)} OR ta.user_id = ${String(userId)}::uuid OR ca.user_id = ${String(userId)}::uuid)`);
-  } else if (terminalColumns.has("user_id")) {
-    whereClauses.push(`(tt.user_id = ${String(userId)}::uuid OR ta.user_id = ${String(userId)}::uuid OR ca.user_id = ${String(userId)}::uuid)`);
-  } else {
-    if (hasTradingUser) whereClauses.push(`ta.user_id = ${String(userId)}::uuid`);
-    if (hasChallengeUser) whereClauses.push(`ca.user_id = ${String(userId)}::uuid`);
+    directOwnerClauses.push(`tt.external_id = ${String(userId)}`);
+  }
+  if (terminalColumns.has("user_id")) {
+    directOwnerClauses.push(`tt.user_id = ${String(userId)}::uuid`);
+  }
+  if (hasTradingUser) {
+    directOwnerClauses.push(`ta.user_id = ${String(userId)}::uuid`);
+  }
+  if (hasChallengeUser) {
+    directOwnerClauses.push(`ca.user_id = ${String(userId)}::uuid`);
+  }
+  if (directOwnerClauses.length > 0) {
+    whereClauses.push(`(${directOwnerClauses.join(" OR ")})`);
   }
 
   if (whereClauses.length === 0) {
