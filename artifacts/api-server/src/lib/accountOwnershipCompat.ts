@@ -81,49 +81,51 @@ export async function fetchUserLiveAccounts(db: DbLike, userId: string, traderId
   const hasTradingUser = tradingColumns.has("user_id");
   const hasChallengeUser = challengeColumns.has("user_id");
 
-  const joinClauses: string[] = [];
-  const whereClauses: string[] = [];
+  const joinClauses: SQL<unknown>[] = [];
+  const whereClauses: SQL<unknown>[] = [];
 
   // Admin OS resolves ownership through the purchase chain:
   // users -> orders -> provisioning_logs -> challenge/trading account IDs.
   // This is the authoritative link for provisioned accounts and must be part
   // of the dashboard query, even when trader identity columns have drifted.
-  whereClauses.push(`EXISTS (
-    SELECT 1
-    FROM orders o
-    INNER JOIN provisioning_logs pl ON pl.order_id::text = o.id::text
-    WHERE o.user_id::text = ${String(userId)}::text
-      AND (
-        pl.trading_account_id::text = ta.id::text
-        OR pl.challenge_account_id::text = ca.id::text
-      )
-  )`);
+  whereClauses.push(sql`
+    EXISTS (
+      SELECT 1
+      FROM orders o
+      INNER JOIN provisioning_logs pl ON pl.order_id::text = o.id::text
+      WHERE o.user_id::text = ${String(userId)}::text
+        AND (
+          pl.trading_account_id::text = ta.id::text
+          OR pl.challenge_account_id::text = ca.id::text
+        )
+    )
+  `);
 
   if (terminalColumns.has("external_id") || terminalColumns.has("user_id")) {
-    joinClauses.push("LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id");
+    joinClauses.push(sql`LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id`);
   }
 
   if (hasTradingTrader || hasChallengeTrader) {
     if (traderId) {
-      whereClauses.push(`(ta.trader_id = ${String(traderId)}::uuid OR ca.trader_id = ${String(traderId)}::uuid)`);
+      whereClauses.push(sql`(ta.trader_id = ${String(traderId)}::uuid OR ca.trader_id = ${String(traderId)}::uuid)`);
     }
   }
 
-  const directOwnerClauses: string[] = [];
+  const directOwnerClauses: SQL<unknown>[] = [];
   if (terminalColumns.has("external_id")) {
-    directOwnerClauses.push(`tt.external_id = ${String(userId)}`);
+    directOwnerClauses.push(sql`tt.external_id = ${String(userId)}`);
   }
   if (terminalColumns.has("user_id")) {
-    directOwnerClauses.push(`tt.user_id = ${String(userId)}::uuid`);
+    directOwnerClauses.push(sql`tt.user_id = ${String(userId)}::uuid`);
   }
   if (hasTradingUser) {
-    directOwnerClauses.push(`ta.user_id = ${String(userId)}::uuid`);
+    directOwnerClauses.push(sql`ta.user_id = ${String(userId)}::uuid`);
   }
   if (hasChallengeUser) {
-    directOwnerClauses.push(`ca.user_id = ${String(userId)}::uuid`);
+    directOwnerClauses.push(sql`ca.user_id = ${String(userId)}::uuid`);
   }
   if (directOwnerClauses.length > 0) {
-    whereClauses.push(`(${directOwnerClauses.join(" OR ")})`);
+    whereClauses.push(sql`(${sql.join(directOwnerClauses, sql` OR `)})`);
   }
 
   if (whereClauses.length === 0) {
@@ -156,8 +158,8 @@ export async function fetchUserLiveAccounts(db: DbLike, userId: string, traderId
       ca.updated_at       AS updated_at
     FROM trading_accounts ta
     LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-    ${sql.join(joinClauses.map((clause) => sql`${sql.raw(clause)}`), sql` `)}
-    WHERE (${sql.join(whereClauses.map((clause) => sql`${sql.raw(clause)}`), sql` OR `)})
+    ${sql.join(joinClauses, sql` `)}
+    WHERE (${sql.join(whereClauses, sql` OR `)})
       AND ta.status != 'inactive'
     ORDER BY ca.created_at DESC NULLS LAST
   `;
@@ -170,12 +172,12 @@ export async function resolveUserAccountOwnership(db: DbLike, userId: string, ac
   const tradingColumns = await getTableColumns(db, "trading_accounts");
   const challengeColumns = await getTableColumns(db, "challenge_accounts");
   const terminalColumns = await getTableColumns(db, "terminal_traders");
-  const ownerClauses: string[] = [];
+  const ownerClauses: SQL<unknown>[] = [];
 
-  if (terminalColumns.has("external_id")) ownerClauses.push(`tt.external_id = ${String(userId)}`);
-  if (terminalColumns.has("user_id")) ownerClauses.push(`tt.user_id = ${String(userId)}::uuid`);
-  if (tradingColumns.has("user_id")) ownerClauses.push(`ta.user_id = ${String(userId)}::uuid`);
-  if (challengeColumns.has("user_id")) ownerClauses.push(`ca.user_id = ${String(userId)}::uuid`);
+  if (terminalColumns.has("external_id")) ownerClauses.push(sql`tt.external_id = ${String(userId)}`);
+  if (terminalColumns.has("user_id")) ownerClauses.push(sql`tt.user_id = ${String(userId)}::uuid`);
+  if (tradingColumns.has("user_id")) ownerClauses.push(sql`ta.user_id = ${String(userId)}::uuid`);
+  if (challengeColumns.has("user_id")) ownerClauses.push(sql`ca.user_id = ${String(userId)}::uuid`);
 
   if (ownerClauses.length === 0) {
     return { rows: [] };
@@ -195,7 +197,7 @@ export async function resolveUserAccountOwnership(db: DbLike, userId: string, ac
     LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id
     LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
     WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-      AND (${sql.join(ownerClauses.map((clause) => sql`${sql.raw(clause)}`), sql` OR `)})
+      AND (${sql.join(ownerClauses, sql` OR `)})
     LIMIT 1
   `);
 
