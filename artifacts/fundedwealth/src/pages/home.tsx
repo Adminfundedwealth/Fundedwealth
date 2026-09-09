@@ -1,6 +1,7 @@
 ﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
+import { useLiveDiscountConfig, computeDiscountedPrice, formatINR } from "@/hooks/useDiscountConfig";
 import SEOHead from "@/components/SEOHead";
 import { FAQSchema, ServiceSchema } from "@/components/StructuredData";
 import IndiaTraderNetworkHero from "@/components/IndiaTraderNetworkHero";
