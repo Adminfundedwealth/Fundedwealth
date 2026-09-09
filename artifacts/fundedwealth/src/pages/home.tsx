@@ -714,13 +714,9 @@ const Navbar = () => {
           <nav className="hidden xl:flex items-center gap-2 2xl:gap-3.5 ml-4 2xl:ml-6">
             <a href="#home" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Home</a>
             <a href="#plans" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Plans</a>
-            <Link href="/leaderboard" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Leaderboard</Link>
-            <Link href="/scaling" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Scaling</Link>
             <Link href="/impact" className="text-xs 2xl:text-sm font-medium text-pink-400 hover:text-pink-300 transition-colors whitespace-nowrap">FW Impact</Link>
-            <Link href="/payouts" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Payouts</Link>
             <Link href="/rules" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Rules</Link>
             <Link href="/blog" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Blog</Link>
-            <Link href="/success-stories" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Stories</Link>
             <Link href="/community" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Community</Link>
             <Link href="/championship" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Championship</Link>
             <a href="#affiliate" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Affiliate</a>
@@ -762,12 +758,8 @@ const Navbar = () => {
               <div className="flex flex-col px-6 py-4 gap-4">
                 <a href="#home" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Home</a>
                 <a href="#plans" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Plans</a>
-                <Link href="/leaderboard" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Leaderboard</Link>
-                <Link href="/scaling" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Scaling Plan</Link>
-                <Link href="/payouts" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Payout Proofs</Link>
                 <Link href="/rules" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Trading Rules</Link>
                 <Link href="/blog" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
-                <Link href="/success-stories" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Success Stories</Link>
                 <Link href="/community" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Community</Link>
                 <Link href="/impact" className="text-lg font-medium text-pink-400" onClick={() => setMobileMenuOpen(false)}>FW Impact Initiative</Link>
                 <Link href="/championship" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Championship</Link>
@@ -5433,9 +5425,6 @@ const Footer = () => {
             <h4 className="text-white font-bold mb-6 tracking-wider uppercase text-sm">Quick Links</h4>
             <ul className="space-y-3">
               <li><a href="#plans" className="text-white/50 hover:text-fw-orange transition-colors">Plans & Pricing</a></li>
-              <li><Link href="/scaling" className="text-white/50 hover:text-fw-orange transition-colors">Scaling Plan</Link></li>
-              <li><Link href="/leaderboard" className="text-white/50 hover:text-fw-orange transition-colors">Leaderboard</Link></li>
-              <li><Link href="/payouts" className="text-white/50 hover:text-fw-orange transition-colors">Payout Proofs</Link></li>
               <li><Link href="/rules" className="text-white/50 hover:text-fw-orange transition-colors">Trading Rules</Link></li>
               <li><Link href="/championship" className="text-white/50 hover:text-fw-orange transition-colors">FW Championship</Link></li>
             </ul>
@@ -5445,7 +5434,6 @@ const Footer = () => {
             <h4 className="text-white font-bold mb-6 tracking-wider uppercase text-sm">Resources</h4>
             <ul className="space-y-3">
               <li><Link href="/blog" className="text-white/50 hover:text-fw-orange transition-colors">Trading Blog</Link></li>
-              <li><Link href="/success-stories" className="text-white/50 hover:text-fw-orange transition-colors">Success Stories</Link></li>
               <li><Link href="/community" className="text-white/50 hover:text-fw-orange transition-colors">Community</Link></li>
               <li><a href="#affiliate" className="text-white/50 hover:text-fw-orange transition-colors">Affiliate Program</a></li>
               <li><Link href="/impact" className="text-white/50 hover:text-fw-orange transition-colors">FW Impact Initiative</Link></li>
