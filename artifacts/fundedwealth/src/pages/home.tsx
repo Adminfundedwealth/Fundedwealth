@@ -626,17 +626,14 @@ const AnnouncementBar = () => {
 };
 
 const DiscountBar = () => {
-  const offers = [
-    { code: "Flash", discount: "60% OFF", label: "Flash Funding" },
-    { code: "Instant", discount: "55% OFF", label: "Instant Funding" },
-    { code: "FW", discount: "65% OFF", label: "1-Step Evaluation" },
-    { code: "FW", discount: "70% OFF", label: "2-Step Evaluation" },
-  ];
+  const { entries } = useLiveDiscountConfig();
+  const activeOffers = entries.filter((e) => e.active);
+  const offers = activeOffers.length > 0 ? activeOffers : entries;
 
   const content = offers.map((o, i) => (
     <span key={i} className="inline-flex items-center gap-3 mx-8">
-      <span className="text-white font-extrabold text-sm tracking-tight">{o.discount}</span>
-      <span className="text-white/60 text-xs font-medium">{o.label}</span>
+      <span className="text-white font-extrabold text-sm tracking-tight">{o.discountPct}% OFF</span>
+      <span className="text-white/60 text-xs font-medium">{o.displayLabel}</span>
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 border border-white/15">
         <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Code:</span>
         <span className="text-xs text-fw-orange font-bold tracking-wide">{o.code}</span>
@@ -645,10 +642,45 @@ const DiscountBar = () => {
   ));
 
   return (
-    <div className="bg-[#060012] border-b border-white/5 py-2 overflow-hidden whitespace-nowrap relative z-50">
-      <div className="animate-marquee-slow inline-block">
-        {content}
-        {content}
+    <div className="sticky top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0F0020] via-[#1A0030] to-[#0F0020] border-b border-white/5">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center gap-1 sm:gap-3 py-1.5">
+          {/* Tabs Section */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
+              <span></span>FundedWealth <span className="opacity-90">IND</span>
+            </button>
+            <a
+              href="https://forex.fundedwealth.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-all duration-200 hover:scale-105 select-none"
+              style={{
+                background: "linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(0,255,180,0.10) 50%, rgba(0,120,255,0.18) 100%)",
+                border: "1px solid rgba(0,220,255,0.35)",
+                boxShadow: "0 2px 16px 0 rgba(0,212,255,0.18), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.10)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                color: "rgba(180,255,255,0.95)",
+                textShadow: "0 0 8px rgba(0,212,255,0.6)",
+              }}
+            >
+              <span style={{ filter: "drop-shadow(0 0 4px rgba(0,212,255,0.8))" }}></span>
+              FundedWealth <span style={{ opacity: 0.9 }}>Forex</span>
+            </a>
+          </div>
+          
+          {/* Divider */}
+          <div className="hidden sm:block w-px h-6 bg-white/10"></div>
+          
+          {/* Discount Ticker Section */}
+          <div className="flex-1 overflow-hidden whitespace-nowrap min-w-0">
+            <div className="animate-marquee-slow inline-block">
+              {content}
+              {content}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -672,32 +704,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="sticky top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0F0020] via-[#1A0030] to-[#0F0020] border-b border-white/5">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 overflow-x-auto scrollbar-hide py-1.5">
-            <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
-              <span></span>FundedWealth <span className="opacity-90">IND</span>
-            </button>
-            {[
-              { label: "Forex", icon: "" },
-              { label: "Crypto", icon: "₿" },
-              { label: "Futures", icon: "" },
-            ].map((t) => (
-              <button
-                key={t.label}
-                disabled
-                title="Coming Soon"
-                className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-medium text-white/50 hover:text-white/70 transition-colors flex items-center gap-1.5 cursor-not-allowed"
-              >
-                <span>{t.icon}</span>
-                FundedWealth <span className="opacity-90">{t.label}</span>
-                <span className="ml-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">Soon</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <header className={`sticky top-[34px] sm:top-[36px] left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-3' : 'bg-[#1A0030]/85 backdrop-blur-md border-b border-white/10 py-4'}`}>
+      <header className={`sticky top-[40px] left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-3' : 'bg-[#1A0030]/85 backdrop-blur-md border-b border-white/10 py-4'}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 rounded-lg" />
