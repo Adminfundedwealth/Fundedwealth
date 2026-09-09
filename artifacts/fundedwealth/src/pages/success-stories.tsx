@@ -86,7 +86,7 @@ export default function SuccessStories() {
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
         title="Funded Trader Success Stories India — Real Reviews & Profits"
-        description="Real success stories from FundedWealth funded traders across India. See how traders from Delhi, Mumbai, Bangalore, Hyderabad & more earn consistent profits with India's best prop firm. 15,000+ funded traders."
+        description="Real success stories from FundedWealth evaluation participants across India. See how traders from Delhi, Mumbai, Bangalore, Hyderabad & more earn consistent profits through FundedWealth's structured evaluation programs."
         keywords="funded trader success stories India, prop trading success stories, funded trader testimonials India, FundedWealth reviews, real funded trader profits, best prop firm reviews India, prop trading India reviews, prop firm testimonials"
         canonical="/success-stories"
       />

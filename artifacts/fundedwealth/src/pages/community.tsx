@@ -681,8 +681,8 @@ export default function Community() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Trading Community India — Join 15,000+ Funded Traders"
-        description="Join India's largest prop trading community. Connect with 15,000+ funded traders. Free trading signals, market analysis & support from FundedWealth."
+        title="Trading Community India — Join 15,000+ Evaluation Participants"
+        description="Join India's trading community. Connect with 15,000+ evaluation participants. Free trading signals, market analysis & support from FundedWealth."
         keywords="trading community India, prop trading group India, funded traders community, trading discord India, free trading signals India"
         canonical="/community"
       />
