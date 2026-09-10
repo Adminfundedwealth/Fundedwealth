@@ -11,7 +11,8 @@ export interface ChallengeItem {
 
 declare global {
   interface Window {
-    ga4ClientId?: string;
+    dataLayer: unknown[];
+    gtag: (...args: unknown[]) => void;
   }
 }
 
@@ -20,89 +21,6 @@ let lastTrackedKey: string | null = null;
 function resolvePath(path: string): string {
   const normalized = path || "/";
   return normalized.startsWith("/") ? normalized : `/${normalized}`;
-}
-
-function getClientId(): string {
-  if (typeof window === "undefined") return "server";
-  if (window.ga4ClientId) return window.ga4ClientId;
-
-  const storageKey = "fw_ga4_client_id";
-  let clientId = "";
-  try {
-    clientId = window.localStorage.getItem(storageKey) || "";
-  } catch {
-    clientId = "";
-  }
-  if (!clientId) {
-    clientId = `${Date.now()}.${Math.floor(Math.random() * 1_000_000_000)}`;
-    try {
-      window.localStorage.setItem(storageKey, clientId);
-    } catch {
-      // Collection still works for this page when storage is unavailable.
-    }
-  }
-  window.ga4ClientId = clientId;
-  return clientId;
-}
-
-function serializeItem(item: ChallengeItem, quantity?: number): string {
-  const values = [
-    `id${item.item_id}`,
-    `nm${item.item_name}`,
-    `ca${item.item_category}`,
-    `pr${item.price}`,
-    `k0currency`,
-    `v0${item.currency}`,
-    `lp${item.index}`,
-  ];
-  if (quantity !== undefined) values.push(`qt${quantity}`);
-  return values.join("~");
-}
-
-function sendGa4Event(eventName: string, parameters: Record<string, unknown>): void {
-  if (typeof window === "undefined" || typeof navigator === "undefined") return;
-
-  const payload = new URLSearchParams({
-    v: "2",
-    tid: GA4_MEASUREMENT_ID,
-    cid: getClientId(),
-    en: eventName,
-    dl: window.location.href,
-    dp: `${window.location.pathname}${window.location.search}${window.location.hash}`,
-    dt: document.title,
-  });
-
-  for (const [key, value] of Object.entries(parameters)) {
-    if (key === "items" && Array.isArray(value)) {
-      value.forEach((item, index) => {
-        if (item && typeof item === "object") {
-          const quantity = (item as ChallengeItem & { quantity?: number }).quantity
-            ?? (eventName === "view_item" || eventName === "begin_checkout" || eventName === "purchase" ? 1 : undefined);
-          payload.set(`pr${index + 1}`, serializeItem(item as ChallengeItem, quantity));
-        }
-      });
-      continue;
-    }
-    if (key === "currency") {
-      payload.set("cu", String(value));
-    } else if (typeof value === "number") {
-      payload.set(`epn.${key}`, String(value));
-    } else if (typeof value === "string" || typeof value === "boolean") {
-      payload.set(`ep.${key}`, String(value));
-    }
-  }
-
-  const body = new Blob([payload.toString()], { type: "application/x-www-form-urlencoded;charset=UTF-8" });
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon("https://www.google-analytics.com/g/collect", body);
-  } else {
-    void fetch("https://www.google-analytics.com/g/collect", {
-      method: "POST",
-      body,
-      keepalive: true,
-      mode: "no-cors",
-    });
-  }
 }
 
 export function trackPageView(path: string): void {
@@ -114,12 +32,15 @@ export function trackPageView(path: string): void {
   if (lastTrackedKey === key) return;
   lastTrackedKey = key;
 
+  if (typeof window.gtag !== "function") return;
+
   const pagePath = resolvePath(window.location.pathname + window.location.search + window.location.hash || "/");
 
-  sendGa4Event("page_view", {
+  window.gtag("event", "page_view", {
     page_title: document.title,
     page_location: currentUrl,
     page_path: pagePath,
+    send_to: GA4_MEASUREMENT_ID,
   });
 }
 
@@ -127,8 +48,22 @@ export function trackAnalyticsEvent(
   eventName: string,
   parameters: Record<string, unknown>,
 ): Promise<void> {
-  sendGa4Event(eventName, parameters);
-  return Promise.resolve();
+  if (typeof window === "undefined" || typeof window.gtag !== "function") return Promise.resolve();
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    window.gtag("event", eventName, {
+      ...parameters,
+      send_to: GA4_MEASUREMENT_ID,
+      event_callback: finish,
+      event_timeout: 1000,
+    });
+    window.setTimeout(finish, 350);
+  });
 }
 
 export function trackViewItemList(listId: string, listName: string, items: ChallengeItem[]): Promise<void> {
@@ -155,14 +90,6 @@ export function trackCtaClick(parameters: {
 }
 
 export function trackBeginCheckout(item: ChallengeItem, value: number): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  const key = `fw_begin_checkout:${item.item_id}:${value}`;
-  try {
-    if (window.sessionStorage.getItem(key) === "1") return Promise.resolve();
-    window.sessionStorage.setItem(key, "1");
-  } catch {
-    // Continue collection when session storage is unavailable.
-  }
   return trackAnalyticsEvent("begin_checkout", { currency: "INR", value, items: [{ ...item, quantity: 1 }] });
 }
 
@@ -187,14 +114,7 @@ export function trackPaymentInitiated(paymentMethod: string, item: ChallengeItem
 }
 
 export function trackPurchase(transactionId: string, item: ChallengeItem, value: number): Promise<void> {
-  if (typeof window === "undefined" || !transactionId) return Promise.resolve();
-  const key = `fw_purchase:${transactionId}`;
-  try {
-    if (window.localStorage.getItem(key) === "1") return Promise.resolve();
-    window.localStorage.setItem(key, "1");
-  } catch {
-    // Collection still proceeds when storage is unavailable.
-  }
+  if (!transactionId) return Promise.resolve();
   return trackAnalyticsEvent("purchase", {
     transaction_id: transactionId,
     value,

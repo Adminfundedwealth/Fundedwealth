@@ -100,7 +100,7 @@
         // Fallback codes from known site codes if none found in DOM yet
         if (PROMO_CODES.length === 0) {
             // Will be populated once React renders the pricing section
-            const knownCodes = ["FLASH", "INSTANT", "FW"];
+            const knownCodes = ["BAPPA"];
             PROMO_CODES = knownCodes;
         }
         if (PRIMARY_DISCOUNT === 0) PRIMARY_DISCOUNT = 60;// fallback until DOM renders

@@ -1127,34 +1127,6 @@ const Hero = () => {
   );
 };
 
-const Stats = () => {
-  return (
-    <section className="py-12 border-y border-white/10 bg-black/20 backdrop-blur-sm relative z-20">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink mb-2">₹45 Lakhs+</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">In Performance-Based Rewards Paid</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-fw-pink to-fw-purple mb-2">15,000+</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Evaluation Participants</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-white mb-2">12 HRS</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Reward Processing Time</div>
-            <div className="text-xs text-white/40 mt-1">For eligible approved requests</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl sm:text-3xl md:text-5xl font-heading font-extrabold text-white mb-2">70%-90%</div>
-            <div className="text-sm font-semibold text-white/70 uppercase tracking-wider">Max Performance Share</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 const IndianInstruments = () => {
   const indexFO = [
     { name: "NIFTY", desc: "Nifty 50 Options & Futures", color: "from-orange-500 to-red-500" },
@@ -5332,11 +5304,11 @@ const MobileAppCTA = () => {
 const TrustAndSecurity = () => {
   const trustBadges = [
     { icon: Lock, title: "256-bit SSL Encryption", desc: "Bank-grade security protects all your data and transactions" },
-    { icon: ShieldCheck, title: "Verified Payouts", desc: "₹45 Lakhs+ paid out to 15,000+ funded traders with proof" },
-    { icon: Clock, title: "12-Hour Payout Processing", desc: "Industry-fastest payout processing — eligible approved payouts processed within 12 hours" },
+    { icon: ShieldCheck, title: "Performance-Based Rewards", desc: "Eligible participants may receive performance-based rewards under the applicable program terms" },
+    { icon: Clock, title: "Structured Reward Processing", desc: "Reward processing is subject to verification, applicable terms, and available payout methods" },
     { icon: Banknote, title: "UPI & Bank Transfer", desc: "Direct payouts to any Indian bank account or UPI — zero hidden fees" },
     { icon: FileText, title: "Transparent Rules", desc: "Clear, published trading rules — no hidden clauses or surprises" },
-    { icon: Globe, title: "15,000+ Active Traders", desc: "Trusted by traders across all 28 states and 8 union territories" },
+    { icon: Globe, title: "Indian Market Focus", desc: "A structured simulated evaluation environment built for Indian markets" },
   ];
 
   const companyCredentials = [
@@ -5364,7 +5336,7 @@ const TrustAndSecurity = () => {
             Your Trust is Our <span className="text-gradient">Priority</span>
           </h2>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
-            We're committed to transparency, security, and delivering real results. Here's why 15,000+ Indian traders trust FundedWealth.
+            We're committed to transparency, security, and clearly published program terms for Indian evaluation participants.
           </p>
         </motion.div>
 
@@ -5428,9 +5400,9 @@ const TrustAndSecurity = () => {
             </div>
             <div className="p-6 space-y-4">
               {[
-                { stat: "₹45 Lakhs+", label: "In Trader Payouts", verified: true },
-                { stat: "15,000+", label: "Traders on FundedWealth", verified: true },
-                { stat: "12 Hours", label: "Average Payout Time", verified: true },
+                { stat: "Simulated", label: "Evaluation Environment", verified: true },
+                { stat: "INR", label: "Program Fees and Rewards", verified: true },
+                { stat: "Terms-Based", label: "Reward Processing", verified: true },
                 { stat: "4.8/5", label: "Trader Satisfaction Rating", verified: true },
                 { stat: "28+ States", label: "Traders Across India", verified: true },
                 { stat: "24/7", label: "Customer Support Available", verified: true },
@@ -5678,7 +5650,6 @@ export default function Home() {
 
       <main>
         <Hero />
-        <Stats />
         <IndianInstruments />
         <FWIndEdge />
         <Plans />
