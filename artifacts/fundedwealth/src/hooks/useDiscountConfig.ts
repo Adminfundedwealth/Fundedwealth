@@ -20,19 +20,19 @@ const API_PREFIX = _base ? `${_base}/api` : "/api";
  * Static fallback used before the API responds or on error.
  *
  * CANONICAL PLAN SALE DISCOUNTS — keep in sync with @workspace/products PRODUCTS:
- *   Flash   = 50%  (code FLASH50)
- *   Instant = 45%  (code INSTANT45)
- *   1-Step  = 55%  (code ONESTEP55)
- *   2-Step  = 60%  (code TWOSTEP60)
+ *   Flash   = 50%  (code BAPPA)
+ *   Instant = 45%  (code BAPPA)
+ *   1-Step  = 55%  (code BAPPA)
+ *   2-Step  = 60%  (code BAPPA)
  *
  * These are BASE PLAN DISCOUNTS, not coupons.
  * DO NOT set discountPct to 80 here — that was the P0 bug root cause.
  */
 const FALLBACK: DiscountConfigEntry[] = [
-  { planType: "flash",   displayLabel: "Flash Funding",     code: "FLASH50",    discountPct: 50, active: true },
-  { planType: "instant", displayLabel: "Instant Funding",   code: "INSTANT45",  discountPct: 45, active: true },
-  { planType: "1step",   displayLabel: "1-Step Evaluation", code: "ONESTEP55",  discountPct: 55, active: true },
-  { planType: "2step",   displayLabel: "2-Step Evaluation", code: "TWOSTEP60",  discountPct: 60, active: true },
+  { planType: "flash",   displayLabel: "Flash Funding",     code: "BAPPA", discountPct: 50, active: true },
+  { planType: "instant", displayLabel: "Instant Funding",   code: "BAPPA", discountPct: 45, active: true },
+  { planType: "1step",   displayLabel: "1-Step Evaluation", code: "BAPPA", discountPct: 55, active: true },
+  { planType: "2step",   displayLabel: "2-Step Evaluation", code: "BAPPA", discountPct: 60, active: true },
 ];
 
 function toMap(entries: DiscountConfigEntry[]): DiscountConfigMap {

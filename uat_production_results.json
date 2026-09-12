@@ -1,0 +1,1364 @@
+[
+  {
+    "step": "CONFIG",
+    "status": "INFO",
+    "detail": "API: https://fundedwealth-api-production.up.railway.app | Supabase: https://nysrxvpjdlvzvcawysvh.supabase.co | AnonKey: 208 chars",
+    "ts": "2026-07-14T02:07:54.992Z"
+  },
+  {
+    "step": "TEST_EMAIL",
+    "status": "INFO",
+    "detail": "fwuat1783994874992@yopmail.com",
+    "ts": "2026-07-14T02:07:54.994Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 1: INFRASTRUCTURE ══",
+    "ts": "2026-07-14T02:07:55.213Z"
+  },
+  {
+    "step": "MAIN_SITE_HTTP",
+    "status": "PASS",
+    "detail": "HTTP 200",
+    "ts": "2026-07-14T02:07:55.778Z"
+  },
+  {
+    "step": "API_SERVER_HEALTH",
+    "status": "PASS",
+    "detail": "HTTP 200 | DB: true | latency: 4975ms",
+    "ts": "2026-07-14T02:08:07.672Z"
+  },
+  {
+    "step": "ADMIN_SITE_HTTP",
+    "status": "FAIL",
+    "detail": "HTTP 307",
+    "ts": "2026-07-14T02:08:07.909Z"
+  },
+  {
+    "step": "TERMINAL_SITE_HTTP",
+    "status": "PASS",
+    "detail": "HTTP 200",
+    "ts": "2026-07-14T02:08:08.731Z"
+  },
+  {
+    "step": "TERMINAL_INSTRUMENTS_API",
+    "status": "PASS",
+    "detail": "HTTP 200 | 11 instruments returned | first: NIFTY",
+    "ts": "2026-07-14T02:08:09.085Z"
+  },
+  {
+    "step": "TERMINAL_AUTH_GATE",
+    "status": "PASS",
+    "detail": "HTTP 401 | {\"valid\":false,\"reason\":\"no_session\"}",
+    "ts": "2026-07-14T02:08:09.563Z"
+  },
+  {
+    "step": "TERMINAL_SSO_REJECTS_INVALID",
+    "status": "PASS",
+    "detail": "HTTP 302 | redirects to: https://fundedwealth.com/terminal-error?reason=Invalid%20SSO%20token%20signature.",
+    "ts": "2026-07-14T02:08:09.886Z"
+  },
+  {
+    "step": "RAZORPAY_METHODS_API",
+    "status": "PASS",
+    "detail": "HTTP 200 | {\"success\":true,\"methods\":[{\"id\":\"upi\",\"name\":\"UPI\",\"description\":\"Google Pay, P",
+    "ts": "2026-07-14T02:08:10.379Z"
+  },
+  {
+    "step": "LEADERBOARD_API",
+    "status": "PASS",
+    "detail": "HTTP 200 | 20 live traders on leaderboard",
+    "ts": "2026-07-14T02:08:13.057Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 2: REGISTRATION ══",
+    "ts": "2026-07-14T02:08:13.058Z"
+  },
+  {
+    "step": "SIGNUP_PAGE_EMAIL_FIELD",
+    "status": "PASS",
+    "detail": "1 email fields",
+    "ts": "2026-07-14T02:08:28.415Z"
+  },
+  {
+    "step": "SIGNUP_PAGE_PASSWORD_FIELD",
+    "status": "PASS",
+    "detail": "2 password fields",
+    "ts": "2026-07-14T02:08:28.415Z"
+  },
+  {
+    "step": "SIGNUP_PAGE_FIRSTNAME",
+    "status": "FAIL",
+    "detail": "0 first-name fields",
+    "ts": "2026-07-14T02:08:28.416Z"
+  },
+  {
+    "step": "SIGNUP_SUBMIT_BUTTON",
+    "status": "PASS",
+    "detail": "Buttons: Create Account →",
+    "ts": "2026-07-14T02:08:28.416Z"
+  },
+  {
+    "step": "REGISTRATION_RATE_LIMITED",
+    "status": "WARN",
+    "detail": "HTTP 429 — email rate limit (too many test registrations)",
+    "ts": "2026-07-14T02:08:29.383Z"
+  },
+  {
+    "step": "REGISTRATION_USING_EXISTING",
+    "status": "INFO",
+    "detail": "Will attempt login with previously registered test user",
+    "ts": "2026-07-14T02:08:29.384Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 3: LOGIN ══",
+    "ts": "2026-07-14T02:08:29.405Z"
+  },
+  {
+    "step": "LOGIN_NEW_USER",
+    "status": "FAIL",
+    "detail": "HTTP 400 | error: invalid_credentials | Invalid login credentials",
+    "ts": "2026-07-14T02:08:29.498Z"
+  },
+  {
+    "step": "SIGNIN_PAGE_RENDERS",
+    "status": "PASS",
+    "detail": "email: 1 pw: 1",
+    "ts": "2026-07-14T02:08:34.183Z"
+  },
+  {
+    "step": "SIGNIN_FORGOT_PASSWORD",
+    "status": "PASS",
+    "detail": "Forgot password link: true",
+    "ts": "2026-07-14T02:08:34.185Z"
+  },
+  {
+    "step": "SIGNIN_GOOGLE_OAUTH",
+    "status": "PASS",
+    "detail": "Google button: true",
+    "ts": "2026-07-14T02:08:34.185Z"
+  },
+  {
+    "step": "SIGNIN_SUBMIT_BUTTON",
+    "status": "PASS",
+    "detail": "\"Login\"",
+    "ts": "2026-07-14T02:08:34.186Z"
+  },
+  {
+    "step": "LOGIN_UI_SUPABASE_CALL",
+    "status": "FAIL",
+    "detail": "HTTP 400 | error: invalid_credentials | msg: Invalid login credentials",
+    "ts": "2026-07-14T02:08:35.064Z"
+  },
+  {
+    "step": "POST_LOGIN_URL",
+    "status": "INFO",
+    "detail": "https://www.fundedwealth.com/sign-in",
+    "ts": "2026-07-14T02:08:37.076Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 4: CHECKOUT & PAYMENT ══",
+    "ts": "2026-07-14T02:08:37.838Z"
+  },
+  {
+    "step": "CHECKOUT_PAGE_LOADS",
+    "status": "PASS",
+    "detail": "https://www.fundedwealth.com/checkout",
+    "ts": "2026-07-14T02:08:43.002Z"
+  },
+  {
+    "step": "CHECKOUT_PLAN_FLASH",
+    "status": "FAIL",
+    "detail": "Flash plan visible: false",
+    "ts": "2026-07-14T02:08:43.003Z"
+  },
+  {
+    "step": "CHECKOUT_PLAN_INSTANT",
+    "status": "FAIL",
+    "detail": "Instant plan visible: false",
+    "ts": "2026-07-14T02:08:43.003Z"
+  },
+  {
+    "step": "CHECKOUT_PLAN_1STEP",
+    "status": "PASS",
+    "detail": "1-Step plan visible: true",
+    "ts": "2026-07-14T02:08:43.003Z"
+  },
+  {
+    "step": "CHECKOUT_PLAN_2STEP",
+    "status": "FAIL",
+    "detail": "2-Step plan visible: false",
+    "ts": "2026-07-14T02:08:43.003Z"
+  },
+  {
+    "step": "CHECKOUT_RAZORPAY_LOADED",
+    "status": "PASS",
+    "detail": "Razorpay JS loaded: true",
+    "ts": "2026-07-14T02:08:43.004Z"
+  },
+  {
+    "step": "CHECKOUT_UPI_OPTION",
+    "status": "PASS",
+    "detail": "UPI payment option: true",
+    "ts": "2026-07-14T02:08:43.004Z"
+  },
+  {
+    "step": "CHECKOUT_RAZORPAY_API",
+    "status": "PASS",
+    "detail": "5 payment methods: upi, card, netbanking, wallet, emi",
+    "ts": "2026-07-14T02:08:44.218Z"
+  },
+  {
+    "step": "CHECKOUT_PROVISIONING_CATALOG",
+    "status": "FAIL",
+    "detail": "HTTP 401 | 0 plans in catalog: none",
+    "ts": "2026-07-14T02:08:44.547Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout.razorpay.com/v1/checkout.js",
+    "ts": "2026-07-14T02:08:44.548Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://cdn.razorpay.com/static/cx/razorpay-risk-detection/bundle.js",
+    "ts": "2026-07-14T02:08:44.549Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout.razorpay.com/v1/checkout.js",
+    "ts": "2026-07-14T02:08:44.549Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://api.razorpay.com/v1/checkout/public?traffic_env=production&build=309175090e8afce78fc5e908a94",
+    "ts": "2026-07-14T02:08:44.549Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/309175090e8afce78fc5e908a94a10676ce15aa5/v2-entry.mo",
+    "ts": "2026-07-14T02:08:44.550Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-loader-dc712d69.modern.js",
+    "ts": "2026-07-14T02:08:44.551Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2.cff72dbc.32143.css",
+    "ts": "2026-07-14T02:08:44.551Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-e58f6b1a.modern.js",
+    "ts": "2026-07-14T02:08:44.551Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-1cc331de.modern.js",
+    "ts": "2026-07-14T02:08:44.552Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-d3a7c88e.modern.js",
+    "ts": "2026-07-14T02:08:44.552Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-9eb63077.modern.js",
+    "ts": "2026-07-14T02:08:44.553Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-a49c05c2.modern.js",
+    "ts": "2026-07-14T02:08:44.554Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-7c35fe81.modern.js",
+    "ts": "2026-07-14T02:08:44.555Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-app-87810e3c.modern.js",
+    "ts": "2026-07-14T02:08:44.555Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-4a797004.modern.js",
+    "ts": "2026-07-14T02:08:44.556Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-fd25f1d5.modern.js",
+    "ts": "2026-07-14T02:08:44.556Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-85ee08a4.modern.js",
+    "ts": "2026-07-14T02:08:44.556Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-3ed85425.modern.js",
+    "ts": "2026-07-14T02:08:44.556Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-b15ef099.modern.js",
+    "ts": "2026-07-14T02:08:44.557Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-c3c81c80.modern.js",
+    "ts": "2026-07-14T02:08:44.557Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-24f7edae.modern.js",
+    "ts": "2026-07-14T02:08:44.558Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-363f4f91.modern.js",
+    "ts": "2026-07-14T02:08:44.558Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-c9c6affe.modern.js",
+    "ts": "2026-07-14T02:08:44.558Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-13ebe9b7.modern.js",
+    "ts": "2026-07-14T02:08:44.559Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-e7a18286.modern.js",
+    "ts": "2026-07-14T02:08:44.559Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-e4836d19.modern.js",
+    "ts": "2026-07-14T02:08:44.560Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-b7b87cca.modern.js",
+    "ts": "2026-07-14T02:08:44.560Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-682cca78.modern.js",
+    "ts": "2026-07-14T02:08:44.563Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-1aeebec8.modern.js",
+    "ts": "2026-07-14T02:08:44.564Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-card-10683cf7.modern.js",
+    "ts": "2026-07-14T02:08:44.564Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-8fe043e0.modern.js",
+    "ts": "2026-07-14T02:08:44.564Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-6c3c083f.modern.js",
+    "ts": "2026-07-14T02:08:44.564Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-03dbce28.modern.js",
+    "ts": "2026-07-14T02:08:44.565Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-4d8a423e.modern.js",
+    "ts": "2026-07-14T02:08:44.565Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-b9f42252.modern.js",
+    "ts": "2026-07-14T02:08:44.565Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-f5ba2a87.modern.js",
+    "ts": "2026-07-14T02:08:44.566Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-80e731fd.modern.js",
+    "ts": "2026-07-14T02:08:44.566Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-e2f2063a.modern.js",
+    "ts": "2026-07-14T02:08:44.566Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-apple-pay-method-button-6ebb3646.mod",
+    "ts": "2026-07-14T02:08:44.567Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-card-block-1869df17.modern.js",
+    "ts": "2026-07-14T02:08:44.567Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-apple-pay-button-04b67778.modern.js",
+    "ts": "2026-07-14T02:08:44.567Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-email-sanitisation-9f424c8b.modern.j",
+    "ts": "2026-07-14T02:08:44.567Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-62f08a1c.modern.js",
+    "ts": "2026-07-14T02:08:44.568Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-upi-qr-f9fcd0cb.modern.js",
+    "ts": "2026-07-14T02:08:44.568Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-93fcd662.modern.js",
+    "ts": "2026-07-14T02:08:44.568Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-upi-block-376f1ea2.modern.js",
+    "ts": "2026-07-14T02:08:44.569Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-emi-block-413d3b0b.modern.js",
+    "ts": "2026-07-14T02:08:44.569Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-netbanking-block-388684dc.modern.js",
+    "ts": "2026-07-14T02:08:44.569Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-wallet-block-bcc550f9.modern.js",
+    "ts": "2026-07-14T02:08:44.570Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-otp-d0f8812c.modern.js",
+    "ts": "2026-07-14T02:08:44.570Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-paylater-block-d4919414.modern.js",
+    "ts": "2026-07-14T02:08:44.570Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-lang-en-8a3392ae.modern.js",
+    "ts": "2026-07-14T02:08:44.570Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-standard-icon-common-4a0e596f.mod",
+    "ts": "2026-07-14T02:08:44.571Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-icon-common0-17d40644.modern.js",
+    "ts": "2026-07-14T02:08:44.571Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-analytics-c18a0a4b.modern.js",
+    "ts": "2026-07-14T02:08:44.571Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-icon-common-3676ba9a.modern.js",
+    "ts": "2026-07-14T02:08:44.572Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-illustration-a3bdff51.modern.js",
+    "ts": "2026-07-14T02:08:44.572Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-customer-11729827.modern.js",
+    "ts": "2026-07-14T02:08:44.572Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-shield-57f9e895.modern.js",
+    "ts": "2026-07-14T02:08:44.573Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-checkout-payment-82a3d161.modern.js",
+    "ts": "2026-07-14T02:08:44.573Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-nach-block-22478978.modern.js",
+    "ts": "2026-07-14T02:08:44.573Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://lumberjack.razorpay.com/v2/logz",
+    "ts": "2026-07-14T02:08:44.573Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-merchant-identity-1f762126.modern.js",
+    "ts": "2026-07-14T02:08:44.574Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-overview-30b06949.modern.js",
+    "ts": "2026-07-14T02:08:44.574Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-home-1ca68d24.modern.js",
+    "ts": "2026-07-14T02:08:44.574Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-upi-f01d1d31.modern.js",
+    "ts": "2026-07-14T02:08:44.574Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-checkout-payment-82a3d161.modern.js",
+    "ts": "2026-07-14T02:08:44.575Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-card-10683cf7.modern.js",
+    "ts": "2026-07-14T02:08:44.576Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-google-pay-store-21b64dcc.modern.js",
+    "ts": "2026-07-14T02:08:44.576Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-apple-pay-experiment-eligibility-16c",
+    "ts": "2026-07-14T02:08:44.576Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-festivity-flow-77ae3ef5.modern.js",
+    "ts": "2026-07-14T02:08:44.576Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-apple-pay-flow-336fcdb7.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-load-partner-sdks-9f773a1d.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-getAppleExperimentEligibilityData-9f",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-gpay-in-a-box-62b6102e.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-in-app-aba6ff46.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-intl-bank-transfer-currency-d0ce3d69",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-fiduciary-consent-384b9854.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-sentry-904228da.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-lottie-player-e75f21ba.modern.js",
+    "ts": "2026-07-14T02:08:44.577Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-intelligent-offers-ranking-86fa6bc9.",
+    "ts": "2026-07-14T02:08:44.579Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-upi-qr-f9fcd0cb.modern.js",
+    "ts": "2026-07-14T02:08:44.580Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-upi-block-376f1ea2.modern.js",
+    "ts": "2026-07-14T02:08:44.580Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-asset-common-7ed82058.modern.js",
+    "ts": "2026-07-14T02:08:44.581Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-cod-block-efc66d7c.modern.js",
+    "ts": "2026-07-14T02:08:44.581Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-initialize-pay-with-partner-eb5a6df3",
+    "ts": "2026-07-14T02:08:44.581Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-show-pay-with-partner-buttons-9aa6f1",
+    "ts": "2026-07-14T02:08:44.581Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-dcc-ui-b8fcadcf.modern.js",
+    "ts": "2026-07-14T02:08:44.581Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-offers-e4339c37.modern.js",
+    "ts": "2026-07-14T02:08:44.582Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-events-a9e64728.modern.js",
+    "ts": "2026-07-14T02:08:44.582Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-downtime-eea7850e.modern.js",
+    "ts": "2026-07-14T02:08:44.582Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-qrcode-03e9cdce.modern.js",
+    "ts": "2026-07-14T02:08:44.582Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-vajra-track-metrics-8d37ba7c.modern.",
+    "ts": "2026-07-14T02:08:44.583Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-error-service-5f339613.modern.js",
+    "ts": "2026-07-14T02:08:44.583Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-phone-number-hint-884e6ab6.modern.js",
+    "ts": "2026-07-14T02:08:44.583Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-festivity-animation-7c806cac.modern.",
+    "ts": "2026-07-14T02:08:44.583Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-confirm-exit-bf320494.modern.js",
+    "ts": "2026-07-14T02:08:44.584Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-upi-helpers-events-8a581da0.modern.j",
+    "ts": "2026-07-14T02:08:44.584Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-pay-without-offer-39a82a6d.modern.js",
+    "ts": "2026-07-14T02:08:44.584Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-link-and-pay-508f346e.modern.js",
+    "ts": "2026-07-14T02:08:44.585Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-pay-with-partner-helpers-payment-dda",
+    "ts": "2026-07-14T02:08:44.585Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-card-block-1869df17.modern.js",
+    "ts": "2026-07-14T02:08:44.585Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-quick-buy-mobile-home-b98d363d.moder",
+    "ts": "2026-07-14T02:08:44.585Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-otp-d0f8812c.modern.js",
+    "ts": "2026-07-14T02:08:44.585Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-email-contact-collect-1c793acc.moder",
+    "ts": "2026-07-14T02:08:44.585Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-powered-by-stamp-1ac0cc64.modern.js",
+    "ts": "2026-07-14T02:08:44.586Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-magic-entry-helper-6741d660.moder",
+    "ts": "2026-07-14T02:08:44.586Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-entry-64f4ab19.modern.js",
+    "ts": "2026-07-14T02:08:44.587Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-magic-icons-79139443.modern.js",
+    "ts": "2026-07-14T02:08:44.587Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-magic-icon-common-da7c4cff.modern",
+    "ts": "2026-07-14T02:08:44.587Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-v2-icon-magic-74b5fcd9.modern.js",
+    "ts": "2026-07-14T02:08:44.587Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-redirection-f51691e5.modern.js",
+    "ts": "2026-07-14T02:08:44.587Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-common-component-838ed0ad.modern.js",
+    "ts": "2026-07-14T02:08:44.588Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-address-b80c096b.modern.js",
+    "ts": "2026-07-14T02:08:44.588Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-opc-address-sheet-35ea7b81.modern.js",
+    "ts": "2026-07-14T02:08:44.588Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-add-shipping-address-ddf1c3d6.",
+    "ts": "2026-07-14T02:08:44.588Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-select-billing-address-72f0269",
+    "ts": "2026-07-14T02:08:44.588Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-side-panel-overview-e6accc30.m",
+    "ts": "2026-07-14T02:08:44.588Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-select-delivery-address-cf597e",
+    "ts": "2026-07-14T02:08:44.589Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-order-summary-widget-b7e4a0a5.",
+    "ts": "2026-07-14T02:08:44.589Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-order-summary-sheet-cd77363f.m",
+    "ts": "2026-07-14T02:08:44.589Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-partial-cod-2128de1a.modern.js",
+    "ts": "2026-07-14T02:08:44.590Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-order-notes-84c261ef.modern.js",
+    "ts": "2026-07-14T02:08:44.591Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-order-summary-order-notes-b0f2",
+    "ts": "2026-07-14T02:08:44.591Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-address-consent-7a2098a0.moder",
+    "ts": "2026-07-14T02:08:44.591Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-third-party-address-consent-8c",
+    "ts": "2026-07-14T02:08:44.591Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-notifications-consent-0ddae77d",
+    "ts": "2026-07-14T02:08:44.592Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-delivery-fees-callout-a996395b",
+    "ts": "2026-07-14T02:08:44.592Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-coupons-widget-5129d9cb.modern",
+    "ts": "2026-07-14T02:08:44.592Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-loyalty-points-widget-80cf5480.moder",
+    "ts": "2026-07-14T02:08:44.592Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-yotpo-points-widget-ff51cee8.modern.",
+    "ts": "2026-07-14T02:08:44.593Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-razorpay-wallet-widget-fc3f165a.mode",
+    "ts": "2026-07-14T02:08:44.593Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-breadcrumbs-f437c2ea.modern.js",
+    "ts": "2026-07-14T02:08:44.593Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-BuyerProtectWrapper-2b412d3f.modern.",
+    "ts": "2026-07-14T02:08:44.593Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-BuyerProtect-ef4dbcf5.modern.js",
+    "ts": "2026-07-14T02:08:44.594Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-select-delivery-speed-68422104",
+    "ts": "2026-07-14T02:08:44.596Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-update-delivery-address-69f539",
+    "ts": "2026-07-14T02:08:44.597Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-tcs-breakup-4e1df9b2.modern.js",
+    "ts": "2026-07-14T02:08:44.597Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-item-picker-f9577e52.modern.js",
+    "ts": "2026-07-14T02:08:44.598Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-magic-reset-order-2b1f5fae.modern.js",
+    "ts": "2026-07-14T02:08:44.598Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-ga4-fallback-b44561e2.modern.js",
+    "ts": "2026-07-14T02:08:44.598Z"
+  },
+  {
+    "step": "CHECKOUT_API_CALL",
+    "status": "INFO",
+    "detail": "200 https://checkout-static-next.razorpay.com/build/chunks/v2-entry-channel-c02c77eb.modern.js",
+    "ts": "2026-07-14T02:08:44.598Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 5: AUTHENTICATED APIs (token: NO) ══",
+    "ts": "2026-07-14T02:08:44.610Z"
+  },
+  {
+    "step": "BLOCK5_SKIP",
+    "status": "WARN",
+    "detail": "Skipping authenticated API tests — no access token (email not confirmed)",
+    "ts": "2026-07-14T02:08:44.611Z"
+  },
+  {
+    "step": "API_ACCOUNTS_UNAUTH",
+    "status": "PASS",
+    "detail": "Unauthenticated: HTTP 401 (expected 401) | {\"success\":false,\"message\":\"Authentication required\"}",
+    "ts": "2026-07-14T02:08:45.083Z"
+  },
+  {
+    "step": "API_KYC_UNAUTH",
+    "status": "PASS",
+    "detail": "Unauthenticated: HTTP 401 (expected 401)",
+    "ts": "2026-07-14T02:08:45.563Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 6: DASHBOARD UI ══",
+    "ts": "2026-07-14T02:08:45.563Z"
+  },
+  {
+    "step": "DASHBOARD_AUTH_REDIRECT",
+    "status": "PASS",
+    "detail": "Unauthenticated user redirected to: https://www.fundedwealth.com/sign-in",
+    "ts": "2026-07-14T02:08:51.066Z"
+  },
+  {
+    "step": "DASHBOARD_API_CALL",
+    "status": "PASS",
+    "detail": "200 https://www.fundedwealth.com/assets/supabase-D1S55ZRl.js",
+    "ts": "2026-07-14T02:08:51.066Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 7: ADMIN PANEL ══",
+    "ts": "2026-07-14T02:08:51.086Z"
+  },
+  {
+    "step": "ADMIN_ROOT_HTTP",
+    "status": "FAIL",
+    "detail": "HTTP 307",
+    "ts": "2026-07-14T02:08:51.405Z"
+  },
+  {
+    "step": "ADMIN_ROOT_REDIRECT",
+    "status": "INFO",
+    "detail": "Location: /login?redirect=%2F",
+    "ts": "2026-07-14T02:08:51.406Z"
+  },
+  {
+    "step": "ADMIN_LOGIN_URL",
+    "status": "PASS",
+    "detail": "https://admin.fundedwealth.com/login",
+    "ts": "2026-07-14T02:08:52.498Z"
+  },
+  {
+    "step": "ADMIN_LOGIN_FIELDS",
+    "status": "PASS",
+    "detail": "identifier: 1 | password: 1",
+    "ts": "2026-07-14T02:08:52.538Z"
+  },
+  {
+    "step": "ADMIN_LOGIN_BUTTONS",
+    "status": "INFO",
+    "detail": "Sign In",
+    "ts": "2026-07-14T02:08:52.538Z"
+  },
+  {
+    "step": "ADMIN_AUTH_SYSTEM",
+    "status": "PASS",
+    "detail": "Uses custom staff_sessions (not Supabase user auth): true",
+    "ts": "2026-07-14T02:08:52.542Z"
+  },
+  {
+    "step": "ADMIN_API_AUTH_GATE/api/users",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication re",
+    "ts": "2026-07-14T02:08:52.609Z"
+  },
+  {
+    "step": "ADMIN_API_AUTH_GATE/api/payments",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication re",
+    "ts": "2026-07-14T02:08:52.679Z"
+  },
+  {
+    "step": "ADMIN_API_AUTH_GATE/api/purchases",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication re",
+    "ts": "2026-07-14T02:08:52.741Z"
+  },
+  {
+    "step": "ADMIN_API_AUTH_GATE/api/challenges",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication re",
+    "ts": "2026-07-14T02:08:52.837Z"
+  },
+  {
+    "step": "ADMIN_API_AUTH_GATE/api/executive",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication re",
+    "ts": "2026-07-14T02:08:52.921Z"
+  },
+  {
+    "step": "ADMIN_API_AUTH_GATE/api/provision",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":{\"code\":\"UNAUTHORIZED\",\"message\":\"Authentication re",
+    "ts": "2026-07-14T02:08:53.042Z"
+  },
+  {
+    "step": "ADMIN_2FA_PAGE",
+    "status": "PASS",
+    "detail": "2FA page: true",
+    "ts": "2026-07-14T02:08:53.782Z"
+  },
+  {
+    "step": "ADMIN_CSRF_COOKIE",
+    "status": "WARN",
+    "detail": "CSRF cookie: not set",
+    "ts": "2026-07-14T02:08:53.831Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 8: TERMINAL APP ══",
+    "ts": "2026-07-14T02:08:53.835Z"
+  },
+  {
+    "step": "TERMINAL_URL",
+    "status": "INFO",
+    "detail": "https://terminal.fundedwealth.com/",
+    "ts": "2026-07-14T02:08:59.388Z"
+  },
+  {
+    "step": "TERMINAL_ACCESS_DENIED_SHOWN",
+    "status": "PASS",
+    "detail": "AccessDenied component rendered: true",
+    "ts": "2026-07-14T02:08:59.389Z"
+  },
+  {
+    "step": "TERMINAL_AUTH_VERIFY_ON_LOAD",
+    "status": "FAIL",
+    "detail": "no auth calls made",
+    "ts": "2026-07-14T02:08:59.389Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__AUTH_VERIFY",
+    "status": "PASS",
+    "detail": "HTTP 401 | {\"valid\":false,\"reason\":\"no_session\"}",
+    "ts": "2026-07-14T02:09:00.135Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__AUTH_SSO_TOKEN_BADTOKEN",
+    "status": "PASS",
+    "detail": "HTTP 302 | Found. Redirecting to https://fundedwealth.com/terminal-error?reason=Invalid%20S",
+    "ts": "2026-07-14T02:09:00.609Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__API_ACCOUNTS",
+    "status": "PASS",
+    "detail": "HTTP 401 | {\"error\":\"unauthorized\",\"message\":\"No session token provided. Please login via F",
+    "ts": "2026-07-14T02:09:01.040Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__API_WATCHLISTS",
+    "status": "PASS",
+    "detail": "HTTP 401 | {\"error\":\"unauthorized\",\"message\":\"No session token provided. Please login via F",
+    "ts": "2026-07-14T02:09:01.401Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__API_PERSISTENCE_THEMES",
+    "status": "PASS",
+    "detail": "HTTP 401 | {\"error\":\"unauthorized\",\"message\":\"No session token provided. Please login via F",
+    "ts": "2026-07-14T02:09:01.775Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__API_INSTRUMENTS_SEARCH_Q_NIFTY",
+    "status": "PASS",
+    "detail": "HTTP 200 | 11 items",
+    "ts": "2026-07-14T02:09:02.217Z"
+  },
+  {
+    "step": "TERMINAL_ENDPOINT__API_INSTRUMENTS_SEARCH_Q_BANKNIFTY",
+    "status": "PASS",
+    "detail": "HTTP 200 | 3 items",
+    "ts": "2026-07-14T02:09:02.850Z"
+  },
+  {
+    "step": "TERMINAL_NIFTY_DATA_QUALITY",
+    "status": "PASS",
+    "detail": "token:99926000 symbol:NIFTY segment:NSE lotSize:50 tickSize:0.05",
+    "ts": "2026-07-14T02:09:03.344Z"
+  },
+  {
+    "step": "TERMINAL_MARKET_QUOTE",
+    "status": "PASS",
+    "detail": "HTTP 200 | {\"symbol\":\"NIFTY 50\",\"exchange\":\"NSE\",\"segment\":\"NSE\",\"token\":\"99926000\",\"ltp\":24211,\"timestamp\":178",
+    "ts": "2026-07-14T02:09:03.803Z"
+  },
+  {
+    "step": "TERMINAL_MARKET_DEPTH",
+    "status": "PASS",
+    "detail": "HTTP 200 | {\"token\":\"99926000\",\"bids\":[],\"asks\":[],\"totalBuyQty\":0,\"totalSellQty\":0}",
+    "ts": "2026-07-14T02:09:04.901Z"
+  },
+  {
+    "step": "TERMINAL_ONLOAD_CALL",
+    "status": "FAIL",
+    "detail": "401 /api/watchlists",
+    "ts": "2026-07-14T02:09:04.901Z"
+  },
+  {
+    "step": "TERMINAL_ONLOAD_CALL",
+    "status": "FAIL",
+    "detail": "401 /api/account",
+    "ts": "2026-07-14T02:09:04.901Z"
+  },
+  {
+    "step": "TERMINAL_ONLOAD_CALL",
+    "status": "FAIL",
+    "detail": "401 /api/persistence/themes",
+    "ts": "2026-07-14T02:09:04.902Z"
+  },
+  {
+    "step": "",
+    "status": "INFO",
+    "detail": "══ BLOCK 9: SYNC VERIFICATION ══",
+    "ts": "2026-07-14T02:09:04.906Z"
+  },
+  {
+    "step": "SYNC_ENDPOINT_NO_AUTH",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"success\":false,\"message\":\"Unauthorized - invalid API key\"}",
+    "ts": "2026-07-14T02:09:05.574Z"
+  },
+  {
+    "step": "TRADE_EVENT_NO_AUTH",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"success\":false,\"message\":\"Unauthorized\"}",
+    "ts": "2026-07-14T02:09:05.944Z"
+  },
+  {
+    "step": "ADMIN_EVENTS_API",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":\"Unauthorized\"}",
+    "ts": "2026-07-14T02:09:06.364Z"
+  },
+  {
+    "step": "PROVISIONING_RETRY_NO_AUTH",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":\"Unauthorized\"}",
+    "ts": "2026-07-14T02:09:06.841Z"
+  },
+  {
+    "step": "PAYOUTS_NO_AUTH",
+    "status": "PASS",
+    "detail": "HTTP 401 (expected 401) | {\"error\":\"Unauthorized\"}",
+    "ts": "2026-07-14T02:09:07.194Z"
+  },
+  {
+    "step": "BLOG_API_PUBLIC",
+    "status": "PASS",
+    "detail": "HTTP 200 | []",
+    "ts": "2026-07-14T02:09:07.793Z"
+  },
+  {
+    "step": "IMPACT_API_PUBLIC",
+    "status": "PASS",
+    "detail": "HTTP 404 | {\"error\":\"Not found\"}",
+    "ts": "2026-07-14T02:09:08.111Z"
+  },
+  {
+    "step": "SECURITY_DEBUG_ENDPOINT_EXPOSED",
+    "status": "FAIL",
+    "detail": "HTTP 200 — /debug/secret-hash IS EXPOSED (SECURITY RISK) | {\"hash\":\"ca8165db24d06884b2a22e17563ec8caef316b7e417eafbd27c4af040449927e\",\"length\":64,\"varName\":\"SS",
+    "ts": "2026-07-14T02:09:08.548Z"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/export-cleanup", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/login-history-cleanup", "schedule": "0 1 * * *" }
+  ]
+}
