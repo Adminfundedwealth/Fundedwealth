@@ -8,7 +8,10 @@
 -- of the correct plan sale discounts.
 --
 -- CANONICAL PLAN SALE DISCOUNTS:
---   All plans use code BAPPA; discount percentages remain plan-specific.
+--   Flash   = 50% OFF  (code FLASH50)
+--   Instant = 45% OFF  (code INSTANT45)
+--   1-Step  = 55% OFF  (code ONESTEP55)
+--   2-Step  = 60% OFF  (code TWOSTEP60)
 --
 -- These values match @workspace/products PRODUCTS[planType].discountPct.
 -- The admin panel (Admin → Founder → Discount Config) can override these,
@@ -33,10 +36,10 @@ CREATE TABLE IF NOT EXISTS discount_config (
 -- Upsert correct values — this overwrites any stale rows from the old seed.
 INSERT INTO discount_config (plan_type, code, discount_pct, active, updated_at)
 VALUES
-  ('flash',   'BAPPA', 50, TRUE, NOW()),
-  ('instant', 'BAPPA', 45, TRUE, NOW()),
-  ('1step',   'BAPPA', 55, TRUE, NOW()),
-  ('2step',   'BAPPA', 60, TRUE, NOW())
+  ('flash',   'FLASH50',   50, TRUE, NOW()),
+  ('instant', 'INSTANT45', 45, TRUE, NOW()),
+  ('1step',   'ONESTEP55', 55, TRUE, NOW()),
+  ('2step',   'TWOSTEP60', 60, TRUE, NOW())
 ON CONFLICT (plan_type) DO UPDATE SET
   code         = EXCLUDED.code,
   discount_pct = EXCLUDED.discount_pct,

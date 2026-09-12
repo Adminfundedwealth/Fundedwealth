@@ -119,7 +119,7 @@ import("./lib/redis-client").then(({ getRedisClient }) => {
     }
 
     invalidateDiscountCache();
-    logger.info("discount_config seeded/verified: all plans use code BAPPA; Flash=50%, Instant=45%, 1-Step=55%, 2-Step=60%");
+    logger.info("discount_config seeded/verified: Flash=50%, Instant=45%, 1-Step=55%, 2-Step=60%");
   } catch (err) {
     logger.warn({ err }, "discount_config startup seed skipped (non-fatal)");
   }

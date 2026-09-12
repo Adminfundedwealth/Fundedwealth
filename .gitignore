@@ -76,5 +76,3 @@ lib/db/.env
 .vercel/output/
 
 
-.vercel
-.env*
