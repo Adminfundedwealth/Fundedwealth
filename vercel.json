@@ -5,7 +5,18 @@
   "framework": null,
   "redirects": [
     { "source": "/trade", "destination": "https://terminal.fundedwealth.com", "permanent": true },
-    { "source": "/trade/:path*", "destination": "https://terminal.fundedwealth.com", "permanent": true }
+    { "source": "/trade/:path*", "destination": "https://terminal.fundedwealth.com", "permanent": true },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "fundedwealth.com"
+        }
+      ],
+      "destination": "https://www.fundedwealth.com/:path*",
+      "permanent": true
+    }
   ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://fundedwealth-api-production.up.railway.app/api/:path*" },
