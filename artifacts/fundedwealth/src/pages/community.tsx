@@ -682,7 +682,7 @@ export default function Community() {
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
         title="Trading Community India — Join 15,000+ Evaluation Participants"
-        description="Join India's trading community. Connect with 15,000+ evaluation participants. Free trading signals, market analysis & support from FundedWealth."
+        description="India's prop trading community — post trade ideas, join discussions, and connect on WhatsApp, Telegram, YouTube & Instagram. Free to join for all evaluation participants."
         keywords="trading community India, prop trading group India, funded traders community, trading discord India, free trading signals India"
         canonical="/community"
       />
@@ -696,7 +696,7 @@ export default function Community() {
             <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
           </Link>
           <h1 className="text-lg font-heading font-bold flex items-center gap-2">
-            <Users className="text-green-400" size={20} /> Community
+            <Users className="text-green-400" size={20} /> India's Prop Trading Community
           </h1>
           <Link href="/">
             <Button variant="ghost" className="text-white/70 hover:text-white">
