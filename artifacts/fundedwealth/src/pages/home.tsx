@@ -1203,6 +1203,107 @@ const IndianInstruments = () => {
   );
 };
 
+// ─── Why NIFTY for Funded Accounts ───────────────────────────────────────────
+const WhyNIFTYFundedAccount = () => {
+  return (
+    <section className="py-16 relative overflow-hidden">
+      <div className="glow-orb orb-3"></div>
+      <div className="container mx-auto px-4 md:px-6 relative">
+        <div className="text-center mb-12">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-300 text-xs font-bold uppercase tracking-wider mb-4">
+            Popular Choice
+          </span>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4">
+            Why <span className="text-gradient">NIFTY</span> for Funded Account Evaluations?
+          </h2>
+          <p className="text-white/60 max-w-3xl mx-auto text-lg">
+            Many traders at FundedWealth choose to start their funded account journey with NIFTY 50. Here's why NIFTY is well-suited for simulated prop trading evaluations in the Indian market.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {/* Card 1: Liquidity */}
+          <div className="group rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-6 hover:border-orange-500/30 hover:bg-white/[0.08] transition-all">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <TrendingUp className="w-6 h-6 text-blue-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg mb-2">Deep Liquidity</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
+              NIFTY 50 offers excellent liquidity on NSE, ensuring tight spreads and minimal slippage — critical factors for maintaining profitability in simulated funded account evaluations.
+            </p>
+          </div>
+
+          {/* Card 2: Position Sizing Flexibility */}
+          <div className="group rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-6 hover:border-orange-500/30 hover:bg-white/[0.08] transition-all">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Banknote className="w-6 h-6 text-emerald-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg mb-2">Position Sizing Flexibility</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
+              NIFTY offers practical position-sizing flexibility within evaluation plans. Margin requirements vary by instrument and contract, helping traders manage capital allocation according to the applicable rules.
+            </p>
+          </div>
+
+          {/* Card 3: Broader Exposure */}
+          <div className="group rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-6 hover:border-orange-500/30 hover:bg-white/[0.08] transition-all">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Layers className="w-6 h-6 text-purple-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg mb-2">Diversified Market Exposure</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
+              NIFTY 50 represents India's top 50 companies across multiple sectors, offering broader market exposure compared to sector-specific indices like BANKNIFTY or FINNIFTY.
+            </p>
+          </div>
+
+          {/* Card 4: All Plans */}
+          <div className="group rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 p-6 hover:border-orange-500/30 hover:bg-white/[0.08] transition-all">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="w-6 h-6 text-orange-400" />
+            </div>
+            <h3 className="text-white font-bold text-lg mb-2">Available Across All Plans</h3>
+            <p className="text-white/60 text-sm leading-relaxed">
+              Trade NIFTY 50 on any FundedWealth evaluation plan — Flash, Instant, 1-Step, or 2-Step. Scale from ₹1 Lakh to ₹50 Lakhs in simulated capital through the scaling program.
+            </p>
+          </div>
+        </div>
+
+        {/* CTA Box */}
+        <div className="max-w-4xl mx-auto rounded-2xl bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-orange-500/10 border border-orange-500/20 p-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="flex-1">
+              <h3 className="text-white font-bold text-xl mb-2">
+                Ready to trade NIFTY in a funded account environment?
+              </h3>
+              <p className="text-white/70 text-sm mb-4">
+                Whether you're trading NIFTY, BANKNIFTY, or SENSEX, all evaluation plans follow structured risk rules designed to identify consistent execution. Learn the complete evaluation rules for each plan.
+              </p>
+              <Link href="/rules">
+                <a className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 font-semibold text-sm transition-colors group">
+                  View NIFTY Trading Rules & Evaluation Plans
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </Link>
+            </div>
+            <div className="shrink-0">
+              <Link href="/rules">
+                <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold px-8 py-6 rounded-xl shadow-lg hover:shadow-orange-500/25 transition-all">
+                  View All Rules
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-white/40 text-xs max-w-3xl mx-auto">
+            All trading on FundedWealth is simulated for evaluation purposes. Account balances shown are simulated balances. NIFTY funded account evaluations assess trader performance under defined risk parameters within a structured simulated environment.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const FWIndEdge = () => {
   const edges = [
     { icon: <Building2 className="w-6 h-6" />, title: "Market Data Infrastructure", desc: "Our market-data infrastructure supports simulated account prices that reflect available Indian market conditions. FundedWealth is not a SEBI-registered broker or investment adviser.", color: "from-blue-500 to-cyan-500" },
@@ -5629,6 +5730,7 @@ export default function Home() {
       <main>
         <Hero />
         <IndianInstruments />
+        <WhyNIFTYFundedAccount />
         <FWIndEdge />
         <Plans />
         <HowItWorksIND />
