@@ -5558,6 +5558,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li><Link href="/blog" className="text-white/50 hover:text-fw-orange transition-colors">Trading Blog</Link></li>
               <li><Link href="/success-stories" className="text-white/50 hover:text-fw-orange transition-colors">Success Stories</Link></li>
+              <li><Link href="/about" className="text-white/50 hover:text-fw-orange transition-colors">About FundedWealth</Link></li>
               <li><Link href="/community" className="text-white/50 hover:text-fw-orange transition-colors">Community</Link></li>
               <li><a href="#affiliate" className="text-white/50 hover:text-fw-orange transition-colors">Affiliate Program</a></li>
               <li><Link href="/impact" className="text-white/50 hover:text-fw-orange transition-colors">FW Impact Initiative</Link></li>
