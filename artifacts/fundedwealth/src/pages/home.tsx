@@ -3536,7 +3536,6 @@ const WhatPeopleSay = () => {
       handle: "@disha_kakkar",
       quote: "Every metric I actually care about — daily limit, profit target, payout window — is right there on one screen. My day starts calmer and my routine just runs.",
       ago: "5 days ago",
-      amount: "₹1,18,900",
       gradient: "from-pink-400 to-rose-500",
       initials: "DK",
     },
@@ -3545,7 +3544,6 @@ const WhatPeopleSay = () => {
       handle: "@hrdaya_grover",
       quote: "Watching my P&L update tick-by-tick in the FundedWealth Terminal removed the mental noise. I stopped refreshing five tabs and just focused on hitting my 8% target.",
       ago: "3 days ago",
-      amount: "₹67,200",
       gradient: "from-violet-500 to-blue-500",
       initials: "HG",
     },
@@ -3554,7 +3552,6 @@ const WhatPeopleSay = () => {
       handle: "@sanyam_maheswari",
       quote: "Fills are quick, the layout is uncluttered, and the live risk meter keeps me honest. It pushes me to trade my plan instead of my mood.",
       ago: "2 days ago",
-      amount: "₹1,80,000",
       gradient: "from-amber-400 to-orange-500",
       initials: "SM",
     },
@@ -3563,7 +3560,6 @@ const WhatPeopleSay = () => {
       handle: "@rohan_mehta",
       quote: "Cleared the 2-Step in 19 days. The drawdown tracker literally saved me from a revenge trade on a Friday close — that one nudge paid for the entire challenge fee.",
       ago: "1 week ago",
-      amount: "₹2,45,000",
       gradient: "from-cyan-400 to-blue-600",
       initials: "RM",
     },
@@ -3572,7 +3568,6 @@ const WhatPeopleSay = () => {
       handle: "@priya_trades",
       quote: "Payout hit my HDFC account in under 24 hours, no follow-ups, no awkward ticket replies. After two offshore prop horror stories, this felt unreal.",
       ago: "4 days ago",
-      amount: "₹98,400",
       gradient: "from-emerald-400 to-teal-600",
       initials: "PI",
     },
@@ -3581,7 +3576,6 @@ const WhatPeopleSay = () => {
       handle: "@aakash_fno",
       quote: "Trading BankNifty with 25L funded capital while my own savings stayed untouched — that mental shift alone improved my execution. Sizing finally feels rational.",
       ago: "6 days ago",
-      amount: "₹3,12,750",
       gradient: "from-indigo-500 to-purple-600",
       initials: "AS",
     },
@@ -3590,7 +3584,6 @@ const WhatPeopleSay = () => {
       handle: "@neha_sgh",
       quote: "Hindi support over WhatsApp, clear KYC steps, and zero hidden fees. As a part-time trader from Lucknow, this is the first platform that actually felt built for us.",
       ago: "2 weeks ago",
-      amount: "₹54,600",
       gradient: "from-rose-500 to-pink-600",
       initials: "NS",
     },
@@ -3599,7 +3592,6 @@ const WhatPeopleSay = () => {
       handle: "@vik_trades",
       quote: "The discipline score is brutal but fair. Watching it drop after a single rule break taught me more about risk than three years of YouTube content ever did.",
       ago: "9 days ago",
-      amount: "₹1,76,200",
       gradient: "from-amber-500 to-red-500",
       initials: "VR",
     },
@@ -3608,7 +3600,6 @@ const WhatPeopleSay = () => {
       handle: "@ananya.b",
       quote: "I scaled from ₹5L to ₹20L in five months without ever touching my own capital. The milestone framework keeps the goals concrete instead of abstract.",
       ago: "3 weeks ago",
-      amount: "₹4,28,000",
       gradient: "from-fuchsia-500 to-violet-700",
       initials: "AB",
     },
@@ -3617,7 +3608,6 @@ const WhatPeopleSay = () => {
       handle: "@karan.mal",
       quote: "What I love is the absence of gimmicks — no flashy WhatsApp groups, no signal calls. Just a clean evaluation, real rules, and a payout when you earn it.",
       ago: "1 day ago",
-      amount: "₹89,500",
       gradient: "from-sky-500 to-cyan-600",
       initials: "KM",
     },
@@ -3640,7 +3630,6 @@ const WhatPeopleSay = () => {
       <p className="text-white/65 text-sm italic leading-relaxed mb-5 flex-1">&ldquo;{t.quote}&rdquo;</p>
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
         <span className="text-white/40 text-xs">{t.ago}</span>
-        <span className="text-emerald-400 font-extrabold text-sm">{t.amount}</span>
       </div>
     </div>
   );
@@ -5651,7 +5640,6 @@ export default function Home() {
         <Guarantee />
         <ImpactInitiative />
         <PayoutsMadeSimple />
-        <LivePayouts />
         <TerminalMockup />
         <Advantages />
         <WhyChoose />
