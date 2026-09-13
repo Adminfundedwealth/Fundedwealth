@@ -15,6 +15,8 @@ import {
   ShieldCheck,
   TrendingUp,
   Zap,
+  Rocket,
+  Layers,
   BarChart3,
   Users,
   CreditCard,
@@ -2790,7 +2792,7 @@ const Plans = () => {
               {/* Flash ⚡ — yellow/orange active */}
               <TabsTrigger
                 value="flash"
-                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 flex-col gap-1 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-3 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2803,13 +2805,14 @@ const Plans = () => {
                   }}
                 />
                 <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="relative z-10 text-yellow-400"><Zap className="h-6 w-6" aria-hidden="true" /></span>
                 <span className="relative z-10">Flash ⚡</span>
               </TabsTrigger>
 
               {/* Instant — pink/violet active */}
               <TabsTrigger
                 value="instant"
-                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 flex-col gap-1 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-3 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2822,13 +2825,14 @@ const Plans = () => {
                   }}
                 />
                 <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="relative z-10"><Rocket className="h-6 w-6" aria-hidden="true" /></span>
                 <span className="relative z-10">Instant</span>
               </TabsTrigger>
 
               {/* 1-Step — cyan/violet active */}
               <TabsTrigger
                 value="1step"
-                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 flex-col gap-1 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-3 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2841,13 +2845,14 @@ const Plans = () => {
                   }}
                 />
                 <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="relative z-10"><BarChart3 className="h-6 w-6" aria-hidden="true" /></span>
                 <span className="relative z-10">1-Step</span>
               </TabsTrigger>
 
               {/* 2-Step — violet/pink active */}
               <TabsTrigger
                 value="2step"
-                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 flex-col gap-1 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-3 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2860,6 +2865,7 @@ const Plans = () => {
                   }}
                 />
                 <span className="glass-tab-gloss absolute inset-x-0 top-0 h-[45%] rounded-t-xl pointer-events-none opacity-0 transition-opacity duration-300" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} aria-hidden="true" />
+                <span className="relative z-10"><Layers className="h-6 w-6" aria-hidden="true" /></span>
                 <span className="relative z-10">2-Step</span>
               </TabsTrigger>
             </TabsList>
