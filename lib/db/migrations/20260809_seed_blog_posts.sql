@@ -70,7 +70,7 @@ VALUES
 (
   'Nifty 50 Weekly Analysis: Key Levels to Watch',
   'nifty-50-weekly-analysis-key-levels-to-watch',
-  'Our technical breakdown of Nifty''s current structure, support/resistance levels, and what to expect this week.',
+  'A technical breakdown of Nifty 50 support and resistance levels, trend structure, and trading strategy for Indian prop traders on NSE.',
   '<h2>Nifty 50 Overview</h2>
 <p>The Nifty 50 is India''s benchmark stock market index, representing the top 50 companies listed on the NSE. Understanding its structure is essential for every Indian prop trader.</p>
 <h2>Current Market Structure</h2>
