@@ -8,9 +8,9 @@ const organizationSchema = {
   url: "https://www.fundedwealth.com",
   logo: "https://www.fundedwealth.com/logo.png",
   image: "https://www.fundedwealth.com/opengraph.jpg",
-  description: "FundedWealth is a simulated trading evaluation platform focused on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). Eligible participants can earn performance-based rewards, typically processed within 12 hours for approved requests, under program terms.",
+  description: "FundedWealth is a simulated prop trading platform offering structured funded account evaluations for traders in the Indian stock market. Trade NIFTY, BANKNIFTY, SENSEX and selected Indian equities and futures in a defined simulated environment. Eligible participants can earn performance-based rewards under program terms.",
   foundingDate: "2023",
-  slogan: "India's #1 Prop Trading Firm — Trade Smarter, Get Funded",
+  slogan: "Indian Prop Trading & Funded Accounts",
   priceRange: "₹999 - ₹49,999",
   currenciesAccepted: "INR, USDT, BTC, ETH",
   paymentAccepted: "UPI, Credit Card, Debit Card, Net Banking, Crypto",
@@ -103,7 +103,7 @@ const faqSchema = {
       name: "What is FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth is a simulated trading evaluation platform that provides simulated evaluation accounts up to ₹50 Lakhs. Eligible participants may qualify for plan-specific performance-based rewards under applicable terms, verification, and provider timelines. The platform focuses on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). All trading is simulated and no customer-owned live capital is provided."
+        text: "FundedWealth is a simulated prop trading platform offering structured funded account evaluations for traders in the Indian stock market. Trade NIFTY, BANKNIFTY, SENSEX and selected Indian equities and futures in a simulated environment. Eligible participants may qualify for plan-specific performance-based rewards under applicable terms. All trading is simulated and no customer-owned live capital is provided."
       }
     },
     {
@@ -111,7 +111,7 @@ const faqSchema = {
       name: "Is FundedWealth the best prop firm in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth is an Indian simulated trading evaluation platform with evaluation plans starting at ₹999. Eligible participants may qualify for plan-specific performance-based rewards under applicable program terms; experiences and outcomes vary."
+        text: "FundedWealth is a simulated prop trading platform offering funded account evaluations in India. Evaluation plans start at ₹999. Eligible participants may qualify for plan-specific performance-based rewards under applicable program terms."
       }
     },
     {
@@ -214,7 +214,7 @@ const serviceSchema = {
     "@type": "Organization",
     name: "FundedWealth"
   },
-  description: "Simulated trading evaluation service for Indian markets. Eligible participants can earn performance-based rewards under program terms. All trading is simulated.",
+  description: "Simulated prop trading evaluation service for Indian stock market traders. Trade NIFTY, BANKNIFTY, SENSEX and selected equities in a structured funded account evaluation program. Eligible participants can earn performance-based rewards under program terms. All trading is simulated.",
   areaServed: { "@type": "Country", name: "India" },
   hasOfferCatalog: {
     "@type": "OfferCatalog",

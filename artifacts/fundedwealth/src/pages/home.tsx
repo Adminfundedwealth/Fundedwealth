@@ -920,7 +920,7 @@ const Hero = () => {
             {/* Top badge */}
             <div className="mb-3 lg:mb-1 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
               <span className="text-lg">🇮🇳</span>
-              <span><BulgeText text="INDIA'S SIMULATED TRADING " /><BulgeText text="& EVALUATION PLATFORM" className="text-fw-orange" /></span>
+              <span><BulgeText text="INDIA'S SIMULATED PROP TRADING " /><BulgeText text="& FUNDED ACCOUNT PLATFORM" className="text-fw-orange" /></span>
             </div>
 
             {/* Subtitle line */}
@@ -935,8 +935,8 @@ const Hero = () => {
 
             {/* Main headline */}
             <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white text-3xl sm:text-4xl md:text-5xl lg:text-[48px] uppercase hero-color-cycle">
-              <BulgeText text="TRADE SMARTER." radius={150} strength={0.6} /><br />
-              <BulgeText text="PROVE YOUR SKILLS." radius={150} strength={0.6} />
+              <BulgeText text="GET FUNDED TO TRADE" radius={150} strength={0.6} /><br />
+              <BulgeText text="INDIAN MARKETS." radius={150} strength={0.6} />
             </h1>
 
             {/* Gradient sub-headline */}
@@ -947,16 +947,16 @@ const Hero = () => {
             {/* Description block */}
             <div className="mt-6 lg:mt-3 max-w-[700px] space-y-4 lg:space-y-2 text-white/85 text-lg md:text-xl lg:text-lg leading-relaxed">
               <p>
-                Build your trading discipline in a structured simulated environment designed around risk management, consistent execution, and measurable performance.
+                FundedWealth is a simulated prop trading platform offering structured funded account evaluations for traders in the Indian stock market. Trade NIFTY, BANKNIFTY, SENSEX and selected Indian equities and futures in a defined simulated environment built around risk management and consistent execution.
               </p>
               <p>
-                Trade Indian market instruments including NIFTY, BANKNIFTY, SENSEX and selected equities &amp; futures:<br />
+                Indian market instruments available for simulated trading:<br />
                 <span className="text-white font-bold tracking-wide">
                   <BulgeText text="NIFTY • BANKNIFTY • SENSEX • FINNIFTY" radius={120} strength={0.45} />
                 </span>
               </p>
               <p>
-                Equities :<br />
+                Equities:<br />
                 <span className="text-white font-bold tracking-wide">
                   <BulgeText text="NIFTY 500 • Stock Futures." radius={120} strength={0.45} />
                 </span>
@@ -5616,8 +5616,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-fw-pink selection:text-white">
       <SEOHead
-        title="NIFTY Funded Account Evaluations in India"
-        description="Explore simulated NIFTY, BANKNIFTY and SENSEX trading evaluations in India. FundedWealth offers structured risk rules, accounts up to ₹50 Lakhs and performance-based rewards."
+        title="Indian Prop Trading & NIFTY Funded Accounts | FundedWealth"
+        description="Explore simulated funded account evaluations for Indian traders. Trade NIFTY, BANKNIFTY and SENSEX in a structured prop trading environment with clear risk rules and accounts up to ₹50 Lakhs."
         canonical="/"
       />
       <FAQSchema />
