@@ -130,6 +130,70 @@
     <priority>0.4</priority>
   </url>
 
+  <!-- ── Blog articles (published) ──────────────────────────────────── -->
+  <url>
+    <loc>https://www.fundedwealth.com/blog/5-golden-rules-every-prop-trader-must-follow</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/understanding-drawdown-your-1-risk-metric</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/nifty-50-weekly-analysis-key-levels-to-watch</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/the-psychology-behind-revenge-trading</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/how-to-use-rsi-and-macd-together</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/from-rs1l-to-rs25l-a-scaling-success-story</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/position-sizing-the-1-5-percent-rule-explained</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/bank-nifty-expiry-day-strategies</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.fundedwealth.com/blog/why-90-percent-of-traders-fail</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!--
     NOTE: The following routes are intentionally excluded from the sitemap
     because they are noindex or require authentication:
@@ -137,9 +201,8 @@
       /purchase-success, /kyc, /auth/*, /sso-callback,
       /reset-password, /ref/:code
 
-    Blog article URLs (/blog/:slug) should be added dynamically during
-    build or via a separate sitemap-blog.xml once the API is available
-    at build time.
+    Blog articles above are from the database seed and represent all
+    currently published articles as of 2026-08-09.
   -->
 
 </urlset>
