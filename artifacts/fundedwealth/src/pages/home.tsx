@@ -638,7 +638,7 @@ const DiscountBar = () => {
   ));
 
   return (
-    <div className="bg-[#060012] border-b border-white/5 py-2 overflow-hidden whitespace-nowrap relative z-50">
+    <div className="flex-1 min-w-0 bg-[#060012] border-b border-white/5 py-2 overflow-hidden whitespace-nowrap relative z-50">
       <div className="animate-marquee-slow inline-block">
         {content}
         {content}
@@ -667,29 +667,32 @@ const Navbar = () => {
     <>
       <div className="sticky top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0F0020] via-[#1A0030] to-[#0F0020] border-b border-white/5">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 overflow-x-auto scrollbar-hide py-1.5">
-            <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
-              <span></span>FundedWealth <span className="opacity-90">IND</span>
-            </button>
-            {/* FundedWealth Forex — 3D glassy tab */}
-            <a
-              href="https://forex.fundedwealth.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-all duration-200 hover:scale-105 select-none"
-              style={{
-                background: "linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(0,255,180,0.10) 50%, rgba(0,120,255,0.18) 100%)",
-                border: "1px solid rgba(0,220,255,0.35)",
-                boxShadow: "0 2px 16px 0 rgba(0,212,255,0.18), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.10)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                color: "rgba(180,255,255,0.95)",
-                textShadow: "0 0 8px rgba(0,212,255,0.6)",
-              }}
-            >
-              <span style={{ filter: "drop-shadow(0 0 4px rgba(0,212,255,0.8))" }}></span>
-              FundedWealth <span style={{ opacity: 0.9 }}>Forex</span>
-            </a>
+          <div className="flex items-center gap-1 sm:gap-2 py-1.5">
+            <div className="flex shrink-0 items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide">
+              <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
+                <span></span>FundedWealth <span className="opacity-90">IND</span>
+              </button>
+              {/* FundedWealth Forex — 3D glassy tab */}
+              <a
+                href="https://forex.fundedwealth.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold flex items-center gap-1.5 transition-all duration-200 hover:scale-105 select-none"
+                style={{
+                  background: "linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(0,255,180,0.10) 50%, rgba(0,120,255,0.18) 100%)",
+                  border: "1px solid rgba(0,220,255,0.35)",
+                  boxShadow: "0 2px 16px 0 rgba(0,212,255,0.18), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.10)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  color: "rgba(180,255,255,0.95)",
+                  textShadow: "0 0 8px rgba(0,212,255,0.6)",
+                }}
+              >
+                <span style={{ filter: "drop-shadow(0 0 4px rgba(0,212,255,0.8))" }}></span>
+                FundedWealth <span style={{ opacity: 0.9 }}>Forex</span>
+              </a>
+            </div>
+            <DiscountBar />
           </div>
         </div>
       </div>
@@ -5645,7 +5648,6 @@ export default function Home() {
       <FAQSchema />
       <ServiceSchema />
       <AnnouncementBar />
-      <DiscountBar />
       <Navbar />
 
       <main>
