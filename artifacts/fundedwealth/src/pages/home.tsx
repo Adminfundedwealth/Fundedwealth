@@ -696,7 +696,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      <header className={`sticky top-[34px] sm:top-[36px] left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-3' : 'bg-[#1A0030]/85 backdrop-blur-md border-b border-white/10 py-4'}`}>
+      <header className={`sticky top-[34px] sm:top-[36px] left-0 right-0 z-40 border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/85 py-3' : 'bg-[#1A0030]/75 py-4'}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 rounded-lg" />
@@ -744,7 +744,7 @@ const Navbar = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="xl:hidden bg-[#1A0030] border-b border-white/10"
+              className="xl:hidden bg-[#1A0030]/85 backdrop-blur-xl border-b border-white/10"
             >
               <div className="flex flex-col px-6 py-4 gap-4">
                 <a href="#home" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Home</a>
