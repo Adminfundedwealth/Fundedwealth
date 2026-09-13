@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { FAQSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -491,11 +492,12 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Frequently Asked Questions — FundedWealth | Prop Trading FAQ India"
+        title="Prop Trading FAQ India — Evaluations, Payouts & Rules"
         description="Everything you wanted to know about FundedWealth — payouts, evaluation rules, profit split, scaling, KYC, taxes and more. Detailed FAQ for India's prop trading community."
         keywords="FundedWealth FAQ, prop trading questions India, prop firm FAQ, funded trader FAQ, evaluation rules, profit split, drawdown rules, payout process India"
         canonical="/faq"
       />
+      <FAQSchema />
 
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
         <div className="container mx-auto px-4 flex items-center justify-between">
@@ -505,7 +507,7 @@ export default function FAQ() {
             <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
           </Link>
           <h1 className="text-lg font-heading font-bold flex items-center gap-2">
-            <HelpCircle className="text-fw-pink" size={20} /> FAQ
+            <HelpCircle className="text-fw-pink" size={20} /> Prop Trading FAQ India
           </h1>
           <Link href="/">
             <Button variant="ghost" className="text-white/70 hover:text-white">Home</Button>
