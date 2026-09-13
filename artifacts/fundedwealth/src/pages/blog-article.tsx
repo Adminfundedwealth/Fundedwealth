@@ -158,7 +158,12 @@ export default function BlogArticle() {
 
   // ── Resolved SEO values ──
   const seoTitle = post.metaTitle || post.title;
-  const seoDesc = post.metaDescription || post.excerpt;
+  // Strip time-relative excerpts from SEO description — they go stale and mislead searchers.
+  const TIME_RELATIVE = /\b(this week|this month|today|tonight|right now|currently|at the moment|as of now)\b/i;
+  const rawDesc = post.metaDescription || post.excerpt;
+  const seoDesc = TIME_RELATIVE.test(rawDesc)
+    ? `${post.title} — a practical guide for Indian prop traders on NSE and BSE.`
+    : rawDesc;
   const seoKeywords = post.keywords || undefined;
   const seoImage = post.ogImage || post.coverImage || `${BASE_URL}/opengraph.jpg`;
   const canonicalPath = `/blog/${post.slug}`;
