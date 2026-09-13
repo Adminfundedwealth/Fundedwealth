@@ -110,7 +110,7 @@ export const CheckoutSummary = ({
       <div className="text-[11px] leading-relaxed text-white/60">
         <span className="text-yellow-400 font-semibold block mb-1">Compliance Disclosure</span>
         All Instant Funding accounts are{" "}
-        <span className="font-semibold text-white/80">simulated funded accounts</span>. No real capital is at risk. Profits are paid from the firm's revenue pool based on your simulated trading performance.{" "}
+        <span className="font-semibold text-white/80">simulated funded accounts</span>. No real capital is at risk. Any performance-based reward is subject to the applicable program terms and is not a withdrawal of live trading capital.{" "}
         KYC verification and e-Sign are mandatory before account activation. By purchasing, you agree to the firm's{" "}
         <a href="/terms" className="text-yellow-400 underline underline-offset-2 hover:text-yellow-300">Terms of Service</a>{" "}
         and{" "}

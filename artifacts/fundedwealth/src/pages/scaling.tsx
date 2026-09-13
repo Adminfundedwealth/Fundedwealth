@@ -15,7 +15,7 @@ const LEVELS = [
 
 const REQUIREMENTS = [
   "Complete minimum 30 trading days at current level",
-  "Achieve at least 10% profit on your funded account",
+  "Achieve at least 10% simulated performance on your simulated account",
   "Maintain consistency — no single day exceeding 40% of total profit",
   "No active rule violations (drawdown, risk limits, etc.)",
   "Request scaling upgrade through your dashboard",
@@ -27,7 +27,7 @@ export default function Scaling() {
       <SEOHead
         title="Scaling Plan — Grow your simulated evaluation account from ₹1L to ₹50L | FundedWealth India"
         description="Scale your simulated evaluation account size from ₹1 Lakh to ₹50 Lakhs across 6 levels as you demonstrate consistency. FundedWealth's scaling program rewards consistent performance with larger simulated accounts and higher reward splits."
-        keywords="prop trading scaling plan India, funded account scaling, grow trading capital India, ₹50 lakh funded account, scaling program prop firm, best prop firm India scaling, increase funded account size, prop firm capital growth India"
+        keywords="prop trading scaling plan India, simulated account scaling, simulated trading evaluation India, ₹50 lakh simulated account, scaling program prop firm, best prop firm India scaling"
         canonical="/scaling"
       />
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">

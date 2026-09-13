@@ -1205,9 +1205,9 @@ const IndianInstruments = () => {
 
 const FWIndEdge = () => {
   const edges = [
-    { icon: <Building2 className="w-6 h-6" />, title: "SEBI-Aligned Data Infrastructure", desc: "Our real-time price feeds are sourced from SEBI-licensed Indian brokerages — simulated account prices mirror live market conditions accurately.", color: "from-blue-500 to-cyan-500" },
+    { icon: <Building2 className="w-6 h-6" />, title: "Market Data Infrastructure", desc: "Our market-data infrastructure supports simulated account prices that reflect available Indian market conditions. FundedWealth is not a SEBI-registered broker or investment adviser.", color: "from-blue-500 to-cyan-500" },
     { icon: <BarChart3 className="w-6 h-6" />, title: "Real-Time NSE/BSE Price Data", desc: "Simulated accounts use live NSE & BSE tick data — exactly the same prices a retail trader sees on their broker terminal.", color: "from-emerald-500 to-teal-500" },
-    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Pay in ₹, receive performance-based rewards in ₹. Processed via UPI / IMPS / NEFT direct to your bank — no FX, no intermediary, no delay.", color: "from-orange-500 to-amber-500" },
+    { icon: <Banknote className="w-6 h-6" />, title: "INR Pricing · INR Rewards", desc: "Pay in ₹, and eligible performance-based rewards may be paid in ₹ via available UPI / IMPS / NEFT methods under the applicable terms and provider timelines.", color: "from-orange-500 to-amber-500" },
     { icon: <Zap className="w-6 h-6" />, title: "Real-Time Market Data", desc: "Simulated accounts use live NSE & BSE tick data — the same prices a retail trader sees on their broker terminal.", color: "from-purple-500 to-pink-500" },
     { icon: <ShieldCheck className="w-6 h-6" />, title: "AI Risk Coach™", desc: "Built-in discipline scoring monitors your every simulated trade — overleveraging, revenge trading, and drawdown breaches flagged in real time.", color: "from-rose-500 to-red-500" },
     { icon: <Lock className="w-6 h-6" />, title: "Full Transparency", desc: "Structured simulated evaluation environment using real market data. Every rule, fee, and reward condition published upfront. No surprises.", color: "from-indigo-500 to-violet-500" },
@@ -1287,7 +1287,7 @@ const AIRiskCoach = () => {
             </ul>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/60 text-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Active on every funded account
+              Active on every simulated account
             </div>
           </div>
 
@@ -1476,7 +1476,7 @@ const PayoutsMadeSimple = () => {
             </p>
             <Link href="/checkout">
               <Button className="bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white rounded-xl h-12 px-7 font-bold shadow-lg hover:shadow-purple-500/30">
-                Start Earning Today <ArrowRight size={16} className="ml-2" />
+                View Plans <ArrowRight size={16} className="ml-2" />
               </Button>
             </Link>
           </div>
@@ -3443,8 +3443,8 @@ const SmartScalingPlan = () => {
 const SEBIBrokers = () => {
   const cards = [
     {
-      title: "SEBI-Aligned Data",
-      desc: "Our real-time price feeds come from SEBI-registered broker infrastructure, ensuring simulated account prices accurately mirror the live Indian market.",
+      title: "Market Data",
+      desc: "Our market-data infrastructure supports simulated account prices that reflect available Indian market conditions. FundedWealth is not a SEBI-registered broker or investment adviser.",
       icon: <ShieldCheck className="w-6 h-6" />,
       iconBg: "bg-emerald-500/15",
       iconColor: "text-emerald-400",
@@ -3459,8 +3459,8 @@ const SEBIBrokers = () => {
       dot: "bg-blue-400",
     },
     {
-      title: "Real-time Data",
-      desc: "Direct exchange feeds from NSE and BSE keep your charts, P&L, and order fills in sync with the live market — no lag, no delay.",
+      title: "Market Data",
+      desc: "Market-data feeds from NSE and BSE support simulated charts, P&L, and order fills. Data availability and timing may vary.",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
           <path d="M5 12.55a11 11 0 0114 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
@@ -3486,10 +3486,10 @@ const SEBIBrokers = () => {
       <div className="container mx-auto px-4 md:px-6 relative">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-3 leading-tight">
-            Powered by <span className="text-gradient">SEBI-Registered</span> Broker Data
+            Simulated Trading Using <span className="text-gradient">Market Data</span>
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            We use infrastructure from SEBI-registered brokers to source real-time market data feeds, so simulated account prices accurately reflect live NSE/BSE market conditions at all times.
+            We use market-data infrastructure so simulated account prices can reflect available NSE/BSE market conditions. FundedWealth does not provide brokerage, investment-advisory, or live trading services.
           </p>
         </div>
 
@@ -3769,7 +3769,7 @@ const Calculator = () => {
                   </div>
 
                   <Button className="w-full h-14 mt-4 bg-white text-black hover:bg-gray-200 text-lg font-bold">
-                    Start Earning Now
+                    View Plans
                   </Button>
 
                   <p className="text-xs text-white/40 text-center mt-4">

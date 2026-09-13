@@ -259,18 +259,18 @@ export default function Refund() {
           <section>
             <h2 className="text-xl font-bold text-white mb-3">13. Challenge Fee Reimbursement After Successful Completion</h2>
             <p>
-              FundedWealth offers a <strong className="text-fw-orange">100% Challenge Fee Reimbursement</strong> upon successfully passing the evaluation and receiving a funded account. This is a commercial benefit distinct from a pre-trading cancellation refund.
+              FundedWealth offers a <strong className="text-fw-orange">100% Challenge Fee Reimbursement</strong> upon successfully passing the evaluation and receiving eligible simulated-account access. This is a commercial benefit distinct from a pre-trading cancellation refund.
             </p>
             <p className="mt-3 font-semibold text-white/80">Eligibility conditions:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-white/60">
               <li>You have successfully passed all phases of the evaluation challenge.</li>
-              <li>You have been allocated a funded account.</li>
+              <li>You have been granted eligible access to a simulated account.</li>
               <li>You have completed KYC verification as required for payouts.</li>
               <li>You have generated eligible profit and requested your first profit-share payout.</li>
             </ul>
             <p className="mt-3 font-semibold text-white/80">How it works:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-white/60">
-              <li>The original challenge fee (as actually paid, after any applicable discount) is included with your first profit-share payout from the funded account.</li>
+              <li>The original challenge fee (as actually paid, after any applicable discount) is included with your first eligible performance-based reward, subject to the applicable program terms.</li>
               <li>This reimbursement becomes payable only at the point of the first eligible payout — not at the moment of passing the evaluation.</li>
               <li>Standard KYC, payout, and compliance requirements must be satisfied before any payout (including the fee reimbursement) is processed.</li>
             </ul>

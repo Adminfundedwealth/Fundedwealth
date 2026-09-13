@@ -339,7 +339,7 @@ function InstantRulesDetail({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <p className="text-white/65 text-base leading-relaxed max-w-3xl">
-          FundedWealth Instant gives you a <strong className="text-white">live funded account</strong> from day one — no challenge, no evaluation. Trade within the risk limits, hit the payout threshold, and withdraw on demand. Accounts scale automatically every 90 days based on performance.
+          FundedWealth Instant gives you access to a <strong className="text-white">simulated account</strong> from day one — no separate evaluation phase. Trade within the risk limits and request any eligible performance-based reward under the applicable program terms. Scaling is subject to the program rules and review.
         </p>
         <div className="mt-5 p-4 rounded-xl bg-amber-500/5 border border-amber-500/25">
           <p className="text-white/75 text-sm leading-relaxed">
@@ -653,7 +653,7 @@ function InstantRulesDetail({ onBack }: { onBack: () => void }) {
       <Card className="border-0 overflow-hidden bg-gradient-to-br from-cyan-600 via-teal-600 to-cyan-700 shadow-2xl shadow-cyan-500/20">
         <CardContent className="p-8 text-center">
           <h3 className="text-2xl font-heading font-extrabold text-white mb-2">Ready to trade Instant?</h3>
-          <p className="text-white/80 mb-5 text-sm">Live funded account. No evaluation. Withdraw on demand.</p>
+          <p className="text-white/80 mb-5 text-sm">Simulated account. No separate evaluation phase. Eligible rewards are subject to program terms.</p>
           <Link href="/sign-up">
             <Button size="lg" className="bg-white text-cyan-700 hover:bg-white/90 rounded-full px-8 h-11 font-extrabold shadow-lg">
               <TrendingUp size={15} className="mr-2" /> Get Instant account
@@ -1850,7 +1850,7 @@ function FlashRulesDetail({ onBack }: { onBack: () => void }) {
       <Card className="border-0 overflow-hidden bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 shadow-2xl shadow-amber-500/20">
         <CardContent className="p-8 text-center">
           <h3 className="text-2xl font-heading font-extrabold text-white mb-2">Ready to trade Flash?</h3>
-          <p className="text-white/80 mb-5 text-sm">24-hour funded account. No profit target. Start now.</p>
+          <p className="text-white/80 mb-5 text-sm">24-hour simulated account access. No profit target. Subject to program terms.</p>
           <Link href="/sign-up">
             <Button size="lg" className="bg-white text-amber-700 hover:bg-white/90 rounded-full px-8 h-11 font-extrabold shadow-lg">
               <Zap size={15} className="mr-2" /> Get Flash account
@@ -1881,7 +1881,7 @@ export default function Rules() {
         try {
           await navigator.share({
             title: "FundedWealth Flash Rules",
-            text: "Check out the Flash trading account rules on FundedWealth — 24-hour funded account, 80% profit split, no profit target.",
+            text: "Check out the Flash simulated-account rules on FundedWealth — 24-hour access, plan-specific reward share, no profit target.",
             url: flashUrl,
           });
         } catch (_) { /* user dismissed */ }

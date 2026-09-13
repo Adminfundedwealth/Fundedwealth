@@ -8,7 +8,7 @@ const MissionPage = () => {
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
         title="Our Mission — Democratizing Trading for Every Indian"
-        description="FundedWealth's mission is to democratize trading by providing funded accounts to talented Indian traders. We believe every skilled trader deserves capital to trade, regardless of their financial background."
+        description="FundedWealth's mission is to make structured simulated trading evaluations accessible to talented Indian traders. We provide a place to practise and demonstrate skill without providing customer-owned live capital."
         keywords="FundedWealth mission, prop trading India mission, democratize trading India, funded trading vision, Indian traders empowerment, prop firm mission India"
         canonical="/mission"
       />
@@ -141,7 +141,7 @@ const MissionPage = () => {
             </div>
             <div className="bg-white/3 border border-white/10 rounded-2xl p-8">
               <p className="text-white/75 text-lg leading-relaxed">
-                To become India's most trusted trader-first prop firm — one where success is shared, barriers are removed, and every funded trader becomes a story of skill meeting opportunity. We measure our growth in funded accounts and trader milestones, not just revenue.
+                To become India's most trusted trader-first evaluation platform — one where success is shared, barriers are removed, and every participant can turn disciplined simulated practice into a story of skill meeting opportunity. We measure our growth in simulated accounts and participant milestones, not just revenue.
               </p>
             </div>
           </div>

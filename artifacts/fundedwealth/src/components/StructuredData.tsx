@@ -51,8 +51,8 @@ const organizationSchema = {
     itemListElement: [
       {
         "@type": "Offer",
-        name: "Flash Instant Funded Account",
-        description: "Get instantly funded with no evaluation. Trade immediately with up to ₹10L capital.",
+        name: "Flash Instant Simulated Account",
+        description: "Access a simulated account without a separate evaluation phase, subject to the applicable program terms.",
         priceCurrency: "INR",
         price: "999",
         availability: "https://schema.org/InStock",
@@ -61,7 +61,7 @@ const organizationSchema = {
       {
         "@type": "Offer",
         name: "1-Step Evaluation",
-        description: "Pass a single evaluation phase with 10% profit target. Funded accounts from ₹1L to ₹25L.",
+        description: "Pass a single evaluation phase with a 10% performance target. Simulated accounts from ₹1L to ₹25L; no live trading capital is provided.",
         priceCurrency: "INR",
         price: "2999",
         availability: "https://schema.org/InStock",
@@ -70,7 +70,7 @@ const organizationSchema = {
       {
         "@type": "Offer",
         name: "2-Step Evaluation",
-        description: "Two-phase evaluation with lowest fees. Funded accounts from ₹5L to ₹25L. Scale up to ₹50L.",
+        description: "Two-phase evaluation with low fees. Simulated accounts from ₹5L to ₹25L, with program-based scaling up to ₹50L.",
         priceCurrency: "INR",
         price: "1999",
         availability: "https://schema.org/InStock",
@@ -83,7 +83,7 @@ const organizationSchema = {
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "FundedWealth — India's Best Prop Trading Firm",
+  name: "FundedWealth — Simulated Trading Evaluations in India",
   alternateName: "FundedWealth",
   url: "https://www.fundedwealth.com",
   inLanguage: ["en-IN", "hi-IN"],
@@ -103,7 +103,7 @@ const faqSchema = {
       name: "What is FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth is a simulated trading evaluation platform that provides simulated evaluation accounts up to ₹50 Lakhs. Eligible participants keep 70-90% as performance-based rewards, typically processed within 12 hours for eligible approved requests. The platform focuses on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). All trading is simulated."
+        text: "FundedWealth is a simulated trading evaluation platform that provides simulated evaluation accounts up to ₹50 Lakhs. Eligible participants may qualify for plan-specific performance-based rewards under applicable terms, verification, and provider timelines. The platform focuses on Indian markets (NIFTY, BANKNIFTY, SENSEX, FINNIFTY, NIFTY 500). All trading is simulated and no customer-owned live capital is provided."
       }
     },
     {
@@ -111,7 +111,7 @@ const faqSchema = {
       name: "Is FundedWealth the best prop firm in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth is a fast-growing Indian prop trading evaluation platform with 15,000+ evaluation participants, ₹45 Lakhs+ in performance-based rewards paid to date, rewards typically processed within 12 hours for eligible approved requests, up to 90% reward split, and evaluation fees starting at just ₹999. We are 100% dedicated to Indian traders."
+        text: "FundedWealth is an Indian simulated trading evaluation platform with evaluation plans starting at ₹999. Eligible participants may qualify for plan-specific performance-based rewards under applicable program terms; experiences and outcomes vary."
       }
     },
     {
@@ -127,7 +127,7 @@ const faqSchema = {
       name: "What is the cheapest prop firm in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "FundedWealth offers among the most affordable evaluation plans in India. Flash instant simulated funded accounts start at just ₹999. We also offer regular coupon codes for additional discounts."
+        text: "FundedWealth offers evaluation plans in India. Flash instant simulated accounts start at ₹999, subject to the selected plan terms. Coupon availability may vary."
       }
     },
     {
@@ -140,18 +140,18 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "How fast are payouts at FundedWealth?",
+      name: "How are eligible rewards processed at FundedWealth?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Eligible performance-based rewards are typically processed within 12 hours under the applicable program terms. We support bank transfer, UPI, and crypto payouts."
+        text: "Eligible performance-based reward requests are reviewed and processed under the applicable program terms, verification requirements, and payment-provider timelines. Available payment methods may include bank transfer or UPI."
       }
     },
     {
       "@type": "Question",
-      name: "What is the maximum funded account size?",
+      name: "What is the maximum simulated account size?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Through our scaling program, participants can scale their simulated evaluation account from ₹1 Lakh up to ₹50 Lakhs across 6 levels. Start with a ₹1L Flash account and grow to ₹50L."
+        text: "Through the scaling program, eligible participants may progress from a ₹1 Lakh simulated evaluation account up to ₹50 Lakhs across six levels, subject to the applicable program rules."
       }
     },
     {
@@ -199,7 +199,7 @@ const faqSchema = {
       name: "How to become a funded trader in India?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "To reach a simulated funded account with FundedWealth: 1) Visit fundedwealth.com, 2) Choose a plan (Flash for instant simulated funding or 1-Step/2-Step for evaluation), 3) Pay the evaluation fee (starting ₹999), 4) Meet profit targets within drawdown limits, 5) Reach a simulated funded account and become eligible to keep 70-90% as performance-based rewards. All trading is simulated."
+        text: "To access a simulated account with FundedWealth: 1) Visit fundedwealth.com, 2) Choose a plan, 3) Pay the evaluation fee, 4) Meet the applicable performance and drawdown criteria, and 5) follow the selected program terms for any eligible performance-based reward. All trading is simulated."
       }
     }
   ]

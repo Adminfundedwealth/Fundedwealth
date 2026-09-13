@@ -3066,7 +3066,9 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/10 border border-amber-500/25 rounded-2xl p-8 text-center">
             <div className="text-6xl mb-4"><Trophy className="mx-auto text-amber-400" size={56} /></div>
             <h3 className="text-white font-extrabold text-2xl mb-2">FW Championship Giveaway</h3>
-            <p className="text-white/65 mb-6 max-w-md mx-auto">Win top prizes including iPhone 16, MacBook, and cash rewards. Trade on any funded account during the championship period.</p>
+            <p className="text-white/65 mb-6 max-w-md mx-auto">
+              Win top prizes including iPhone 16, MacBook, and cash rewards. Participate with any eligible simulated account during the championship period.
+            </p>
             <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto mb-6">
               {[["1st Place", "?10L + MacBook"], ["2nd Place", "?5L + ?20K"], ["3rd Place", "?2L + ?9K"]].map(([place, prize]) => (
                 <div key={place} className="bg-white/5 border border-white/10 rounded-xl p-3">

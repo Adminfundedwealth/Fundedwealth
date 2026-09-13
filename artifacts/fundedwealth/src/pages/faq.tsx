@@ -136,24 +136,24 @@ const FAQS: Faq[] = [
   {
     cat: "Assessment",
     q: "Is the evaluation account real or simulated?",
-    a: "Simulated. All evaluations run inside our structured environment using live NSE/BSE price feeds. Funded accounts are also simulated — your profit share is paid out in real INR from the firm's treasury.",
+    a: "Simulated. All evaluations and account balances run inside our structured environment using market data. Any eligible performance-based reward is paid in INR under the applicable program terms; it is not a withdrawal of a live trading account balance.",
   },
   {
     cat: "Assessment",
     q: "How is my evaluation performance verified?",
-    a: "Every trade, P&L tick and rule check is logged in real time on our risk engine. Once you hit the profit target, our system runs an automated compliance review and your funded account is approved within 24 hours.",
+    a: "Every trade, P&L tick and rule check is logged in real time on our risk engine. Once you meet the applicable evaluation criteria, the results are subject to compliance review and any next-stage simulated access is issued only after approval under the program terms.",
   },
 
   // ---------------- Funded Account ----------------
   {
     cat: "Funded Account",
     q: "How do I get my funded account activated?",
-    a: "After clearing the final phase, our compliance review runs within 24 hours. Once approved, your funded account credentials are issued by email and inside the dashboard automatically.",
+    a: "After clearing the final phase, your results are subject to compliance review. Once approved, simulated-account access credentials may be issued by email and inside the dashboard under the applicable program terms.",
   },
   {
     cat: "Funded Account",
     q: "What is the starting balance of my funded account?",
-    a: "Whatever account size you purchased the evaluation for — for example, a ₹10 lakh evaluation grants a ₹10 lakh funded account. The balance resets to its original size each new payout cycle.",
+    a: "The displayed simulated balance corresponds to the account size selected for the program — for example, a ₹10 lakh evaluation may provide a ₹10 lakh simulated balance. It is not customer-owned or live trading capital, and any reset follows the applicable program terms.",
   },
   {
     cat: "Funded Account",
@@ -200,7 +200,7 @@ const FAQS: Faq[] = [
   {
     cat: "Payouts",
     q: "When can I request my first payout?",
-    a: "After 7 calendar days from your funded account activation, provided you have at least one profitable trade and have completed the required minimum trading days inside that cycle.",
+    a: "The first reward request is available only after the selected program's waiting period, trading-day, performance, verification, and other eligibility conditions are met. The activity and balance are simulated.",
   },
   {
     cat: "Payouts",
