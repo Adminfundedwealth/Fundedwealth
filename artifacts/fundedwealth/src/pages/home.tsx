@@ -2785,7 +2785,7 @@ const Plans = () => {
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
           <div className="flex justify-center mb-10">
             <TabsList
-              className="relative grid w-full max-w-4xl grid-cols-2 sm:grid-cols-4 gap-3 rounded-2xl p-3"
+              className="relative grid h-auto w-full max-w-4xl grid-cols-2 items-stretch gap-3 rounded-2xl p-3 sm:grid-cols-4"
               style={{
                 background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                 backdropFilter: "blur(24px) saturate(1.6)",
