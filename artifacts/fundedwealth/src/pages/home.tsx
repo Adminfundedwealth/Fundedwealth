@@ -2785,12 +2785,12 @@ const Plans = () => {
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
           <div className="flex justify-center mb-10">
             <TabsList
-              className="grid h-auto w-full max-w-5xl grid-cols-2 items-stretch gap-3 sm:grid-cols-4"
+              className="grid h-auto w-full max-w-5xl grid-cols-2 items-stretch gap-3 rounded-none bg-transparent p-0 sm:grid-cols-4"
             >
               {/* Flash ⚡ — yellow/orange active */}
               <TabsTrigger
                 value="flash"
-                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2809,7 +2809,7 @@ const Plans = () => {
               {/* Instant — pink/violet active */}
               <TabsTrigger
                 value="instant"
-                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2828,7 +2828,7 @@ const Plans = () => {
               {/* 1-Step — cyan/violet active */}
               <TabsTrigger
                 value="1step"
-                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -2847,7 +2847,7 @@ const Plans = () => {
               {/* 2-Step — violet/pink active */}
               <TabsTrigger
                 value="2step"
-                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex min-h-20 sm:min-h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
