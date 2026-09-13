@@ -19,7 +19,6 @@ const Dashboard = lazy(() => import("@/pages/dashboard"));
 const EconomicCalendar = lazy(() => import("@/pages/economic-calendar"));
 const Leaderboard = lazy(() => import("@/pages/leaderboard"));
 const Scaling = lazy(() => import("@/pages/scaling"));
-const Payouts = lazy(() => import("@/pages/payouts"));
 const Blog = lazy(() => import("@/pages/blog"));
 const BlogArticle = lazy(() => import("@/pages/blog-article"));
 const Rules = lazy(() => import("@/pages/rules"));
@@ -97,7 +96,6 @@ function AppRouter() {
             <Route path="/about" component={About} />
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/scaling" component={Scaling} />
-            <Route path="/payouts" component={Payouts} />
             <Route path="/blog" component={Blog} />
             <Route path="/blog/:slug" component={BlogArticle} />
             <Route path="/rules" component={Rules} />
