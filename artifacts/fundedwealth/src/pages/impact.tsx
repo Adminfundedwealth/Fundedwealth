@@ -53,11 +53,9 @@ export default function ImpactPage() {
   // Real donations from the DB are added on top.
   const BASE_MEALS = 12500;
   const BASE_STUDENTS = 850;
-  const BASE_DONATIONS = 350000; // ₹3.5L base
-
   const totalMeals = BASE_MEALS + (liveStats ? Number(liveStats.totalMeals) : 0);
   const totalStudents = BASE_STUDENTS + (liveStats ? Number(liveStats.totalStudents) : 0);
-  const totalDonations = (liveStats ? 360000 : 350000) + (liveStats ? Number(liveStats.totalDonations) : 0);
+  const totalDonations = 570000;
 
   // Use live leaderboard if available, else fall back to static
   const leaderboard = liveLeaderboard.length > 0
@@ -75,9 +73,9 @@ export default function ImpactPage() {
   return (
     <div className="min-h-screen bg-[#0D0020] font-sans">
       <SEOHead
-        title="FW Impact Initiative — Trade for Change, Profit with Purpose | CSR"
-        description="FundedWealth's Impact Initiative: Trade for Change — Profit with Purpose. A portion of every trade goes toward feeding the hungry and educating underprivileged children across India. India's most socially responsible prop firm."
-        keywords="FW Impact Initiative, trade for change, profit with purpose, social impact trading, FundedWealth charity, prop firm CSR India, responsible prop firm India, trading for good"
+        title="FW Impact Initiative — Trade with Purpose | CSR"
+        description="FundedWealth's Impact Initiative supports selected social initiatives across India through FundedWealth and voluntary participant contributions."
+        keywords="FW Impact Initiative, trade with purpose, social impact trading, FundedWealth charity, prop firm CSR India, responsible prop firm India"
         canonical="/impact"
       />
       <nav className="sticky top-0 z-50 bg-[#0D0020]/90 backdrop-blur-lg border-b border-white/10">
@@ -295,7 +293,7 @@ export default function ImpactPage() {
           </h2>
           <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
-              { step: "1", icon: <TrendingUp size={24} className="text-white" />, title: "You Trade & Profit", desc: "Focus on your trading strategy. We handle everything else.", tag: null },
+              { step: "1", icon: <TrendingUp size={24} className="text-white" />, title: "You Trade & Learn", desc: "Focus on your trading strategy while we handle the impact program.", tag: null },
               { step: "2", icon: <Building2 size={24} className="text-white" />, title: "We Contribute Automatically", desc: "FundedWealth contributes through its impact program — no action needed from you.", tag: "AUTO" },
               { step: "3", icon: <Heart size={24} className="text-white" />, title: "You Can Give Back (Optional)", desc: "When requesting an eligible reward payout, you may optionally contribute to a cause you care about.", tag: "OPTIONAL" },
               { step: "4", icon: <BarChart3 size={24} className="text-white" />, title: "Track & Share Your Impact", desc: "See your meals, students supported & badge level in your dashboard.", tag: null },
@@ -461,7 +459,7 @@ export default function ImpactPage() {
             <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 object-contain" />
             <div className="text-white font-bold">Funded<span className="text-[#FF8A3D]">Wealth</span></div>
           </div>
-          <p className="text-white/40 text-sm">FW Impact Initiative — Trade for Change, Profit with Purpose.</p>
+          <p className="text-white/40 text-sm">FW Impact Initiative — Trade with Purpose, Create Real Impact.</p>
           <p className="text-white/20 text-xs mt-2">© 2026 FundedWealth. All rights reserved.</p>
         </div>
       </footer>
