@@ -2785,24 +2785,13 @@ const Plans = () => {
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
           <div className="flex justify-center mb-10">
             <TabsList
-              className="relative grid h-auto w-full max-w-4xl grid-cols-2 items-stretch gap-3 rounded-2xl p-3 sm:grid-cols-4"
-              style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                backdropFilter: "blur(24px) saturate(1.6)",
-                WebkitBackdropFilter: "blur(24px) saturate(1.6)",
-                border: "1px solid rgba(255,255,255,0.10)",
-                boxShadow: "0 4px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.08) inset, 0 -1px 0 rgba(0,0,0,0.3) inset",
-              }}
+              className="grid h-auto w-full max-w-5xl grid-cols-2 items-stretch gap-3 sm:grid-cols-4"
             >
-              {/* Top gloss on container */}
-              <span className="absolute inset-x-0 top-0 h-[40%] rounded-t-2xl pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)" }} aria-hidden="true" />
-
               {/* Flash ⚡ — yellow/orange active */}
               <TabsTrigger
                 value="flash"
-                className="relative flex h-28 sm:h-36 w-full items-center justify-center rounded-xl px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
@@ -2820,9 +2809,8 @@ const Plans = () => {
               {/* Instant — pink/violet active */}
               <TabsTrigger
                 value="instant"
-                className="relative flex h-28 sm:h-36 w-full items-center justify-center rounded-xl px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
@@ -2840,9 +2828,8 @@ const Plans = () => {
               {/* 1-Step — cyan/violet active */}
               <TabsTrigger
                 value="1step"
-                className="relative flex h-28 sm:h-36 w-full items-center justify-center rounded-xl px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
@@ -2860,9 +2847,8 @@ const Plans = () => {
               {/* 2-Step — violet/pink active */}
               <TabsTrigger
                 value="2step"
-                className="relative flex h-28 sm:h-36 w-full items-center justify-center rounded-xl px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
+                className="relative flex h-20 sm:h-24 w-full items-center justify-center rounded-lg border border-white/10 bg-purple-950/40 px-3 py-4 text-sm sm:text-base md:text-lg font-semibold text-white/50 transition-all duration-300 overflow-hidden
                   data-[state=active]:text-white data-[state=active]:font-bold"
-                style={{ background: "transparent" }}
               >
                 <span className="glass-tab-overlay absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none"
                   style={{
