@@ -844,7 +844,7 @@ const HeroChampionshipPopup = () => {
 const Hero = () => {
   const [, navigate] = useLocation();
   return (
-    <section id="home" className="relative bg-[#03000A] overflow-hidden min-h-[94vh] flex items-start justify-center pt-16 lg:pt-20">
+    <section id="home" className="relative bg-[#03000A] overflow-hidden min-h-[94vh] flex items-start justify-center pt-16 lg:min-h-[calc(100vh-132px)] lg:pt-4">
       <IndiaTraderNetworkHero />
 
       {/* Extra shooting stars & sparkle particles */}
@@ -916,13 +916,13 @@ const Hero = () => {
           <div className="flex flex-col items-center text-center">
 
             {/* Top badge */}
-            <div className="mb-3 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
+            <div className="mb-3 lg:mb-1 inline-flex items-center gap-3 text-white/90 text-sm md:text-base font-bold tracking-wide">
               <span className="text-lg">🇮🇳</span>
               <span><BulgeText text="INDIA'S SIMULATED TRADING " /><BulgeText text="& EVALUATION PLATFORM" className="text-fw-orange" /></span>
             </div>
 
             {/* Subtitle line */}
-            <div className="mb-5 flex items-center gap-3">
+            <div className="mb-5 lg:mb-2 flex items-center gap-3">
               <div className="h-px w-8 bg-white/20" />
               <span className="text-white/50 text-xs md:text-sm italic tracking-widest font-medium">
                 <BulgeText text="Structured Simulated Trading for Indian Markets" radius={100} strength={0.4} />
@@ -932,18 +932,18 @@ const Hero = () => {
 
 
             {/* Main headline */}
-            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white text-3xl sm:text-4xl md:text-5xl lg:text-[56px] uppercase hero-color-cycle">
+            <h1 className="font-black tracking-[-0.04em] leading-[0.88] text-white text-3xl sm:text-4xl md:text-5xl lg:text-[48px] uppercase hero-color-cycle">
               <BulgeText text="TRADE SMARTER." radius={150} strength={0.6} /><br />
               <BulgeText text="PROVE YOUR SKILLS." radius={150} strength={0.6} />
             </h1>
 
             {/* Gradient sub-headline */}
-            <h2 className="mt-2 font-black tracking-[-0.04em] leading-[0.9] text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase bg-gradient-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent">
+            <h2 className="mt-2 lg:mt-1 font-black tracking-[-0.04em] leading-[0.9] text-xl sm:text-2xl md:text-3xl lg:text-3xl uppercase bg-gradient-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent">
               <BulgeText text="TURN DISCIPLINE INTO MEASURABLE PERFORMANCE." radius={140} strength={0.55} />
             </h2>
 
             {/* Description block */}
-            <div className="mt-6 max-w-[700px] space-y-4 text-white/85 text-lg md:text-xl leading-relaxed">
+            <div className="mt-6 lg:mt-3 max-w-[700px] space-y-4 lg:space-y-2 text-white/85 text-lg md:text-xl lg:text-lg leading-relaxed">
               <p>
                 Build your trading discipline in a structured simulated environment designed around risk management, consistent execution, and measurable performance.
               </p>
@@ -959,7 +959,7 @@ const Hero = () => {
                   <BulgeText text="NIFTY 500 • Stock Futures." radius={120} strength={0.45} />
                 </span>
               </p>
-              <p className="pt-4 text-white font-bold text-base md:text-lg">
+              <p className="pt-4 lg:pt-2 text-white font-bold text-base md:text-lg lg:text-base">
                 Access simulated account sizes of up to <span className="text-fw-orange font-extrabold">₹50 Lakhs</span> and trade under clearly defined risk parameters.<br />
                 Demonstrate consistent performance and become eligible for <span className="text-blue-400 font-extrabold not-italic">performance-based rewards</span> under the applicable program terms.
               </p>
@@ -969,12 +969,12 @@ const Hero = () => {
             </div>
 
             {/* CTA Buttons — Liquid Glass */}
-            <div className="mt-10 flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
+            <div className="mt-10 lg:mt-4 flex items-center justify-center gap-6 sm:gap-10 lg:gap-4 flex-wrap">
 
               {/* 1. GET FUNDED NOW — Liquid Sunset Glass */}
               <button
                 onClick={() => navigate("/checkout")}
-                className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative rounded-full px-8 sm:px-10 lg:px-7 py-4 sm:py-5 lg:py-3 text-sm sm:text-base lg:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(255,106,61,0.18) 0%, rgba(255,0,128,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -1001,7 +1001,7 @@ const Hero = () => {
                 href="https://youtu.be/w3yyFx_hDcE"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative rounded-full px-8 sm:px-10 lg:px-7 py-4 sm:py-5 lg:py-3 text-sm sm:text-base lg:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(140,80,255,0.18) 0%, rgba(90,0,255,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
@@ -1025,7 +1025,7 @@ const Hero = () => {
               {/* 3. TRADING RULES — Liquid Neon Blue Glass */}
               <Link href="/rules">
                 <button
-                  className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-full px-8 sm:px-10 lg:px-7 py-4 sm:py-5 lg:py-3 text-sm sm:text-base lg:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(0,180,255,0.18) 0%, rgba(90,80,255,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -1051,7 +1051,7 @@ const Hero = () => {
               {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
               <button
                 onClick={() => navigate("/sign-up?trial=true")}
-                className="group relative rounded-full px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
+                className="group relative rounded-full px-8 sm:px-10 lg:px-7 py-4 sm:py-5 lg:py-3 text-sm sm:text-base lg:text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0.5 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(5,150,105,0.14) 100%)",
                   backdropFilter: "blur(24px) saturate(1.8)",
