@@ -634,6 +634,11 @@ export default function FAQ() {
                     <ArrowRight size={16} className="mr-2" /> Get Started
                   </Button>
                 </Link>
+                <Link href="/how-it-works">
+                  <Button size="lg" variant="outline" className="border-white/15 text-white bg-white/5 hover:bg-white/10 rounded-full px-4 md:px-6 lg:px-8 xl:px-10 h-12 font-bold">
+                    <ArrowRight size={16} className="mr-2" /> How the evaluation works
+                  </Button>
+                </Link>
                 <Link href="/#contact">
                   <Button size="lg" variant="outline" className="border-fw-pink/40 text-white bg-white/5 hover:bg-white/10 rounded-full px-4 md:px-6 lg:px-8 xl:px-10 h-12 font-bold">
                     <MessageCircle size={16} className="mr-2" /> Contact Support
