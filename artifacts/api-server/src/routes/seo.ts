@@ -16,6 +16,7 @@ const STATIC_PAGES = [
   { path: '/scaling',          changefreq: 'weekly',  priority: 0.9 },
   { path: '/faq',              changefreq: 'weekly',  priority: 0.8 },
   { path: '/rules',            changefreq: 'weekly',  priority: 0.8 },
+  { path: '/how-it-works',     changefreq: 'monthly', priority: 0.8 },
   { path: '/community',        changefreq: 'weekly',  priority: 0.8 },
   { path: '/success-stories',  changefreq: 'weekly',  priority: 0.8 },
   { path: '/economic-calendar',changefreq: 'daily',   priority: 0.7 },
