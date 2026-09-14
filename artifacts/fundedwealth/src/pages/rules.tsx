@@ -2374,6 +2374,15 @@ export default function Rules() {
           </div>
         </div>
 
+        {/* ── Economic calendar tip ── */}
+        <p className="text-white/45 text-sm mb-8 text-center">
+          Track upcoming RBI, FOMC and other high-impact events on the{" "}
+          <Link href="/economic-calendar" className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+            India economic calendar
+          </Link>{" "}
+          to plan around prohibited news windows.
+        </p>
+
         {/* ── Important note ── */}
         <Card className="glass-card border-yellow-500/20 mb-12">
           <CardContent className="p-6 flex items-start gap-3">
