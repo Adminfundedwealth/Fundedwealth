@@ -423,8 +423,11 @@ function InstantRulesDetail({ onBack }: { onBack: () => void }) {
       {/* Max Lot Table */}
       <div className="mb-10">
         <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2">
-          <Scale size={20} className="text-emerald-400" /> Max Lot Rule
+          <Scale size={20} className="text-emerald-400" /> Indian Market Instruments & Maximum Lot Sizes
         </h3>
+        <p className="text-white/65 text-sm leading-relaxed mb-4">
+          FundedWealth funded account evaluations support NIFTY 50, Bank NIFTY, Fin NIFTY futures and options, along with equity futures, stock options, currency futures, and commodity contracts. Maximum lot sizes vary by instrument and account size according to the applicable evaluation rules.
+        </p>
         <Card className="glass-card border-white/10 overflow-x-auto">
           <div className="min-w-[580px]">
             <div className="grid grid-cols-5 px-4 py-3 bg-white/[0.03] text-xs font-bold text-white/40 uppercase tracking-widest">
@@ -820,7 +823,10 @@ function OneStepRulesDetail({ onBack }: { onBack: () => void }) {
 
       {/* Max Lot Table */}
       <div className="mb-10">
-        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2"><Scale size={20} className="text-emerald-400" /> Max Lot Rule</h3>
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2"><Scale size={20} className="text-emerald-400" /> Indian Market Instruments & Maximum Lot Sizes</h3>
+        <p className="text-white/65 text-sm leading-relaxed mb-4">
+          FundedWealth funded account evaluations support NIFTY 50, Bank NIFTY, Fin NIFTY futures and options, along with equity futures, stock options, currency futures, and commodity contracts. Maximum lot sizes vary by instrument and account size according to the applicable evaluation rules.
+        </p>
         <Card className="glass-card border-white/10 overflow-x-auto">
           <div className="min-w-[580px]">
             <div className="grid grid-cols-5 px-4 py-3 bg-white/[0.03] text-xs font-bold text-white/40 uppercase tracking-widest">
@@ -1216,7 +1222,10 @@ function TwoStepRulesDetail({ onBack }: { onBack: () => void }) {
 
       {/* Max Lot Table */}
       <div className="mb-10">
-        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2"><Scale size={20} className="text-emerald-400" /> Max Lot Rule</h3>
+        <h3 className="text-xl font-heading font-extrabold text-white mb-4 flex items-center gap-2"><Scale size={20} className="text-emerald-400" /> Indian Market Instruments & Maximum Lot Sizes</h3>
+        <p className="text-white/65 text-sm leading-relaxed mb-4">
+          FundedWealth funded account evaluations support NIFTY 50, Bank NIFTY, Fin NIFTY futures and options, along with equity futures, stock options, currency futures, and commodity contracts. Maximum lot sizes vary by instrument and account size according to the applicable evaluation rules.
+        </p>
         <Card className="glass-card border-white/10 overflow-x-auto">
           <div className="min-w-[520px]">
             <div className="grid grid-cols-4 px-4 py-3 bg-white/[0.03] text-xs font-bold text-white/40 uppercase tracking-widest">
@@ -2076,9 +2085,9 @@ export default function Rules() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Prop Trading Rules India — Flash, Instant, 1-Step & 2-Step Rules"
-        description="Complete prop trading evaluation rules at FundedWealth. Understand drawdown limits, profit targets, allowed instruments, and plan comparison for India's best prop firm. Flash, Instant, 1-Step & 2-Step plans explained."
-        keywords="prop trading rules India, funded account rules, Flash rules, Instant funding rules, 1-Step evaluation, 2-Step evaluation, drawdown limits prop firm, profit target prop trading"
+        title="Indian Prop Trading Rules — NIFTY Funded Account Evaluation Guidelines"
+        description="Complete prop trading rules for Indian funded account evaluations. NIFTY, BANKNIFTY, and stock futures lot sizes, drawdown limits, profit targets, and evaluation guidelines. Flash, Instant, 1-Step & 2-Step plans."
+        keywords="indian prop trading rules, nifty funded account rules, prop firm for indian stock market, indian funded account rules, banknifty funded account, indian market prop firm rules, funded trading account india, nse bse prop trading rules, evaluation rules india, flash instant 1-step 2-step rules"
         canonical="/rules"
       />
 
@@ -2091,7 +2100,7 @@ export default function Rules() {
             <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
           </Link>
           <h1 className="text-lg font-heading font-bold flex items-center gap-2">
-            <Shield className="text-blue-400" size={20} /> Trading Rules
+            <Shield className="text-blue-400" size={20} /> Indian Prop Trading & Funded Account Rules
           </h1>
           <Link href="/">
             <Button variant="ghost" className="text-white/70 hover:text-white">Home</Button>
@@ -2111,6 +2120,9 @@ export default function Rules() {
           </h2>
           <p className="text-white/60 text-base md:text-lg max-w-2xl mx-auto">
             Everything that governs your challenge in one place: profit targets, loss limits, session rules, instruments, sizing, and timelines.
+          </p>
+          <p className="text-white/70 text-base leading-relaxed max-w-3xl mx-auto mt-4">
+            FundedWealth provides simulated prop trading evaluations for Indian market instruments including NIFTY, BANKNIFTY, SENSEX, equity futures, and options. All trading occurs within a funded account evaluation environment with defined risk limits, profit targets, and scaling rules. Choose from four evaluation plans tailored for Indian prop traders.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-7">
             <Link href="/sign-up">
