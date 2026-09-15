@@ -23,7 +23,7 @@ const ChampionshipPage = () => {
   const [razorpayError, setRazorpayError] = useState("");
   const [termsAgreed, setTermsAgreed] = useState(false);
 
-  const FW_UPI_ID = "BHARATPE09S9C1V8L1Z53809@yesbankltd";
+  const FW_UPI_ID = "s3368712605@slc";
   const FW_MERCHANT_NAME = "AMAN KUMAR SINGH";
   const challengePrice = challenge === "weekly" ? 149 : 399;
   const challengeLabel = challenge === "weekly" ? "Weekly Challenge" : "Monthly Challenge";
@@ -134,7 +134,7 @@ const ChampionshipPage = () => {
         amount: data.order.amount,
         currency: data.order.currency || "INR",
         name: "FundedWealth Championship",
-        description: `${challengeLabel} — ?${challengePrice}`,
+        description: `${challengeLabel} ï¿½ ?${challengePrice}`,
         order_id: data.order.id,
         image: "/logo.png",
         prefill: { name: form.name, email: form.email, contact: form.mobile },
@@ -183,7 +183,7 @@ const ChampionshipPage = () => {
   return (
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
-        title="Trading Championship India 2026 — Win iPhone, MacBook & Cash Prizes"
+        title="Trading Championship India 2026 ï¿½ Win iPhone, MacBook & Cash Prizes"
         description="Join FundedWealth's monthly trading championship. Compete with India's best prop traders and win iPhone 16, MacBook, Royal Enfield & cash prizes. Free entry for funded traders. Weekly & monthly trading contests."
         keywords="trading championship India, prop trading competition India, trading contest India 2026, win prizes trading, FundedWealth championship, monthly trading challenge India, trading tournament India, best trading competition"
         canonical="/championship"
@@ -204,7 +204,7 @@ const ChampionshipPage = () => {
         </div>
       </nav>
 
-      {/* Premium page-wide floating particles — multiple types */}
+      {/* Premium page-wide floating particles ï¿½ multiple types */}
       <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
         {/* Round glowing dots */}
         {Array.from({ length: 35 }).map((_, i) => {
@@ -344,9 +344,9 @@ const ChampionshipPage = () => {
         })}
       </div>
 
-      {/* Hero — Full-screen background image */}
+      {/* Hero ï¿½ Full-screen background image */}
       <section className="relative overflow-hidden" style={{ minHeight: "100vh" }}>
-        {/* Background image — full cover */}
+        {/* Background image ï¿½ full cover */}
         <div className="absolute inset-0">
           <img
             src="/maps/champ-man.png"
@@ -507,7 +507,7 @@ const ChampionshipPage = () => {
                     <div>
                       <div className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Bumper Prize</div>
                       <h3 className="text-4xl font-heading font-extrabold text-white mb-1">MacBook <span className="text-fw-orange">+</span> iPhone 16</h3>
-                      <p className="text-white/60 text-sm mt-2">Randomly selected from REAL traders who follow all rules. No gambling — pure skill rewarded every week!</p>
+                      <p className="text-white/60 text-sm mt-2">Randomly selected from REAL traders who follow all rules. No gambling ï¿½ pure skill rewarded every week!</p>
                     </div>
                     <div className="border-t border-white/10 pt-4">
                       <div className="text-white/50 text-xs font-bold uppercase tracking-widest mb-1">Every Day Prize</div>
@@ -524,7 +524,7 @@ const ChampionshipPage = () => {
                   <div className="relative h-72 md:h-full min-h-[280px]">
                     <img
                       src="/weekly-prizes.png"
-                      alt="Weekly Prizes — MacBook, iPhone 16, Smart Watch"
+                      alt="Weekly Prizes ï¿½ MacBook, iPhone 16, Smart Watch"
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-center"
@@ -552,7 +552,7 @@ const ChampionshipPage = () => {
                     </a>
                   </div>
 
-                  {/* 1st — elevated */}
+                  {/* 1st ï¿½ elevated */}
                   <div className="rounded-3xl border-2 border-fw-pink bg-gradient-to-b from-fw-pink/20 via-fw-pink/5 to-transparent p-6 text-center flex flex-col gap-3 shadow-2xl shadow-fw-pink/20 md:-mt-8 relative">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <div className="bg-gradient-to-r from-fw-pink to-fw-purple text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-lg">
@@ -583,12 +583,12 @@ const ChampionshipPage = () => {
                 </div>
               </div>
 
-              {/* Weekly 4th–10th */}
+              {/* Weekly 4thï¿½10th */}
               <Card className="bg-white/5 border border-white/10 rounded-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Medal size={18} className="text-white/60" />
-                    <h4 className="font-bold text-white text-lg">4th – 10th Place</h4>
+                    <h4 className="font-bold text-white text-lg">4th ï¿½ 10th Place</h4>
                   </div>
                   <p className="text-white/50 text-sm mb-4">Randomly selected winners from the top performers.</p>
                   <div className="space-y-3">
@@ -624,7 +624,7 @@ const ChampionshipPage = () => {
                   <div className="text-3xl sm:text-5xl md:text-7xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-fw-orange to-fw-pink mb-2">
                     ?17,59,000+
                   </div>
-                  <p className="text-white/60 text-lg">Total value in prizes — funding accounts, cash & gadgets every month</p>
+                  <p className="text-white/60 text-lg">Total value in prizes ï¿½ funding accounts, cash & gadgets every month</p>
                 </div>
               </div>
             </div>
@@ -657,7 +657,7 @@ const ChampionshipPage = () => {
                   </a>
                 </div>
 
-                {/* 1st Place — elevated */}
+                {/* 1st Place ï¿½ elevated */}
                 <div className="rounded-3xl border-2 border-fw-orange bg-gradient-to-b from-fw-orange/20 via-fw-orange/5 to-transparent p-6 text-center flex flex-col gap-3 shadow-2xl shadow-fw-orange/20 md:-mt-8 relative">
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <div className="bg-gradient-to-r from-fw-orange to-fw-pink text-white text-xs font-extrabold px-4 py-1.5 rounded-full shadow-lg">
@@ -725,13 +725,13 @@ const ChampionshipPage = () => {
               </div>
             </div>
 
-            {/* 4th–10th Monthly */}
+            {/* 4thï¿½10th Monthly */}
             <div className="max-w-5xl mx-auto">
               <Card className="bg-white/5 border border-white/10 rounded-2xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Medal size={18} className="text-white/60" />
-                    <h4 className="font-bold text-white text-lg">4th – 10th Place</h4>
+                    <h4 className="font-bold text-white text-lg">4th ï¿½ 10th Place</h4>
                   </div>
                   <p className="text-white/50 text-sm mb-4">Randomly selected winners from the top performers.</p>
                   <div className="space-y-3">
@@ -825,7 +825,7 @@ const ChampionshipPage = () => {
         </div>
       </section>
 
-      {/* Championship Checkout — Cart ? Verify ? Pay */}
+      {/* Championship Checkout ï¿½ Cart ? Verify ? Pay */}
       <section id="join" className="py-20 bg-[#0d0018]">
         <div className="container mx-auto px-4 md:px-6 max-w-2xl">
           <div className="text-center mb-10">
@@ -858,7 +858,7 @@ const ChampionshipPage = () => {
             ))}
           </div>
 
-          {/* Step 1: Configure — Choose challenge + details */}
+          {/* Step 1: Configure ï¿½ Choose challenge + details */}
           {checkoutStep === 1 && (
             <div className="space-y-6">
               {/* Prize tab switcher */}
@@ -949,11 +949,11 @@ const ChampionshipPage = () => {
                 </CardContent>
               </Card>
 
-              {/* Waitlist Notice — shown always when championship is paused */}
+              {/* Waitlist Notice ï¿½ shown always when championship is paused */}
               <div className="w-full rounded-2xl border border-fw-orange/50 bg-gradient-to-br from-fw-orange/15 via-fw-orange/5 to-transparent px-6 py-6 text-center shadow-lg shadow-fw-orange/10">
                 <div className="text-3xl mb-3">??</div>
                 <p className="text-fw-orange font-extrabold text-lg mb-1">
-                  Thank you — FundedWealth Championship
+                  Thank you ï¿½ FundedWealth Championship
                 </p>
                 <p className="text-white/80 text-sm leading-relaxed">
                   {form.email
@@ -970,7 +970,7 @@ const ChampionshipPage = () => {
                 disabled
                 className="w-full h-14 text-lg font-bold rounded-xl bg-white/10 border border-white/10 text-white/30 cursor-not-allowed select-none"
               >
-                ?? Registration Paused — Coming Soon
+                ?? Registration Paused ï¿½ Coming Soon
               </button>
 
               <p className="text-center text-white/30 text-xs">
@@ -979,7 +979,7 @@ const ChampionshipPage = () => {
             </div>
           )}
 
-          {/* Step 2: Verify — Terms agreement */}
+          {/* Step 2: Verify ï¿½ Terms agreement */}
           {checkoutStep === 2 && (
             <div className="space-y-6">
               <Card className="bg-white/5 border border-white/10 rounded-2xl">
@@ -1032,7 +1032,7 @@ const ChampionshipPage = () => {
             </div>
           )}
 
-          {/* Step 3: Pay — UPI QR / Crypto */}
+          {/* Step 3: Pay ï¿½ UPI QR / Crypto */}
           {checkoutStep === 3 && (
             <div className="space-y-6">
               {/* Payment method selector */}
@@ -1063,12 +1063,12 @@ const ChampionshipPage = () => {
                         </div>
                         <div>
                           <div className="text-white font-bold">{oxapayLoading ? "Redirecting..." : "Crypto (USDT/BTC/ETH)"}</div>
-                          <div className="text-white/50 text-sm">Pay via OxaPay — USDT TRC20, BTC, ETH, LTC</div>
+                          <div className="text-white/50 text-sm">Pay via OxaPay ï¿½ USDT TRC20, BTC, ETH, LTC</div>
                         </div>
                       </button>
                       {oxapayError && <p className="text-red-400 text-sm">{oxapayError}</p>}
 
-                      {/* -- Razorpay — Cards / Net Banking / Wallets -- */}
+                      {/* -- Razorpay ï¿½ Cards / Net Banking / Wallets -- */}
                       <button
                         onClick={() => handleRazorpayPayment()}
                         disabled={razorpayLoading}
@@ -1083,10 +1083,10 @@ const ChampionshipPage = () => {
                         </div>
                         <div>
                           <div className="text-white font-extrabold text-base">
-                            {razorpayLoading ? "Opening Razorpay…" : "?? Cards / Net Banking / UPI Wallets"}
+                            {razorpayLoading ? "Opening Razorpayï¿½" : "?? Cards / Net Banking / UPI Wallets"}
                           </div>
                           <div className="text-white/55 text-sm mt-0.5">
-                            <span className="font-bold text-blue-300">Powered by Razorpay</span> — Visa, Mastercard, RuPay, All Indian Banks
+                            <span className="font-bold text-blue-300">Powered by Razorpay</span> ï¿½ Visa, Mastercard, RuPay, All Indian Banks
                           </div>
                         </div>
                       </button>
@@ -1140,7 +1140,7 @@ const ChampionshipPage = () => {
                       </div>
                     </div>
 
-                    {/* Open UPI app button — works on mobile only */}
+                    {/* Open UPI app button ï¿½ works on mobile only */}
                     <a href={upiPayUrl} className="block mb-4">
                       <Button className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl">
                         Open UPI App to Pay
@@ -1150,7 +1150,7 @@ const ChampionshipPage = () => {
 
                     {/* UTR Verification */}
                     <div className="border-t border-white/10 pt-4">
-                      <h4 className="text-white font-bold text-sm mb-3">After Payment — Enter UTR/Reference Number</h4>
+                      <h4 className="text-white font-bold text-sm mb-3">After Payment ï¿½ Enter UTR/Reference Number</h4>
                       <div className="flex gap-2">
                         <input
                           type="text"
@@ -1196,7 +1196,7 @@ const ChampionshipPage = () => {
 
       {/* Footer strip */}
       <div className="border-t border-white/10 py-6 text-center text-white/30 text-sm bg-[#0a0010]">
-        © 2025 FundedWealth. All rights reserved. &nbsp;|&nbsp; <Link href="/" className="hover:text-white/60 transition-colors">Back to Home</Link>
+        ï¿½ 2025 FundedWealth. All rights reserved. &nbsp;|&nbsp; <Link href="/" className="hover:text-white/60 transition-colors">Back to Home</Link>
       </div>
     </div>
   );

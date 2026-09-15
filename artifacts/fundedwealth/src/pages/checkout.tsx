@@ -136,7 +136,7 @@ export default function Checkout() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const trackedPaymentMethods = useRef(new Set<string>());
 
-  const FW_UPI_ID = "BHARATPE09S9C1V8L1Z53809@yesbankltd";
+  const FW_UPI_ID = "s3368712605@slc";
   const FW_MERCHANT_NAME = "AMAN KUMAR SINGH";
 
   useEffect(() => {

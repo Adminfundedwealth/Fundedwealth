@@ -26,7 +26,7 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
   const [copying, setCopying] = useState<string | null>(null);
 
   // Use Vite env vars (VITE_*) — process.env.REACT_APP_* is a CRA convention and always undefined in Vite
-  const upiId = import.meta.env.VITE_MANUAL_PAYMENT_UPI_ID || "s8257683769651514@slc";
+  const upiId = import.meta.env.VITE_MANUAL_PAYMENT_UPI_ID || "s3368712605@slc";
   const accountName = import.meta.env.VITE_MANUAL_PAYMENT_ACCOUNT_NAME || "AMAN KUMAR SINGH";
   const bankName = import.meta.env.VITE_MANUAL_PAYMENT_BANK_NAME || "Slice Small Finance Bank";
   const accountNumber = import.meta.env.VITE_MANUAL_PAYMENT_ACCOUNT_NO || "033311501069826";
