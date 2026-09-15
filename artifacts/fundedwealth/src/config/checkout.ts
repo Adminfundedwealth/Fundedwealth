@@ -16,7 +16,20 @@ export type { PlanType };
 
 export interface PlanConfig {
   label: string;
-  sizes: { size: string; fee: number; origFee: string; discFee: string; popular?: boolean }[];
+  sizes: {
+    size: string;
+    fee: number;
+    origFee: string;
+    /** Formatted plan-sale-discounted fee for display, e.g. "₹2,750" */
+    discFee: string;
+    /**
+     * Authoritative plan-sale-discounted fee as an integer (INR).
+     * Read this for all price calculations — do NOT re-compute Math.round(fee × factor).
+     * Mirrors ProductSize.discFee from @workspace/products.
+     */
+    discFeeNum: number;
+    popular?: boolean;
+  }[];
   /** Plan sale discount as string e.g. "50%" */
   discount: string;
   /** Plan sale discount as number e.g. 50 — use this for calculations */
@@ -52,6 +65,7 @@ export const PLANS: Record<PlanType, PlanConfig> = PLAN_TYPES.reduce((acc, key) 
       fee: s.fee,
       origFee: s.origFeeLabel,
       discFee: s.discFeeLabel,
+      discFeeNum: s.discFee,
       ...(s.popular ? { popular: true } : {}),
     })),
   };

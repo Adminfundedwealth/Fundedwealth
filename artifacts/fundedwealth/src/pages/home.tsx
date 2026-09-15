@@ -2,6 +2,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useLiveDiscountConfig, computeDiscountedPrice, formatINR } from "@/hooks/useDiscountConfig";
+import { PRODUCTS } from "@workspace/products";
 import SEOHead from "@/components/SEOHead";
 import { FAQSchema, ServiceSchema } from "@/components/StructuredData";
 import IndiaTraderNetworkHero from "@/components/IndiaTraderNetworkHero";
@@ -3052,14 +3053,20 @@ const Plans = () => {
 
           <TabsContent value="instant" className="mt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-              {[
-                { size: "₹1,00,000", baseFee: 4999, origFee: "₹4,999" },
-                { size: "₹5,00,000", baseFee: 10999, origFee: "₹10,999", popular: true },
-                { size: "₹10,00,000", baseFee: 17999, origFee: "₹17,999" },
-                { size: "₹20,00,000", baseFee: 29999, origFee: "₹29,999" },
-              ].map((plan, i) => {
+              {(PRODUCTS.instant.sizes.map((s) => ({
+                size: s.sizeLabel,
+                baseFee: s.fee,
+                origFee: s.origFeeLabel,
+                catalogDiscFee: s.discFee,   // authoritative integer from catalog
+                popular: s.popular,
+              }))).map((plan, i) => {
                 const instantPct = discountConfig["instant"]?.discountPct ?? 45;
-                const discFee = formatINR(computeDiscountedPrice(plan.baseFee, instantPct));
+                // Use catalog value when discount is at default (45%) to avoid
+                // floating-point off-by-one. Re-compute only if admin has changed it.
+                const discFeeAmount = instantPct === PRODUCTS.instant.discountPct
+                  ? plan.catalogDiscFee
+                  : computeDiscountedPrice(plan.baseFee, instantPct);
+                const discFee = formatINR(discFeeAmount);
                 return (
                 <Card key={i} className={`glass-card border-white/10 relative overflow-hidden ${plan.popular ? 'border-fw-pink shadow-[0_0_25px_rgba(214,51,132,0.15)]' : ''}`}>
                   {plan.popular && (

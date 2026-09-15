@@ -50,6 +50,18 @@ export interface ProductSize {
    * e.g. Flash ₹50K: Math.round(1999 * 0.50) = ₹1,000
    */
   discFeeLabel: string;
+  /**
+   * Authoritative plan-sale-discounted fee as an integer (INR).
+   *
+   * This is the SINGLE SOURCE OF TRUTH for the discounted price.
+   * It is used by computeTotal() for server-side pricing and by the
+   * frontend checkout to derive finalTotal — eliminating any floating-point
+   * rounding ambiguity from re-computing (fee × factor) at call time.
+   *
+   * Must equal the number shown in discFeeLabel.
+   * e.g. Instant ₹1L: discFee = 2750  (not Math.round(4999×0.55) = 2749)
+   */
+  discFee: number;
   popular?: boolean;
 }
 
@@ -122,11 +134,20 @@ export interface ProductDefinition {
 }
 
 // ---------------------------------------------------------------------------
-// Helper used inline to pre-compute discFeeLabel values.
-// Math.round(fee * (1 - pct/100))
+// Helpers used inline to pre-compute discFeeLabel and discFee values.
+//
+// discFeeNum — authoritative integer: Math.round(fee * (1 - pct/100))
+//   Used as the source-of-truth discFee in every ProductSize entry.
+//   Both the display label AND computeTotal() read from this value so
+//   there is no risk of a rounding discrepancy between display and charge.
+//
+// discFeeLabel — formatted string derived from discFeeNum, e.g. "₹2,750"
 // ---------------------------------------------------------------------------
+function discFeeNum(fee: number, pct: number): number {
+  return Math.round(fee * (1 - pct / 100));
+}
 function discFee(fee: number, pct: number): string {
-  return "₹" + Math.round(fee * (1 - pct / 100)).toLocaleString("en-IN");
+  return "₹" + discFeeNum(fee, pct).toLocaleString("en-IN");
 }
 
 export const PRODUCTS: Record<PlanType, ProductDefinition> = {
@@ -147,20 +168,32 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     duration: "24 Hours",
     sizes: [
       // Math.round(1999 * 0.50) = 1000 (→ ₹1,000)
-      { accountSize:   50000, fee:  1999, sizeLabel: "₹50,000",     origFeeLabel: "₹1,999",  discFeeLabel: discFee( 1999, 50) },
+      { accountSize:   50000, fee:  1999, sizeLabel: "₹50,000",     origFeeLabel: "₹1,999",  discFeeLabel: discFee( 1999, 50), discFee: discFeeNum( 1999, 50) },
       // Math.round(3499 * 0.50) = 1750 (→ ₹1,750)
-      { accountSize:  100000, fee:  3499, sizeLabel: "₹1,00,000",   origFeeLabel: "₹3,499",  discFeeLabel: discFee( 3499, 50) },
+      { accountSize:  100000, fee:  3499, sizeLabel: "₹1,00,000",   origFeeLabel: "₹3,499",  discFeeLabel: discFee( 3499, 50), discFee: discFeeNum( 3499, 50) },
       // Math.round(7499 * 0.50) = 3750 (→ ₹3,750)
-      { accountSize:  250000, fee:  7499, sizeLabel: "₹2,50,000",   origFeeLabel: "₹7,499",  discFeeLabel: discFee( 7499, 50), popular: true },
+      { accountSize:  250000, fee:  7499, sizeLabel: "₹2,50,000",   origFeeLabel: "₹7,499",  discFeeLabel: discFee( 7499, 50), discFee: discFeeNum( 7499, 50), popular: true },
       // Math.round(11499 * 0.50) = 5750 (→ ₹5,750)
-      { accountSize:  500000, fee: 11499, sizeLabel: "₹5,00,000",   origFeeLabel: "₹11,499", discFeeLabel: discFee(11499, 50) },
+      { accountSize:  500000, fee: 11499, sizeLabel: "₹5,00,000",   origFeeLabel: "₹11,499", discFeeLabel: discFee(11499, 50), discFee: discFeeNum(11499, 50) },
       // Math.round(19499 * 0.50) = 9750 (→ ₹9,750)
-      { accountSize: 1000000, fee: 19499, sizeLabel: "₹10,00,000",  origFeeLabel: "₹19,499", discFeeLabel: discFee(19499, 50) },
+      { accountSize: 1000000, fee: 19499, sizeLabel: "₹10,00,000",  origFeeLabel: "₹19,499", discFeeLabel: discFee(19499, 50), discFee: discFeeNum(19499, 50) },
     ],
     rules: { profitTargetPct: 0, dailyLossLimitPct: 2, maxDrawdownPct: 4, minTradingDays: 0, maxDaysAllowed: 1, type: "flash_funding" },
   },
 
   // ─── INSTANT — 45% OFF ─────────────────────────────────────────────────────
+  //
+  // PRICING NOTE: Math.round(fee × 0.55) rounds DOWN for all four Instant fees
+  // because the fractional part is exactly 0.45 in every case:
+  //   4999 × 0.55 = 2749.45 → Math.round → 2749  (target: 2750)
+  //  10999 × 0.55 = 6049.45 → Math.round → 6049  (target: 6050)
+  //  17999 × 0.55 = 9899.45 → Math.round → 9899  (target: 9900)
+  //  29999 × 0.55 = 16499.45 → Math.round → 16499 (target: 16500)
+  //
+  // The authoritative discFee values below are set explicitly to the correct
+  // rounded-up integers. computeTotal() reads size.discFee directly so the
+  // same value flows through display, checkout, QR amount, and server validation.
+  // ---------------------------------------------------------------------------
   instant: {
     key: "instant",
     displayLabel: "Instant",
@@ -176,14 +209,14 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     profitSplit: "80%",
     duration: "Unlimited",
     sizes: [
-      // Math.round(4999 * 0.55) = 2750 (→ ₹2,750)
-      { accountSize:  100000, fee:  4999, sizeLabel: "₹1,00,000",   origFeeLabel: "₹4,999",  discFeeLabel: discFee( 4999, 45) },
-      // Math.round(10999 * 0.55) = 6049 (→ ₹6,049) — note: 10999*0.55=6049.45 → rounds to 6049
-      { accountSize:  500000, fee: 10999, sizeLabel: "₹5,00,000",   origFeeLabel: "₹10,999", discFeeLabel: discFee(10999, 45), popular: true },
-      // Math.round(17999 * 0.55) = 9899 (→ ₹9,899)
-      { accountSize: 1000000, fee: 17999, sizeLabel: "₹10,00,000",  origFeeLabel: "₹17,999", discFeeLabel: discFee(17999, 45) },
-      // Math.round(29999 * 0.55) = 16499 (→ ₹16,499)
-      { accountSize: 2000000, fee: 29999, sizeLabel: "₹20,00,000",  origFeeLabel: "₹29,999", discFeeLabel: discFee(29999, 45) },
+      // Explicit discFee: 2750 (Math.round gives 2749 — off-by-one corrected)
+      { accountSize:  100000, fee:  4999, sizeLabel: "₹1,00,000",   origFeeLabel: "₹4,999",  discFeeLabel: "₹2,750",  discFee: 2750 },
+      // Explicit discFee: 6050 (Math.round gives 6049 — off-by-one corrected), popular: true
+      { accountSize:  500000, fee: 10999, sizeLabel: "₹5,00,000",   origFeeLabel: "₹10,999", discFeeLabel: "₹6,050",  discFee: 6050, popular: true },
+      // Explicit discFee: 9900 (Math.round gives 9899 — off-by-one corrected)
+      { accountSize: 1000000, fee: 17999, sizeLabel: "₹10,00,000",  origFeeLabel: "₹17,999", discFeeLabel: "₹9,900",  discFee: 9900 },
+      // Explicit discFee: 16500 (Math.round gives 16499 — off-by-one corrected)
+      { accountSize: 2000000, fee: 29999, sizeLabel: "₹20,00,000",  origFeeLabel: "₹29,999", discFeeLabel: "₹16,500", discFee: 16500 },
     ],
     rules: {
       profitTargetPct: 0,
@@ -224,13 +257,13 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     duration: "Unlimited",
     sizes: [
       // Math.round(2999 * 0.45) = 1350 (→ ₹1,350)
-      { accountSize:  100000, fee:  2999, sizeLabel: "₹1,00,000",   origFeeLabel: "₹2,999",  discFeeLabel: discFee( 2999, 55) },
+      { accountSize:  100000, fee:  2999, sizeLabel: "₹1,00,000",   origFeeLabel: "₹2,999",  discFeeLabel: discFee( 2999, 55), discFee: discFeeNum( 2999, 55) },
       // Math.round(11999 * 0.45) = 5400 (→ ₹5,400)
-      { accountSize:  500000, fee: 11999, sizeLabel: "₹5,00,000",   origFeeLabel: "₹11,999", discFeeLabel: discFee(11999, 55), popular: true },
+      { accountSize:  500000, fee: 11999, sizeLabel: "₹5,00,000",   origFeeLabel: "₹11,999", discFeeLabel: discFee(11999, 55), discFee: discFeeNum(11999, 55), popular: true },
       // Math.round(21999 * 0.45) = 9900 (→ ₹9,900)
-      { accountSize: 1000000, fee: 21999, sizeLabel: "₹10,00,000",  origFeeLabel: "₹21,999", discFeeLabel: discFee(21999, 55) },
+      { accountSize: 1000000, fee: 21999, sizeLabel: "₹10,00,000",  origFeeLabel: "₹21,999", discFeeLabel: discFee(21999, 55), discFee: discFeeNum(21999, 55) },
       // Math.round(48499 * 0.45) = 21825 (→ ₹21,825)
-      { accountSize: 2500000, fee: 48499, sizeLabel: "₹25,00,000",  origFeeLabel: "₹48,499", discFeeLabel: discFee(48499, 55) },
+      { accountSize: 2500000, fee: 48499, sizeLabel: "₹25,00,000",  origFeeLabel: "₹48,499", discFeeLabel: discFee(48499, 55), discFee: discFeeNum(48499, 55) },
     ],
     rules: { profitTargetPct: 10, dailyLossLimitPct: 3, maxDrawdownPct: 6, minTradingDays: 5, maxDaysAllowed: 365, type: "1step_evaluation" },
   },
@@ -252,11 +285,11 @@ export const PRODUCTS: Record<PlanType, ProductDefinition> = {
     duration: "Unlimited",
     sizes: [
       // Math.round(11999 * 0.40) = 4800 (→ ₹4,800)
-      { accountSize:  500000, fee: 11999, sizeLabel: "₹5,00,000",   origFeeLabel: "₹11,999", discFeeLabel: discFee(11999, 60) },
+      { accountSize:  500000, fee: 11999, sizeLabel: "₹5,00,000",   origFeeLabel: "₹11,999", discFeeLabel: discFee(11999, 60), discFee: discFeeNum(11999, 60) },
       // Math.round(21999 * 0.40) = 8800 (→ ₹8,800)
-      { accountSize: 1000000, fee: 21999, sizeLabel: "₹10,00,000",  origFeeLabel: "₹21,999", discFeeLabel: discFee(21999, 60), popular: true },
+      { accountSize: 1000000, fee: 21999, sizeLabel: "₹10,00,000",  origFeeLabel: "₹21,999", discFeeLabel: discFee(21999, 60), discFee: discFeeNum(21999, 60), popular: true },
       // Math.round(48499 * 0.40) = 19400 (→ ₹19,400)
-      { accountSize: 2500000, fee: 48499, sizeLabel: "₹25,00,000",  origFeeLabel: "₹48,499", discFeeLabel: discFee(48499, 60) },
+      { accountSize: 2500000, fee: 48499, sizeLabel: "₹25,00,000",  origFeeLabel: "₹48,499", discFeeLabel: discFee(48499, 60), discFee: discFeeNum(48499, 60) },
     ],
     rules: { profitTargetPct: 8, dailyLossLimitPct: 3, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 365, type: "2step_evaluation_phase1" },
     rulesPhase2: { profitTargetPct: 5, dailyLossLimitPct: 3, maxDrawdownPct: 8, minTradingDays: 5, maxDaysAllowed: 365, type: "evaluation_phase2" },
@@ -356,16 +389,18 @@ export function getCouponDiscount(couponCode?: string | null): number {
  * Returns null if the plan/size selection is invalid.
  *
  * Pricing logic:
- *   1. baseFee       = original fee from product catalog
- *   2. planDiscount  = plan's canonical sale discount (50/45/55/60)
- *   3. planPrice     = Math.round(baseFee * (1 - planDiscount/100))
- *   4. couponDiscount = additional coupon % (0 if no coupon)
- *   5. finalTotal    = couponDiscount > 0
- *                        ? Math.round(planPrice * (1 - couponDiscount/100))
- *                        : planPrice
+ *   1. baseFee       = original fee from product catalog (size.fee)
+ *   2. planPrice     = size.discFee  ← authoritative pre-computed integer,
+ *                      NOT Math.round(fee × factor). This is the single source
+ *                      of truth for the discounted price, ensuring display,
+ *                      checkout, QR amount, and server validation all agree.
+ *                      If planDiscountOverride is supplied (admin DB override),
+ *                      we recompute: Math.round(fee × (1 - override/100)).
+ *   3. couponDiscount = additional coupon % (0 if no coupon / unknown code)
+ *   4. finalTotal    = planPrice - couponDiscountAmount
  *
  * @param planDiscountOverride — If provided (e.g. from admin DB config),
- *   uses this percentage instead of the static product planDiscount.
+ *   uses this percentage instead of the catalog's pre-computed discFee.
  *   This allows the admin to temporarily adjust the plan sale discount.
  * @param couponCode — Optional promo code for ADDITIONAL discount on top
  *   of the already-discounted plan price.
@@ -392,7 +427,12 @@ export function computeTotal(
 
   const baseFee = size.fee;
   const planDiscountPct = planDiscountOverride != null ? planDiscountOverride : getPlanDiscountPct(planType);
-  const planPrice = Math.round(baseFee * (1 - planDiscountPct / 100));
+
+  // Use the catalog's pre-computed authoritative discFee unless the admin has
+  // overridden the discount percentage at runtime via the DB.
+  const planPrice = planDiscountOverride != null
+    ? Math.round(baseFee * (1 - planDiscountOverride / 100))
+    : size.discFee;
 
   const couponDiscountPct = getCouponDiscount(couponCode);
   const couponDiscountAmount = couponDiscountPct > 0 ? Math.round(planPrice * (couponDiscountPct / 100)) : 0;
@@ -422,6 +462,10 @@ export function formatINR(amount: number): string {
 /**
  * Compute the discounted fee for a given base fee and discount percentage.
  * Returns the rounded integer amount.
+ *
+ * NOTE: For Instant plan display on the home page, prefer reading
+ * size.discFee directly from PRODUCTS["instant"].sizes[i] so the
+ * pre-computed authoritative value is used instead of re-computing here.
  */
 export function computeDiscountedFee(baseFee: number, discountPct: number): number {
   return Math.round(baseFee * (1 - discountPct / 100));

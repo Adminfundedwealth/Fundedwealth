@@ -98,7 +98,15 @@ export default function Checkout() {
   const plan = PLANS[selectedPlan];
   const size = plan.sizes[selectedSizeIdx];
   const origNum = size.fee;
-  const priceNum = couponDiscount > 0 ? Math.round(origNum * (1 - couponDiscount / 100)) : origNum;
+  // Use size.discFeeNum — the authoritative pre-computed integer from the product
+  // catalog — as the plan sale price. Do NOT re-compute Math.round(origNum × factor)
+  // here because floating-point rounding can diverge by ₹1 (e.g. Instant 45% OFF:
+  // Math.round(4999 × 0.55) = 2749 but the correct displayed price is ₹2,750).
+  // If the live API has overridden the discount % we fall back to re-computing.
+  const planPrice = couponDiscount === plan.discountPct
+    ? size.discFeeNum   // discount unchanged → use catalog value
+    : Math.round(origNum * (1 - couponDiscount / 100));  // admin override → recompute
+  const priceNum = planPrice;
   const selectedAddonData = ADDONS.find((a) => a.id === selectedAddon) ?? null;
   const addonPrice = selectedAddonData ? parseInt(selectedAddonData.price.replace(/[₹,/a-zA-Z]/g, "")) : 0;
   const finalTotal = priceNum + addonPrice;
