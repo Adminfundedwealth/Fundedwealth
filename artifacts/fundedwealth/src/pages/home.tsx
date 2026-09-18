@@ -964,12 +964,12 @@ const Hero = () => {
               </p>
 
               {/* CTA Buttons — directly below NIFTY 500 • Stock Futures. */}
-              <div className="pt-5 lg:pt-3 flex items-center justify-center gap-2 sm:gap-3 flex-nowrap overflow-x-auto">
+              <div className="pt-5 lg:pt-3 flex items-center justify-center gap-2 sm:gap-3 flex-nowrap">
 
                 {/* 1. EXPLORE PLANS — Liquid Sunset Glass */}
                 <button
                   onClick={() => navigate("/checkout")}
-                  className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(255,106,61,0.18) 0%, rgba(255,0,128,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -981,7 +981,7 @@ const Hero = () => {
                   <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
                   <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,106,61,0.22) 0%, rgba(255,0,128,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(255,106,61,0.1)" }} />
                   <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,106,61,0.4) 0%, rgba(255,0,128,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                  <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                     <Zap className="w-4 h-4 text-orange-300" />
                     <BulgeText text="EXPLORE PLANS" radius={100} strength={0.5} />
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -993,7 +993,7 @@ const Hero = () => {
                   href="https://youtu.be/w3yyFx_hDcE"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(140,80,255,0.18) 0%, rgba(90,0,255,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -1005,7 +1005,7 @@ const Hero = () => {
                   <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
                   <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(140,80,255,0.22) 0%, rgba(90,0,255,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(140,80,255,0.1)" }} />
                   <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(140,80,255,0.4) 0%, rgba(90,0,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                  <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                     <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                     <BulgeText text="WATCH DEMO" radius={100} strength={0.5} />
                   </span>
@@ -1014,7 +1014,7 @@ const Hero = () => {
                 {/* 3. HOW IT WORKS — Liquid Neon Blue Glass */}
                 <Link href="/how-it-works">
                   <button
-                    className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                    className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                     style={{
                       background: "linear-gradient(135deg, rgba(0,180,255,0.18) 0%, rgba(90,80,255,0.14) 100%)",
                       backdropFilter: "blur(24px) saturate(1.8)",
@@ -1026,7 +1026,7 @@ const Hero = () => {
                     <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
                     <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,180,255,0.22) 0%, rgba(90,80,255,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(0,180,255,0.1)" }} />
                     <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.4) 0%, rgba(90,80,255,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                    <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                    <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                       <FileText className="w-4 h-4 text-cyan-300" />
                       <BulgeText text="HOW IT WORKS" radius={100} strength={0.5} />
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -1037,7 +1037,7 @@ const Hero = () => {
                 {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
                 <button
                   onClick={() => navigate("/sign-up?trial=true")}
-                  className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(5,150,105,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -1049,7 +1049,7 @@ const Hero = () => {
                   <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
                   <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.18) 100%)", boxShadow: "inset 0 0 30px rgba(16,185,129,0.1)" }} />
                   <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.4) 0%, rgba(5,150,105,0.25) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                  <span className="relative flex items-center gap-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+                  <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                     <Users className="w-4 h-4 text-emerald-300" />
                     <BulgeText text="FREE TRIAL ACCOUNT" radius={100} strength={0.5} />
                     <ArrowRight className="w-3.5 h-3.5" />
