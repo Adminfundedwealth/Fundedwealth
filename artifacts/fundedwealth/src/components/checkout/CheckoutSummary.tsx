@@ -40,6 +40,10 @@ export const CheckoutSummary = ({
       <span className="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded">
         {discountPct}% OFF
       </span>
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-400/20 border border-yellow-400/40">
+        <span className="text-[9px] text-yellow-200/70 uppercase tracking-wider font-medium">CODE:</span>
+        <span className="text-xs text-yellow-300 font-extrabold tracking-wide">{plan.code}</span>
+      </span>
     </div>
 
     <div className="flex gap-2 mb-6">

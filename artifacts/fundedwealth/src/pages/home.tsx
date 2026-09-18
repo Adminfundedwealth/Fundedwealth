@@ -624,24 +624,75 @@ const AnnouncementBar = () => {
   );
 };
 
+/** Small Ganesh Ji sticker — inline SVG, ~24px, orange/gold gradient */
+const GaneshSticker = () => (
+  <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "inline-block", verticalAlign: "middle", filter: "drop-shadow(0 0 3px rgba(255,160,40,0.7))" }}>
+    <defs>
+      <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#FFD700"/>
+        <stop offset="50%" stopColor="#FF8C00"/>
+        <stop offset="100%" stopColor="#FF4500"/>
+      </linearGradient>
+    </defs>
+    {/* Crown/mukut */}
+    <ellipse cx="50" cy="14" rx="14" ry="9" fill="url(#gGold)" opacity="0.95"/>
+    <rect x="42" y="8" width="4" height="10" rx="2" fill="#FFD700"/>
+    <rect x="50" y="5" width="4" height="13" rx="2" fill="#FFA500"/>
+    <rect x="58" y="8" width="4" height="10" rx="2" fill="#FFD700"/>
+    {/* Head */}
+    <ellipse cx="50" cy="36" rx="20" ry="22" fill="url(#gGold)"/>
+    {/* Ears */}
+    <ellipse cx="26" cy="33" rx="9" ry="13" fill="url(#gGold)" opacity="0.85"/>
+    <ellipse cx="74" cy="33" rx="9" ry="13" fill="url(#gGold)" opacity="0.85"/>
+    <ellipse cx="26" cy="33" rx="5" ry="8" fill="#FF6B00" opacity="0.5"/>
+    <ellipse cx="74" cy="33" rx="5" ry="8" fill="#FF6B00" opacity="0.5"/>
+    {/* Eyes */}
+    <ellipse cx="43" cy="30" rx="3.5" ry="4" fill="#1a0a00"/>
+    <ellipse cx="57" cy="30" rx="3.5" ry="4" fill="#1a0a00"/>
+    <circle cx="44" cy="29" r="1.2" fill="white"/>
+    <circle cx="58" cy="29" r="1.2" fill="white"/>
+    {/* Trunk — curved down-left */}
+    <path d="M50 43 Q44 52 46 60 Q47 66 42 68" stroke="#FF8C00" strokeWidth="4.5" strokeLinecap="round" fill="none"/>
+    {/* Body */}
+    <ellipse cx="50" cy="78" rx="22" ry="18" fill="url(#gGold)" opacity="0.9"/>
+    {/* Belly circle */}
+    <circle cx="50" cy="79" r="9" fill="#FF6B00" opacity="0.35"/>
+    {/* Arms - blessing pose */}
+    <path d="M28 68 Q18 62 16 56" stroke="url(#gGold)" strokeWidth="6" strokeLinecap="round" fill="none"/>
+    <path d="M72 68 Q82 62 84 56" stroke="url(#gGold)" strokeWidth="6" strokeLinecap="round" fill="none"/>
+    {/* Hands open */}
+    <circle cx="14" cy="54" r="5" fill="url(#gGold)" opacity="0.9"/>
+    <circle cx="86" cy="54" r="5" fill="url(#gGold)" opacity="0.9"/>
+    {/* Lotus / modak in hand */}
+    <ellipse cx="86" cy="54" rx="5" ry="4" fill="#FF4500" opacity="0.7"/>
+    {/* Legs crossed */}
+    <ellipse cx="38" cy="93" rx="12" ry="7" fill="url(#gGold)" opacity="0.85"/>
+    <ellipse cx="62" cy="93" rx="12" ry="7" fill="url(#gGold)" opacity="0.85"/>
+  </svg>
+);
+
 const DiscountBar = () => {
   const { entries } = useLiveDiscountConfig();
   const activeOffers = entries.filter((e) => e.active);
   const offers = activeOffers.length > 0 ? activeOffers : entries;
 
+  // Short display label: "Flash" not "Flash Funding"
+  const shortLabel = (lbl: string) => lbl.replace(" Funding", "").replace(" Evaluation", "");
+
   const content = offers.map((o, i) => (
-    <span key={i} className="inline-flex items-center gap-3 mx-8">
-      <span className="text-white font-extrabold text-sm tracking-tight">{o.discountPct}% OFF</span>
-      <span className="text-white/60 text-xs font-medium">{o.displayLabel}</span>
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 border border-white/15">
-        <span className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Code:</span>
-        <span className="text-xs text-fw-orange font-bold tracking-wide">{o.code}</span>
+    <span key={i} className="inline-flex items-center gap-1.5 mx-4">
+      <GaneshSticker />
+      <span className="text-yellow-300 font-extrabold text-sm tracking-tight whitespace-nowrap">{o.discountPct}% OFF</span>
+      <span className="text-white/70 text-xs font-semibold whitespace-nowrap">{shortLabel(o.displayLabel)}</span>
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-yellow-400/20 border border-yellow-400/40">
+        <span className="text-[9px] text-yellow-200/70 uppercase tracking-wider font-medium">CODE:</span>
+        <span className="text-xs text-yellow-300 font-extrabold tracking-wide whitespace-nowrap">{o.code}</span>
       </span>
     </span>
   ));
 
   return (
-    <div className="flex-1 min-w-0 bg-[#060012] border-b border-white/5 py-2 overflow-hidden whitespace-nowrap relative z-50">
+    <div className="flex-1 min-w-0 bg-[#060012] border-b border-white/5 py-1.5 overflow-hidden whitespace-nowrap relative z-50" style={{ scrollbarWidth: "none" }}>
       <div className="animate-marquee-slow inline-block">
         {content}
         {content}
