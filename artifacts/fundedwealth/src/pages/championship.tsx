@@ -23,7 +23,7 @@ const ChampionshipPage = () => {
   const [razorpayError, setRazorpayError] = useState("");
   const [termsAgreed, setTermsAgreed] = useState(false);
 
-  const FW_UPI_ID = "s3368712605@slc";
+  const FW_UPI_ID = "pfm-pfc@ptyes";
   const FW_MERCHANT_NAME = "AMAN KUMAR SINGH";
   const challengePrice = challenge === "weekly" ? 149 : 399;
   const challengeLabel = challenge === "weekly" ? "Weekly Challenge" : "Monthly Challenge";
