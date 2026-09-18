@@ -964,12 +964,12 @@ const Hero = () => {
               </p>
 
               {/* CTA Buttons — directly below NIFTY 500 • Stock Futures. */}
-              <div className="pt-5 lg:pt-3 flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
+              <div className="pt-5 lg:pt-3 flex items-center justify-center gap-2 sm:gap-3 flex-nowrap overflow-x-auto">
 
                 {/* 1. EXPLORE PLANS — Liquid Sunset Glass */}
                 <button
                   onClick={() => navigate("/checkout")}
-                  className="group relative rounded-lg px-6 sm:px-8 lg:px-6 py-3 sm:py-3.5 lg:py-2.5 text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(255,106,61,0.18) 0%, rgba(255,0,128,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -993,7 +993,7 @@ const Hero = () => {
                   href="https://youtu.be/w3yyFx_hDcE"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative rounded-lg px-6 sm:px-8 lg:px-6 py-3 sm:py-3.5 lg:py-2.5 text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(140,80,255,0.18) 0%, rgba(90,0,255,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
@@ -1014,7 +1014,7 @@ const Hero = () => {
                 {/* 3. HOW IT WORKS — Liquid Neon Blue Glass */}
                 <Link href="/how-it-works">
                   <button
-                    className="group relative rounded-lg px-6 sm:px-8 lg:px-6 py-3 sm:py-3.5 lg:py-2.5 text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                    className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                     style={{
                       background: "linear-gradient(135deg, rgba(0,180,255,0.18) 0%, rgba(90,80,255,0.14) 100%)",
                       backdropFilter: "blur(24px) saturate(1.8)",
@@ -1037,7 +1037,7 @@ const Hero = () => {
                 {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
                 <button
                   onClick={() => navigate("/sign-up?trial=true")}
-                  className="group relative rounded-lg px-6 sm:px-8 lg:px-6 py-3 sm:py-3.5 lg:py-2.5 text-sm font-extrabold text-white uppercase tracking-wider overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-4 sm:px-5 lg:px-5 py-2.5 sm:py-3 lg:py-2.5 text-xs sm:text-sm font-extrabold text-white uppercase tracking-wide overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(5,150,105,0.14) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
