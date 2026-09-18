@@ -671,7 +671,7 @@ const Navbar = () => {
       <div className="sticky top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#0F0020] via-[#1A0030] to-[#0F0020] border-b border-white/5">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center gap-1 sm:gap-2 py-1.5">
-            <div className="flex shrink-0 items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide">
+            <div className="no-scrollbar-tabs flex shrink-0 items-center gap-1 sm:gap-2 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}>
               <button className="shrink-0 px-3 sm:px-4 py-1.5 rounded-md text-[11px] sm:text-xs font-bold bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] text-white shadow-md flex items-center gap-1.5">
                 <span></span>FundedWealth <span className="opacity-90">IND</span>
               </button>
@@ -1073,6 +1073,9 @@ const Hero = () => {
 
       {/* Color cycle animation + shooting stars */}
       <style>{`
+        /* Hide scrollbar on the product tab selector — all browsers */
+        .no-scrollbar-tabs::-webkit-scrollbar { display: none; }
+        .no-scrollbar-tabs { -ms-overflow-style: none; scrollbar-width: none; }
         .hero-color-cycle {
           animation: _colorCycle 8s ease-in-out infinite;
         }
