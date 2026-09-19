@@ -3056,7 +3056,7 @@ const Plans = () => {
                         <span className="text-white font-bold">24 Hours</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-white/60">Daily Drawdown</span>
+                        <span className="text-white/60">Max Loss Per Trade</span>
                         <span className="text-white font-bold">2%</span>
                       </div>
                       <div className="flex justify-between text-xs">
@@ -3081,9 +3081,16 @@ const Plans = () => {
                       </div>
                     </div>
 
-                    <Button onClick={() => navigatePlans("/checkout")} className={`w-full h-10 text-sm font-bold ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0' : 'bg-white text-black hover:bg-gray-200'}`}>
-                      Select Plan
-                    </Button>
+                    <div className="flex gap-2 mt-1 mb-3">
+                      <Button onClick={() => navigatePlans("/checkout")} className={`flex-1 h-10 text-sm font-bold ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0' : 'bg-white text-black hover:bg-gray-200'}`}>
+                        Select Plan
+                      </Button>
+                      <Link href="/rules?plan=flash">
+                        <Button variant="outline" className="h-10 px-3 text-xs font-bold border-white/20 text-white/70 hover:text-white hover:bg-white/10 bg-transparent" title="Flash Rule Book">
+                          Rule Book
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
               );

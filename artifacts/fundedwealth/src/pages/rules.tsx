@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "wouter";
+import React, { useState, useEffect } from "react";
+import { Link, useSearch } from "wouter";
 import SEOHead from "@/components/SEOHead";
 import {
   ArrowLeft, Shield, CheckCircle, XCircle, AlertTriangle, Info,
@@ -1883,6 +1883,16 @@ export default function Rules() {
   const [instantLinkCopied, setInstantLinkCopied] = useState(false);
   const [oneStepLinkCopied, setOneStepLinkCopied] = useState(false);
   const [twoStepLinkCopied, setTwoStepLinkCopied] = useState(false);
+
+  // Auto-open the plan detail view when ?plan=<key> is in the URL
+  const search = useSearch();
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const plan = params.get("plan") as PlanKey | null;
+    if (plan && ["flash", "instant", "1step", "2step"].includes(plan)) {
+      setActivePlan(plan);
+    }
+  }, [search]);
 
   // Flash plan — show its own full detail page
   if (activePlan === "flash") {
