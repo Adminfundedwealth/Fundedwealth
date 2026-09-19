@@ -32,14 +32,18 @@ function getCsrfToken(): string {
 /**
  * Fetch a fresh CSRF token from the server when the cookie is unavailable.
  * Falls back to empty string if the request fails.
+ *
+ * Note: the /api/auth/csrf endpoint returns 204 (no body) when the cookie has
+ * not been set yet — guard against calling res.json() on an empty body so the
+ * parse error is not silently swallowed, leaving the token as ''.
  */
 async function fetchCsrfToken(): Promise<string> {
   try {
     const res = await fetch('/api/auth/csrf', { credentials: 'include' });
-    if (res.ok) {
-      const json = await res.json();
-      return (json.token as string) || '';
-    }
+    // 204 = cookie not yet set; any non-200 = cannot obtain token
+    if (!res.ok || res.status === 204) return '';
+    const json = await res.json();
+    return (json.token as string) || '';
   } catch {
     // Non-fatal — proceed without token
   }

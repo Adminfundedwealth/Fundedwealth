@@ -35,8 +35,9 @@ export async function GET() {
 
     return NextResponse.json({ data: data ?? [] });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error('discount-config GET error:', err);
-    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Failed' } }, { status: 500 });
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
 
@@ -113,7 +114,8 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, updated: upsertRows.length });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error('discount-config PUT error:', err);
-    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: 'Failed' } }, { status: 500 });
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message } }, { status: 500 });
   }
 }
