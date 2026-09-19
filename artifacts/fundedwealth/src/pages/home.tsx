@@ -761,6 +761,7 @@ const Navbar = () => {
             <a href="#home" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Home</a>
             <a href="#plans" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Plans</a>
             <Link href="/impact" className="text-xs 2xl:text-sm font-medium text-pink-400 hover:text-pink-300 transition-colors whitespace-nowrap">FW Impact</Link>
+            <Link href="/instruments" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Instruments</Link>
             <Link href="/rules" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Rules</Link>
             <Link href="/blog" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Blog</Link>
             <Link href="/championship" className="text-xs 2xl:text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap">Championship</Link>
@@ -803,6 +804,7 @@ const Navbar = () => {
               <div className="flex flex-col px-6 py-4 gap-4">
                 <a href="#home" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Home</a>
                 <a href="#plans" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Plans</a>
+                <Link href="/instruments" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Instruments</Link>
                 <Link href="/rules" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Trading Rules</Link>
                 <Link href="/blog" className="text-lg font-medium text-white/80" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
                 <Link href="/impact" className="text-lg font-medium text-pink-400" onClick={() => setMobileMenuOpen(false)}>FW Impact Initiative</Link>

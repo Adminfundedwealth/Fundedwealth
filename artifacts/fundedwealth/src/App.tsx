@@ -8,6 +8,7 @@ import { FingerprintProvider } from "@/contexts/FingerprintContext";
 import { TradingDataProvider } from "@/contexts/TradingDataContext";
 
 const HowItWorks = lazy(() => import("@/pages/how-it-works"));
+const Instruments = lazy(() => import("@/pages/instruments"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const Home = lazy(() => import("@/pages/home"));
 const Championship = lazy(() => import("@/pages/championship"));
@@ -126,6 +127,7 @@ function AppRouter() {
             <Route path="/reset-password" component={ResetPassword} />
             <Route path="/economic-calendar" component={EconomicCalendar} />
             <Route path="/how-it-works" component={HowItWorks} />
+            <Route path="/instruments" component={Instruments} />
             <Route path="/login">{() => { window.location.replace(basePath + "/sign-in"); return null; }}</Route>
             <Route path="/register">{() => { window.location.replace(basePath + "/sign-up"); return null; }}</Route>
             <Route path="/dashboard" component={DashboardRoute} />
