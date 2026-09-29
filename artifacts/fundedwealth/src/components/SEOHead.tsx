@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 
 interface SEOHeadProps {
@@ -33,6 +34,11 @@ export default function SEOHead({
 }: SEOHeadProps) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
   const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : undefined;
+  useEffect(() => {
+    if (canonicalUrl) {
+      document.querySelector('link[data-seo-fallback="true"][rel="canonical"]')?.remove();
+    }
+  }, [canonicalUrl]);
   const robotsContent = noindex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
