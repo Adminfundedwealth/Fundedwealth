@@ -1081,7 +1081,7 @@ const Hero = () => {
                     <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.6) 0%, rgba(0,100,220,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
                     <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                       <FileText className="w-4 h-4 text-cyan-300" />
-                      <BulgeText text="HOW IT WORKS" radius={100} strength={0.5} />
+                      <BulgeText text="HOW THE EVALUATION WORKS" radius={100} strength={0.5} />
                       <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </button>
