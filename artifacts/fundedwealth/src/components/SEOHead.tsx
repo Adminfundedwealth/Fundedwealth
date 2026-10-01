@@ -34,14 +34,12 @@ export default function SEOHead({
 }: SEOHeadProps) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
   const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : undefined;
+
   useEffect(() => {
-    if (noindex) {
-      document.querySelector('meta[data-seo-fallback="true"][name="robots"]')?.remove();
-      document.querySelector('link[data-seo-fallback="true"][rel="canonical"]')?.remove();
-    } else if (canonicalUrl) {
-      document.querySelector('link[data-seo-fallback="true"][rel="canonical"]')?.remove();
-    }
-  }, [canonicalUrl, noindex]);
+    const fallbackEls = document.querySelectorAll('[data-seo-fallback="true"]');
+    fallbackEls.forEach((el) => el.remove());
+  }, [fullTitle, description, keywords, canonicalUrl, ogImage, ogImageAlt, ogType, noindex]);
+
   const robotsContent = noindex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
