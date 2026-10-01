@@ -147,9 +147,9 @@ export default function HowItWorks() {
             <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
             <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
           </Link>
-          <h1 className="text-lg font-heading font-bold flex items-center gap-2">
+          <div className="text-lg font-heading font-bold flex items-center gap-2">
             <BookOpen className="text-fw-orange" size={20} /> How It Works
-          </h1>
+          </div>
           <Link href="/#plans">
             <Button variant="ghost" className="text-white/70 hover:text-white text-sm">View Plans</Button>
           </Link>
@@ -163,13 +163,13 @@ export default function HowItWorks() {
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fw-orange/10 border border-fw-orange/30 text-fw-orange text-xs font-bold uppercase tracking-[0.2em] mb-5">
             Simple 5-Step Process
           </span>
-          <h2 className="text-4xl sm:text-5xl font-heading font-extrabold mb-4 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-heading font-extrabold mb-4 leading-tight">
             How to Get a{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-fw-orange to-fw-pink">
               Funded Trading Account
             </span>{" "}
             in India
-          </h2>
+          </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto">
             FundedWealth provides simulated prop trading evaluations for Indian market instruments — NIFTY, BANKNIFTY, SENSEX, and equities. Here is exactly how the process works, from registration to funded account to rewards.
           </p>
