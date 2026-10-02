@@ -5663,9 +5663,11 @@ const Footer = () => {
               India's #1 Fastest Growing Prop Trading Firm Dedicated to Indian Traders
             </p>
             <div className="space-y-2 mb-6 text-sm text-white/40">
-              <p className="flex items-center gap-2"><Building2 size={14} className="text-white/30 shrink-0" /> FundedWealth</p>
+              <p className="flex items-center gap-2"><Building2 size={14} className="text-white/30 shrink-0" /> FundedWealth Private Limited</p>
               <p className="flex items-center gap-2"><Globe size={14} className="text-white/30 shrink-0" /> Simulated Trading &amp; Evaluation Platform</p>
-              <p className="flex items-center gap-2"><MapPin size={14} className="text-white/30 shrink-0" /> Mumbai, Maharashtra, India</p>
+              <p className="flex items-start gap-2"><MapPin size={14} className="text-white/30 shrink-0 mt-0.5" /> LODHA SIGNET 1 UNIT NO. 825 THANE, Mumbai, Maharashtra, 421204, India</p>
+              <p className="flex items-center gap-2"><span className="text-white/30 shrink-0 text-xs font-mono">CIN</span> U62099MR2026PTC480822</p>
+              <p className="flex items-center gap-2"><span className="text-white/30 shrink-0 text-xs font-mono">SAC</span> 999294 · Other education and training service</p>
               <p className="flex items-center gap-2"><Mail size={14} className="text-white/30 shrink-0" /> support@fundedwealth.com</p>
             </div>
             <div className="flex gap-4">
