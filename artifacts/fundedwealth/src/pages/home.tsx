@@ -5739,21 +5739,11 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* ── Company Info + New FundedWealth Disclaimer ── */}
-        <div className="mt-6 border border-white/10 rounded-xl bg-white/[0.02] px-6 py-5 space-y-4">
-
-          {/* Company Information */}
-          <div className="text-xs text-white/45 leading-relaxed space-y-0.5">
-            <p className="text-white/65 font-semibold">FundedWealth Private Limited</p>
-            <p>Simulated Trading &amp; Evaluation Platform</p>
-            <p>LODHA SIGNET 1 UNIT NO. 825 THANE, Mumbai, Maharashtra, 421204, India</p>
-            <p>CIN: U62099MR2026PTC480822</p>
-            <p>SAC: 999294 · Other education and training service</p>
-            <p><a href="mailto:support@fundedwealth.com" className="text-white/55 hover:text-white/80 transition-colors underline underline-offset-2">support@fundedwealth.com</a></p>
-          </div>
+        {/* ── New FundedWealth Disclaimer ── */}
+        <div className="mt-6 border border-white/10 rounded-xl bg-white/[0.02] px-6 py-5">
 
           {/* New FundedWealth Disclaimer */}
-          <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-white/45 leading-relaxed">
+          <div className="space-y-2 text-xs text-white/45 leading-relaxed">
             <p className="text-white/60 font-semibold">Disclaimer</p>
             <p>FundedWealth is the brand name of FundedWealth Private Limited (CIN U62099MR2026PTC480822). All trading on FundedWealth takes place on a simulator: "funded accounts" hold simulated capital, no real money is traded and no orders are sent to any exchange.</p>
             <p>The fee is a one-time charge for a trading evaluation and training service, not a deposit or an investment. "Payouts" and "profit split" refer to performance rewards paid by FundedWealth Private Limited from its own funds, only to traders who meet the published rules and verification checks; they are not a return on any fee and are not guaranteed.</p>
