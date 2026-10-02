@@ -1016,96 +1016,73 @@ const Hero = () => {
                 </span>
               </p>
 
-              {/* CTA Buttons — directly below NIFTY 500 • Stock Futures. */}
-              <div className="pt-5 lg:pt-3 flex items-center justify-center gap-2 sm:gap-3 flex-nowrap">
+              {/* CTA Buttons — 3 buttons: EXPLORE PLANS | WATCH DEMO | FREE TRIAL ACCOUNT */}
+              <div className="pt-5 lg:pt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
 
-                {/* 1. EXPLORE PLANS — Liquid Sunset Glass */}
+                {/* 1. EXPLORE PLANS — Red / Coral gradient */}
                 <button
                   onClick={() => navigate("/checkout")}
-                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
-                    background: "linear-gradient(135deg, rgba(255,80,20,0.55) 0%, rgba(220,0,100,0.45) 100%)",
+                    background: "linear-gradient(135deg, rgba(255,60,60,0.60) 0%, rgba(230,60,20,0.50) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
                     WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-                    border: "1px solid rgba(255,106,61,0.7)",
-                    boxShadow: "0 0 28px rgba(255,80,20,0.5), 0 0 60px rgba(220,0,100,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(255,80,20,0.2)",
+                    border: "1px solid rgba(255,80,60,0.7)",
+                    boxShadow: "0 0 28px rgba(255,60,60,0.5), 0 0 60px rgba(230,60,20,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(255,60,60,0.2)",
                   }}
                 >
                   <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,80,20,0.70) 0%, rgba(220,0,100,0.60) 100%)", boxShadow: "inset 0 0 30px rgba(255,80,20,0.2)" }} />
-                  <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,80,20,0.6) 0%, rgba(220,0,100,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(255,60,60,0.75) 0%, rgba(230,60,20,0.65) 100%)", boxShadow: "inset 0 0 30px rgba(255,60,60,0.2)" }} />
+                  <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(255,60,60,0.6) 0%, rgba(230,60,20,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
                   <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                    <Zap className="w-4 h-4 text-orange-300" />
+                    <Zap className="w-4 h-4 text-orange-200 shrink-0" />
                     <BulgeText text="EXPLORE PLANS" radius={100} strength={0.5} />
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                   </span>
                 </button>
 
-                {/* 2. WATCH DEMO — Liquid Cosmic Violet Glass */}
+                {/* 2. WATCH DEMO — Purple / Violet gradient */}
                 <a
                   href="https://youtu.be/w3yyFx_hDcE"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
-                    background: "linear-gradient(135deg, rgba(160,60,255,0.55) 0%, rgba(90,0,240,0.45) 100%)",
+                    background: "linear-gradient(135deg, rgba(160,60,255,0.60) 0%, rgba(100,20,240,0.50) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
                     WebkitBackdropFilter: "blur(24px) saturate(1.8)",
                     border: "1px solid rgba(160,60,255,0.7)",
-                    boxShadow: "0 0 28px rgba(160,60,255,0.5), 0 0 60px rgba(90,0,240,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(160,60,255,0.2)",
+                    boxShadow: "0 0 28px rgba(160,60,255,0.5), 0 0 60px rgba(100,20,240,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(160,60,255,0.2)",
                   }}
                 >
                   <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(160,60,255,0.70) 0%, rgba(90,0,240,0.60) 100%)", boxShadow: "inset 0 0 30px rgba(160,60,255,0.2)" }} />
-                  <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(160,60,255,0.6) 0%, rgba(90,0,240,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(160,60,255,0.75) 0%, rgba(100,20,240,0.65) 100%)", boxShadow: "inset 0 0 30px rgba(160,60,255,0.2)" }} />
+                  <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(160,60,255,0.6) 0%, rgba(100,20,240,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
                   <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                    <svg className="w-4 h-4 text-violet-300" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                    <svg className="w-4 h-4 text-violet-200 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                     <BulgeText text="WATCH DEMO" radius={100} strength={0.5} />
                   </span>
                 </a>
 
-                {/* 3. HOW IT WORKS — Liquid Neon Blue Glass */}
-                <Link href="/how-it-works">
-                  <button
-                    className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(0,180,255,0.55) 0%, rgba(0,100,220,0.45) 100%)",
-                      backdropFilter: "blur(24px) saturate(1.8)",
-                      WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-                      border: "1px solid rgba(0,180,255,0.7)",
-                      boxShadow: "0 0 28px rgba(0,180,255,0.5), 0 0 60px rgba(0,100,220,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,180,255,0.2)",
-                    }}
-                  >
-                    <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                    <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,180,255,0.70) 0%, rgba(0,100,220,0.60) 100%)", boxShadow: "inset 0 0 30px rgba(0,180,255,0.2)" }} />
-                    <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,180,255,0.6) 0%, rgba(0,100,220,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
-                    <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                      <FileText className="w-4 h-4 text-cyan-300" />
-                      <BulgeText text="HOW IT WORKS" radius={100} strength={0.5} />
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
-                  </button>
-                </Link>
-
-                {/* 4. FREE TRIAL ACCOUNT — Liquid Emerald Glass */}
+                {/* 3. FREE TRIAL ACCOUNT — Blue / Cyan gradient */}
                 <button
                   onClick={() => navigate("/sign-up?trial=true")}
-                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap min-w-[9rem] overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
+                  className="group relative rounded-lg px-5 py-2.5 text-xs font-extrabold text-white uppercase tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300 hover:-translate-y-1 active:translate-y-0.5 active:scale-[0.97]"
                   style={{
-                    background: "linear-gradient(135deg, rgba(16,185,129,0.55) 0%, rgba(5,150,105,0.45) 100%)",
+                    background: "linear-gradient(135deg, rgba(0,160,255,0.60) 0%, rgba(0,80,220,0.50) 100%)",
                     backdropFilter: "blur(24px) saturate(1.8)",
                     WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-                    border: "1px solid rgba(16,185,129,0.7)",
-                    boxShadow: "0 0 28px rgba(16,185,129,0.5), 0 0 60px rgba(5,150,105,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(16,185,129,0.2)",
+                    border: "1px solid rgba(0,180,255,0.7)",
+                    boxShadow: "0 0 28px rgba(0,160,255,0.5), 0 0 60px rgba(0,80,220,0.3), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,160,255,0.2)",
                   }}
                 >
                   <div className="absolute inset-x-0 top-0 h-[45%] rounded-t-lg pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }} />
-                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.70) 0%, rgba(5,150,105,0.60) 100%)", boxShadow: "inset 0 0 30px rgba(16,185,129,0.2)" }} />
-                  <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(16,185,129,0.6) 0%, rgba(5,150,105,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
+                  <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(0,160,255,0.75) 0%, rgba(0,80,220,0.65) 100%)", boxShadow: "inset 0 0 30px rgba(0,160,255,0.2)" }} />
+                  <div className="absolute inset-0 rounded-lg -z-10 blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300 pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(0,160,255,0.6) 0%, rgba(0,80,220,0.4) 60%, transparent 100%)", transform: "scale(1.3) translateY(6px)" }} />
                   <span className="relative flex items-center gap-2 whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                    <Users className="w-4 h-4 text-emerald-300" />
+                    <Users className="w-4 h-4 text-cyan-200 shrink-0" />
                     <BulgeText text="FREE TRIAL ACCOUNT" radius={100} strength={0.5} />
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                   </span>
                 </button>
 
