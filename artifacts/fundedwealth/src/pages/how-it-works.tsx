@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
-import { BreadcrumbSchema } from "@/components/StructuredData";
+import { BreadcrumbSchema, HowToSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -145,6 +145,7 @@ export default function HowItWorks() {
           { name: "How It Works", url: "https://www.fundedwealth.com/how-it-works" },
         ]}
       />
+      <HowToSchema />
 
       {/* Navbar */}
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">

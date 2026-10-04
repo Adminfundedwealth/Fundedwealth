@@ -207,7 +207,7 @@ const faqSchema = {
 
 const serviceSchema = {
   "@context": "https://schema.org",
-  "@type": "Service",
+  "@type": "FinancialService",
   serviceType: "Proprietary Trading / Prop Trading Evaluation",
   name: "FundedWealth Prop Trading",
   provider: {
@@ -346,6 +346,61 @@ export function ArticleSchema({
     <Helmet>
       <script type="application/ld+json">
         {JSON.stringify(schema)}
+      </script>
+    </Helmet>
+  );
+}
+
+// ── HowTo schema — used on /how-it-works ─────────────────────────────────────
+const howToSchema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: "How to Get a Funded Trading Account in India",
+  description:
+    "Step-by-step guide to getting a simulated funded trading account with FundedWealth — from choosing a plan to receiving performance-based rewards.",
+  totalTime: "PT10M",
+  estimatedCost: {
+    "@type": "MonetaryAmount",
+    currency: "INR",
+    value: "999",
+  },
+  step: [
+    {
+      "@type": "HowToStep",
+      position: 1,
+      name: "Choose an Evaluation Plan",
+      text: "Select from Flash (₹999), Instant, 1-Step or 2-Step evaluation plans based on your trading style and timeline.",
+      url: "https://www.fundedwealth.com/how-it-works#step-1",
+    },
+    {
+      "@type": "HowToStep",
+      position: 2,
+      name: "Pass the Simulated Evaluation",
+      text: "Trade on a simulated account using live NSE/BSE price data. Hit the profit target while staying within the 2% daily and 4–8% maximum drawdown limits.",
+      url: "https://www.fundedwealth.com/how-it-works#step-2",
+    },
+    {
+      "@type": "HowToStep",
+      position: 3,
+      name: "Receive Your Funded Simulated Account",
+      text: "After passing and completing compliance review, receive access to a funded simulated account up to ₹50 Lakhs.",
+      url: "https://www.fundedwealth.com/how-it-works#step-3",
+    },
+    {
+      "@type": "HowToStep",
+      position: 4,
+      name: "Trade and Earn Performance-Based Rewards",
+      text: "Trade within risk limits and earn up to 90% of eligible profits, processed every 7 days via UPI or bank transfer.",
+      url: "https://www.fundedwealth.com/how-it-works#step-4",
+    },
+  ],
+};
+
+export function HowToSchema() {
+  return (
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(howToSchema)}
       </script>
     </Helmet>
   );
