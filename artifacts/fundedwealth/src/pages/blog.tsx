@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { ArrowLeft, BookOpen, Clock, User, Tag, Search, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -54,10 +55,16 @@ export default function Blog() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Prop Trading Blog India — Trading Tips, Strategies & Market Analysis"
-        description="Learn trading discipline from experienced Indian traders. Expert tips on NSE, BSE and MCX instruments, risk management, technical analysis, and trading psychology. Free trading education from FundedWealth."
-        keywords="prop trading blog India, trading tips India, NSE trading tips, BSE trading tips, MCX trading tips, forex trading tips India, crypto trading tips, trading psychology India, risk management trading, technical analysis India, prop trading strategies, how to become funded trader India, trading education India"
+        title="Prop Trading Blog India [Free Education] — NIFTY Tips, Risk & Psychology"
+        description="Free trading education for Indian prop traders. Expert tips on NIFTY, BANKNIFTY and index F&O strategies, risk management, technical analysis, and trading psychology from FundedWealth's expert team."
+        keywords="prop trading blog India, trading tips India, NSE trading tips, NIFTY options strategies, trading psychology India, risk management trading india, technical analysis India, prop trading strategies, how to become funded trader India 2026"
         canonical="/blog"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Blog", url: "https://www.fundedwealth.com/blog" },
+        ]}
       />
 
       {/* ── Sticky nav ── */}

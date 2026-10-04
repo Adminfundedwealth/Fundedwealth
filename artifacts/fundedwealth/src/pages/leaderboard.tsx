@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Trophy, Medal, TrendingUp, Users, ArrowLeft, Crown, Star, Flame, Target, ChevronDown, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,10 +39,16 @@ export default function Leaderboard() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Top Funded Traders in India — Prop Trading Leaderboard 2026"
-        description="See India's top-performing funded traders at FundedWealth. Real-time leaderboard showing profit, win rate, and rankings. ₹45L+ monthly payouts. Join 15,000+ traders at India's best prop firm."
-        keywords="top funded traders India, prop trading leaderboard India, best prop traders India, trading competition India, funded trader rankings, prop firm leaderboard, best traders India 2026, trading profits India, prop trading results"
+        title="Prop Trading Leaderboard India [Live Rankings] — Top Funded Traders 2026"
+        description="Live rankings of India's top-performing funded traders at FundedWealth. See profit, win rate, and payout totals. ₹45L+ paid monthly. Join 15,000+ evaluation participants."
+        keywords="top funded traders India, prop trading leaderboard India, best prop traders India, trading competition India, funded trader rankings, prop firm leaderboard, best traders India 2026, trading profits India"
         canonical="/leaderboard"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Leaderboard", url: "https://www.fundedwealth.com/leaderboard" },
+        ]}
       />
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
         <div className="container mx-auto px-4 flex items-center justify-between">

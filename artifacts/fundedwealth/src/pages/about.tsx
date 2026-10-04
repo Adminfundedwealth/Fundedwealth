@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import {
   ArrowRight,
   ShieldCheck,
@@ -32,10 +33,16 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
-        title="About FundedWealth — India's First AI-Native Prop Firm"
-        description="FundedWealth is India's first AI-native proprietary trading evaluation platform built for trust, discipline, and long-term performance. Learn how we align with serious Indian traders."
-        keywords="about FundedWealth, AI prop firm India, FundedWealth founder, prop trading India, A-book prop firm"
+        title="About FundedWealth [India's Prop Trading Platform] — Our Story & Values"
+        description="FundedWealth is India's AI-native prop trading evaluation platform. Learn about our team, mission, and why we built a simulated evaluation platform specifically for Indian traders trading NIFTY and BANKNIFTY."
+        keywords="about FundedWealth, AI prop firm India, FundedWealth story, prop trading India, fundedwealth founder india, india prop firm about"
         canonical="/about"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "About", url: "https://www.fundedwealth.com/about" },
+        ]}
       />
 
       {/* Navbar */}

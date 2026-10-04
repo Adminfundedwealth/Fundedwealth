@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import {
   ArrowLeft,
   CheckCircle,
@@ -230,10 +231,16 @@ export default function Instruments() {
   return (
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
-        title="Instruments | FundedWealth — Indian Market Simulated Trading"
-        description="Explore the Indian market instruments available on FundedWealth's simulated evaluation platform — NIFTY 50, BANKNIFTY, SENSEX, FINNIFTY. Clear rules, defined sessions, transparent risk parameters."
-        keywords="NIFTY trading, BANKNIFTY simulated, SENSEX prop firm India, FINNIFTY evaluation, FundedWealth instruments, Indian index futures, NSE BSE simulated trading"
+        title="Tradable Instruments India [NIFTY, BANKNIFTY, SENSEX] — FundedWealth"
+        description="Full list of instruments available on FundedWealth's simulated evaluation platform: NIFTY 50, BANKNIFTY, SENSEX, FINNIFTY index F&O and NIFTY 500 equities. Trading hours, lot sizes, and rules — all in one place."
+        keywords="NIFTY trading prop firm, BANKNIFTY simulated evaluation, SENSEX prop firm India, FINNIFTY funded account, FundedWealth instruments, Indian index futures prop, NSE BSE simulated trading, nifty 50 funded account india"
         canonical="/instruments"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Instruments", url: "https://www.fundedwealth.com/instruments" },
+        ]}
       />
 
       {/* ── Sticky mini-nav ── */}

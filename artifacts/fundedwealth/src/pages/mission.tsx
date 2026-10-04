@@ -2,15 +2,22 @@ import { Link } from "wouter";
 import { TrendingUp, Target, Users, Zap, Heart, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 
 const MissionPage = () => {
   return (
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
-        title="Our Mission — Democratizing Trading for Every Indian"
-        description="FundedWealth's mission is to make structured simulated trading evaluations accessible to talented Indian traders. We provide a place to practise and demonstrate skill without providing customer-owned live capital."
-        keywords="FundedWealth mission, prop trading India mission, democratize trading India, funded trading vision, Indian traders empowerment, prop firm mission India"
+        title="FundedWealth Mission — Democratizing Prop Trading for Every Indian Trader"
+        description="FundedWealth's mission: make structured simulated trading evaluations accessible to every serious Indian trader regardless of capital. Discipline, consistency, and skill — not luck — determine who gets funded."
+        keywords="FundedWealth mission, prop trading India mission, democratize trading India, funded trading vision, Indian traders empowerment, prop firm mission India 2026"
         canonical="/mission"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Mission", url: "https://www.fundedwealth.com/mission" },
+        ]}
       />
       {/* Navbar */}
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0010]/95 backdrop-blur-md">

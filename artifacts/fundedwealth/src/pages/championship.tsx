@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Trophy, ArrowRight, CheckCircle2, Medal, ShieldCheck, BarChart3, Users, Zap, Star, Copy, Smartphone, CreditCard } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getApiBase } from "@/lib/api-base";
@@ -183,10 +184,16 @@ const ChampionshipPage = () => {
   return (
     <div className="min-h-screen bg-[#0a0010] text-white">
       <SEOHead
-        title="Trading Championship India 2026 � Win iPhone, MacBook & Cash Prizes"
-        description="Join FundedWealth's monthly trading championship. Compete with India's best prop traders and win iPhone 16, MacBook, Royal Enfield & cash prizes. Free entry for funded traders. Weekly & monthly trading contests."
-        keywords="trading championship India, prop trading competition India, trading contest India 2026, win prizes trading, FundedWealth championship, monthly trading challenge India, trading tournament India, best trading competition"
+        title="Trading Championship India 2026 [Win iPhone, MacBook & Cash Prizes]"
+        description="Join FundedWealth's monthly trading championship. Compete with India's best prop traders and win iPhone 16, MacBook, Royal Enfield and cash prizes. Free entry for all funded traders."
+        keywords="trading championship India, prop trading competition India, trading contest India 2026, win prizes trading, FundedWealth championship, monthly trading challenge India, trading tournament India, best trading competition india 2026"
         canonical="/championship"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Championship", url: "https://www.fundedwealth.com/championship" },
+        ]}
       />
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0010]/95 backdrop-blur-md">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">

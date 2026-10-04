@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowLeft, Star, Quote, TrendingUp, Award, Users, Play } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -85,10 +86,16 @@ export default function SuccessStories() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Funded Trader Success Stories India — Real Reviews & Profits"
-        description="Real success stories from FundedWealth evaluation participants across India. See how traders from Delhi, Mumbai, Bangalore, Hyderabad & more earn consistent profits through FundedWealth's structured evaluation programs."
-        keywords="funded trader success stories India, prop trading success stories, funded trader testimonials India, FundedWealth reviews, real funded trader profits, best prop firm reviews India, prop trading India reviews, prop firm testimonials"
+        title="Funded Trader Success Stories India [Real Case Studies] — Profits & Reviews"
+        description="Real case studies from FundedWealth evaluation participants across India — Delhi, Mumbai, Bangalore, Hyderabad & more. See profits earned, strategies used, and honest reviews of India's prop trading platform."
+        keywords="funded trader success stories India, prop trading success stories, funded trader testimonials India, FundedWealth reviews, real funded trader profits, best prop firm reviews India, prop trading india reviews"
         canonical="/success-stories"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Success Stories", url: "https://www.fundedwealth.com/success-stories" },
+        ]}
       />
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
         <div className="container mx-auto px-4 flex items-center justify-between">

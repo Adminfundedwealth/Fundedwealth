@@ -26,6 +26,7 @@ import {
   ImagePlus,
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useUser } from "@/contexts/SupabaseAuthContext";
@@ -681,10 +682,16 @@ export default function Community() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Trading Community India — Join 15,000+ Evaluation Participants"
-        description="India's prop trading community — post trade ideas, join discussions, and connect on WhatsApp, Telegram, YouTube & Instagram. Free to join for all evaluation participants."
-        keywords="trading community India, prop trading group India, funded traders community, trading discord India, free trading signals India"
+        title="Prop Trading Community India [15,000+ Traders] — Discussion & Trade Ideas"
+        description="Join India's prop trading community: post trade ideas, discuss NIFTY and BANKNIFTY setups, and connect on WhatsApp, Telegram, YouTube and Instagram. Free for all FundedWealth evaluation participants."
+        keywords="trading community India, prop trading group India, funded traders community, NIFTY trading discussion, trading discord India, prop firm community 2026"
         canonical="/community"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Community", url: "https://www.fundedwealth.com/community" },
+        ]}
       />
 
       {/* Nav */}
