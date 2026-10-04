@@ -1,16 +1,16 @@
-name: Deploy to AWS
+name: CI
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 env:
-  AWS_REGION: ap-south-1
-  S3_BUCKET: fundedwealth-frontend
   NODE_VERSION: 22
 
 jobs:
-  build-check:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,20 +30,7 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
-      - name: Verify API URL is configured
-        run: |
-          if [ -z "$VITE_API_URL" ]; then
-            echo "⚠️  WARNING: VITE_API_URL secret is not set. Frontend will fall back to"
-            echo "   https://api.fundedwealth.com — if that DNS record does not exist,"
-            echo "   ALL dashboard API calls will fail and users will see 'No Active Accounts'."
-            echo "   FIX: Set VITE_API_URL in GitHub Actions secrets to the real EC2 hostname or IP."
-          else
-            echo "✅ VITE_API_URL is set (length=${#VITE_API_URL})"
-          fi
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-
-      - name: Build Frontend
+      - name: Build frontend
         run: pnpm --filter @workspace/fundedwealth build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
@@ -52,88 +39,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_RAZORPAY_KEY_ID: ${{ secrets.VITE_RAZORPAY_KEY_ID }}
 
-      - name: Build Backend
+      - name: Build backend
         run: pnpm --filter @workspace/api-server build
 
-  deploy-frontend:
-    needs: build-check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Verify API URL is configured
-        run: |
-          if [ -z "$VITE_API_URL" ]; then
-            echo "⚠️  WARNING: VITE_API_URL not set — frontend will use https://api.fundedwealth.com fallback"
-            echo "   If DNS is not configured, users will see 'No Active Accounts' on dashboard."
-          else
-            echo "✅ VITE_API_URL configured (length=${#VITE_API_URL})"
-          fi
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-
-      - name: Build Frontend
-        run: pnpm --filter @workspace/fundedwealth build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_RAZORPAY_KEY_ID: ${{ secrets.VITE_RAZORPAY_KEY_ID }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy to S3
-        run: |
-          # Sync assets with immutable cache
-          aws s3 sync ./artifacts/fundedwealth/dist/assets s3://${{ env.S3_BUCKET }}/assets \
-            --cache-control "public, max-age=31536000, immutable" \
-            --delete
-
-          # Sync root files with no-cache
-          aws s3 sync ./artifacts/fundedwealth/dist s3://${{ env.S3_BUCKET }} \
-            --cache-control "no-cache, no-store, must-revalidate" \
-            --exclude "assets/*" \
-            --delete
-
-      - name: Invalidate CloudFront
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
-
-  deploy-backend:
-    needs: build-check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /opt/fundedwealth
-            git pull origin main
-            pnpm install --no-frozen-lockfile
-            pnpm --filter @workspace/db run build
-            pnpm --filter @workspace/api-zod run build
-            pnpm --filter @workspace/api-server run build
-            pm2 reload fundedwealth-api --update-env
+# Deployment is handled automatically:
+#   Frontend → Vercel (connected to this repo, deploys on push to main)
+#   Backend  → Railway (connected to this repo, deploys on push to main)
