@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useSearch } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import {
   ArrowLeft, Shield, CheckCircle, XCircle, AlertTriangle, Info,
   BookOpen, Clock, Target, Activity, Calendar, Scale, FileText,
@@ -2099,10 +2100,16 @@ export default function Rules() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Indian Prop Trading Rules — NIFTY Funded Account Evaluation Guidelines"
-        description="Complete prop trading rules for Indian funded account evaluations. NIFTY, BANKNIFTY, and stock futures lot sizes, drawdown limits, profit targets, and evaluation guidelines. Flash, Instant, 1-Step & 2-Step plans."
-        keywords="indian prop trading rules, nifty funded account rules, prop firm for indian stock market, indian funded account rules, banknifty funded account, indian market prop firm rules, funded trading account india, nse bse prop trading rules, evaluation rules india, flash instant 1-step 2-step rules"
+        title="Prop Trading Rules India [Complete Guide] — Drawdown, Targets & Evaluation"
+        description="Full evaluation rules for every FundedWealth plan. 2% daily drawdown, no time limit, min 5 trading days. Flash, Instant, 1-Step & 2-Step rules for NIFTY, BANKNIFTY and stock futures — explained in plain language."
+        keywords="indian prop trading rules, nifty funded account rules, prop firm for indian stock market, indian funded account rules, banknifty funded account, indian market prop firm rules, funded trading account india, nse bse prop trading rules, evaluation rules india, flash instant 1-step 2-step rules, drawdown rules prop firm india"
         canonical="/rules"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Rules", url: "https://www.fundedwealth.com/rules" },
+        ]}
       />
 
       {/* ── Navbar ── */}

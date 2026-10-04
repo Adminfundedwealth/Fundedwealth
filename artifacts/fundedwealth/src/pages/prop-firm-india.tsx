@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, BadgeCheck, ChartCandlestick, CheckCircle2, ShieldCheck, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -52,10 +53,16 @@ export default function PropFirmIndiaPage() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Prop Firm India — Simulated Funded Trading Accounts for Indian Traders"
-        description="Find the FundedWealth prop firm experience built for Indian traders. Learn how simulated funded accounts, evaluation rules, rewards, and NIFTY-focused trading work in India."
-        keywords="prop firm india, prop trading firm india, best prop firm india, funded trading account india, prop firm for indian traders, indian prop firm, funded trader india, funded account india"
+        title="Prop Firm India [Best 2026] — Simulated Funded Trading Accounts for Indian Traders"
+        description="FundedWealth: India's prop firm built for NIFTY, BANKNIFTY & SENSEX traders. Simulated funded accounts from ₹999, clear evaluation rules, rewards up to 90% split. No real capital risk."
+        keywords="prop firm india, prop trading firm india, best prop firm india 2026, funded trading account india, prop firm for indian traders, indian prop firm, funded trader india, funded account india, nifty prop firm, banknifty funded account india"
         canonical="/prop-firm-india"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Prop Firm India", url: "https://www.fundedwealth.com/prop-firm-india" },
+        ]}
       />
 
       <div className="sticky top-0 z-40 border-b border-white/10 bg-[#1A0030]/95 backdrop-blur-md">

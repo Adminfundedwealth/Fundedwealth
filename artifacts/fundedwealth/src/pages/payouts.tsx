@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { ArrowLeft, CheckCircle, Clock, IndianRupee, Users, TrendingUp, Shield, ChevronDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -111,10 +112,16 @@ export default function Payouts() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Prop Trading Payout Proofs India — ₹45L+ Paid in Performance-Based Rewards"
-        description="Performance-based rewards for eligible participants under the applicable program terms. Over ₹45 Lakhs paid to FundedWealth evaluation participants. See verified payout proofs from India's top funded traders."
-        keywords="prop trading payouts India, funded trader payouts India, payout proof prop firm, verified payouts prop trading, fastest prop firm payouts India, 12 hour payout prop firm, prop firm payout proof, real prop trading profits India"
+        title="Prop Trading Payouts India [Live Proof] — ₹45L+ Paid in Under 12 Hours"
+        description="See real verified payout proofs from FundedWealth traders. Over ₹45 Lakhs in performance-based rewards paid. Eligible rewards typically processed within 12 hours via UPI or bank transfer — subject to verification and program terms."
+        keywords="prop trading payouts India, funded trader payouts India, payout proof prop firm, verified payouts prop trading, fastest prop firm payouts India, 12 hour payout prop firm, prop firm payout proof, real prop trading profits India, prop firm payout india 2026"
         canonical="/payouts"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Payouts", url: "https://www.fundedwealth.com/payouts" },
+        ]}
       />
 
       {/* ── Nav ── */}

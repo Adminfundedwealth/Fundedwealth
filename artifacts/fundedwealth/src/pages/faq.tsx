@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "wouter";
 import SEOHead from "@/components/SEOHead";
-import { FAQSchema } from "@/components/StructuredData";
+import { FAQSchema, BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -492,12 +492,18 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Prop Trading FAQ India — Evaluations, Payouts & Rules"
-        description="Everything you wanted to know about FundedWealth — payouts, evaluation rules, profit split, scaling, KYC, taxes and more. Detailed FAQ for India's prop trading community."
-        keywords="FundedWealth FAQ, prop trading questions India, prop firm FAQ, funded trader FAQ, evaluation rules, profit split, drawdown rules, payout process India"
+        title="Prop Trading FAQ India [70+ Answers] — Payouts, Rules & Evaluation"
+        description="Answers to 70+ questions about FundedWealth: payouts in 12 hours, 2% daily drawdown, 90% profit split, KYC, taxes, scaling and evaluation rules. Complete FAQ for Indian prop traders."
+        keywords="FundedWealth FAQ, prop trading questions India, prop firm FAQ, funded trader FAQ, evaluation rules, profit split, drawdown rules, payout process India, prop trading india 2026 faq"
         canonical="/faq"
       />
       <FAQSchema />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "FAQ", url: "https://www.fundedwealth.com/faq" },
+        ]}
+      />
 
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
         <div className="container mx-auto px-4 flex items-center justify-between">

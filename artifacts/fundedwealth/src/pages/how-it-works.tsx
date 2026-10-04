@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -133,10 +134,16 @@ export default function HowItWorks() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="How to Get a Funded Trading Account in India — Step-by-Step"
-        description="Learn exactly how FundedWealth's prop trading evaluation works. Choose a plan from ₹999, pass a simulated NIFTY/BANKNIFTY challenge, receive a funded account up to ₹50 Lakhs, and earn performance-based rewards."
-        keywords="how to get funded trading account India, prop trading evaluation process India, how prop trading works India, funded account India steps, become funded trader India, NIFTY funded account how it works, prop firm evaluation India, funded trading account process"
+        title="How to Get a Funded Trading Account in India [4 Steps] — From ₹999"
+        description="Step-by-step guide: choose a plan from ₹999, pass a simulated NIFTY/BANKNIFTY evaluation, receive a funded account up to ₹50 Lakhs, and earn performance-based rewards up to 90% split. FundedWealth India."
+        keywords="how to get funded trading account India, prop trading evaluation process India, how prop trading works India, funded account India steps, become funded trader India, NIFTY funded account how it works, prop firm evaluation India, funded trading account process, how to become funded trader india 2026"
         canonical="/how-it-works"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "How It Works", url: "https://www.fundedwealth.com/how-it-works" },
+        ]}
       />
 
       {/* Navbar */}

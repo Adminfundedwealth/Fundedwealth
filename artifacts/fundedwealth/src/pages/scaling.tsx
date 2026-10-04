@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowLeft, TrendingUp, ChevronRight, CheckCircle, Star, Zap, Crown, Rocket } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
+import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -25,10 +26,16 @@ export default function Scaling() {
   return (
     <div className="min-h-screen bg-[#0D0020] text-white">
       <SEOHead
-        title="Scaling Plan — Grow your simulated evaluation account from ₹1L to ₹50L | FundedWealth India"
-        description="Scale your simulated evaluation account size from ₹1 Lakh to ₹50 Lakhs across 6 levels as you demonstrate consistency. FundedWealth's scaling program rewards consistent performance with larger simulated accounts and higher reward splits."
-        keywords="prop trading scaling plan India, simulated account scaling, simulated trading evaluation India, ₹50 lakh simulated account, scaling program prop firm, best prop firm India scaling"
+        title="Scaling Plan India [Step-by-Step] — Grow Your Funded Account from ₹1L to ₹50L"
+        description="Scale your simulated prop trading account across 6 levels from ₹1 Lakh to ₹50 Lakhs. Profit split grows from 80% to 90% as you advance. No extra fees — automatic scaling for consistent traders. FundedWealth India."
+        keywords="prop trading scaling plan India, simulated account scaling, funded account scaling india, 90 percent profit split prop firm, ₹50 lakh funded account, scaling program prop firm, best prop firm India scaling, prop trading growth plan india 2026"
         canonical="/scaling"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://www.fundedwealth.com/" },
+          { name: "Scaling Plan", url: "https://www.fundedwealth.com/scaling" },
+        ]}
       />
       <div className="sticky top-0 z-40 bg-[#1A0030]/95 backdrop-blur-md border-b border-white/10 py-4">
         <div className="container mx-auto px-4 flex items-center justify-between">
