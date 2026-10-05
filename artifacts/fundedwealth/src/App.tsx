@@ -51,7 +51,6 @@ const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 const SocialMediaRail = lazy(() => import("@/components/SocialMediaRail"));
 import { OrganizationSchema, WebsiteSchema } from "@/components/StructuredData";
 import MobileShell from "@/components/MobileShell";
-import ForexLaunchPopup from "@/components/ForexLaunchPopup";
 import { trackPageView } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
@@ -186,7 +185,6 @@ function App() {
                                         <ChatWidget />
                                         <WhatsAppButton />
                                         <SocialMediaRail />
-                                        {window.location.pathname === `${basePath || ""}/` && <ForexLaunchPopup />}
                                     </MobileShell>
                                 </Suspense>
                                 <Toaster />
