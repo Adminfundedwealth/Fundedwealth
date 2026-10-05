@@ -1,0 +1,46 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^index\.html$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self)"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; connect-src 'self' https: wss: ws:; frame-src https://checkout.razorpay.com; object-src 'none'; base-uri 'self';"
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    <FilesMatch "\.(html)$">
+        ExpiresDefault "access plus 0 seconds"
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "\.(js|css|woff2?|ttf|eot)$">
+        ExpiresDefault "access plus 1 year"
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(png|jpg|jpeg|webp|avif|svg|ico)$">
+        ExpiresDefault "access plus 1 month"
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<FilesMatch "\.(env|env\..*|git|gitignore|htpasswd|log|sql)$">
+    Require all denied
+</FilesMatch>

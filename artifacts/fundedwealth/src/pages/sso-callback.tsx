@@ -7,7 +7,7 @@ import SEOHead from "@/components/SEOHead";
  */
 export default function SSOCallbackPage() {
   useEffect(() => {
-    window.location.replace("/auth/callback" + window.location.search);
+    window.location.replace("/auth/callback" + window.location.search + window.location.hash);
   }, []);
 
   return (

@@ -3,22 +3,49 @@ import { supabase } from "@/lib/supabase";
 import SEOHead from "@/components/SEOHead";
 
 /**
- * Auth Callback page — Supabase redirects here after Google OAuth.
- * Handles the code exchange and redirects to dashboard.
+ * Supabase may return either an implicit-flow token in the URL fragment or a
+ * PKCE code in the query string, so handle both callback shapes.
  */
 export default function AuthCallbackPage() {
     useEffect(() => {
         const handleCallback = async () => {
-            const { error } = await supabase.auth.exchangeCodeForSession(
-                window.location.href
-            );
-            if (error) {
+            try {
+                const hasAccessToken = new URLSearchParams(
+                    window.location.hash.slice(1)
+                ).has("access_token");
+
+                if (hasAccessToken) {
+                    const { data: { session }, error } = await supabase.auth.getSession();
+                    if (error) throw error;
+                    if (session) {
+                        window.location.replace("/dashboard");
+                        return;
+                    }
+                }
+
+                if (new URLSearchParams(window.location.search).has("code")) {
+                    const { error } = await supabase.auth.exchangeCodeForSession(
+                        window.location.href
+                    );
+                    if (error) throw error;
+                    window.location.replace("/dashboard");
+                    return;
+                }
+
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) throw error;
+                if (session) {
+                    window.location.replace("/dashboard");
+                    return;
+                }
+
+                window.location.replace("/sign-in?error=callback_failed");
+            } catch (error) {
                 console.error("Auth callback error:", error);
                 window.location.replace("/sign-in?error=callback_failed");
-            } else {
-                window.location.replace("/dashboard");
             }
         };
+
         handleCallback();
     }, []);
 
