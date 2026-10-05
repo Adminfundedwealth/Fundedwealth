@@ -2,24 +2,16 @@
  * Centralised API base URL resolver.
  *
  * Priority:
- *  1. VITE_API_URL  — only used if it is NOT the dead api.fundedwealth.com domain
- *  2. VITE_API_BASE_URL  — legacy alias, same guard
- *  3. Empty string ""  — falls back to RELATIVE /api/* URLs which Vercel
- *     proxies to the Railway backend via the /api rewrite in vercel.json.
- *
- * WHY THE GUARD:
- *   api.fundedwealth.com DNS currently points to Vercel (returns 404) — it is
- *   NOT the Railway Express server. Any build that had VITE_API_URL set to that
- *   domain will silently fail all API calls. Relative "" is always safe because
- *   vercel.json rewrites /api/* → fundedwealth-api-production.up.railway.app/api/*
- *
- * NEVER hard-code api.fundedwealth.com as a fallback anywhere in the codebase.
- * Use getApiBase() from this file everywhere instead.
+ *  1. VITE_API_URL
+ *  2. VITE_API_BASE_URL — legacy alias
+ *  3. https://api.fundedwealth.com — the production Railway API domain
  */
 
-/** Dead domains that must be treated as if unset. */
+const LEGACY_API_HOST = "api.fundedwealth11.com";
+const PRODUCTION_API_BASE = "https://api.fundedwealth.com";
+
+/** Domains that must be treated as if unset. */
 const DEAD_DOMAINS = [
-  "api.fundedwealth.com",
   "fundedwealth-api.onrender.com",  // Render service is suspended
 ];
 
@@ -32,10 +24,16 @@ export function getApiBase(): string {
   const fromEnv =
     import.meta.env.VITE_API_URL ||
     import.meta.env.VITE_API_BASE_URL ||
-    "";
+    PRODUCTION_API_BASE;
+
+  // Rewrite the previously misconfigured hostname to the production API domain.
+  const normalized = fromEnv.replace(
+    new RegExp(`(^https?://)${LEGACY_API_HOST.replace(/\./g, "\\.")}(?=[:/]|$)`, "i"),
+    "$1api.fundedwealth.com",
+  );
 
   // If the env var is set to a known-dead domain, ignore it and use relative.
-  if (isDeadUrl(fromEnv)) return "";
+  if (isDeadUrl(normalized)) return "";
 
-  return fromEnv;
+  return normalized;
 }

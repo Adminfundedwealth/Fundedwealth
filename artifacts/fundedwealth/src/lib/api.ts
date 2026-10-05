@@ -1,14 +1,13 @@
 /**
  * api.ts — Thin fetch wrapper for the FundedWealth backend API.
  *
- * All calls use getApiBase() which strips dead domains and falls back to
- * relative /api/* URLs (proxied by Vercel → Railway). Never hard-code
- * api.fundedwealth.com here — that domain is dead (Vercel 404).
+ * All calls use getApiBase() so production requests use the configured API
+ * host, defaulting to api.fundedwealth.com.
  */
 import { getApiBase } from "./api-base";
 
 function getApiPrefix(): string {
-  const base = getApiBase(); // "" | "https://fundedwealth-api-production.up.railway.app"
+  const base = getApiBase();
   return base ? `${base}/api` : "/api";
 }
 

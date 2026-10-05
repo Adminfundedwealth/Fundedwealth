@@ -9,10 +9,7 @@
  */
 
 const API_HOSTS = [
-    // api.fundedwealth.com DNS points to Vercel (404) — not the Railway backend.
-    // Relative /api/* is the correct path (Vercel proxies to Railway).
-    // Keep this list for header-injection matching only; relative URLs ("/api")
-    // are checked first so this dead domain entry is harmless.
+    // Production API host, plus supported deployment and local API hosts.
     "api.fundedwealth.com",
     "fundedwealth-api-production.up.railway.app",
     "localhost:9000",
