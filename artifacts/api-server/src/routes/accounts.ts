@@ -3,7 +3,11 @@ import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users, orders } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { decrypt, isEncrypted } from "../lib/encryption-service";
-import { resolveUserTraderId, fetchUserLiveAccounts } from "../lib/accountOwnershipCompat";
+import {
+  resolveUserTraderId,
+  fetchUserLiveAccounts,
+  resolveUserAccountOwnership,
+} from "../lib/accountOwnershipCompat";
 
 const router = Router();
 
@@ -681,23 +685,26 @@ router.get("/:accountId/trades", async (req: Request, res: Response) => {
 
     const { accountId } = req.params;
 
-    // Verify ownership via trader chain
-    const [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+    let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+    if (!user && auth.email) {
+      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
+      if (byEmail) {
+        [user] = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
+      }
+    }
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    const ownerCheck = await db.execute(sql`
-      SELECT ta.id
-      FROM trading_accounts ta
-      JOIN terminal_traders tt ON tt.id = ta.trader_id
-      WHERE (ta.id = ${accountId}::uuid OR ta.challenge_id = ${accountId}::uuid)
-        AND tt.external_id = ${String(user.id)}
-      LIMIT 1
-    `);
-    if (!ownerCheck.rows || ownerCheck.rows.length === 0) {
+    const ownerCheck = await resolveUserAccountOwnership(db, String(user.id), accountId);
+    const ownedAccount = ownerCheck.rows?.[0] as { trading_account_id: string } | undefined;
+    if (!ownedAccount) {
       return res.status(404).json({ success: false, message: "Account not found" });
     }
 
-    const tradingAccountId = (ownerCheck.rows[0] as any).id;
+    const tradingAccountId = ownedAccount.trading_account_id;
 
     // Fetch from trade_logs — gracefully return empty if table doesn't exist
     const tradesResult = await db.execute(sql`
@@ -723,6 +730,135 @@ router.get("/:accountId/trades", async (req: Request, res: Response) => {
   } catch (err: any) {
     // trade_logs table may not exist in all environments
     return res.json({ success: true, trades: [] });
+  }
+});
+
+/**
+ * GET /api/accounts/:accountId/analytics
+ * Returns aggregated trading metrics for an account owned by the user.
+ */
+router.get("/:accountId/analytics", async (req: Request, res: Response) => {
+  try {
+    const auth = getAuth(req);
+    if (!auth?.userId) {
+      return res.status(401).json({ success: false, message: "Authentication required" });
+    }
+
+    const { accountId } = req.params;
+    let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
+    if (!user && auth.email) {
+      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
+      if (byEmail) {
+        [user] = await db
+          .update(users)
+          .set({ clerkId: auth.userId, updatedAt: new Date() })
+          .where(eq(users.id, byEmail.id))
+          .returning();
+      }
+    }
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    const ownerCheck = await resolveUserAccountOwnership(db, String(user.id), accountId);
+    if (!ownerCheck.rows?.length) {
+      return res.status(404).json({ success: false, message: "Account not found" });
+    }
+
+    const account = ownerCheck.rows[0] as {
+      trading_account_id: string;
+      initial_balance: string | number | null;
+      account_code: string | null;
+    };
+    const accountBalances = await db.execute(sql`
+      SELECT ca.current_balance, ta.balance AS trading_balance
+      FROM trading_accounts ta
+      LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+      WHERE ta.id = ${account.trading_account_id}::uuid
+      LIMIT 1
+    `);
+    const balance = accountBalances.rows?.[0] as {
+      current_balance: string | number | null;
+      trading_balance: string | number | null;
+    } | undefined;
+    const initialBalance = Number(account.initial_balance ?? balance?.trading_balance ?? 0);
+    const currentBalance = Number(balance?.current_balance ?? balance?.trading_balance ?? initialBalance);
+
+    const tradeResult = await db.execute(sql`
+      SELECT pnl, exited_at, created_at
+      FROM trade_logs
+      WHERE trading_account_id = ${account.trading_account_id}::uuid
+      ORDER BY exited_at ASC NULLS LAST, created_at ASC
+      LIMIT 5000
+    `);
+    const trades = (tradeResult.rows || []).map((row: any) => ({
+      pnl: Number(row.pnl) || 0,
+      date: row.exited_at || row.created_at,
+    }));
+
+    const dailyTotals = new Map<string, number>();
+    let equity = initialBalance;
+    let peak = initialBalance;
+    let maxDrawdown = 0;
+    const equityCurve: Array<{ date: string; equity: number; pnl: number }> = [];
+
+    for (const trade of trades) {
+      if (!trade.date) continue;
+      const date = new Date(trade.date).toISOString().slice(0, 10);
+      equity += trade.pnl;
+      peak = Math.max(peak, equity);
+      maxDrawdown = Math.max(maxDrawdown, peak - equity);
+      dailyTotals.set(date, (dailyTotals.get(date) || 0) + trade.pnl);
+      equityCurve.push({ date, equity, pnl: trade.pnl });
+    }
+
+    const aggregatePeriods = (format: (date: Date) => string) => {
+      const totals = new Map<string, number>();
+      for (const [day, pnl] of dailyTotals) {
+        const key = format(new Date(`${day}T00:00:00.000Z`));
+        totals.set(key, (totals.get(key) || 0) + pnl);
+      }
+      return [...totals].map(([key, pnl]) => ({ key, pnl }));
+    };
+    const dailyPnl = [...dailyTotals].map(([date, pnl]) => ({ date, pnl }));
+    const weeklyPnl = aggregatePeriods((date) => {
+      const monday = new Date(date);
+      monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
+      return monday.toISOString().slice(0, 10);
+    }).map(({ key: week, pnl }) => ({ week, pnl }));
+    const monthlyPnl = aggregatePeriods((date) => date.toISOString().slice(0, 7))
+      .map(({ key: month, pnl }) => ({ month, pnl }));
+
+    const winners = trades.filter((trade) => trade.pnl > 0);
+    const losers = trades.filter((trade) => trade.pnl < 0);
+    const grossProfit = winners.reduce((sum, trade) => sum + trade.pnl, 0);
+    const grossLoss = Math.abs(losers.reduce((sum, trade) => sum + trade.pnl, 0));
+    const totalPositiveDailyPnl = dailyPnl.reduce((sum, day) => sum + Math.max(day.pnl, 0), 0);
+    const largestPositiveDay = Math.max(0, ...dailyPnl.map((day) => day.pnl));
+
+    return res.json({
+      equityCurve,
+      dailyPnl,
+      weeklyPnl,
+      monthlyPnl,
+      winRate: trades.length ? (winners.length / trades.length) * 100 : 0,
+      profitFactor: grossLoss ? grossProfit / grossLoss : 0,
+      maxDrawdown,
+      maxDrawdownPct: initialBalance ? (maxDrawdown / initialBalance) * 100 : 0,
+      consistencyScore: totalPositiveDailyPnl
+        ? Math.max(0, 100 - (largestPositiveDay / totalPositiveDailyPnl) * 100)
+        : 0,
+      netPnl: trades.reduce((sum, trade) => sum + trade.pnl, 0),
+      grossProfit,
+      grossLoss,
+      avgWin: winners.length ? grossProfit / winners.length : 0,
+      avgLoss: losers.length ? grossLoss / losers.length : 0,
+      totalTrades: trades.length,
+      tradingDays: dailyPnl.length,
+      initialBalance,
+      currentBalance,
+    });
+  } catch (error) {
+    console.error("[Accounts] Failed to fetch account analytics:", error);
+    return res.status(500).json({ success: false, message: "Failed to load account analytics" });
   }
 });
 

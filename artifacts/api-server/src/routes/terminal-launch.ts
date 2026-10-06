@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
-import { createHash, createHmac, randomUUID } from "crypto";
+import { createHmac, randomUUID } from "crypto";
 import { resolveTerminalLaunchUser } from "../lib/terminalLaunchAuth.js";
 import { resolveUserAccountOwnership } from "../lib/accountOwnershipCompat";
 
@@ -11,7 +11,6 @@ const router = Router();
 const PRODUCTION_TERMINAL_URL = "https://terminal.fundedwealth.com";
 const SSO_API_KEY = process.env.SSO_API_KEY || "";
 const SSO_TOKEN_ALGORITHM = "HS256";
-let lastReturnedTerminalJwt: string | null = null;
 
 function getTerminalSSOSecret(): { secret: string; source: string } {
   // Try every variable name that could hold the shared SSO secret.
@@ -41,27 +40,6 @@ function signTerminalJWT(payload: Record<string, unknown>, secret: string): stri
 }
 
 function verifyTerminalJWT(token: string): { payload: any; reason?: string; secretSource?: string } | null {
-  console.info("[Terminal Launch] received JWT for verification", { jwt: token });
-
-  if (lastReturnedTerminalJwt && token !== lastReturnedTerminalJwt) {
-    let firstDiffIndex = -1;
-    for (let i = 0; i < Math.max(token.length, lastReturnedTerminalJwt.length); i += 1) {
-      if (token[i] !== lastReturnedTerminalJwt[i]) {
-        firstDiffIndex = i;
-        break;
-      }
-    }
-    console.error("[Terminal Launch] JWT byte mismatch", {
-      returnedJwt: lastReturnedTerminalJwt,
-      receivedJwt: token,
-      firstDiffIndex,
-      returnedChar: firstDiffIndex >= 0 ? lastReturnedTerminalJwt[firstDiffIndex] ?? null : null,
-      receivedChar: firstDiffIndex >= 0 ? token[firstDiffIndex] ?? null : null,
-    });
-  } else if (lastReturnedTerminalJwt && token === lastReturnedTerminalJwt) {
-    console.info("[Terminal Launch] JWT byte comparison", { identical: true });
-  }
-
   const parts = token.split(".");
   if (parts.length !== 3) {
     return { payload: null, reason: "invalid_format" };
@@ -73,16 +51,6 @@ function verifyTerminalJWT(token: string): { payload: any; reason?: string; secr
   const expected = createHmac("sha256", secret).update(signingInput).digest("base64url");
 
   if (expected !== signature) {
-    const verificationSecretHash = createHash("sha256").update(secret).digest("hex");
-    const signingSecretHash = lastReturnedTerminalJwt
-      ? createHash("sha256").update(secret).digest("hex")
-      : verificationSecretHash;
-    console.error("[Terminal Launch] JWT verification mismatch", {
-      receivedJwt: token,
-      secretSource: source,
-      signingSecretHash,
-      verificationSecretHash,
-    });
     return { payload: null, reason: "signature_mismatch", secretSource: source };
   }
 
@@ -367,12 +335,6 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           });
 
           if (launchUrl) {
-            const launchToken = terminalData.token ?? (launchUrl ? new URL(launchUrl).searchParams.get("token") : null);
-            lastReturnedTerminalJwt = launchToken ?? null;
-            console.info("[Terminal Launch] returning launchUrl JWT", {
-              jwt: launchToken,
-              launchUrl,
-            });
             return res.json({ success: true, launchUrl });
           }
         }
@@ -387,9 +349,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     const ssoToken = generateSSOToken(String(user.id), prov.trading_account_id, storedLoginEmail);
     const terminalBase = TERMINAL_API_URL || PRODUCTION_TERMINAL_URL;
     const launchUrl = buildTerminalLaunchUrl(terminalBase, ssoToken, storedAccountCode);
-    lastReturnedTerminalJwt = ssoToken;
-    console.info("[Terminal Launch] returning local fallback launch url", { launchUrl, accountCode: storedAccountCode });
-    console.info("[Terminal Launch] returning launchUrl JWT", { jwt: ssoToken, launchUrl });
+    console.info("[Terminal Launch] generated local fallback launch URL", { accountCode: storedAccountCode });
 
     return res.json({
       success: true,

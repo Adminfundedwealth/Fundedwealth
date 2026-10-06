@@ -1233,7 +1233,7 @@ function PrivacySection() {
 
 export default function Dashboard({ initialSection }: { initialSection?: string }) {
   const { user } = useUser();
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const { profile, loadDemoData, donate, isDemo } = useTradingData();
   const [, navigate] = useLocation();
   const [section, setSection] = useState<Section>((initialSection as Section) || "home");
@@ -1324,7 +1324,11 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
     const fetchTrades = async (accountId: string): Promise<TradeLog[]> => {
       try {
-        const r = await fetch(`${apiBase}/api/accounts/${accountId}/trades`, { credentials: "include" });
+        const token = await getToken();
+        const r = await fetch(`${apiBase}/api/accounts/${accountId}/trades`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: "include",
+        });
         if (!r.ok) return [];
         const data: any = await r.json();
         return (data.trades || []).map((t: any) => ({
@@ -1337,7 +1341,11 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
     const fetchAnalytics = async (accountId: string): Promise<AccountAnalytics | null> => {
       try {
-        const r = await fetch(`${apiBase}/api/accounts/${accountId}/analytics`, { credentials: "include" });
+        const token = await getToken();
+        const r = await fetch(`${apiBase}/api/accounts/${accountId}/analytics`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: "include",
+        });
         if (!r.ok) return null;
         return await r.json();
       } catch { return null; }
@@ -1357,7 +1365,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         .then(setAccountAnalytics)
         .catch(() => setAccountAnalytics(null));
     }
-  }, [user?.id, profile.accounts.length, analyticsAccountId]);
+  }, [user?.id, profile.accounts.length, analyticsAccountId, getToken]);
 
   const [affiliateStats, setAffiliateStats] = useState({
     affiliateCode: profile.referralCode,
@@ -1399,19 +1407,28 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
 
   useEffect(() => {
     if (!user) return;
-    const apiBase = getApiBase();
-    fetch(`${apiBase}/api/users/me`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        email: user.emailAddresses?.[0]?.emailAddress || "",
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        avatarUrl: user.imageUrl || "",
-      }),
-    }).catch(() => { });
-  }, [user]);
+    const syncProfile = async () => {
+      const token = await getToken();
+      const apiBase = getApiBase();
+      await fetch(`${apiBase}/api/users/me`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: user.emailAddresses?.[0]?.emailAddress || "",
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          avatarUrl: user.imageUrl || "",
+        }),
+      });
+    };
+    syncProfile().catch((error) => {
+      console.error("[Dashboard] Failed to sync profile:", error);
+    });
+  }, [user?.id, getToken]);
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.isRead) {
@@ -3689,4 +3706,3 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
     </>
   );
 }
-

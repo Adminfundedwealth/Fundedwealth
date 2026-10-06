@@ -179,9 +179,19 @@ export async function resolveUserAccountOwnership(db: DbLike, userId: string, ac
   if (tradingColumns.has("user_id")) ownerClauses.push(sql`ta.user_id = ${String(userId)}::uuid`);
   if (challengeColumns.has("user_id")) ownerClauses.push(sql`ca.user_id = ${String(userId)}::uuid`);
 
-  if (ownerClauses.length === 0) {
-    return { rows: [] };
-  }
+  // Provisioned accounts are authoritatively linked through the purchase chain.
+  ownerClauses.push(sql`
+    EXISTS (
+      SELECT 1
+      FROM orders o
+      INNER JOIN provisioning_logs pl ON pl.order_id::text = o.id::text
+      WHERE o.user_id::text = ${String(userId)}::text
+        AND (
+          pl.trading_account_id::text = ta.id::text
+          OR pl.challenge_account_id::text = ca.id::text
+        )
+    )
+  `);
 
   const result = await db.execute(sql`
     SELECT
