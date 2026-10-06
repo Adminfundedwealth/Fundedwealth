@@ -68,7 +68,7 @@ catalog:
   tailwind-merge: ^3.3.1
   tailwindcss: ^4.1.14
   tsx: ^4.21.0
-  vite: ^7.3.2
+  vite: ^7.3.5
   zod: 3.24.3
 
 autoInstallPeers: false
@@ -152,7 +152,8 @@ overrides:
   "@expo/ngrok-bin>@expo/ngrok-bin-sunos-x64": "-"
   # drizzle-kit uses esbuild internally on an older version that's vulnerable, this overrides it
   "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0"
-  esbuild: "0.27.3"
+  esbuild: "0.28.1"
+  vite: "7.3.7"
   # Security: update transitive dependencies to patched versions
   lodash: ">=4.18.0"
   path-to-regexp@8: ">=8.4.0"
@@ -160,6 +161,7 @@ overrides:
   picomatch@4: ">=4.0.4"
   brace-expansion@2: "2.0.3"
   follow-redirects: "1.16.0"
+  fast-uri: "3.1.8"
   '@grpc/grpc-js': "1.14.5"
   protobufjs@7: "7.6.6"
   '@protobufjs/utf8': "1.1.2"
@@ -180,6 +182,14 @@ overrides:
   '@opentelemetry/auto-instrumentations-node': "0.80.0"
   '@opentelemetry/sdk-node': "0.222.0"
   '@opentelemetry/exporter-trace-otlp-http': "0.222.0"
+  source-map-js: ">=1.2.2"
+  nanoid@3: "3.3.18"
+  browserslist: ">=4.28.7"
+  baseline-browser-mapping: ">=2.11.0"
+  postcss: ">=8.5.23"
+  postcss-selector-parser: "7.1.6"
+  fast-copy: ">=4.1.0"
+  '@babel/core': ">=7.29.6"
 
 allowBuilds:
   '@clerk/shared': true
