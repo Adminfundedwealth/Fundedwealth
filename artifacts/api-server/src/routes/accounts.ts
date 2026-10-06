@@ -683,7 +683,12 @@ router.get("/:accountId/trades", async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    const { accountId } = req.params;
+    const accountId = Array.isArray(req.params.accountId)
+      ? req.params.accountId[0]
+      : req.params.accountId;
+    if (!accountId) {
+      return res.status(400).json({ success: false, message: "Account ID is required" });
+    }
 
     let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
     if (!user && auth.email) {
@@ -744,7 +749,12 @@ router.get("/:accountId/analytics", async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    const { accountId } = req.params;
+    const accountId = Array.isArray(req.params.accountId)
+      ? req.params.accountId[0]
+      : req.params.accountId;
+    if (!accountId) {
+      return res.status(400).json({ success: false, message: "Account ID is required" });
+    }
     let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
     if (!user && auth.email) {
       const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
