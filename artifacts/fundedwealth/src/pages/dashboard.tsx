@@ -1235,6 +1235,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
   const { user } = useUser();
   const { signOut, getToken } = useAuth();
   const { profile, loadDemoData, donate, isDemo } = useTradingData();
+  const activeAccountCount = profile.accounts.filter(a => a.status === "active").length;
   const [, navigate] = useLocation();
   const [section, setSection] = useState<Section>((initialSection as Section) || "home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -1694,7 +1695,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
                 </>
               ) : (
                 <>
-                  <p className="text-white/80 text-sm mb-5">You have {profile.accounts.length} active account{profile.accounts.length > 1 ? "s" : ""}. Keep it up!</p>
+                  <p className="text-white/80 text-sm mb-5">You have {activeAccountCount} active account{activeAccountCount !== 1 ? "s" : ""}. Keep it up!</p>
                   <div className="flex gap-3 flex-wrap">
                     <Button onClick={() => setSection("accounts")}
                       className="bg-white text-[#4A00E0] font-bold hover:bg-white/90 rounded-xl h-10 px-5">
@@ -1716,7 +1717,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
               {[
                 { label: "Total P&L", value: fmt(profile.accounts.reduce((s, a) => s + (a.balance - a.startBalance), 0)), icon: TrendingUp, color: "text-green-400", bg: "bg-green-500/10" },
                 { label: "Total Payouts", value: fmt(profile.totalPayout), icon: Wallet, color: "text-[#FF8A3D]", bg: "bg-[#FF8A3D]/10" },
-                { label: "Active Accounts", value: String(profile.accounts.filter(a => a.status === "active").length), icon: BarChart2, color: "text-blue-400", bg: "bg-blue-500/10" },
+                { label: "Active Accounts", value: String(activeAccountCount), icon: BarChart2, color: "text-blue-400", bg: "bg-blue-500/10" },
                 { label: "Avg Win Rate", value: `${Math.round(profile.accounts.reduce((s, a) => s + a.winRate, 0) / profile.accounts.length)}%`, icon: Trophy, color: "text-purple-400", bg: "bg-purple-500/10" },
               ].map(s => (
                 <div key={s.label} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4">
