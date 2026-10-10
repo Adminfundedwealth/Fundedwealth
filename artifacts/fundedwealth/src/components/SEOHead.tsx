@@ -32,7 +32,12 @@ export default function SEOHead({
   ogType = "website",
   noindex = false,
 }: SEOHeadProps) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
+  const normalizedTitle = title?.trim();
+  const fullTitle = normalizedTitle
+    ? /\|\s*FundedWealth\s*$/i.test(normalizedTitle)
+      ? normalizedTitle
+      : `${normalizedTitle} | ${SITE_NAME}`
+    : DEFAULT_TITLE;
   const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : undefined;
 
   useEffect(() => {
