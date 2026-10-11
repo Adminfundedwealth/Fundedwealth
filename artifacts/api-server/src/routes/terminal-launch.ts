@@ -160,6 +160,14 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
 
     console.info("[Terminal Launch] account state ok", { challengeStatus: prov.challenge_status, tradingStatus: prov.trading_status });
 
+    const terminalAccountId = typeof prov.account_code === "string" ? prov.account_code.trim() : "";
+    if (!terminalAccountId) {
+      return res.status(409).json({
+        success: false,
+        message: "This account is not linked to a terminal account. Contact support.",
+      });
+    }
+
     const sharedKey = process.env.SSO_API_KEY || process.env.SSO_SHARED_SECRET;
     if (!sharedKey) {
       return res.status(503).json({
@@ -175,7 +183,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           "Content-Type": "application/json",
           "x-sso-api-key": sharedKey,
         },
-        body: JSON.stringify({ accountId: String(prov.trading_account_id) }),
+        body: JSON.stringify({ accountId: terminalAccountId }),
         signal: AbortSignal.timeout(8000),
       });
 

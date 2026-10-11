@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireFounderInHandler } from '@/lib/security/require-auth';
 
 const TERMINAL_API_URL = 'https://new-terminal-production.up.railway.app';
@@ -48,6 +49,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const supabase = createAdminClient();
+    const { data: account, error: accountError } = await supabase
+      .from('trading_accounts')
+      .select('account_code')
+      .eq('id', accountId)
+      .single();
+
+    if (accountError || !account?.account_code) {
+      return NextResponse.json(
+        { error: { code: 'NOT_FOUND', message: 'Trading account or terminal account mapping not found' } },
+        { status: 404 },
+      );
+    }
+
     try {
       const terminalRes = await fetch(`${TERMINAL_API_URL}/auth/sso/generate`, {
         method: 'POST',
@@ -55,7 +70,7 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json',
           'x-sso-api-key': SSO_API_KEY,
         },
-        body: JSON.stringify({ accountId }),
+        body: JSON.stringify({ accountId: account.account_code }),
         signal: AbortSignal.timeout(10000),
       });
 
