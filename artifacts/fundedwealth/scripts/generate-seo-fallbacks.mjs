@@ -6,9 +6,13 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const outputDirectory = path.join(projectRoot, "dist");
 const templatePath = path.join(outputDirectory, "index.html");
 const siteUrl = "https://www.fundedwealth.com";
+const apiBaseUrl =
+  process.env.VITE_API_URL ||
+  process.env.VITE_API_BASE_URL ||
+  "https://api.fundedwealth.com";
 const isCheck = process.argv.includes("--check");
 
-const pages = [
+const staticPages = [
   {
     path: "",
     title: "Indian Prop Trading & NIFTY Funded Accounts | FundedWealth",
@@ -39,6 +43,46 @@ const pages = [
     heading: "Indian Prop Trading & Funded Account Rules",
   },
 ];
+
+async function getPublishedArticlePages() {
+  const response = await fetch(`${apiBaseUrl}/api/blog`, {
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) {
+    throw new Error(`Could not load published articles for SEO output: HTTP ${response.status}`);
+  }
+
+  const posts = await response.json();
+  if (!Array.isArray(posts)) {
+    throw new Error("Could not load published articles for SEO output: invalid API response.");
+  }
+
+  return posts
+    .filter((post) => post?.isPublished === true)
+    .map((post) => {
+      if (typeof post.slug !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(post.slug)) {
+        throw new Error("Could not generate article SEO output: published article has an invalid slug.");
+      }
+      if (typeof post.title !== "string" || !post.title.trim()) {
+        throw new Error(`Could not generate article SEO output for "${post.slug}": missing title.`);
+      }
+
+      const title = post.metaTitle?.trim() || post.title.trim();
+      const description = post.metaDescription?.trim() || post.excerpt?.trim();
+      if (!description) {
+        throw new Error(`Could not generate article SEO output for "${post.slug}": missing description.`);
+      }
+
+      return {
+        path: `blog/${post.slug}`,
+        title: /\|\s*FundedWealth\s*$/i.test(title) ? title : `${title} | FundedWealth`,
+        description,
+        heading: post.title.trim(),
+        ogType: "article",
+        ogImage: post.ogImage || post.coverImage || `${siteUrl}/opengraph.jpg`,
+      };
+    });
+}
 
 function escapeHtml(value) {
   return value
@@ -91,8 +135,47 @@ function updateLink(html, rel, attribute, value, href) {
   );
 }
 
+function markSeoFallbackTags(html) {
+  const managedMetaValues = new Set([
+    "description",
+    "keywords",
+    "author",
+    "robots",
+    "geo.region",
+    "theme-color",
+    "mobile-web-app-capable",
+    "apple-mobile-web-app-status-bar-style",
+    "og:type",
+    "og:title",
+    "og:description",
+    "og:image",
+    "og:image:alt",
+    "og:site_name",
+    "og:locale",
+    "og:url",
+    "twitter:card",
+    "twitter:site",
+    "twitter:creator",
+    "twitter:title",
+    "twitter:description",
+    "twitter:image",
+    "twitter:image:alt",
+  ]);
+  const mark = (tag) =>
+    tag.replace(/^<(title|meta|link)\b/i, '<$1 data-seo-fallback="true"');
+
+  html = html.replace(/<title\b[^>]*>/i, mark);
+  html = html.replace(/<meta\b[^>]*>/gi, (tag) => {
+    const name = tag.match(/\b(?:name|property)="([^"]+)"/i)?.[1]?.toLowerCase();
+    return name && managedMetaValues.has(name) ? mark(tag) : tag;
+  });
+  return html.replace(/<link\b[^>]*>/gi, (tag) =>
+    /\brel="canonical"/i.test(tag) ? mark(tag) : tag,
+  );
+}
+
 function renderPage(template, page) {
-  const canonicalUrl = `${siteUrl}${page.path ? `/${page.path}` : ""}`;
+  const canonicalUrl = `${siteUrl}${page.path ? `/${page.path}/` : ""}`;
   let html = replaceExactlyOnce(
     template,
     /<title\b[^>]*>[\s\S]*?<\/title>/i,
@@ -103,6 +186,8 @@ function renderPage(template, page) {
   html = updateMeta(html, "name", "description", page.description);
   html = updateMeta(html, "property", "og:title", page.title);
   html = updateMeta(html, "property", "og:description", page.description);
+  if (page.ogType) html = updateMeta(html, "property", "og:type", page.ogType);
+  if (page.ogImage) html = updateMeta(html, "property", "og:image", page.ogImage);
   html = updateMeta(html, "property", "og:url", canonicalUrl);
   html = updateMeta(html, "name", "twitter:title", page.title);
   html = updateMeta(html, "name", "twitter:description", page.description);
@@ -130,19 +215,20 @@ function renderPage(template, page) {
     "</main>",
   ].join("");
 
-  return replaceExactlyOnce(
+  html = replaceExactlyOnce(
     html,
     /<div id="root"><\/div>/i,
     `<div id="root">${fallback}</div>`,
     "empty React root",
   );
+  return markSeoFallbackTags(html);
 }
 
 function assertPage(html, page) {
-  const canonicalUrl = `${siteUrl}${page.path ? `/${page.path}` : ""}`;
+  const canonicalUrl = `${siteUrl}${page.path ? `/${page.path}/` : ""}`;
   const requiredMarkup = [
-    `<title>${escapeHtml(page.title)}</title>`,
-    `rel="canonical" href="${canonicalUrl}"`,
+    `<title data-seo-fallback="true">${escapeHtml(page.title)}</title>`,
+    `data-seo-fallback="true" rel="canonical" href="${canonicalUrl}"`,
     `hreflang="en-IN" href="${canonicalUrl}"`,
     `hreflang="x-default" href="${canonicalUrl}"`,
     `<h1 style="font-size:2rem;line-height:1.2">${escapeHtml(page.heading)}</h1>`,
@@ -151,8 +237,10 @@ function assertPage(html, page) {
   const missingMarkup = requiredMarkup.filter((markup) => !html.includes(markup));
   for (const [attribute, name, content] of [
     ["name", "description", page.description],
+    ...(page.ogType ? [["property", "og:type", page.ogType]] : []),
     ["property", "og:title", page.title],
     ["property", "og:description", page.description],
+    ...(page.ogImage ? [["property", "og:image", page.ogImage]] : []),
     ["property", "og:url", canonicalUrl],
     ["name", "twitter:title", page.title],
     ["name", "twitter:description", page.description],
@@ -176,6 +264,7 @@ function assertPage(html, page) {
 }
 
 const template = await readFile(templatePath, "utf8");
+const pages = [...staticPages, ...(await getPublishedArticlePages())];
 for (const page of pages) {
   const outputPath = page.path
     ? path.join(outputDirectory, page.path, "index.html")

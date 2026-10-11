@@ -20,6 +20,7 @@ const DEFAULT_KEYWORDS =
   "prop trading India, best prop firm India, funded trading account India, prop firm India, funded trader India, NSE prop trading, BSE prop trading, MCX prop trading, forex prop trading India, crypto prop trading India, proprietary trading India, funded account India, FundedWealth, get funded trading, best prop trading firm India, prop trading company India, instant funded account India, prop firm for Indian traders, cheapest prop firm India, top prop firm India, trading evaluation India, prop trading challenge India, funded forex account India, best proprietary trading firm India, prop trading firms in India, Indian prop firm, prop trading platform India, 90 profit split prop firm, instant funding prop firm India, lowest drawdown prop firm";
 const BASE_URL = "https://www.fundedwealth.com";
 const DEFAULT_OG_IMAGE = `${BASE_URL}/opengraph.jpg`;
+const TRAILING_SLASH_CANONICALS = new Set(["/leaderboard", "/blog", "/rules"]);
 const DEFAULT_OG_IMAGE_ALT = "FundedWealth — Simulated Trading Evaluations in India";
 
 export default function SEOHead({
@@ -38,7 +39,12 @@ export default function SEOHead({
       ? normalizedTitle
       : `${normalizedTitle} | ${SITE_NAME}`
     : DEFAULT_TITLE;
-  const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : undefined;
+  const canonicalPath = canonical
+    ? TRAILING_SLASH_CANONICALS.has(canonical) || /^\/blog\/[^/]+$/.test(canonical)
+      ? `${canonical}/`
+      : canonical
+    : undefined;
+  const canonicalUrl = canonicalPath ? `${BASE_URL}${canonicalPath}` : undefined;
 
   useEffect(() => {
     const fallbackEls = document.querySelectorAll('[data-seo-fallback="true"]');

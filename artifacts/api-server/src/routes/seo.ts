@@ -9,13 +9,13 @@ const router = express.Router();
 
 const STATIC_PAGES = [
   { path: '/',                 changefreq: 'daily',   priority: 1.0 },
-  { path: '/leaderboard',      changefreq: 'daily',   priority: 0.9 },
+  { path: '/leaderboard/',     changefreq: 'daily',   priority: 0.9 },
   { path: '/payouts',          changefreq: 'daily',   priority: 0.9 },
-  { path: '/blog',             changefreq: 'daily',   priority: 0.9 },
+  { path: '/blog/',            changefreq: 'daily',   priority: 0.9 },
   { path: '/championship',     changefreq: 'weekly',  priority: 0.9 },
   { path: '/scaling',          changefreq: 'weekly',  priority: 0.9 },
   { path: '/faq',              changefreq: 'weekly',  priority: 0.8 },
-  { path: '/rules',            changefreq: 'weekly',  priority: 0.8 },
+  { path: '/rules/',           changefreq: 'weekly',  priority: 0.8 },
   { path: '/how-it-works',     changefreq: 'monthly', priority: 0.8 },
   { path: '/community',        changefreq: 'weekly',  priority: 0.8 },
   { path: '/success-stories',  changefreq: 'weekly',  priority: 0.8 },
@@ -69,7 +69,7 @@ router.get('/sitemap.xml', generalLimiter, async (req, res) => {
 
     for (const post of posts) {
       entries.push({
-        loc: `${host}/blog/${post.slug}`,
+        loc: `${host}/blog/${post.slug}/`,
         lastmod: (post.publishedAt ?? post.updatedAt).toISOString(),
         changefreq: 'weekly',
         priority: 0.7,
