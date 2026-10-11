@@ -49,6 +49,97 @@ const staticPages = [
       "Full evaluation rules for every FundedWealth plan. 2% daily drawdown, no time limit, min 5 trading days. Flash, Instant, 1-Step & 2-Step rules for NIFTY, BANKNIFTY and stock futures — explained in plain language.",
     heading: "Indian Prop Trading & Funded Account Rules",
   },
+  {
+    path: "payouts",
+    title: "Prop Trading Payouts India [Live Proof] — ₹45L+ Paid in Under 12 Hours | FundedWealth",
+    description:
+      "See real verified payout proofs from FundedWealth traders. Over ₹45 Lakhs in performance-based rewards paid. Eligible rewards typically processed within 12 hours via UPI or bank transfer — subject to verification and program terms.",
+    heading: "Verified Payout Proofs",
+  },
+  {
+    path: "scaling",
+    title: "Scaling Plan India [Step-by-Step] — Grow Your Funded Account from ₹1L to ₹50L | FundedWealth",
+    description:
+      "Scale your simulated prop trading account across 6 levels from ₹1 Lakh to ₹50 Lakhs. Profit split grows from 80% to 90% as you advance. No extra fees — automatic scaling for consistent traders. FundedWealth India.",
+    heading: "Scaling Plan",
+  },
+  {
+    path: "faq",
+    title: "Prop Trading FAQ India [70+ Answers] — Payouts, Rules & Evaluation | FundedWealth",
+    description:
+      "Answers to 70+ questions about FundedWealth: payouts in 12 hours, 2% daily drawdown, 90% profit split, KYC, taxes, scaling and evaluation rules. Complete FAQ for Indian prop traders.",
+    heading: "Prop Trading FAQ India",
+  },
+  {
+    path: "championship",
+    title: "Trading Championship India 2026 [Win iPhone, MacBook & Cash Prizes] | FundedWealth",
+    description:
+      "Join FundedWealth's monthly trading championship. Compete with India's best prop traders and win iPhone 16, MacBook, Royal Enfield and cash prizes. Free entry for all funded traders.",
+    heading: "Where Traders Become Champions.",
+  },
+  {
+    path: "success-stories",
+    title: "Funded Trader Success Stories India [Real Case Studies] — Profits & Reviews | FundedWealth",
+    description:
+      "Real case studies from FundedWealth evaluation participants across India — Delhi, Mumbai, Bangalore, Hyderabad & more. See profits earned, strategies used, and honest reviews of India's prop trading platform.",
+    heading: "Success Stories",
+  },
+  {
+    path: "about",
+    title: "About FundedWealth [India's Prop Trading Platform] — Our Story & Values | FundedWealth",
+    description:
+      "FundedWealth is India's AI-native prop trading evaluation platform. Learn about our team, mission, and why we built a simulated evaluation platform specifically for Indian traders trading NIFTY and BANKNIFTY.",
+    heading: "The AI-first proprietary trading firm Indian traders can finally trust and stay disciplined with.",
+  },
+  {
+    path: "mission",
+    title: "FundedWealth Mission — Democratizing Prop Trading for Every Indian Trader | FundedWealth",
+    description:
+      "FundedWealth's mission: make structured simulated trading evaluations accessible to every serious Indian trader regardless of capital. Discipline, consistency, and skill — not luck — determine who gets funded.",
+    heading: "Turning Indian Skill Into Performance-Based Rewards",
+  },
+  {
+    path: "impact",
+    title: "FW Impact Initiative — Trade with Purpose | CSR | FundedWealth",
+    description:
+      "FundedWealth's Impact Initiative supports selected social initiatives across India through FundedWealth and voluntary participant contributions.",
+    heading: "Trade with Purpose — Create Real Impact",
+  },
+  {
+    path: "community",
+    title: "Prop Trading Community India [15,000+ Traders] — Discussion & Trade Ideas | FundedWealth",
+    description:
+      "Join India's prop trading community: post trade ideas, discuss NIFTY and BANKNIFTY setups, and connect on WhatsApp, Telegram, YouTube and Instagram. Free for all FundedWealth evaluation participants.",
+    heading: "India's Prop Trading Community",
+  },
+  {
+    path: "economic-calendar",
+    title: "India Economic Calendar 2026 — RBI & Global Macro Events | FundedWealth",
+    description:
+      "Free India-first economic calendar for traders. Track RBI announcements, FOMC, CPI, GDP and all high-impact macro events for NSE, BSE & MCX trading in real time.",
+    heading: "Zero-maintenance India-first macro schedule",
+  },
+  {
+    path: "terms",
+    title: "Terms of Service — FundedWealth | FundedWealth",
+    description:
+      "Read FundedWealth's Terms of Service. Understand the rules, obligations, and conditions for using our simulated trading evaluation platform.",
+    heading: "Terms of Service",
+  },
+  {
+    path: "privacy",
+    title: "Privacy Policy — FundedWealth | FundedWealth",
+    description:
+      "FundedWealth's Privacy Policy. Learn how we collect, use, and protect your personal information.",
+    heading: "Privacy Policy",
+  },
+  {
+    path: "refund",
+    title: "Refund Policy — FundedWealth | FundedWealth",
+    description:
+      "FundedWealth's Refund Policy. Understand our refund terms, eligibility criteria, review process, and timelines for simulated trading challenges and evaluation programs.",
+    heading: "Refund Policy",
+  },
 ];
 
 async function getPublishedArticlePages() {
