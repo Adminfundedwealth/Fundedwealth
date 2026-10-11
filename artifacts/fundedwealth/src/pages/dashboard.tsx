@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
 import { getApiBase } from "@/lib/api-base";
+import { submitTerminalSSO } from "@/lib/terminalSSO";
 
 type Section =
   | "home" | "accounts" | "platform" | "payouts" | "leaderboard"
@@ -49,6 +50,7 @@ type TradingAccount = {
   startDate: string;
   accountCode: string;
   pnlPercent: number;
+  canLaunch?: boolean;
 };
 
 type Notification = DashboardNotification;
@@ -327,16 +329,12 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     setLaunchError("");
     try {
       const token = await getToken();
+      if (!token) {
+        setLaunchError("Your session expired. Please sign in again to launch the terminal.");
+        return;
+      }
       const apiBase = getApiBase();
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
-      console.info("[Launch Terminal] request start", {
-        accountId: acc.id,
-        accountCode: acc.accountCode,
-        phase: acc.phase,
-        tokenPresent: Boolean(token),
-        apiBase,
-        body,
-      });
       const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
@@ -344,23 +342,14 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
-      console.info("[Launch Terminal] response", {
-        ok: res.ok,
-        status: res.status,
-        success: data.success,
-        launchUrlPresent: Boolean(data.launchUrl),
-        message: data.message,
-      });
-      if (res.ok && data.success && data.launchUrl) {
-        window.location.assign(data.launchUrl);
+      if (res.ok && data.success && data.ssoToken) {
+        submitTerminalSSO(data.ssoToken);
       } else {
         setLaunchError(data.message || "Failed to generate terminal session. Please try again.");
         toast.error("Unable to launch terminal.");
       }
-    } catch (err: any) {
-      console.error("[Launch Terminal] request failed", err);
-      setLaunchError("Terminal is offline. Use your credentials below to log in manually.");
-      setShowCreds(true);
+    } catch {
+      setLaunchError("Could not reach terminal sign-in. Please try again.");
       toast.error("Unable to launch terminal.");
     } finally {
       setLaunching(false);
@@ -457,6 +446,24 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
         </div>
       </div>
 
+      <div className="mb-4">
+        <button
+          onClick={handleLaunch}
+          disabled={launching || acc.status !== "active" || acc.canLaunch === false}
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold py-3 px-5 rounded-xl text-sm hover:shadow-lg hover:shadow-[#D63384]/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          title={acc.status === "active" && acc.canLaunch !== false
+            ? "Open trading terminal"
+            : "Only active accounts that are ready to launch can open the terminal"}
+        >
+          {launching ? (
+            <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Launching...</>
+          ) : (
+            <><Monitor size={16} /> Launch Terminal <ExternalLink size={13} /></>
+          )}
+        </button>
+        {launchError && <p className="text-red-400 text-xs text-center mt-2">{launchError}</p>}
+      </div>
+
       {/* -- Credentials panel -- */}
       <div className="border-t border-white/10 pt-4 mt-4 space-y-3">
         <button
@@ -526,21 +533,6 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 
             {/* Action buttons */}
             <div className="flex gap-2 pt-1">
-              {/* Launch Terminal */}
-              <button
-                onClick={handleLaunch}
-                disabled={launching || !(acc as any).canLaunch}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#4A00E0] to-[#D63384] text-white font-bold py-2 px-3 rounded-xl text-xs hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                title={(acc as any).canLaunch ? "Open trading terminal" : "Account must be active to launch"}
-              >
-                {launching ? (
-                  <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Monitor size={13} />
-                )}
-                {launching ? "Launching�" : "Launch Terminal"}
-              </button>
-
               {/* Copy all credentials */}
               <button
                 onClick={() => {
@@ -641,13 +633,13 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         ok: res.ok,
         status: res.status,
         success: data.success,
-        launchUrlPresent: Boolean(data.launchUrl),
+        ssoTokenPresent: Boolean(data.ssoToken),
         message: data.message,
       });
-      if (res.ok && data.success && data.launchUrl) {
+      if (res.ok && data.success && data.ssoToken) {
         // Cache credentials for display
         if (data.credentials) setCreds(data.credentials);
-        window.location.assign(data.launchUrl);
+        submitTerminalSSO(data.ssoToken);
       } else {
         setError(data.message || "Failed to launch terminal. Please try again.");
       }
@@ -684,7 +676,7 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
             value: safeExtractPassword((acc as any).terminalPassword || (acc as any).tempPassword || creds?.password) || "Password unavailable",
           },
           { label: "Account Code", key: "code", value: acc.accountCode || creds?.accountCode || "�" },
-          { label: "Server", key: "server", value: import.meta.env.VITE_TERMINAL_URL || "terminal.fundedwealth.com" },
+          { label: "Server", key: "server", value: import.meta.env.VITE_TERMINAL_URL || "charts.fundedwealth.com" },
           { label: "Status", key: "status", value: acc.status || creds?.status || "active" },
         ].map(({ label, key, value }) => (
           <div key={key} className="flex items-center justify-between gap-2">

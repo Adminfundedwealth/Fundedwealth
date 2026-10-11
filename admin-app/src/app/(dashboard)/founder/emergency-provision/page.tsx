@@ -1,6 +1,7 @@
 'use client';
 
 import { apiFetch } from '@/lib/api/fetch';
+import { submitTerminalSSO } from '@/lib/terminalSSO';
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -214,8 +215,7 @@ export default function EmergencyManualProvisionPage() {
     }
   }
 
-  // Launch terminal — uses SSO endpoint when trading_account_id is available,
-  // falls back to direct terminal URL when it is null (e.g. existing account lookup)
+  // Launch terminal only when the existing account has a canonical trading account ID.
   async function handleLaunchTerminal(
     tradingAccountId: string | null,
     loginEmail: string,
@@ -224,15 +224,8 @@ export default function EmergencyManualProvisionPage() {
     setLaunching(true);
     setLaunchError('');
     try {
-      // If we have no trading_account_id we can't call the SSO endpoint —
-      // open the terminal login page directly instead.
       if (!tradingAccountId) {
-        const base = process.env.NEXT_PUBLIC_TERMINAL_URL || 'https://terminal.fundedwealth.com';
-        window.open(
-          `${base}/login?login=${encodeURIComponent(terminalLogin)}&email=${encodeURIComponent(loginEmail)}`,
-          '_blank',
-          'noopener,noreferrer',
-        );
+        setLaunchError('This account has no linked trading account and cannot be launched securely.');
         return;
       }
 
@@ -249,7 +242,11 @@ export default function EmergencyManualProvisionPage() {
         setLaunchError(json.error?.message || 'Failed to generate launch URL');
         return;
       }
-      window.open(json.launch_url, '_blank', 'noopener,noreferrer');
+      if (typeof json.sso_token !== 'string' || !json.sso_token) {
+        setLaunchError('Terminal SSO returned an invalid handoff.');
+        return;
+      }
+      submitTerminalSSO(json.sso_token);
     } catch {
       setLaunchError('Network error. Could not launch terminal.');
     } finally {

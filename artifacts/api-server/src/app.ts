@@ -46,7 +46,7 @@ const ALLOWED_ORIGINS = [
   "https://www.fundedwealth.in",
   "https://fundedwealth.in",
   "https://admin.fundedwealth.com",
-  "https://terminal.fundedwealth.com",
+  "https://charts.fundedwealth.com",
   "https://fundedwealth.vercel.app",
   "https://d-fundedwealth.cloudfront.net", // CloudFront distribution
   ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim()).filter(Boolean) : []),
@@ -63,8 +63,8 @@ app.use(cors({
       // SECURITY: Only allow fundedwealth Vercel preview deployments, not any .vercel.app
       if (origin.match(/^https:\/\/fundedwealth[a-z0-9-]*\.vercel\.app$/)) {
         callback(null, true);
-      } else if (origin.match(/^https:\/\/(admin|terminal)\.fundedwealth\.(com|in)$/)) {
-        // Allow admin and terminal subdomains
+      } else if (origin.match(/^https:\/\/(admin|charts)\.fundedwealth\.(com|in)$/)) {
+        // Allow admin and chart terminal subdomains
         callback(null, true);
       } else if (origin.match(/^https:\/\/[a-z0-9-]+\.(replit\.dev|repl\.co|replit\.app)$/)) {
         // Allow Replit dev/preview environments
@@ -116,7 +116,7 @@ app.use((req, res, next) => {
       "style-src 'self' 'unsafe-inline'", // inline styles needed for React
       "img-src 'self' data: https:",
       "font-src 'self'",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.razorpay.com https://challenges.cloudflare.com https://terminal.fundedwealth.com https://admin.fundedwealth.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.razorpay.com https://challenges.cloudflare.com https://charts.fundedwealth.com https://admin.fundedwealth.com",
       "frame-src https://challenges.cloudflare.com https://api.razorpay.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",

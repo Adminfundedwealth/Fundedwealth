@@ -26,6 +26,7 @@ import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
 import { getApiBase } from "@/lib/api-base";
+import { submitTerminalSSO } from "@/lib/terminalSSO";
 
 type SuccessPageData = {
   id?: string;
@@ -228,8 +229,8 @@ export default function PurchaseSuccess() {
 
       const data = await res.json().catch(() => ({}));
       
-      if (res.ok && data.success && data.launchUrl) {
-        window.location.href = data.launchUrl;
+      if (res.ok && data.success && data.ssoToken) {
+        submitTerminalSSO(data.ssoToken);
       } else {
         toast.error("Unable to launch terminal.");
       }

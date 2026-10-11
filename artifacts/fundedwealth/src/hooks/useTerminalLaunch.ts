@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { getApiBase } from "../lib/api-base";
+import { submitTerminalSSO } from "../lib/terminalSSO";
 
 interface LaunchResult {
   success: boolean;
-  launchUrl?: string;
+  ssoToken?: string;
   message?: string;
 }
 
@@ -25,8 +26,8 @@ interface UseTerminalLaunch {
  * Flow:
  *   1. Get Supabase JWT
  *   2. POST /api/terminal/launch  { accountId }
- *   3. Receive launchUrl
- *   4. window.open → terminal.fundedwealth.com → SSO → auto-login
+ *   3. Receive a short-lived SSO handoff token
+ *   4. POST it to charts.fundedwealth.com
  */
 export function useTerminalLaunch(): UseTerminalLaunch {
   const { getToken } = useAuth();
@@ -65,10 +66,8 @@ export function useTerminalLaunch(): UseTerminalLaunch {
         return;
       }
 
-      if (res.ok && data.success && data.launchUrl) {
-        // Use location.assign for immediate navigation — avoids popup blockers
-        // and minimises the window between token generation and browser redirect
-        window.location.assign(data.launchUrl);
+      if (res.ok && data.success && data.ssoToken) {
+        submitTerminalSSO(data.ssoToken);
       } else {
         setLaunchError(data.message ?? "Failed to launch terminal. Please try again.");
       }
