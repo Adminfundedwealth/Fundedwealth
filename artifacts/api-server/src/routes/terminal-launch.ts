@@ -160,7 +160,9 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
 
     console.info("[Terminal Launch] account state ok", { challengeStatus: prov.challenge_status, tradingStatus: prov.trading_status });
 
-    const terminalAccountId = typeof prov.account_code === "string" ? prov.account_code.trim() : "";
+    const terminalAccountId = typeof prov.trading_account_id === "string"
+      ? prov.trading_account_id.trim()
+      : "";
     if (!terminalAccountId) {
       return res.status(409).json({
         success: false,
