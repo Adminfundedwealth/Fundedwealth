@@ -4,6 +4,7 @@ import { db, users } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { resolveTerminalLaunchUser } from "../lib/terminalLaunchAuth.js";
 import { resolveUserAccountOwnership } from "../lib/accountOwnershipCompat";
+import { ensureTerminalAccountLink, loadVerifiedTerminalAccountSource } from "../lib/terminalAccountLink.js";
 
 const router = Router();
 
@@ -150,11 +151,11 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     console.info("[Terminal Launch] ownership ok", { traderId: prov.trader_id, tradingAccountId: prov.trading_account_id, challengeAccountId: prov.challenge_account_id });
 
     // ── 5. CHECK ACCOUNT IS ACTIVE ────────────────────────────────────────────
-    if (prov.challenge_status && prov.challenge_status !== "active") {
+    if (prov.challenge_status !== "active" || prov.trading_status !== "active") {
       console.warn("[Terminal Launch] account not active", { challengeStatus: prov.challenge_status, accountId });
       return res.status(400).json({
         success: false,
-        message: `Account is not active. Current status: ${prov.challenge_status}`,
+        message: "This account is not active and cannot be launched.",
       });
     }
 
@@ -166,7 +167,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     if (!terminalAccountId) {
       return res.status(409).json({
         success: false,
-        message: "This account is not linked to a terminal account. Contact support.",
+        message: "This account does not have a verified terminal account mapping.",
       });
     }
 
@@ -179,7 +180,26 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     }
 
     try {
-      const terminalRes = await fetch(`${TERMINAL_API_URL}/auth/sso/generate`, {
+      const source = await loadVerifiedTerminalAccountSource(db, String(user.id), terminalAccountId);
+      await ensureTerminalAccountLink(source);
+    } catch (linkError: unknown) {
+      const linkErrorStatus = typeof linkError === "object" && linkError !== null && "status" in linkError
+        ? linkError.status
+        : undefined;
+      console.error("[Terminal Launch] terminal account mapping is not ready", {
+        status: typeof linkErrorStatus === "number" && Number.isInteger(linkErrorStatus) ? linkErrorStatus : 500,
+      });
+      const status = linkErrorStatus === 409 ? 409 : 503;
+      return res.status(status).json({
+        success: false,
+        message: status === 409
+          ? "This account is not eligible for terminal launch until its account mapping and rules are verified."
+          : "Terminal account linking is temporarily unavailable. Please try again later.",
+      });
+    }
+
+    try {
+      const terminalRes = await fetch(`${process.env.TERMINAL_API_URL || TERMINAL_API_URL}/auth/sso/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

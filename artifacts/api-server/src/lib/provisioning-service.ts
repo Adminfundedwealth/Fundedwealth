@@ -6,6 +6,7 @@ import {
   resolveAccountSize,
   type PlanType,
 } from "@workspace/products";
+import { ensureTerminalAccountLink, loadVerifiedTerminalAccountSource } from "./terminalAccountLink.js";
 
 export type ProvisioningSource = "website" | "founder_emergency";
 
@@ -364,6 +365,23 @@ export async function provisionChallenge(
       WHERE id = ${orderId}
         AND status IN ('paid', 'pending', 'confirmed')
     `);
+  }
+
+  if (provId) {
+    try {
+      const source = await loadVerifiedTerminalAccountSource(db, String(userId), tradingAccountId);
+      await ensureTerminalAccountLink(source);
+      console.info("[Provisioning] terminal account mapping ensured", { tradingAccountId });
+    } catch (linkError: unknown) {
+      const linkErrorStatus = typeof linkError === "object" && linkError !== null && "status" in linkError
+        ? linkError.status
+        : undefined;
+      console.warn("[Provisioning] terminal account mapping deferred", {
+        tradingAccountId,
+        status: typeof linkErrorStatus === "number" && Number.isInteger(linkErrorStatus) ? linkErrorStatus : 500,
+        message: linkError instanceof Error ? linkError.message : "Unknown terminal account-link failure.",
+      });
+    }
   }
 
   console.log(
