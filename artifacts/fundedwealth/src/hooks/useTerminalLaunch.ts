@@ -30,7 +30,7 @@ interface UseTerminalLaunch {
  *   4. POST it to charts.fundedwealth.com
  */
 export function useTerminalLaunch(): UseTerminalLaunch {
-  const { getToken } = useAuth();
+  const { getFreshToken } = useAuth();
   const [launching, setLaunching] = useState(false);
   const [launchError, setLaunchError] = useState("");
 
@@ -39,13 +39,11 @@ export function useTerminalLaunch(): UseTerminalLaunch {
     setLaunchError("");
     try {
       // Try refreshing session first to get a fresh token
-      const token = await getToken();
+      const token = await getFreshToken();
       const apiBase = getApiBase();
 
       if (!token) {
-        // No session — redirect to sign-in
-        setLaunchError("Please log out and log in again to refresh your session.");
-        setLaunching(false);
+        setLaunchError("Your session expired. Please sign in again to launch the terminal.");
         return;
       }
 
@@ -61,8 +59,7 @@ export function useTerminalLaunch(): UseTerminalLaunch {
       const data: LaunchResult = await res.json().catch(() => ({ success: false }));
 
       if (res.status === 401) {
-        // Token expired — tell user to re-login
-        setLaunchError("Session expired. Please log out and log in again.");
+        setLaunchError("Your session expired. Please sign in again to launch the terminal.");
         return;
       }
 
