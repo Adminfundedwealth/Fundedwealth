@@ -290,7 +290,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
 
   const [copied, setCopied] = useState<string | null>(null);
   const [showCreds, setShowCreds] = useState(false);
-  const { getToken } = useAuth();
+  const { getFreshToken } = useAuth();
   const [launching, setLaunching] = useState(false);
   const [launchError, setLaunchError] = useState("");
 
@@ -328,7 +328,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
     setLaunching(true);
     setLaunchError("");
     try {
-      const token = await getToken();
+      const token = await getFreshToken();
       if (!token) {
         setLaunchError("Your session expired. Please sign in again to launch the terminal.");
         return;
@@ -581,7 +581,7 @@ function AccountCard({ acc }: { acc: TradingAccount }) {
  * Flash / Instant / 1-Step / 2-Step all use POST /api/terminal/launch.
  */
 function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
-  const { getToken } = useAuth();
+  const { getFreshToken } = useAuth();
   const [launching, setLaunching] = useState(false);
   const [error, setError] = useState("");
   const [creds, setCreds] = useState<{ email: string; password: string | null; accountCode: string; server: string; status: string } | null>(null);
@@ -608,17 +608,13 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
     setLaunching(true);
     setError("");
     try {
-      const token = await getToken();
+      const token = await getFreshToken();
+      if (!token) {
+        setError("Your session expired. Please sign in again to launch the terminal.");
+        return;
+      }
       const apiBase = getApiBase();
       const body = buildTerminalLaunchRequestBody({ ...acc, accountId: acc.id });
-      console.info("[Launch Terminal] request start", {
-        accountId: acc.id,
-        accountCode: acc.accountCode,
-        phase: acc.phase,
-        tokenPresent: Boolean(token),
-        apiBase,
-        body,
-      });
       const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",
         headers: {
@@ -629,13 +625,6 @@ function LaunchTerminalCard({ acc }: { acc: TradingAccount }) {
         body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
-      console.info("[Launch Terminal] response", {
-        ok: res.ok,
-        status: res.status,
-        success: data.success,
-        ssoTokenPresent: Boolean(data.ssoToken),
-        message: data.message,
-      });
       if (res.ok && data.success && data.ssoToken) {
         // Cache credentials for display
         if (data.credentials) setCreds(data.credentials);

@@ -48,7 +48,7 @@ function getQueryParam(search: string, key: string): string | null {
 
 export default function PurchaseSuccess() {
   const [, navigate] = useLocation();
-  const { getToken, isLoaded } = useAuth();
+  const { getToken, getFreshToken, isLoaded } = useAuth();
   const search = window.location.search;
 
   const [loading, setLoading] = useState(true);
@@ -215,7 +215,11 @@ export default function PurchaseSuccess() {
 
     setLaunching(true);
     try {
-      const token = await getToken();
+      const token = await getFreshToken();
+      if (!token) {
+        toast.error("Your session expired. Please sign in again to launch the terminal.");
+        return;
+      }
       const apiBase = getApiBase();
       const res = await fetch(`${apiBase}/api/terminal-launch`, {
         method: "POST",

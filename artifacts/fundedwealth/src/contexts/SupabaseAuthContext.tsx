@@ -21,6 +21,7 @@ interface AuthContextType {
     signInWithGoogle: () => Promise<{ error: string | null }>;
     signOut: () => Promise<void>;
     getToken: () => Promise<string | null>;
+    getFreshToken: () => Promise<string | null>;
     resetPassword: (email: string) => Promise<{ error: string | null }>;
     updatePassword: (newPassword: string) => Promise<{ error: string | null }>;
 }
@@ -136,6 +137,30 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         return s?.access_token ?? null;
     }, []);
 
+    const getFreshToken = useCallback(async () => {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) return null;
+
+        const { data: { user }, error: verificationError } = await supabase.auth.getUser(session.access_token);
+        if (!verificationError && user) return session.access_token;
+        if (verificationError?.status !== 401 && verificationError?.status !== 403) {
+            if (verificationError) throw verificationError;
+            throw new Error("Unable to verify the current authentication session.");
+        }
+
+        const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+            if (refreshError.status === 400 || refreshError.status === 401 || refreshError.status === 403) {
+                await supabase.auth.signOut({ scope: "local" });
+                return null;
+            }
+            throw refreshError;
+        }
+
+        return refreshedSession?.access_token ?? null;
+    }, []);
+
     const resetPassword = useCallback(async (email: string) => {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: `${siteUrl}/reset-password`,
@@ -162,6 +187,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
                 signInWithGoogle,
                 signOut,
                 getToken,
+                getFreshToken,
                 resetPassword,
                 updatePassword,
             }}
