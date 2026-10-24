@@ -178,7 +178,72 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
       });
     }
 
+    const accountLinkSource = {
+      customer: {
+        id: String(user.id),
+        email: String(user.email ?? auth.email ?? "").toLowerCase(),
+        name: [user.firstName, user.lastName].filter(Boolean).join(" "),
+      },
+      account: {
+        id: terminalAccountId,
+        traderId: String(prov.account_trader_id ?? ""),
+        accountCode: String(prov.account_code ?? ""),
+        status: String(prov.trading_status ?? ""),
+        balance: Number(prov.account_balance),
+        availableMargin: prov.available_margin == null ? null : Number(prov.available_margin),
+        usedMargin: prov.used_margin == null ? null : Number(prov.used_margin),
+      },
+      challenge: {
+        id: String(prov.challenge_account_id ?? ""),
+        traderId: String(prov.challenge_trader_id ?? ""),
+        status: String(prov.challenge_status ?? ""),
+        type: String(prov.challenge_type ?? ""),
+        plan: String(prov.plan ?? ""),
+        initialBalance: Number(prov.initial_balance),
+        currentBalance: Number(prov.current_balance),
+        peakBalance: Number(prov.peak_balance),
+        profitTargetPct: Number(prov.profit_target_pct),
+        dailyLossLimitPct: Number(prov.daily_loss_limit_pct),
+        maxDrawdownPct: Number(prov.max_drawdown_pct),
+        minTradingDays: Number(prov.min_trading_days),
+        expiresAt: prov.expires_at ?? null,
+      },
+      provisioning: {
+        status: prov.provisioning_status == null
+          ? "ownership_verified"
+          : String(prov.provisioning_status),
+        tradingAccountId: String(prov.provisioning_trading_account_id ?? terminalAccountId),
+        challengeAccountId: String(prov.provisioning_challenge_account_id ?? prov.challenge_account_id ?? ""),
+        traderId: String(prov.provisioning_trader_id ?? prov.account_trader_id ?? ""),
+      },
+    };
+
     try {
+      const mappingRes = await fetch(`${TERMINAL_API_URL}/api/admin/account-links`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-sso-api-key": sharedKey,
+        },
+        body: JSON.stringify({ mode: "ensure", source: accountLinkSource }),
+        signal: AbortSignal.timeout(25000),
+      });
+      const mappingData = await mappingRes.json().catch(() => null) as {
+        success?: boolean;
+        result?: { accountId?: string };
+        error?: string;
+      } | null;
+      if (!mappingRes.ok || !mappingData?.success || !mappingData.result?.accountId) {
+        console.error("[Terminal Launch] Terminal account mapping failed", {
+          status: mappingRes.status,
+          error: mappingData?.error ?? null,
+        });
+        return res.status(mappingRes.status === 409 ? 409 : 502).json({
+          success: false,
+          message: mappingData?.error ?? "Unable to prepare your trading account in the terminal. Please try again or contact support.",
+        });
+      }
+
       const terminalRes = await fetch(`${TERMINAL_API_URL}/auth/sso/generate`, {
         method: "POST",
         headers: {

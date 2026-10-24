@@ -198,14 +198,39 @@ export async function resolveUserAccountOwnership(db: DbLike, userId: string, ac
       tt.id AS trader_id,
       ca.id AS challenge_account_id,
       ta.id AS trading_account_id,
+      ta.trader_id AS account_trader_id,
+      ta.balance AS account_balance,
+      ta.available_margin AS available_margin,
+      ta.used_margin AS used_margin,
       ca.status AS challenge_status,
+      ca.trader_id AS challenge_trader_id,
+      ca.type AS challenge_type,
       ca.plan AS plan,
       ca.initial_balance AS initial_balance,
+      ca.current_balance AS current_balance,
+      ca.peak_balance AS peak_balance,
+      ca.profit_target_pct AS profit_target_pct,
+      ca.daily_loss_limit_pct AS daily_loss_limit_pct,
+      ca.max_drawdown_pct AS max_drawdown_pct,
+      ca.min_trading_days AS min_trading_days,
+      ca.expires_at AS expires_at,
       ta.account_code AS account_code,
-      ta.status AS trading_status
+      ta.status AS trading_status,
+      pl.status AS provisioning_status,
+      pl.trading_account_id AS provisioning_trading_account_id,
+      pl.challenge_account_id AS provisioning_challenge_account_id,
+      pl.trader_id AS provisioning_trader_id
     FROM trading_accounts ta
     LEFT JOIN terminal_traders tt ON tt.id = ta.trader_id
     LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
+    LEFT JOIN LATERAL (
+      SELECT status, trading_account_id, challenge_account_id, trader_id
+      FROM provisioning_logs
+      WHERE trading_account_id::text = ta.id::text
+        AND challenge_account_id::text = ca.id::text
+      ORDER BY completed_at DESC NULLS LAST, created_at DESC
+      LIMIT 1
+    ) pl ON true
     WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
       AND (${sql.join(ownerClauses, sql` OR `)})
     LIMIT 1
