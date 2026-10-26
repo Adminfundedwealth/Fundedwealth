@@ -12,7 +12,7 @@ export interface DiscountConfigEntry {
 /** Map of planType → entry for convenient lookup */
 export type DiscountConfigMap = Record<string, DiscountConfigEntry>;
 
-// getApiBase() strips dead domains and returns "" (relative) or a live URL
+// getApiBase() returns the configured API URL or the Railway production URL.
 const _base = getApiBase();
 const API_PREFIX = _base ? `${_base}/api` : "/api";
 

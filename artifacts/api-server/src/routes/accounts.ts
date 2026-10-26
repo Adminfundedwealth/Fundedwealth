@@ -4,6 +4,7 @@ import { db, users, orders } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { decrypt, isEncrypted } from "../lib/encryption-service";
 import {
+  buildOrderOwnerPredicate,
   resolveUserTraderId,
   fetchUserLiveAccounts,
   resolveUserAccountOwnership,
@@ -22,6 +23,34 @@ function getPlanRuleDefault(planType: string | null | undefined, field: keyof (t
   const normalizedPlan = String(planType || "").toLowerCase();
   const defaults = planRuleDefaults[normalizedPlan as keyof typeof planRuleDefaults] || planRuleDefaults.flash;
   return defaults[field];
+}
+
+async function resolveAuthenticatedAccountUser(auth: { userId: string; email?: string }) {
+  const [byAuthId] = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkId, auth.userId))
+    .limit(1);
+  if (byAuthId) return byAuthId;
+  if (!auth.email) return null;
+
+  const emailMatches = await db
+    .select()
+    .from(users)
+    .where(sql`lower(${users.email}) = lower(${auth.email})`)
+    .limit(2);
+  if (emailMatches.length > 1) {
+    throw new Error("Refusing ambiguous email-to-user mapping");
+  }
+  const [byEmail] = emailMatches;
+  if (!byEmail) return null;
+
+  const [linkedUser] = await db
+    .update(users)
+    .set({ clerkId: auth.userId, updatedAt: new Date() })
+    .where(eq(users.id, byEmail.id))
+    .returning();
+  return linkedUser ?? null;
 }
 
 /**
@@ -50,24 +79,8 @@ router.get("/my", async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    // 1. Find user by Supabase auth ID
-    let [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, auth.userId))
-      .limit(1);
-
-    // Auto-link by email if not found (handles Clerk → Supabase migration and new browser sessions)
-    if (!user && auth.email) {
-      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
-      if (byEmail) {
-        [user] = await db
-          .update(users)
-          .set({ clerkId: auth.userId, updatedAt: new Date() })
-          .where(eq(users.id, byEmail.id))
-          .returning();
-      }
-    }
+    // Resolve the public profile by auth ID, then by the verified session email.
+    const user = await resolveAuthenticatedAccountUser(auth);
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -81,7 +94,7 @@ router.get("/my", async (req: Request, res: Response) => {
     // 3. Pull every LIVE account for this user/trader straight from the terminal-owned
     //    tables, joined challenge ⇄ trading. We support both the trader_id and user_id
     //    schema variants because the repo has both legacy and migrated data paths.
-    const liveRows = await fetchUserLiveAccounts(db, String(user.id), traderId);
+    const liveRows = await fetchUserLiveAccounts(db, String(user.id), traderId, auth.userId);
 
     // 4. Load the user's orders + provisioning logs to (a) attach purchase/fee context
     //    to each live account and (b) surface pending/failed provisioning attempts that
@@ -97,7 +110,7 @@ router.get("/my", async (req: Request, res: Response) => {
       userOrders = await db
         .select()
         .from(orders)
-        .where(eq(orders.userId, String(user.id)))
+        .where(buildOrderOwnerPredicate(orders.userId, String(user.id), auth.userId))
         .orderBy(desc(orders.createdAt));
 
       for (const o of userOrders) orderById.set(String(o.id), o);
@@ -115,8 +128,15 @@ router.get("/my", async (req: Request, res: Response) => {
       }
 
       // Map trading_account_id → order_id so a live account can show its purchase fee.
+      for (const row of liveRows) {
+        if (row.linked_order_id && row.trading_account_id) {
+          tradingToOrder.set(String(row.trading_account_id), String(row.linked_order_id));
+        }
+      }
       for (const pl of provLogRows) {
-        if (pl.trading_account_id) tradingToOrder.set(String(pl.trading_account_id), String(pl.order_id));
+        if (pl.trading_account_id && !tradingToOrder.has(String(pl.trading_account_id))) {
+          tradingToOrder.set(String(pl.trading_account_id), String(pl.order_id));
+        }
       }
     } catch (ctxErr) {
       console.error("[Accounts] Order/provisioning context lookup failed (non-fatal):", ctxErr);
@@ -379,7 +399,7 @@ router.get("/my", async (req: Request, res: Response) => {
  * Returns a single account by its terminal trading_account ID.
  * Used by launch-terminal flow to get account details before SSO handoff.
  *
- * Verifies ownership via: trading_accounts → provisioning_logs.order_id → orders.user_id
+ * Verifies ownership through the authenticated profile and purchase/provisioning links.
  */
 router.get("/:accountId", async (req: Request, res: Response) => {
   try {
@@ -388,34 +408,18 @@ router.get("/:accountId", async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, message: "Authentication required" });
     }
 
-    const { accountId } = req.params;
+    const accountId = Array.isArray(req.params.accountId)
+      ? req.params.accountId[0]
+      : req.params.accountId;
 
     // 1. Find user
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, auth.userId))
-      .limit(1);
+    const user = await resolveAuthenticatedAccountUser(auth);
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // 2. Resolve the account via the TRADER CHAIN and verify ownership.
-    //    trading_accounts.trader_id → terminal_traders.external_id = users.id.
-    //    Works for website AND manual/emergency provisions (no order dependency).
-    const ownRes = await db.execute(sql`
-      SELECT
-        ta.id  AS trading_account_id,
-        ca.id  AS challenge_account_id,
-        tt.id  AS trader_id
-      FROM trading_accounts ta
-      JOIN terminal_traders tt ON tt.id = ta.trader_id
-      LEFT JOIN challenge_accounts ca ON ca.id = ta.challenge_id
-      WHERE (ta.id = ${accountId}::uuid OR ca.id = ${accountId}::uuid)
-        AND tt.external_id = ${String(user.id)}
-      LIMIT 1
-    `);
+    const ownRes = await resolveUserAccountOwnership(db, String(user.id), accountId, auth.userId);
 
     if (!ownRes.rows || ownRes.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Account not found" });
@@ -446,9 +450,9 @@ router.get("/:accountId", async (req: Request, res: Response) => {
     try {
       const orderSearch = await db.execute(sql`
         SELECT o.id, o.metadata
-        FROM orders o
-        JOIN provisioning_logs pl ON pl.order_id = o.id
-        WHERE pl.trading_account_id = ${prov.trading_account_id}::uuid
+        FROM public.orders o
+        WHERE o.id::text = ${String(prov.order_id ?? "")}
+          AND ${buildOrderOwnerPredicate(sql`o.user_id`, String(user.id), auth.userId)}
         LIMIT 1
       `);
       if (orderSearch.rows && orderSearch.rows.length > 0) {
@@ -549,19 +553,19 @@ router.get("/order/:orderId", async (req: Request, res: Response) => {
 
     // Option A: User is authenticated and owns the order
     if (auth?.userId) {
-      const [user] = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.clerkId, auth.userId))
-        .limit(1);
+      const user = await resolveAuthenticatedAccountUser(auth);
 
-      if (user && order.userId === user.id) {
+      if (user && (
+        order.userId === user.id
+        || (order.userId === auth.userId && user.clerkId === auth.userId)
+      )) {
         authorized = true;
       }
     }
 
-    // Option B: Order is very recent (within 10 minutes) - allows guest checkout success flow
-    if (!authorized) {
+    // Recent-order access is only for guest sessions; it must not bypass
+    // ownership checks when a different authenticated user is present.
+    if (!auth?.userId) {
       const orderAge = Date.now() - new Date(order.createdAt).getTime();
       const TEN_MINUTES = 10 * 60 * 1000;
       
@@ -690,20 +694,10 @@ router.get("/:accountId/trades", async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: "Account ID is required" });
     }
 
-    let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
-    if (!user && auth.email) {
-      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
-      if (byEmail) {
-        [user] = await db
-          .update(users)
-          .set({ clerkId: auth.userId, updatedAt: new Date() })
-          .where(eq(users.id, byEmail.id))
-          .returning();
-      }
-    }
+    const user = await resolveAuthenticatedAccountUser(auth);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    const ownerCheck = await resolveUserAccountOwnership(db, String(user.id), accountId);
+    const ownerCheck = await resolveUserAccountOwnership(db, String(user.id), accountId, auth.userId);
     const ownedAccount = ownerCheck.rows?.[0] as { trading_account_id: string } | undefined;
     if (!ownedAccount) {
       return res.status(404).json({ success: false, message: "Account not found" });
@@ -755,20 +749,10 @@ router.get("/:accountId/analytics", async (req: Request, res: Response) => {
     if (!accountId) {
       return res.status(400).json({ success: false, message: "Account ID is required" });
     }
-    let [user] = await db.select().from(users).where(eq(users.clerkId, auth.userId)).limit(1);
-    if (!user && auth.email) {
-      const [byEmail] = await db.select().from(users).where(eq(users.email, auth.email)).limit(1);
-      if (byEmail) {
-        [user] = await db
-          .update(users)
-          .set({ clerkId: auth.userId, updatedAt: new Date() })
-          .where(eq(users.id, byEmail.id))
-          .returning();
-      }
-    }
+    const user = await resolveAuthenticatedAccountUser(auth);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    const ownerCheck = await resolveUserAccountOwnership(db, String(user.id), accountId);
+    const ownerCheck = await resolveUserAccountOwnership(db, String(user.id), accountId, auth.userId);
     if (!ownerCheck.rows?.length) {
       return res.status(404).json({ success: false, message: "Account not found" });
     }

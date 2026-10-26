@@ -6,16 +6,22 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const outputDirectory = path.join(projectRoot, "dist");
 const templatePath = path.join(outputDirectory, "index.html");
 const siteUrl = "https://www.fundedwealth.com";
+const productionApiBaseUrl = "https://fundedwealth-api-production.up.railway.app";
 const configuredApiBaseUrl =
   process.env.VITE_API_URL ||
   process.env.VITE_API_BASE_URL ||
-  "https://api.fundedwealth.com";
-const normalizedApiBaseUrl = configuredApiBaseUrl.replace(
-  /^(https?:\/\/)api\.fundedwealth11\.com(?=[:/]|$)/i,
-  "$1api.fundedwealth.com",
-);
+  productionApiBaseUrl;
+const normalizedApiBaseUrl = configuredApiBaseUrl
+  .replace(
+    /^(https?:\/\/)api\.fundedwealth11\.com(?=[:/]|$)/i,
+    "$1fundedwealth-api-production.up.railway.app",
+  )
+  .replace(
+    /^(https?:\/\/)api\.fundedwealth\.com(?=[:/]|$)/i,
+    "$1fundedwealth-api-production.up.railway.app",
+  );
 const apiBaseUrl = normalizedApiBaseUrl.includes("fundedwealth-api.onrender.com")
-  ? "https://api.fundedwealth.com"
+  ? productionApiBaseUrl
   : normalizedApiBaseUrl;
 const isCheck = process.argv.includes("--check");
 

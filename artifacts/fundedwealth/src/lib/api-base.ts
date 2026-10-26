@@ -4,11 +4,12 @@
  * Priority:
  *  1. VITE_API_URL
  *  2. VITE_API_BASE_URL — legacy alias
- *  3. https://api.fundedwealth.com — the production Railway API domain
+ *  3. The Railway production API service
  */
 
 const LEGACY_API_HOST = "api.fundedwealth11.com";
-const PRODUCTION_API_BASE = "https://api.fundedwealth.com";
+const BROKEN_API_HOST = "api.fundedwealth.com";
+const PRODUCTION_API_BASE = "https://fundedwealth-api-production.up.railway.app";
 
 /** Domains that must be treated as if unset. */
 const DEAD_DOMAINS = [
@@ -20,20 +21,26 @@ function isDeadUrl(url: string | undefined): boolean {
   return DEAD_DOMAINS.some(d => url.includes(d));
 }
 
-export function getApiBase(): string {
-  const fromEnv =
-    import.meta.env.VITE_API_URL ||
-    import.meta.env.VITE_API_BASE_URL ||
-    PRODUCTION_API_BASE;
-
-  // Rewrite the previously misconfigured hostname to the production API domain.
-  const normalized = fromEnv.replace(
+export function resolveApiBase(fromEnv?: string): string {
+  const configured = fromEnv || PRODUCTION_API_BASE;
+  const normalized = configured.replace(
     new RegExp(`(^https?://)${LEGACY_API_HOST.replace(/\./g, "\\.")}(?=[:/]|$)`, "i"),
-    "$1api.fundedwealth.com",
+    "$1fundedwealth-api-production.up.railway.app",
+  ).replace(
+    new RegExp(`(^https?://)${BROKEN_API_HOST.replace(/\./g, "\\.")}(?=[:/]|$)`, "i"),
+    `$1fundedwealth-api-production.up.railway.app`,
   );
 
-  // If the env var is set to a known-dead domain, ignore it and use relative.
-  if (isDeadUrl(normalized)) return "";
+  // Never fall back to a same-origin /api path on production hosting. This
+  // endpoint must reach the Railway service even when a stale build secret is set.
+  if (isDeadUrl(normalized)) return PRODUCTION_API_BASE;
 
   return normalized;
+}
+
+export function getApiBase(): string {
+  return resolveApiBase(
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_API_BASE_URL,
+  );
 }

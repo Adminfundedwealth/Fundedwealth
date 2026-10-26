@@ -1,8 +1,7 @@
 /**
  * api.ts — Thin fetch wrapper for the FundedWealth backend API.
  *
- * All calls use getApiBase() so production requests use the configured API
- * host, defaulting to api.fundedwealth.com.
+ * All calls use getApiBase() so production requests use the Railway API host.
  */
 import { getApiBase } from "./api-base";
 

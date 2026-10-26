@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { getAuth } from "../middlewares/supabaseAuth";
 import { db, users } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { resolveTerminalLaunchUser } from "../lib/terminalLaunchAuth.js";
 import { resolveUserAccountOwnership } from "../lib/accountOwnershipCompat";
 
@@ -94,12 +94,16 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           return row ?? null;
         },
         lookupByEmail: async (email: string) => {
-          const [row] = await db
+          const matches = await db
             .select()
             .from(users)
-            .where(eq(users.email, email))
-            .limit(1);
-          return row ?? null;
+            .where(sql`lower(${users.email}) = lower(${email})`)
+            .limit(2);
+          if (matches.length > 1) {
+            console.error("[Terminal Launch] Refusing ambiguous email-to-user mapping");
+            return null;
+          }
+          return matches[0] ?? null;
         },
         linkUserToAuth: async (userRow: any) => {
           await db
@@ -132,7 +136,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
     // ── 4. VERIFY OWNERSHIP VIA TRADER CHAIN ────────────────────────────────
     let ownershipResult;
     try {
-      ownershipResult = await resolveUserAccountOwnership(db, String(user.id), accountId);
+      ownershipResult = await resolveUserAccountOwnership(db, String(user.id), accountId, auth.userId);
     } catch (dbErr: any) {
       console.error("[Terminal Launch] DB query failed:", dbErr.message);
       return res.status(500).json({ success: false, message: "Failed to verify account ownership." });
