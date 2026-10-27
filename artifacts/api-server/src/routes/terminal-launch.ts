@@ -179,9 +179,11 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
       });
     }
 
+    let linkedExternalAccountId = terminalAccountId;
     try {
       const source = await loadVerifiedTerminalAccountSource(db, String(user.id), terminalAccountId);
       await ensureTerminalAccountLink(source);
+      linkedExternalAccountId = source.account.id;
     } catch (linkError: unknown) {
       const linkErrorStatus = typeof linkError === "object" && linkError !== null && "status" in linkError
         ? linkError.status
@@ -205,7 +207,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           "Content-Type": "application/json",
           "x-sso-api-key": sharedKey,
         },
-        body: JSON.stringify({ accountId: terminalAccountId }),
+        body: JSON.stringify({ accountId: linkedExternalAccountId }),
         signal: AbortSignal.timeout(8000),
       });
 
