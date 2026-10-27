@@ -6,7 +6,7 @@ RUN npm install --global pnpm@11.24.0
 
 COPY . .
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --filter @workspace/api-server...
 RUN pnpm --filter @workspace/api-server run build
 
 CMD ["node", "--enable-source-maps", "./artifacts/api-server/dist/index.mjs"]
