@@ -247,6 +247,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           message: mappingData?.error ?? "Unable to prepare your trading account in the terminal. Please try again or contact support.",
         });
       }
+      const canonicalTerminalAccountId = mappingData.result.accountId;
 
       const terminalRes = await fetch(`${TERMINAL_API_URL}/auth/sso/generate`, {
         method: "POST",
@@ -254,7 +255,7 @@ export async function handleTerminalLaunch(req: Request, res: Response) {
           "Content-Type": "application/json",
           "x-sso-api-key": sharedKey,
         },
-        body: JSON.stringify({ accountId: terminalAccountId }),
+        body: JSON.stringify({ accountId: canonicalTerminalAccountId }),
         signal: AbortSignal.timeout(8000),
       });
 
