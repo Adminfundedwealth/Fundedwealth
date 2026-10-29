@@ -6,6 +6,7 @@ import { PRODUCTS } from "@workspace/products";
 import SEOHead from "@/components/SEOHead";
 import { FAQSchema, ServiceSchema } from "@/components/StructuredData";
 import IndiaTraderNetworkHero from "@/components/IndiaTraderNetworkHero";
+import DiwaliCelebration from "@/components/DiwaliCelebration";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -5771,6 +5772,7 @@ export default function Home() {
 
       <Footer />
 
+      <DiwaliCelebration />
 
     </div>
   );

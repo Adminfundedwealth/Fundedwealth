@@ -1,0 +1,192 @@
+.diwali-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 1.8s ease;
+}
+
+.diwali-celebration--fading {
+  opacity: 0;
+}
+
+.diwali-fireworks-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.diwali-greeting {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  width: min(90vw, 680px);
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  animation: diwali-greeting-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  filter: drop-shadow(0 4px 24px rgba(255, 174, 45, 0.45));
+}
+
+.diwali-greeting__lamp {
+  width: clamp(42px, 7vw, 70px);
+  height: clamp(42px, 7vw, 70px);
+  margin-bottom: 4px;
+  fill: #ffc857;
+  stroke: #fff0b3;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 16px rgba(255, 187, 56, 0.95));
+}
+
+.diwali-greeting__happy,
+.diwali-greeting__diwali {
+  display: block;
+  background: linear-gradient(180deg, #fff4bd 0%, #ffc04d 42%, #d7761c 72%, #ffe6a0 100%);
+  background-clip: text;
+  color: transparent;
+  font-family: var(--app-font-heading), Georgia, serif;
+  font-weight: 900;
+  line-height: 0.96;
+  -webkit-background-clip: text;
+  -webkit-text-stroke: 0.5px rgba(255, 226, 146, 0.75);
+  text-shadow: 0 0 28px rgba(255, 157, 36, 0.28);
+}
+
+.diwali-greeting__happy {
+  font-size: clamp(2rem, 6vw, 4.2rem);
+  letter-spacing: 0.2em;
+  padding-left: 0.2em;
+}
+
+.diwali-greeting__diwali {
+  margin-top: 0.04em;
+  font-size: clamp(4rem, 15vw, 10.5rem);
+  letter-spacing: 0.025em;
+}
+
+.diwali-greeting__flourish {
+  margin: 0.55rem 0;
+  color: #ffd166;
+  font-size: clamp(0.8rem, 3vw, 1.5rem);
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 12px rgba(255, 208, 102, 0.8);
+}
+
+.diwali-lantern {
+  position: absolute;
+  top: -10px;
+  width: 42px;
+  height: 66px;
+  border: 2px solid rgba(255, 204, 100, 0.95);
+  border-radius: 48% 48% 40% 40%;
+  background: radial-gradient(ellipse at center, rgba(255, 185, 68, 0.55), rgba(191, 55, 119, 0.22) 70%, transparent);
+  color: #fff0ad;
+  font-size: 1.25rem;
+  line-height: 60px;
+  text-align: center;
+  text-shadow: 0 0 15px #ffc857;
+  box-shadow: 0 0 22px rgba(255, 163, 62, 0.42), inset 0 0 13px rgba(255, 223, 145, 0.3);
+  animation: diwali-lantern-sway 3s ease-in-out infinite alternate;
+}
+
+.diwali-lantern::before {
+  position: absolute;
+  top: -52px;
+  left: 50%;
+  width: 1px;
+  height: 52px;
+  background: linear-gradient(rgba(255, 206, 117, 0.2), rgba(255, 206, 117, 0.9));
+  content: "";
+}
+
+.diwali-lantern--left {
+  left: clamp(18px, 8vw, 120px);
+}
+
+.diwali-lantern--right {
+  right: clamp(18px, 8vw, 120px);
+  animation-delay: -1.2s;
+}
+
+.diwali-diya {
+  position: absolute;
+  bottom: 8%;
+  font-size: clamp(1.5rem, 4vw, 3.5rem);
+  filter: drop-shadow(0 0 15px rgba(255, 168, 53, 0.95));
+  animation: diwali-diya-glow 1.4s ease-in-out infinite alternate;
+}
+
+.diwali-diya--left {
+  left: clamp(14px, 8vw, 110px);
+}
+
+.diwali-diya--right {
+  right: clamp(14px, 8vw, 110px);
+  animation-delay: -0.7s;
+}
+
+@keyframes diwali-greeting-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes diwali-lantern-sway {
+  from {
+    transform: rotate(-5deg);
+  }
+
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes diwali-diya-glow {
+  from {
+    opacity: 0.72;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 640px) {
+  .diwali-lantern {
+    width: 28px;
+    height: 48px;
+    font-size: 0.9rem;
+    line-height: 44px;
+  }
+
+  .diwali-lantern::before {
+    top: -35px;
+    height: 35px;
+  }
+
+  .diwali-greeting__flourish {
+    margin: 0.35rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diwali-celebration,
+  .diwali-greeting,
+  .diwali-lantern,
+  .diwali-diya {
+    animation: none;
+    transition: opacity 150ms linear;
+  }
+}
