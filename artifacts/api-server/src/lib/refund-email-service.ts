@@ -19,7 +19,7 @@ import { logger } from "./logger";
 
 const BRAND_HEADER = `
   <div style="margin-bottom:24px;">
-    <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:36px;" />
+    <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:36px;" />
   </div>
 `;
 

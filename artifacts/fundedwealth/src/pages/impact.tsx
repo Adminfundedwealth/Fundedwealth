@@ -81,7 +81,7 @@ export default function ImpactPage() {
       <nav className="sticky top-0 z-50 bg-[#0D0020]/90 backdrop-blur-lg border-b border-white/10">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 object-contain" />
+            <img src="/logo.optimized.png" alt="FundedWealth" className="h-10 w-10 object-contain" />
             <div className="text-white font-bold text-lg">Funded<span className="text-[#FF8A3D]">Wealth</span></div>
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -456,7 +456,7 @@ export default function ImpactPage() {
       <footer className="border-t border-white/10 py-8">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-3">
-            <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 object-contain" />
+            <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 object-contain" />
             <div className="text-white font-bold">Funded<span className="text-[#FF8A3D]">Wealth</span></div>
           </div>
           <p className="text-white/40 text-sm">FW Impact Initiative — Trade with Purpose, Create Real Impact.</p>

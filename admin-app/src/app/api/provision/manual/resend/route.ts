@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 <body style="margin:0;padding:0;background:#f4f4f5;">
   <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
     <div style="background:#ffffff;border-radius:8px;padding:32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a2e;line-height:1.6;">
-      <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:32px;margin-bottom:24px;" />
+      <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:32px;margin-bottom:24px;" />
       <h2 style="margin:0 0 16px;color:#16a34a;">🎉 Your Trading Account is Ready!</h2>
       <p>Hi ${user_name || 'Trader'},</p>
       <p>Great news! Your FundedWealth trading account has been provisioned and is ready to use.</p>

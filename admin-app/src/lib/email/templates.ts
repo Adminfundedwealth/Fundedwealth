@@ -28,7 +28,7 @@ function wrap(title: string, body: string): string {
 <body style="margin:0;padding:0;background:#f4f4f5;">
   <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
     <div style="background:#ffffff;border-radius:8px;padding:32px;${BASE_STYLE}">
-      <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:32px;margin-bottom:24px;" />
+      <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:32px;margin-bottom:24px;" />
       ${body}
       <hr style="border:none;border-top:1px solid #e4e4e7;margin:32px 0 16px;" />
       <p style="font-size:12px;color:#71717a;">

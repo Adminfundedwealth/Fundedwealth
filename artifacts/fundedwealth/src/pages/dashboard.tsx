@@ -1611,7 +1611,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
     <aside className={`${mobile ? "w-full" : "w-64"} h-full flex flex-col bg-[#0A0018] border-r border-white/10`}>
       <div className="p-5 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="FundedWealth" className="h-9 w-9 object-contain" />
+          <img src="/logo.optimized.png" alt="FundedWealth" className="h-9 w-9 object-contain" />
           <div className="text-white font-bold text-lg leading-tight">
             Funded<span className="text-[#FF8A3D]">Wealth</span>
           </div>
@@ -3445,7 +3445,7 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
         currency: orderData.order.currency || "INR",
         name: "FundedWealth Impact",
         description: `Donation - ${donateCause === "animal" ? "Animal Feeding" : "Girls Education"}`,
-        image: "/logo.png",
+        image: "/logo.optimized.png",
         order_id: orderData.order.id,
         handler: async (response: any) => {
           // 3. Verify payment

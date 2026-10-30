@@ -6,7 +6,7 @@ const organizationSchema = {
   name: "FundedWealth",
   alternateName: ["FundedWealth India", "FW", "Funded Wealth"],
   url: "https://www.fundedwealth.com",
-  logo: "https://www.fundedwealth.com/logo.png",
+  logo: "https://www.fundedwealth.com/logo.optimized.png",
   image: "https://www.fundedwealth.com/opengraph.jpg",
   description: "FundedWealth is a simulated prop trading platform offering structured funded account evaluations for traders in the Indian stock market. Trade NIFTY, BANKNIFTY, SENSEX and selected Indian equities and futures in a defined simulated environment. Eligible participants can earn performance-based rewards under program terms.",
   foundingDate: "2023",
@@ -330,7 +330,7 @@ export function ArticleSchema({
       name: "FundedWealth",
       logo: {
         "@type": "ImageObject",
-        url: "https://www.fundedwealth.com/logo.png",
+        url: "https://www.fundedwealth.com/logo.optimized.png",
       },
       url: "https://www.fundedwealth.com",
     },

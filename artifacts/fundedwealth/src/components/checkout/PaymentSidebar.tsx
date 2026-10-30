@@ -23,7 +23,7 @@ export const PaymentSidebar = ({
       }} />
       <div className="relative">
         <div className="flex items-center gap-2 mb-5">
-          <img src="/logo.png" alt="FundedWealth" className="h-9 w-9 rounded-lg" />
+          <img src="/logo.optimized.png" alt="FundedWealth" className="h-9 w-9 rounded-lg" />
           <div>
             <div className="text-white font-extrabold leading-none">FundedWealth</div>
             <div className="text-white/40 text-[10px] mt-1 tracking-wider uppercase">Trader Funding · India</div>

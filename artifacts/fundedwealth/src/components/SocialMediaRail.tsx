@@ -125,7 +125,7 @@ export default function SocialMediaRail() {
             title="FundedWealth"
           >
             <img
-              src="/logo.png"
+              src="/logo.optimized.png"
               alt="FundedWealth logo"
               width={256}
               height={256}

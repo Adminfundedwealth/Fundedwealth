@@ -233,7 +233,7 @@ export default function SignUpPage() {
 
       {/* Brand */}
       <div className="relative z-10 mb-5 flex items-center gap-2.5">
-        <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 object-contain" />
+        <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 object-contain" />
         <span className="text-white font-bold text-lg tracking-tight">
           Funded<span className="text-[#FF8A3D]">Wealth</span>
         </span>

@@ -35,7 +35,7 @@ export default function AcceptableUse() {
         <div className="container mx-auto px-4 flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
             <ArrowLeft size={20} />
-            <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+            <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
             <span className="font-heading font-bold">FundedWealth</span>
           </Link>
         </div>
@@ -314,7 +314,7 @@ export default function AcceptableUse() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-10">
             <div className="lg:col-span-2">
               <Link href="/" className="flex items-center gap-3 mb-6">
-                <img src="/logo.png" alt="FundedWealth" className="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all duration-500" />
+                <img src="/logo.optimized.png" alt="FundedWealth" className="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all duration-500" />
                 <span className="text-2xl font-heading font-bold text-white tracking-tight">Funded<span className="text-fw-orange">Wealth</span></span>
               </Link>
               <p className="text-white/50 max-w-sm mb-4 text-lg font-medium">

@@ -964,7 +964,7 @@ router.post("/forgot-password", async (req, res) => {
       subject: "Reset Your FundedWealth Password",
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-          <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+          <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
           <h2 style="color:#FF8A3D;margin-bottom:16px;">Reset Your Password</h2>
           <p style="color:rgba(255,255,255,0.7);line-height:1.6;">You requested a password reset for your FundedWealth account.</p>
           <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
@@ -1107,7 +1107,7 @@ router.post("/forgot-password", async (req, res) => {
       subject: "Reset Your FundedWealth Password",
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-          <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+          <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
           <h2 style="color:#FF8A3D;margin-bottom:16px;">Reset Your Password</h2>
           <p style="color:rgba(255,255,255,0.7);line-height:1.6;">You requested a password reset for your FundedWealth account.</p>
           <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>

@@ -138,7 +138,7 @@ export default function CreatePasswordPage() {  const [, navigate] = useLocation
 
       <div className="w-full max-w-md bg-[#1A0030] border border-white/10 rounded-2xl p-8">
         <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 rounded-xl" />
+          <img src="/logo.optimized.png" alt="FundedWealth" className="h-10 w-10 rounded-xl" />
         </div>
         <h1 className="text-2xl font-bold text-white text-center mb-1">Create your password</h1>
         <p className="text-white/50 text-sm text-center mb-8">

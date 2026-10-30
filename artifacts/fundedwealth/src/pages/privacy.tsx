@@ -15,7 +15,7 @@ export default function Privacy() {
         <div className="container mx-auto px-4 flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
             <ArrowLeft size={20} />
-            <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+            <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
             <span className="font-heading font-bold">FundedWealth</span>
           </Link>
         </div>

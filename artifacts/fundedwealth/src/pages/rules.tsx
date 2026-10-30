@@ -1923,7 +1923,7 @@ export default function Rules() {
           <div className="container mx-auto px-4 flex items-center justify-between">
             <button onClick={() => setActivePlan(null)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft size={20} />
-              <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+              <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
               <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
             </button>
             <h1 className="text-lg font-heading font-bold flex items-center gap-2">
@@ -1979,7 +1979,7 @@ export default function Rules() {
           <div className="container mx-auto px-4 flex items-center justify-between">
             <button onClick={() => setActivePlan(null)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft size={20} />
-              <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+              <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
               <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
             </button>
             <h1 className="text-lg font-heading font-bold flex items-center gap-2">
@@ -2026,7 +2026,7 @@ export default function Rules() {
           <div className="container mx-auto px-4 flex items-center justify-between">
             <button onClick={() => setActivePlan(null)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft size={20} />
-              <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+              <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
               <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
             </button>
             <h1 className="text-lg font-heading font-bold flex items-center gap-2">
@@ -2067,7 +2067,7 @@ export default function Rules() {
           <div className="container mx-auto px-4 flex items-center justify-between">
             <button onClick={() => setActivePlan(null)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft size={20} />
-              <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+              <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
               <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
             </button>
             <h1 className="text-lg font-heading font-bold flex items-center gap-2">
@@ -2117,7 +2117,7 @@ export default function Rules() {
         <div className="container mx-auto px-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
             <ArrowLeft size={20} />
-            <img src="/logo.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
+            <img src="/logo.optimized.png" alt="FundedWealth" className="h-8 w-8 rounded-lg" />
             <span className="font-heading font-bold hidden sm:block">FundedWealth</span>
           </Link>
           <h1 className="text-lg font-heading font-bold flex items-center gap-2">

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { useLiveDiscountConfig, computeDiscountedPrice, formatINR } from "@/hooks/useDiscountConfig";
@@ -719,7 +719,7 @@ const Navbar = () => {
       <header className={`sticky top-[34px] sm:top-[36px] left-0 right-0 z-40 border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/85 py-3' : 'bg-[#1A0030]/75 py-4'}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="/logo.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-10 w-10 rounded-lg" />
+            <img src="/logo.optimized.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-10 w-10 rounded-lg" />
             <span className="text-lg font-heading font-bold text-white tracking-tight hidden sm:inline xl:hidden 2xl:inline">Funded<span className="text-gradient">Wealth</span></span>
           </Link>
 
@@ -2694,7 +2694,7 @@ const LivePayoutTable = () => {
               Real-Time Payout Transactions
             </span>
             <span className="text-white/30 text-xs flex items-center gap-1.5">
-              <img src="/logo.png" alt="" width={256} height={256} decoding="async" className="w-4 h-4 rounded" />
+              <img src="/logo.optimized.png" alt="" width={256} height={256} decoding="async" className="w-4 h-4 rounded" />
               FundedWealth
             </span>
           </div>
@@ -4582,7 +4582,7 @@ const AffiliateModal = ({
           <div className="hidden md:flex flex-col justify-between w-[42%] shrink-0 bg-[#0f0020] p-10 rounded-l-2xl border-r border-white/10">
             <div>
               <div className="flex items-center gap-3 mb-8">
-                <img src="/logo.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-9 w-9 rounded-lg" />
+                <img src="/logo.optimized.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-9 w-9 rounded-lg" />
                 <span className="text-xl font-heading font-bold text-white">Funded<span className="text-fw-orange">Wealth</span></span>
               </div>
               <h2 className="text-2xl font-heading font-extrabold text-white mb-3 leading-snug">
@@ -5337,7 +5337,7 @@ const MobileAppCTA = () => {
                       <div className="p-4 pt-10">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="w-8 h-8 rounded-lg bg-gradient-fw flex items-center justify-center">
-                            <img src="/logo.png" alt="" width={256} height={256} decoding="async" className="w-5 h-5 rounded" />
+                            <img src="/logo.optimized.png" alt="" width={256} height={256} decoding="async" className="w-5 h-5 rounded" />
                           </div>
                           <span className="text-white text-xs font-bold">FundedWealth</span>
                         </div>
@@ -5622,7 +5622,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-10">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-6">
-              <img src="/logo.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all duration-500" />
+              <img src="/logo.optimized.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all duration-500" />
               <span className="text-2xl font-heading font-bold text-white tracking-tight">Funded<span className="text-fw-orange">Wealth</span></span>
             </Link>
             <p className="text-white/50 max-w-sm mb-4 text-lg font-medium">

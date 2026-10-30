@@ -156,7 +156,7 @@ export const usePayment = (
         name: "FundedWealth",
         description: productName,
         order_id: data.order.id,
-        image: "/logo.png",
+        image: "/logo.optimized.png",
         prefill: {
           name: `${billing.firstName} ${billing.lastName}`.trim(),
           email: billing.email,

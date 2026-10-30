@@ -225,7 +225,7 @@ export default function ResetPasswordPage() {
 
       {/* Brand */}
       <div className="relative z-10 mb-6 flex items-center gap-2.5">
-        <img src={`${basePath}/logo.png`} alt="FundedWealth" className="h-8 w-8 object-contain" />
+        <img src={`${basePath}/logo.optimized.png`} alt="FundedWealth" className="h-8 w-8 object-contain" />
         <span className="text-white font-bold text-lg tracking-tight">
           Funded<span className="text-[#FF8A3D]">Wealth</span>
         </span>
@@ -245,7 +245,7 @@ export default function ResetPasswordPage() {
 
         {/* Logo ring */}
         <div className="mb-6 flex items-center justify-center w-16 h-16 rounded-full" style={{ background: "linear-gradient(135deg,rgba(74,0,224,0.4),rgba(139,92,246,0.2))", border: "1px solid rgba(139,92,246,0.5)", boxShadow: "0 0 20px rgba(139,92,246,0.4), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
-          <img src={`${basePath}/logo.png`} alt="FundedWealth" className="w-10 h-10 object-contain" />
+          <img src={`${basePath}/logo.optimized.png`} alt="FundedWealth" className="w-10 h-10 object-contain" />
         </div>
 
         <a href={`${basePath}/sign-in`} className="self-start text-[12px] text-[#A78BFA] hover:text-white mb-4 flex items-center gap-1 transition">

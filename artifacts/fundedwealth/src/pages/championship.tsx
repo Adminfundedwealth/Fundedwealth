@@ -137,7 +137,7 @@ const ChampionshipPage = () => {
         name: "FundedWealth Championship",
         description: `${challengeLabel} � ?${challengePrice}`,
         order_id: data.order.id,
-        image: "/logo.png",
+        image: "/logo.optimized.png",
         prefill: { name: form.name, email: form.email, contact: form.mobile },
         theme: { color: "#4A00E0" },
         handler: async (response: any) => {
@@ -198,7 +198,7 @@ const ChampionshipPage = () => {
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0010]/95 backdrop-blur-md">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 rounded-lg" />
+            <img src="/logo.optimized.png" alt="FundedWealth" className="h-10 w-10 rounded-lg" />
             <span className="text-xl font-heading font-bold text-white tracking-tight">
               Funded<span className="text-fw-orange">Wealth</span>
             </span>

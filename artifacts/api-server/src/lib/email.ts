@@ -153,7 +153,7 @@ export function contactConfirmationEmail(name: string, email: string) {
     subject: "We received your message — FundedWealth",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#FF8A3D;margin-bottom:16px;">Thank you, ${name}!</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">We've received your message and our team will get back to you within 24 hours.</p>
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0;" />
@@ -169,7 +169,7 @@ export function championshipRegistrationEmail(name: string, email: string, chall
     subject: `Championship Registration Confirmed — FundedWealth`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#FF8A3D;margin-bottom:16px;">You're In, ${name}! 🏆</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">You've successfully registered for the <strong style="color:white;">${challengeType}</strong> FW Championship.</p>
         <div style="background:rgba(74,0,224,0.2);border:1px solid rgba(74,0,224,0.3);border-radius:12px;padding:16px;margin:20px 0;">
@@ -188,7 +188,7 @@ export function affiliateWelcomeEmail(name: string, email: string, affiliateCode
     subject: "Welcome to FundedWealth Affiliate Program!",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#FF8A3D;margin-bottom:16px;">Welcome Aboard, ${name}! 🎉</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Your affiliate application has been received. Here's your unique affiliate code:</p>
         <div style="background:rgba(74,0,224,0.2);border:1px solid rgba(74,0,224,0.3);border-radius:12px;padding:20px;margin:20px 0;text-align:center;">
@@ -211,7 +211,7 @@ export function paymentConfirmationEmail(
     subject: `Payment Confirmed — ${productInfo} | FundedWealth`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#22c55e;margin-bottom:16px;">Payment Successful! ✅</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Hi <strong style="color:white;">${name}</strong>, your payment has been confirmed.</p>
         <div style="background:rgba(74,0,224,0.2);border:1px solid rgba(74,0,224,0.3);border-radius:12px;padding:20px;margin:20px 0;">
@@ -235,7 +235,7 @@ export function challengeStartedEmail(name: string, email: string, accountSize: 
     subject: `Your ${phase} Challenge Has Started! | FundedWealth`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#FF8A3D;margin-bottom:16px;">Your Challenge is Live! 🚀</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Hi <strong style="color:white;">${name}</strong>, your <strong style="color:#FF8A3D;">${accountSize}</strong> ${phase} account is now active.</p>
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0;" />
@@ -265,7 +265,7 @@ export function kycStatusEmail(
     subject: `${titles[status]} | FundedWealth`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:${colors[status]};margin-bottom:16px;">${titles[status]}</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Hi <strong style="color:white;">${name}</strong>,</p>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">${bodies[status]}</p>
@@ -297,7 +297,7 @@ export async function sendKycApprovedEmail(name: string, email: string) {
     subject: "KYC Approved — Welcome to FundedWealth! ✅",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#22c55e;margin-bottom:16px;">Congratulations! Your KYC is Approved ✅</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Hi <strong style="color:white;">${name}</strong>,</p>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Your identity verification has been completed successfully. You now have <strong>full access</strong> to payouts, all trading accounts, and higher limits.</p>
@@ -314,7 +314,7 @@ export async function sendKycRejectedEmail(name: string, email: string, reason: 
     subject: "KYC Verification Update — Action Required",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#ef4444;margin-bottom:16px;">KYC Verification Update</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Hi <strong style="color:white;">${name}</strong>,</p>
         <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px;margin:20px 0;">
@@ -334,7 +334,7 @@ export function donationThankYouEmail(name: string, email: string, amount: numbe
     subject: "Thank You for Your Donation — FW Impact Initiative",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#1A0030;color:white;padding:40px;border-radius:16px;">
-        <img src="https://fundedwealth.com/logo.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
+        <img src="https://fundedwealth.com/logo.optimized.png" alt="FundedWealth" style="height:40px;margin-bottom:24px;" />
         <h2 style="color:#D63384;margin-bottom:16px;">Thank You, ${name}! ❤️</h2>
         <p style="color:rgba(255,255,255,0.7);line-height:1.6;">Your donation of <strong style="color:#FF8A3D;">₹${amount}</strong> towards <strong style="color:white;">${category}</strong> has been received.</p>
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin:24px 0;" />
