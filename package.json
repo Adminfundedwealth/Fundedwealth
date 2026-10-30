@@ -17,14 +17,5 @@
     "@types/node": "catalog:",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2"
-  },
-  "pnpm": {
-    "overrides": {
-      "fast-uri": ">=3.1.2",
-      "protobufjs": ">=7.5.6"
-    },
-    "auditConfig": {
-      "ignoreCves": []
-    }
   }
 }
