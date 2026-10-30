@@ -53,7 +53,7 @@ const createOrderSchema = z.object({
   couponCode: z.string().max(20).optional(),
   currency: z.string().max(5).default("INR"),
   receipt: z.string().max(100).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 const verifyPaymentSchema = z.object({

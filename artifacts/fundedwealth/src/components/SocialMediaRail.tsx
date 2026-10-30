@@ -127,6 +127,9 @@ export default function SocialMediaRail() {
             <img
               src="/logo.png"
               alt="FundedWealth logo"
+              width={256}
+              height={256}
+              decoding="async"
               className="w-7 h-7 rounded-lg object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(74,0,224,0.9)] group-hover:scale-110"
             />
           </a>

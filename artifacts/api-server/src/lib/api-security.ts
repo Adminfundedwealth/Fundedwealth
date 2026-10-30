@@ -21,7 +21,7 @@ export function validateBody<T extends ZodSchema>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      const errors = result.error.errors.map((e) => ({
+      const errors = result.error.issues.map((e) => ({
         field: e.path.join("."),
         message: e.message,
       }));
@@ -42,7 +42,7 @@ export function validateQuery<T extends ZodSchema>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.query);
     if (!result.success) {
-      const errors = result.error.errors.map((e) => ({
+      const errors = result.error.issues.map((e) => ({
         field: e.path.join("."),
         message: e.message,
       }));
@@ -51,7 +51,7 @@ export function validateQuery<T extends ZodSchema>(schema: T) {
         details: errors,
       });
     }
-    req.query = result.data;
+    req.query = result.data as Request["query"];
     next();
   };
 }

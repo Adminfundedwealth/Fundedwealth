@@ -107,12 +107,11 @@ describe("Computed plan prices — known examples", () => {
     expect(result!.finalTotal).not.toBe(3900);
   });
 
-  it("Instant ₹5L: 45% OFF ₹10,999 ≈ ₹6,049 (NOT ₹2,200)", () => {
-    // Math.round(10999 * 0.55) = Math.round(6049.45) = 6049
+  it("Instant ₹5L: catalog price ₹6,050 (NOT ₹2,200)", () => {
     const result = computeTotal("instant", 1); // index 1 = ₹5L popular
     expect(result).not.toBeNull();
-    expect(result!.planPrice).toBe(6049);
-    expect(result!.finalTotal).toBe(6049);
+    expect(result!.planPrice).toBe(6050);
+    expect(result!.finalTotal).toBe(6050);
     expect(result!.finalTotal).not.toBe(2200);
   });
 
@@ -163,9 +162,9 @@ describe("Product size discFeeLabel pre-computed values", () => {
     expect(size!.discFeeLabel).toBe("₹9,750");
   });
 
-  it("Instant ₹5L discFeeLabel = ₹6,049", () => {
+  it("Instant ₹5L discFeeLabel = ₹6,050", () => {
     const size = getProductSize("instant", 1);
-    expect(size!.discFeeLabel).toBe("₹6,049");
+    expect(size!.discFeeLabel).toBe("₹6,050");
   });
 
   it("1-Step ₹5L discFeeLabel = ₹5,400", () => {

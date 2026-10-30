@@ -83,7 +83,7 @@ const REJECTION_REASONS = [
 
 const rejectSchema = z.object({
   rejectionReason: z.enum(REJECTION_REASONS, {
-    errorMap: () => ({ message: "A structured rejection reason is required" }),
+    error: "A structured rejection reason is required",
   }),
   rejectionNote: z.string().optional(),
 });
@@ -152,7 +152,7 @@ router.post("/cases", async (req: Request, res: Response) => {
 
   const parsed = createCaseSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.errors[0].message });
+    return res.status(400).json({ error: parsed.error.issues[0].message });
   }
 
   const d = parsed.data;
@@ -437,7 +437,7 @@ router.patch("/cases/:id/request-info", async (req: Request, res: Response) => {
   if (!hasRole(admin, FINANCE_ROLES)) return res.status(403).json({ error: "Finance role required" });
 
   const parsed = requestInfoSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
 
   try {
     const [existing] = await db
@@ -498,7 +498,7 @@ router.patch("/cases/:id/approve", async (req: Request, res: Response) => {
   if (!hasRole(admin, FINANCE_ROLES)) return res.status(403).json({ error: "Finance role required" });
 
   const parsed = approveSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
 
   try {
     const [existing] = await db
@@ -560,7 +560,7 @@ router.patch("/cases/:id/reject", async (req: Request, res: Response) => {
   if (!hasRole(admin, FINANCE_ROLES)) return res.status(403).json({ error: "Finance role required" });
 
   const parsed = rejectSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
 
   try {
     const [existing] = await db
@@ -621,7 +621,7 @@ router.patch("/cases/:id/process", async (req: Request, res: Response) => {
   if (!hasRole(admin, FINANCE_ROLES)) return res.status(403).json({ error: "Finance role required" });
 
   const parsed = processSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
 
   try {
     const [existing] = await db
@@ -687,7 +687,7 @@ router.patch("/cases/:id/complete", async (req: Request, res: Response) => {
   if (!hasRole(admin, FINANCE_ROLES)) return res.status(403).json({ error: "Finance role required" });
 
   const parsed = completeSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
 
   try {
     const [existing] = await db
@@ -762,7 +762,7 @@ router.patch("/cases/:id/fail", async (req: Request, res: Response) => {
   if (!hasRole(admin, FINANCE_ROLES)) return res.status(403).json({ error: "Finance role required" });
 
   const parsed = failSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.issues[0].message });
 
   try {
     const [existing] = await db

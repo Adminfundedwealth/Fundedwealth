@@ -2,6 +2,22 @@ import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import SEOHead from "@/components/SEOHead";
 
+function getSafeRedirectDestination(search: string, origin: string) {
+    const redirect = new URLSearchParams(search).get("redirect");
+    if (!redirect) return "/dashboard";
+
+    try {
+        const target = new URL(redirect, origin);
+        if (target.origin === origin) {
+            return `${target.pathname}${target.search}${target.hash}`;
+        }
+    } catch {
+        return "/dashboard";
+    }
+
+    return "/dashboard";
+}
+
 /**
  * Supabase may return either an implicit-flow token in the URL fragment or a
  * PKCE code in the query string, so handle both callback shapes.
@@ -18,7 +34,9 @@ export default function AuthCallbackPage() {
                     const { data: { session }, error } = await supabase.auth.getSession();
                     if (error) throw error;
                     if (session) {
-                        window.location.replace("/dashboard");
+                        window.location.replace(
+                            getSafeRedirectDestination(window.location.search, window.location.origin)
+                        );
                         return;
                     }
                 }
@@ -28,14 +46,18 @@ export default function AuthCallbackPage() {
                         window.location.href
                     );
                     if (error) throw error;
-                    window.location.replace("/dashboard");
+                    window.location.replace(
+                        getSafeRedirectDestination(window.location.search, window.location.origin)
+                    );
                     return;
                 }
 
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
                 if (session) {
-                    window.location.replace("/dashboard");
+                    window.location.replace(
+                        getSafeRedirectDestination(window.location.search, window.location.origin)
+                    );
                     return;
                 }
 

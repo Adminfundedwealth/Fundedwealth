@@ -554,8 +554,12 @@ const MiniTrophy = () => (
 
     {/* Trophy Image — requires transparent PNG */}
     <img
-      src="/fw-trophy.png"
+      src="/fw-trophy.webp"
       alt="FundedWealth Championship Trophy"
+      width={447}
+      height={558}
+      loading="lazy"
+      decoding="async"
       className="relative z-[2] object-contain"
       style={{
         width: 300,
@@ -715,7 +719,7 @@ const Navbar = () => {
       <header className={`sticky top-[34px] sm:top-[36px] left-0 right-0 z-40 border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.22)] backdrop-blur-xl transition-all duration-300 ${isScrolled ? 'bg-[#1A0030]/85 py-3' : 'bg-[#1A0030]/75 py-4'}`}>
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="/logo.png" alt="FundedWealth" className="h-10 w-10 rounded-lg" />
+            <img src="/logo.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-10 w-10 rounded-lg" />
             <span className="text-lg font-heading font-bold text-white tracking-tight hidden sm:inline xl:hidden 2xl:inline">Funded<span className="text-gradient">Wealth</span></span>
           </Link>
 
@@ -2690,7 +2694,7 @@ const LivePayoutTable = () => {
               Real-Time Payout Transactions
             </span>
             <span className="text-white/30 text-xs flex items-center gap-1.5">
-              <img src="/logo.png" alt="" className="w-4 h-4 rounded" />
+              <img src="/logo.png" alt="" width={256} height={256} decoding="async" className="w-4 h-4 rounded" />
               FundedWealth
             </span>
           </div>
@@ -4578,7 +4582,7 @@ const AffiliateModal = ({
           <div className="hidden md:flex flex-col justify-between w-[42%] shrink-0 bg-[#0f0020] p-10 rounded-l-2xl border-r border-white/10">
             <div>
               <div className="flex items-center gap-3 mb-8">
-                <img src="/logo.png" alt="FundedWealth" className="h-9 w-9 rounded-lg" />
+                <img src="/logo.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-9 w-9 rounded-lg" />
                 <span className="text-xl font-heading font-bold text-white">Funded<span className="text-fw-orange">Wealth</span></span>
               </div>
               <h2 className="text-2xl font-heading font-extrabold text-white mb-3 leading-snug">
@@ -4998,11 +5002,11 @@ const Affiliate = () => {
   ];
 
   const bonuses = [
-    { milestone: "30 Sales", title: "₹5,000 Cash", sub: "Instant bonus credited to your account", img: null },
-    { milestone: "75 Sales", title: "₹15,000 Cash", sub: "+ Priority affiliate support", img: null },
-    { milestone: "150 Sales", title: "iPhone 16", sub: "Brand new iPhone delivered to you!", img: "/reward-iphone.png" },
-    { milestone: "400 Sales", title: "MacBook", sub: "MacBook Pro as your reward", img: "/reward-macbook.png" },
-    { milestone: "800+ Sales", title: "Bike", sub: "Your dream bike — fully sponsored!", img: "/reward-bike.png" },
+    { milestone: "30 Sales", title: "₹5,000 Cash", sub: "Instant bonus credited to your account", img: null, imageSize: null },
+    { milestone: "75 Sales", title: "₹15,000 Cash", sub: "+ Priority affiliate support", img: null, imageSize: null },
+    { milestone: "150 Sales", title: "iPhone 16", sub: "Brand new iPhone delivered to you!", img: "/reward-iphone.webp", imageSize: { width: 500, height: 500 } },
+    { milestone: "400 Sales", title: "MacBook", sub: "MacBook Pro as your reward", img: "/reward-macbook.webp", imageSize: { width: 688, height: 363 } },
+    { milestone: "800+ Sales", title: "Bike", sub: "Your dream bike — fully sponsored!", img: "/reward-bike.webp", imageSize: { width: 500, height: 500 } },
   ];
 
   return (
@@ -5132,7 +5136,7 @@ const Affiliate = () => {
               <div key={b.milestone} className="glass-card rounded-2xl p-5 border border-white/10 flex flex-col gap-3 group hover:border-fw-orange/30 transition-colors">
                 {b.img ? (
                   <div className="w-full h-28 flex items-center justify-center mb-1 overflow-hidden rounded-xl bg-white/5">
-                    <img src={b.img} alt={b.title} className="h-24 w-auto object-contain group-hover:scale-110 transition-transform duration-500" />
+                    <img src={b.img} alt={b.title} width={b.imageSize?.width} height={b.imageSize?.height} loading="lazy" decoding="async" className="h-24 w-auto object-contain group-hover:scale-110 transition-transform duration-500" />
                   </div>
                 ) : (
                   <Trophy className="text-fw-orange" size={28} />
@@ -5333,7 +5337,7 @@ const MobileAppCTA = () => {
                       <div className="p-4 pt-10">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="w-8 h-8 rounded-lg bg-gradient-fw flex items-center justify-center">
-                            <img src="/logo.png" alt="" className="w-5 h-5 rounded" />
+                            <img src="/logo.png" alt="" width={256} height={256} decoding="async" className="w-5 h-5 rounded" />
                           </div>
                           <span className="text-white text-xs font-bold">FundedWealth</span>
                         </div>
@@ -5618,7 +5622,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-10">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-6">
-              <img src="/logo.png" alt="FundedWealth" className="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all duration-500" />
+              <img src="/logo.png" alt="FundedWealth" width={256} height={256} decoding="async" className="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all duration-500" />
               <span className="text-2xl font-heading font-bold text-white tracking-tight">Funded<span className="text-fw-orange">Wealth</span></span>
             </Link>
             <p className="text-white/50 max-w-sm mb-4 text-lg font-medium">
