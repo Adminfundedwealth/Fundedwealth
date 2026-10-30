@@ -3,20 +3,9 @@ import "./DiwaliCelebration.css";
 
 type CelebrationPhase = "fireworks" | "greeting" | "fading";
 
-const SESSION_KEY = "fundedwealth-diwali-2026-played";
+const SESSION_KEY = "fundedwealth-diwali-celebration-played";
 const WAIT_MS = 4_000;
 const CELEBRATION_MS = 7_000;
-
-export function isDiwaliCelebrationDate(now: Date = new Date()): boolean {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(now);
-  const date = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-  return date.year === "2026" && date.month === "11" && date.day === "10";
-}
 
 let hasPlayedInMemory = false;
 let sessionStorageUnavailable = false;
@@ -197,7 +186,7 @@ export default function DiwaliCelebration() {
   const [phase, setPhase] = useState<CelebrationPhase | null>(null);
 
   useEffect(() => {
-    if (!isDiwaliCelebrationDate() || wasPlayedThisSession()) return;
+    if (wasPlayedThisSession()) return;
 
     let remainingWait = WAIT_MS;
     let waitStartedAt = 0;
