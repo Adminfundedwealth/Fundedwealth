@@ -5736,6 +5736,26 @@ const Footer = () => {
 };
 
 export default function Home() {
+  const [secondaryContentReady, setSecondaryContentReady] = useState(false);
+
+  useEffect(() => {
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+    if (idleWindow.requestIdleCallback) {
+      const idleHandle = idleWindow.requestIdleCallback(
+        () => setSecondaryContentReady(true),
+        { timeout: 1200 },
+      );
+      return () => idleWindow.cancelIdleCallback?.(idleHandle);
+    }
+
+    const timeoutHandle = window.setTimeout(() => setSecondaryContentReady(true), 750);
+    return () => window.clearTimeout(timeoutHandle);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-fw-pink selection:text-white">
       <SEOHead
@@ -5750,33 +5770,37 @@ export default function Home() {
 
       <main>
         <Hero />
-        <IndianInstruments />
-        <WhyNIFTYFundedAccount />
-        <FWIndEdge />
-        <Plans />
-        <HowItWorksIND />
-        <Championship />
-        <TechAndBenefits />
-        <Guarantee />
-        <ImpactInitiative />
-        <PayoutsMadeSimple />
-        <TerminalMockup />
-        <Advantages />
-        <WhyChoose />
-        <Calculator />
-        <SmartScalingPlan />
-        <SEBIBrokers />
-        <Education />
-        <FAQ />
-        <Affiliate />
-        <MobileAppCTA />
-        <ContactUs />
-        <WhatPeopleSay />
+        {secondaryContentReady && (
+          <>
+            <IndianInstruments />
+            <WhyNIFTYFundedAccount />
+            <FWIndEdge />
+            <Plans />
+            <HowItWorksIND />
+            <Championship />
+            <TechAndBenefits />
+            <Guarantee />
+            <ImpactInitiative />
+            <PayoutsMadeSimple />
+            <TerminalMockup />
+            <Advantages />
+            <WhyChoose />
+            <Calculator />
+            <SmartScalingPlan />
+            <SEBIBrokers />
+            <Education />
+            <FAQ />
+            <Affiliate />
+            <MobileAppCTA />
+            <ContactUs />
+            <WhatPeopleSay />
+          </>
+        )}
       </main>
 
-      <Footer />
+      {secondaryContentReady && <Footer />}
 
-      <DiwaliCelebration />
+      {secondaryContentReady && <DiwaliCelebration />}
 
     </div>
   );
