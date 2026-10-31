@@ -32,8 +32,7 @@ export default function IndiaTraderNetworkHero() {
       {/* Background artwork */}
       <motion.img src="/maps/hero-artwork.webp" alt="" width={1529} height={754} fetchPriority="high" decoding="async" className="absolute inset-0 w-full h-full object-cover object-center z-[1]"
         style={{ x: imgX, y: imgY, scale: 1.03 }}
-        initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1.03 }}
-        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} draggable={false}
+        draggable={false}
       />
 
       {/* Star parallax + floating particles */}
