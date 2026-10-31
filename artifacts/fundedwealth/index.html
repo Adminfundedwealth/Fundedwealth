@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- GA4 is controlled by the React SPA route tracker below. -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-2JC3K2H68Y"
-    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       window.gtag = function () {
@@ -16,6 +12,23 @@
       };
       window.gtag("js", new Date());
       window.gtag("config", "G-2JC3K2H68Y", { send_page_view: false });
+
+      window.addEventListener("load", function () {
+        window.setTimeout(function () {
+          var loadAnalytics = function () {
+            var script = document.createElement("script");
+            script.async = true;
+            script.src = "https://www.googletagmanager.com/gtag/js?id=G-2JC3K2H68Y";
+            document.head.appendChild(script);
+          };
+
+          if (typeof window.requestIdleCallback === "function") {
+            window.requestIdleCallback(loadAnalytics, { timeout: 5000 });
+          } else {
+            loadAnalytics();
+          }
+        }, 1500);
+      }, { once: true });
     </script>
 
     <title data-seo-fallback="true">
