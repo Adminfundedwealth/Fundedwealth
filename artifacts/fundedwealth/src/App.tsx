@@ -164,6 +164,35 @@ function AnalyticsRouteTracker() {
     return null;
 }
 
+function DeferredSiteWidgets() {
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+        const idleWindow = window as Window & {
+            requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+            cancelIdleCallback?: (handle: number) => void;
+        };
+
+        if (idleWindow.requestIdleCallback) {
+            const idleHandle = idleWindow.requestIdleCallback(() => setReady(true), { timeout: 2500 });
+            return () => idleWindow.cancelIdleCallback?.(idleHandle);
+        }
+
+        const timeoutHandle = window.setTimeout(() => setReady(true), 1500);
+        return () => window.clearTimeout(timeoutHandle);
+    }, []);
+
+    if (!ready) return null;
+
+    return (
+        <>
+            <ChatWidget />
+            <WhatsAppButton />
+            <SocialMediaRail />
+        </>
+    );
+}
+
 function App() {
     return (
         <WouterRouter base={basePath}>
@@ -182,9 +211,7 @@ function App() {
                 }>
                                     <MobileShell>
                                         <AppRouter />
-                                        <ChatWidget />
-                                        <WhatsAppButton />
-                                        <SocialMediaRail />
+                                        <DeferredSiteWidgets />
                                     </MobileShell>
                                 </Suspense>
                                 <Toaster />
