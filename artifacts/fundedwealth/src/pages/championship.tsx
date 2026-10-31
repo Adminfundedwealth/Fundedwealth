@@ -6,6 +6,7 @@ import { BreadcrumbSchema } from "@/components/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getApiBase } from "@/lib/api-base";
+import { loadRazorpaySdk } from "@/lib/razorpay";
 
 const ChampionshipPage = () => {
   const [challenge, setChallenge] = useState<"weekly" | "monthly">("weekly");
@@ -168,6 +169,14 @@ const ChampionshipPage = () => {
         },
         modal: { ondismiss: () => { setRazorpayLoading(false); setRazorpayError("Payment cancelled. Try again."); } },
       };
+      try {
+        await loadRazorpaySdk();
+      } catch {
+        setRazorpayError("Razorpay payment SDK could not be loaded. Please try again.");
+        setRazorpayLoading(false);
+        return;
+      }
+
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", (r: any) => {
         setRazorpayError("Payment failed: " + (r.error?.description || "Unknown error"));

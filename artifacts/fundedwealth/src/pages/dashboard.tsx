@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { buildTerminalLaunchRequestBody } from "@/lib/terminalLaunchPayload";
 import { getApiBase } from "@/lib/api-base";
+import { loadRazorpaySdk } from "@/lib/razorpay";
 import { submitTerminalSSO } from "@/lib/terminalSSO";
 
 type Section =
@@ -3496,6 +3497,13 @@ export default function Dashboard({ initialSection }: { initialSection?: string 
           },
         },
       };
+
+      try {
+        await loadRazorpaySdk();
+      } catch {
+        alert("Razorpay payment SDK could not be loaded. Please try again.");
+        return;
+      }
 
       const rzp = new (window as any).Razorpay(options);
       rzp.open();

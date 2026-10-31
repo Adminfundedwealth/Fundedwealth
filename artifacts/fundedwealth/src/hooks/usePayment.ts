@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PlanType } from "../config/checkout";
 import { getApiBase } from "../lib/api-base";
+import { loadRazorpaySdk } from "../lib/razorpay";
 
 interface BillingInfo {
   firstName: string;
@@ -224,37 +225,12 @@ export const usePayment = (
           },
         },
       };
-      if (typeof (window as any).Razorpay === "undefined") {
-        // SDK may not have loaded yet (defer script) — try loading it dynamically
-        try {
-          await new Promise<void>((resolve, reject) => {
-            const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
-            if (existing) {
-              // Script tag exists but may still be loading — poll briefly
-              let attempts = 0;
-              const poll = setInterval(() => {
-                attempts++;
-                if (typeof (window as any).Razorpay !== "undefined") {
-                  clearInterval(poll);
-                  resolve();
-                } else if (attempts >= 20) {
-                  clearInterval(poll);
-                  reject(new Error("Razorpay SDK failed to load"));
-                }
-              }, 200);
-            } else {
-              const script = document.createElement("script");
-              script.src = "https://checkout.razorpay.com/v1/checkout.js";
-              script.onload = () => resolve();
-              script.onerror = () => reject(new Error("Razorpay SDK failed to load"));
-              document.head.appendChild(script);
-            }
-          });
-        } catch {
-          setRazorpayError("Razorpay payment SDK could not be loaded. Please refresh the page and try again.");
-          setRazorpayLoading(false);
-          return;
-        }
+      try {
+        await loadRazorpaySdk();
+      } catch {
+        setRazorpayError("Razorpay payment SDK could not be loaded. Please refresh the page and try again.");
+        setRazorpayLoading(false);
+        return;
       }
       const rzp = new (window as any).Razorpay(options);
       rzp.on("payment.failed", (response: any) => {
